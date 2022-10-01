@@ -4,7 +4,7 @@ import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
 import jakarta.persistence.Table
-import java.time.ZonedDateTime
+import java.util.*
 
 @Entity
 @Table(name="PROOF_PHOTOS")
@@ -18,6 +18,9 @@ class ProofPhoto(
     @Column
     val latitude: Float? = 0f,
 
+    /**
+     * Datum und Uhrzeit in UTC
+     */
     @Column
-    val dateTime: ZonedDateTime? = null
+    val date: Date? = null
 )

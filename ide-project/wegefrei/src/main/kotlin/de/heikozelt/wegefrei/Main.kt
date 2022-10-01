@@ -1,4 +1,6 @@
 import com.drew.imaging.ImageMetadataReader
+import com.drew.lang.GeoLocation
+import com.drew.metadata.exif.ExifSubIFDDirectory
 import com.drew.metadata.exif.GpsDirectory
 import de.heikozelt.wegefrei.DatabaseService
 import de.heikozelt.wegefrei.ImageFilenameFilter
@@ -8,6 +10,8 @@ import mu.KotlinLogging
 import org.w3c.dom.NamedNodeMap
 import org.w3c.dom.Node
 import java.io.File
+import java.time.ZonedDateTime
+import java.util.*
 import javax.imageio.ImageIO
 
 
@@ -57,19 +61,28 @@ fun scanForNewImages() {
 fun readPhoto(file: File): ProofPhoto? {
     var longitude: Float? = null
     var latitude: Float? = null
+    var date: Date? = null
     val metadata = ImageMetadataReader.readMetadata(file)
     log.debug("metadata: $metadata")
+
     val gpsDirs = metadata.getDirectoriesOfType(GpsDirectory::class.java)
     for(gpsDir in gpsDirs) {
-        val geoLocation = gpsDir.geoLocation
+        val geoLocation: GeoLocation? = gpsDir.geoLocation
         if(geoLocation != null && !geoLocation.isZero) {
             log.debug("longitude: ${geoLocation.longitude}, latitude: ${geoLocation.latitude}")
             longitude = geoLocation.longitude.toFloat()
             latitude = geoLocation.latitude.toFloat()
         }
     }
-    // todo dateTime
-    return ProofPhoto(file.name, longitude, latitude, null)
+    val exifDirs = metadata.getDirectoriesOfType(ExifSubIFDDirectory::class.java)
+    for(exifDir in exifDirs) {
+        date = exifDir.getDateOriginal()
+        if(date != null) {
+            log.debug("date: ${date}")
+        }
+    }
+
+    return ProofPhoto(file.name, longitude, latitude, date)
 }
 
 

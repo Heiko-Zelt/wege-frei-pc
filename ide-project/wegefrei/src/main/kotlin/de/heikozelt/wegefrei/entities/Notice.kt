@@ -1,63 +1,63 @@
 package de.heikozelt.wegefrei.entities
 
 import jakarta.persistence.*
-import java.time.ZonedDateTime
+import java.util.*
 
 @Entity
 @Table(name="NOTICES")
 class Notice(
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    val id: Int,
+    val id: Int? = 0,
 
     @Column
-    val countrySymbol: Double,
+    val countrySymbol: Double? = 0.0,
 
     @Column
-    val licensePlate: Double,
+    val licensePlate: Double? = 0.0,
 
     @Column
-    val carMake: String,
+    val carMake: String? = null,
 
     @Column
-    val color: String,
+    val color: String? = null,
 
     /**
      * west-east/x-position
      */
     @Column
-    val longitude: Float,
+    val longitude: Float? = null,
 
     /**
      * north-south/y-position
      */
     @Column
-    val latitude: Float,
+    val latitude: Float? = 0f,
 
     @Column
-    val street: String,
+    val street: String? = null,
 
     @Column
-    val zipCode: String,
+    val zipCode: String? = null,
 
     @Column
-    val town: String,
+    val town: String? = null,
 
     @Column
-    val dateTime: ZonedDateTime,
+    val date: Date? = null,
 
     @Column
-    val environmentalStickerMissing: Boolean,
+    val environmentalStickerMissing: Boolean = false,
 
     @Column
-    val vehicleInspectionExpired: Boolean,
+    val vehicleInspectionExpired: Boolean = false,
 
     @Column
-    val vehicleInspectionYear: Short,
+    val vehicleInspectionYear: Short = 0,
 
     @Column
-    val vehicleInspectionMonth: Byte,
+    val vehicleInspectionMonth: Byte = 0,
 
     @Column
-    val vehicleAbandoned: Boolean
+    val vehicleAbandoned: Boolean = false
 )
