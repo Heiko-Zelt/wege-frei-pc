@@ -1,0 +1,38 @@
+plugins {
+    id 'org.jetbrains.kotlin.jvm' version '1.7.10'
+    id 'application'
+}
+
+group = 'de.heikozelt'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.jxmapviewer:jxmapviewer2:2.6'
+    implementation 'io.github.microutils:kotlin-logging:2.1.23'
+    implementation 'org.slf4j:slf4j-api:1.7.36' // needed by kotlin-logging
+    implementation 'org.slf4j:slf4j-simple:1.7.36' // simple implementation of api
+    implementation 'org.hibernate:hibernate-core:6.1.3.Final'
+    implementation 'com.h2database:h2:2.1.214'
+    implementation 'com.drewnoakes:metadata-extractor:2.18.0'
+    testImplementation 'org.jetbrains.kotlin:kotlin-test'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+compileKotlin {
+    kotlinOptions.jvmTarget = '1.8'
+}
+
+compileTestKotlin {
+    kotlinOptions.jvmTarget = '1.8'
+}
+
+application {
+    mainClassName = 'MainKt'
+}
