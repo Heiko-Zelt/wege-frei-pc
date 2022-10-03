@@ -13,6 +13,7 @@ import java.awt.GridBagConstraints
 import java.awt.GridBagConstraints.BOTH
 import java.awt.GridBagConstraints.WEST
 import java.awt.GridBagLayout
+import java.util.*
 import javax.swing.*
 
 class MainFrame: JFrame("Wege frei!") {
@@ -26,7 +27,7 @@ class MainFrame: JFrame("Wege frei!") {
         val selectedPhoto1 = databaseService.getPhotoByFilename("20220301_184943.jpg")
         val selectedPhoto2 = databaseService.getPhotoByFilename("20220301_184952.jpg")
         val selectedPhoto3 = databaseService.getPhotoByFilename("20220301_185001.jpg")
-        val selectedPhotos = mutableSetOf<Photo>()
+        val selectedPhotos = TreeSet<Photo>()
         if(selectedPhoto1 != null) {
             selectedPhotos.add(selectedPhoto1)
         }

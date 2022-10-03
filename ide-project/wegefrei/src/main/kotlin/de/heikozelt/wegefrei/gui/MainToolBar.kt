@@ -2,19 +2,22 @@ package de.heikozelt.wegefrei.gui
 
 import de.heikozelt.wegefrei.log
 import de.heikozelt.wegefrei.scanForNewPhotos
+import mu.KotlinLogging
 import java.awt.event.ActionEvent
 import java.awt.event.ActionListener
 import javax.swing.ImageIcon
 import javax.swing.JButton
 import javax.swing.JToolBar
 
-class MainToolBar: JToolBar(), ActionListener {
+class MainToolBar: JToolBar() {
+
+    private val log = KotlinLogging.logger {}
     init {
         val scanButton = JButton()
         val scanImageURL = this::class.java.getResource("scan_icon.gif")
         //button.setActionCommand(UP)
         scanButton.toolTipText = "Scan"
-        scanButton.addActionListener(this)
+        scanButton.addActionListener { scanForNewPhotos() }
         if(scanImageURL != null) {
             scanButton.icon = ImageIcon(scanImageURL, "Scan")
         } else {
@@ -26,7 +29,7 @@ class MainToolBar: JToolBar(), ActionListener {
         val indexImageURL = this::class.java.getResource("index_icon.gif")
         //button.setActionCommand(UP)
         indexButton.toolTipText = "Übersicht"
-        //button.addActionListener(this)
+        indexButton.addActionListener{ log.debug("unhandled event")}
         if(indexImageURL != null) {
             indexButton.icon = ImageIcon(indexImageURL, "Übersicht")
         } else {
@@ -38,7 +41,7 @@ class MainToolBar: JToolBar(), ActionListener {
         val settingsImageURL = this::class.java.getResource("settings_icon.gif")
         //button.setActionCommand(UP)
         settingsButton.toolTipText = "Einstellungen"
-        //button.addActionListener(this)
+        settingsButton.addActionListener{ log.debug("unhandled event")}
         if(settingsImageURL != null) {
             settingsButton.icon = ImageIcon(settingsImageURL, "Einstellungen")
         } else {
@@ -50,7 +53,7 @@ class MainToolBar: JToolBar(), ActionListener {
         val helpImageURL = this::class.java.getResource("help_icon.gif")
         //button.setActionCommand(UP)
         helpButton.toolTipText = "Hilfe"
-        //button.addActionListener(this)
+        helpButton.addActionListener { log.debug("unhandled event") }
         if(helpImageURL != null) {
             helpButton.icon = ImageIcon(helpImageURL, "Hilfe")
         } else {
@@ -59,10 +62,4 @@ class MainToolBar: JToolBar(), ActionListener {
         add(helpButton)
     }
 
-    override fun actionPerformed(p0: ActionEvent?) {
-        when(p0?.actionCommand) {
-            "Scan" -> scanForNewPhotos()
-            else -> log.debug("unhandled event")
-        }
-    }
 }
