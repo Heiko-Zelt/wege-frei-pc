@@ -101,6 +101,12 @@ class SelectedPhotosPanel(private val mainFrame: MainFrame, var photos: TreeSet<
         }
     }
 
+    fun showBorder(photo: Photo) {
+        for(panel in miniSelectedPhotoPanels) {
+            panel.displayBorder(photo == panel.getPhoto())
+        }
+    }
+
     fun hideBorder() {
         for(panel in miniSelectedPhotoPanels) {
             panel.displayBorder(false)

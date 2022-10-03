@@ -21,7 +21,7 @@ class AllPhotosPanel(private val mainFrame: MainFrame, private var firstPhotoFil
         val backButton = JButton("<")
         add(backButton)
 
-        var photos = databaseService.getPhotos(firstPhotoFilename, 6)
+        var photos = databaseService.getPhotos(firstPhotoFilename, 20)
         for(photo in photos) {
             val active = !selectedPhotos.contains(photo)
             val miniPhotoPanel = MiniPhotoPanel(mainFrame, photo, active)
@@ -61,7 +61,14 @@ class AllPhotosPanel(private val mainFrame: MainFrame, private var firstPhotoFil
         }
     }
 
+    fun showBorder(photo: Photo) {
+        for(panel in miniPhotoPanels) {
+            panel.displayBorder(photo == panel.getPhoto())
+        }
+    }
+
     fun hideBorder() {
+        log.debug("hideBorder()")
         for(panel in miniPhotoPanels) {
             panel.displayBorder(false)
         }

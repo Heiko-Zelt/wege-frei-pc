@@ -88,7 +88,13 @@ class MainFrame: JFrame("Wege frei!") {
     fun selectPhoto(miniPhotoPanel: MiniPhotoPanel) {
         log.debug("select photo")
         allPhotosPanel.deactivatePhoto(miniPhotoPanel)
-        selectedPhotosPanel.addPhoto(miniPhotoPanel.getPhoto())
+        val photo = miniPhotoPanel.getPhoto()
+        selectedPhotosPanel.addPhoto(photo)
+        log.debug("selected photo: $photo")
+        log.debug("zoomed photo: ${zoomPanel.getMaxiPhoto()}")
+        zoomPanel.showSelectedPhoto(photo)
+        allPhotosPanel.hideBorder()
+        selectedPhotosPanel.showBorder(photo)
     }
 
     /**
@@ -98,6 +104,11 @@ class MainFrame: JFrame("Wege frei!") {
         log.debug("select photo")
         allPhotosPanel.deactivatePhoto(photo)
         selectedPhotosPanel.addPhoto(photo)
+        log.debug("selected photo: $photo")
+        log.debug("zoomed photo: ${zoomPanel.getMaxiPhoto()}")
+        zoomPanel.showSelectedPhoto(photo)
+        allPhotosPanel.hideBorder()
+        selectedPhotosPanel.showBorder(photo)
     }
 
     /**
@@ -107,6 +118,10 @@ class MainFrame: JFrame("Wege frei!") {
         log.debug("unselect photo")
         selectedPhotosPanel.removePhoto(photoPanel)
         allPhotosPanel.activatePhoto(photoPanel.getPhoto())
+        val photo = photoPanel.getPhoto()
+        zoomPanel.showPhoto(photo)
+        allPhotosPanel.showBorder(photo)
+        selectedPhotosPanel.hideBorder()
     }
 
     /**
@@ -116,6 +131,9 @@ class MainFrame: JFrame("Wege frei!") {
         log.debug("unselect photo")
         selectedPhotosPanel.removePhoto(photo)
         allPhotosPanel.activatePhoto(photo)
+        zoomPanel.showPhoto(photo)
+        allPhotosPanel.showBorder(photo)
+        selectedPhotosPanel.hideBorder()
     }
 
     /**

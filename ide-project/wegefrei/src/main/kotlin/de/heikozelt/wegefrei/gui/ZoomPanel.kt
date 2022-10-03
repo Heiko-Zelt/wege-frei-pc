@@ -3,18 +3,8 @@ package de.heikozelt.wegefrei.gui
 import de.heikozelt.wegefrei.entities.Photo
 import de.heikozelt.wegefrei.gui.MainFrame.Companion.ZOOM_PANEL_BACKGROUND
 import mu.KotlinLogging
-import org.jxmapviewer.JXMapViewer
-import org.jxmapviewer.OSMTileFactoryInfo
-import org.jxmapviewer.input.PanMouseInputListener
-import org.jxmapviewer.input.ZoomMouseWheelListenerCenter
-import org.jxmapviewer.viewer.*
 import java.awt.BorderLayout
 import java.awt.BorderLayout.CENTER
-import java.awt.Color.green
-import java.awt.Dimension
-import java.awt.GridBagConstraints
-import java.awt.GridBagLayout
-import javax.swing.JButton
 import javax.swing.JPanel
 
 class ZoomPanel(private var mainFrame: MainFrame): JPanel() {
@@ -98,5 +88,20 @@ class ZoomPanel(private var mainFrame: MainFrame): JPanel() {
         log.debug("add map")
         add(MaxiMap(), CENTER)
         revalidate()
+    }
+
+    fun getMaxiPhoto(): Photo? {
+        return if(componentCount == 1) {
+            val comp = getComponent(0)
+            if(comp is MaxiPhotoPanel) {
+                comp.getPhoto()
+            } else if(comp is MaxiSelectedPhotoPanel) {
+                comp.getPhoto()
+            } else {
+                null
+            }
+        } else {
+            null
+        }
     }
 }
