@@ -59,5 +59,11 @@ class Notice(
     val vehicleInspectionMonth: Byte = 0,
 
     @Column
-    val vehicleAbandoned: Boolean = false
+    val vehicleAbandoned: Boolean = false,
+
+    @ManyToMany
+    @JoinTable(name= "NOTICES_PHOTOS",
+    joinColumns = [JoinColumn(name = "id" /*, referencedColumnName = "filename" */) ],
+    inverseJoinColumns = [JoinColumn(name = "filename" /*, referencedColumnName = "id" */)])
+    val photos: Set<Photo>? = null
 )

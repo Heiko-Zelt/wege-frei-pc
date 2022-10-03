@@ -6,7 +6,7 @@
         <!-- Persistence provider -->
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
         <!-- Entity classes -->
-        <class>de.heikozelt.wegefrei.entities.ProofPhoto</class>
+        <class>de.heikozelt.wegefrei.entities.Photo</class>
         <class>de.heikozelt.wegefrei.entities.Notice</class>
         <properties>
             <property name="jakarta.persistence.jdbc.driver" value="org.h2.Driver" />

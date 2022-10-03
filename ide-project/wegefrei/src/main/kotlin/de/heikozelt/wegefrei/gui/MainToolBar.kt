@@ -1,7 +1,7 @@
-package de.heikozelt.wegefrei
+package de.heikozelt.wegefrei.gui
 
-import log
-import scanForNewImages
+import de.heikozelt.wegefrei.log
+import de.heikozelt.wegefrei.scanForNewPhotos
 import java.awt.event.ActionEvent
 import java.awt.event.ActionListener
 import javax.swing.ImageIcon
@@ -61,7 +61,7 @@ class MainToolBar: JToolBar(), ActionListener {
 
     override fun actionPerformed(p0: ActionEvent?) {
         when(p0?.actionCommand) {
-            "Scan" -> scanForNewImages()
+            "Scan" -> scanForNewPhotos()
             else -> log.debug("unhandled event")
         }
     }

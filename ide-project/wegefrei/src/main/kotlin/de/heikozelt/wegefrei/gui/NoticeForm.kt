@@ -1,26 +1,20 @@
-package de.heikozelt.wegefrei
+package de.heikozelt.wegefrei.gui
 
+import de.heikozelt.wegefrei.COLORS
+import de.heikozelt.wegefrei.COUNTRY_SYMBOLS
+import de.heikozelt.wegefrei.VEHICLE_MAKES
 import mu.KotlinLogging
-import org.jxmapviewer.JXMapViewer
-import org.jxmapviewer.OSMTileFactoryInfo
-import org.jxmapviewer.input.PanMouseInputListener
-import org.jxmapviewer.input.ZoomMouseWheelListenerCenter
-import org.jxmapviewer.viewer.*
-import java.awt.Dimension
 import java.awt.GridBagConstraints
 import java.awt.GridBagConstraints.BOTH
 import java.awt.GridBagConstraints.WEST
 import java.awt.GridBagLayout
 import javax.swing.*
 
-class MainFrame: JFrame("Wege frei!") {
+class NoticeForm: JPanel() {
 
     private val log = KotlinLogging.logger {}
 
     init {
-        defaultCloseOperation = JFrame.EXIT_ON_CLOSE;
-
-        //layout = GridLayout(0,2, 20, 20);
         layout = GridBagLayout();
         val constraints = GridBagConstraints()
         constraints.anchor = WEST
@@ -28,22 +22,14 @@ class MainFrame: JFrame("Wege frei!") {
         constraints.weightx=0.5
         constraints.weighty=0.1
 
-        constraints.gridx = 0
-        constraints.gridy = 0
-        constraints.gridwidth = 2
-        add(MainToolBar(), constraints)
-
         constraints.gridy++
         val countrySymbolLabel = JLabel("Länderkennzeichen:")
         constraints.gridx = 0
         constraints.gridwidth = 1
         add(countrySymbolLabel, constraints)
-        val countrySymbolTextField = JTextField()
-        //countrySymbolTextField.maximumSize = Dimension(100,10)
-        //countrySymbolTextField.minimumSize = Dimension(100,10)
-        //countrySymbolTextField.preferredSize = Dimension(100,10)
+        val countrySymbolComboBox = JComboBox(COUNTRY_SYMBOLS)
         constraints.gridx = 1
-        add(countrySymbolTextField, constraints)
+        add(countrySymbolComboBox, constraints)
 
         constraints.gridy++
         val licensePlateLabel = JLabel("Kfz-Kennzeichen:")
@@ -54,63 +40,28 @@ class MainFrame: JFrame("Wege frei!") {
         add(licensePlateTextField, constraints)
 
         constraints.gridy++
-        val carMakeLabel = JLabel("Automarke:")
+        val vehicleMakeLabel = JLabel("Fahrzeugmarke:")
         constraints.gridx = 0
-        add(carMakeLabel, constraints)
-        val carMakeTextField = JTextField()
+        add(vehicleMakeLabel, constraints)
+        val vehicleMakeComboBox = JComboBox(VEHICLE_MAKES)
         constraints.gridx = 1
-        add(carMakeTextField, constraints)
+        add(vehicleMakeComboBox, constraints)
 
         constraints.gridy++
         val colorLabel = JLabel("Farbe:")
         constraints.gridx = 0
         add(colorLabel, constraints)
-        val colorTextField = JTextField()
+        val colorComboBox = JComboBox(COLORS)
         constraints.gridx = 1
-        add(colorTextField, constraints)
+        add(colorComboBox, constraints)
 
         constraints.gridy++
         val coordinatesLabel = JLabel("Koordinaten:")
         constraints.gridx = 0
         add(coordinatesLabel, constraints)
-
-        val map = JXMapViewer()
-        val info = OSMTileFactoryInfo()
-        map.tileFactory = DefaultTileFactory(info)
-        val mm = PanMouseInputListener(map)
-        val mw = ZoomMouseWheelListenerCenter(map)
-        map.addMouseListener(mm)
-        map.addMouseMotionListener(mm)
-        map.addMouseWheelListener (mw)
-
-        val frankfurt = GeoPosition(50.11, 8.68)
-        val wiesbaden = GeoPosition(50, 5, 0, 8, 14, 0)
-        val mainz = GeoPosition(50, 0, 0, 8, 16, 0)
-
-        val fitPoints = HashSet<GeoPosition>()
-        fitPoints.add(frankfurt)
-        fitPoints.add(wiesbaden)
-        fitPoints.add(mainz)
-        log.debug("zoom: " + map.zoom)
-        map.size = Dimension(200,200)
-        map.zoomToBestFit(fitPoints, 0.9)
-        log.debug("zoom: " + map.zoom)
-
-        //map.zoom = 11 // kleine Zahl = Details, große Zahl = Übersicht
-        //map.addressLocation = frankfurt
-
-        val waypoints = HashSet<Waypoint>()
-        waypoints.add(DefaultWaypoint(frankfurt))
-        waypoints.add(DefaultWaypoint(wiesbaden))
-        waypoints.add(DefaultWaypoint(mainz))
-        val painter = WaypointPainter<Waypoint>()
-        painter.waypoints = waypoints
-        map.overlayPainter = painter
-        map.preferredSize = Dimension(200, 200)
-
         constraints.gridx = 1
         constraints.weighty= 1.0
-        add(map, constraints)
+        add(MiniMap(), constraints)
 
         constraints.gridy++
         val streetLabel = JLabel("Straße, Hausnr:")
@@ -183,4 +134,5 @@ class MainFrame: JFrame("Wege frei!") {
         setSize(700, 700)
         isVisible = true
     }
+
 }

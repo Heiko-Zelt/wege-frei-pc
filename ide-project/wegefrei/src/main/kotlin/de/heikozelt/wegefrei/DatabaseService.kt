@@ -1,9 +1,9 @@
 package de.heikozelt.wegefrei
 
-import de.heikozelt.wegefrei.entities.ProofPhoto
+import de.heikozelt.wegefrei.entities.Photo
 import jakarta.persistence.EntityManager
 import jakarta.persistence.Persistence
-import log
+import java.util.*
 
 
 class DatabaseService {
@@ -14,8 +14,8 @@ class DatabaseService {
         em = factory.createEntityManager()
     }
 
-    fun getImageByFilename(filename: String): ProofPhoto? {
-        val photo = em.find(ProofPhoto::class.java, filename)
+    fun getPhotoByFilename(filename: String): Photo? {
+        val photo = em.find(Photo::class.java, filename)
         if(photo == null) {
             log.debug("image $filename not found in database")
         } else {
@@ -24,7 +24,16 @@ class DatabaseService {
         return photo
     }
 
-    fun addProofPhoto(photo: ProofPhoto) {
+    /**
+     * liefert ein sortiertes Set von Fotos
+     */
+    fun getPhotos(firstPhotoFilename: String, limit: Int): Set<Photo> {
+        val resultList: List<Photo> = em.createQuery("SELECT ph FROM Photo ph WHERE ph.filename >= :filename ORDER BY ph.filename", Photo::class.java)
+            .setParameter("filename", firstPhotoFilename).setMaxResults(limit).resultList
+        return TreeSet<Photo>(resultList)
+    }
+
+    fun addPhoto(photo: Photo) {
         //em.merge(photo)
         em.transaction.begin()
         em.persist(photo)

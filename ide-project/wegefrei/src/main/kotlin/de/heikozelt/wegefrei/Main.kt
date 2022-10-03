@@ -1,23 +1,37 @@
+package de.heikozelt.wegefrei
+
 import com.drew.imaging.ImageMetadataReader
 import com.drew.lang.GeoLocation
 import com.drew.metadata.exif.ExifSubIFDDirectory
 import com.drew.metadata.exif.GpsDirectory
-import de.heikozelt.wegefrei.DatabaseService
-import de.heikozelt.wegefrei.ImageFilenameFilter
-import de.heikozelt.wegefrei.MainFrame
-import de.heikozelt.wegefrei.entities.ProofPhoto
+import de.heikozelt.wegefrei.gui.MainFrame
+import de.heikozelt.wegefrei.entities.Photo
 import mu.KotlinLogging
-import org.w3c.dom.NamedNodeMap
-import org.w3c.dom.Node
 import java.io.File
-import java.time.ZonedDateTime
 import java.util.*
-import javax.imageio.ImageIO
-
 
 val log = KotlinLogging.logger {}
 
-val PATH = "/media/veracrypt1/_Fotos/2022/03"
+val PHOTO_DIR = "/media/veracrypt1/_Fotos/2022/03"
+
+val COLORS = arrayOf( "--", "blau", "braun", "gelb", "grau", "grün", "rot", "schwarz", "silber", "weiß")
+
+val COUNTRY_SYMBOLS = arrayOf("--", "A - Österreich", "AL - Albanien", "AND - Andorra", "B - Belgien", "BG - Bulgarien",
+    "BIH - Bosnien-Herzegowina", "BY - Belaruz", "CH - Schweiz", "CY - Zypern", "CZ - Tschechische Republik", "D - Deutschland")
+
+val VEHICLE_MAKES = arrayOf("--", "Abarth", "Alfa Romeo", "Aston Martin", "Audi",
+    "Bentley", "BMW", "Bugatti",
+    "Cadillac", "Chevrolet", "Chrysler", "Citroën", "Crysler",
+    "Dacia", "Daewoo", "Daihatsu", "Dodge", "DS", "Ducati",
+    "Ferrari", "Fiat", "Ford",
+    "Harley-Davidson", "Honda", "Hyundai",
+    "Isuzu", "Jaguar", "Jeep", "Kawasaki", "Kia", "KTM",
+    "Lada", "Lamborghini", "Lancia", "Land Rover", "Lexus", "Lotus",
+    "Maserati", "Mazda", "Mercedes", "MG", "Mini", "Mitsubishi", "Nissan", "Opel",
+    "Peugeot", "Piaggio", "Porsche", "Renault", "Rolls-Royce",
+    "Saab", "Scania", "Seat", "Škoda", "Smart", "SsangYong", "Subaru", "Suzuki",
+    "Tesla", "Toyota",
+    "Vauxhall", "Volkswagen", "Volvo", "Yamaha")
 
 val databaseService = DatabaseService()
 
@@ -30,27 +44,27 @@ fun main(args: Array<String>) {
 
     val f = MainFrame()
 
-    log.debug("main function finished")
+    log.debug("de.heikozelt.wegefrei.main function finished")
 }
 
-fun scanForNewImages() {
+fun scanForNewPhotos() {
     log.info("scanning for new images...")
 
-    val dir = File(PATH)
+    val dir = File(PHOTO_DIR)
     if (!dir.isDirectory) {
-        log.error(PATH + "ist kein Verzeichnis.")
+        log.error(PHOTO_DIR + "ist kein Verzeichnis.")
         return
     }
     val filenames = dir.list(ImageFilenameFilter())
     for (filename in filenames) {
         log.debug(filename)
-        if (databaseService.getImageByFilename(filename) == null) {
+        if (databaseService.getPhotoByFilename(filename) == null) {
             log.debug("image in filesystem is new")
 
-            val photo = readPhoto(File(PATH, filename))
+            val photo = readPhotoMetadata(File(PHOTO_DIR, filename))
             //    ProofPhoto(filename, null, null, null)
             if (photo != null) {
-                databaseService.addProofPhoto(photo)
+                databaseService.addPhoto(photo)
             }
         } else {
             log.debug("image in filesystem is already in database")
@@ -58,7 +72,7 @@ fun scanForNewImages() {
     }
 }
 
-fun readPhoto(file: File): ProofPhoto? {
+fun readPhotoMetadata(file: File): Photo? {
     var longitude: Float? = null
     var latitude: Float? = null
     var date: Date? = null
@@ -82,7 +96,7 @@ fun readPhoto(file: File): ProofPhoto? {
         }
     }
 
-    return ProofPhoto(file.name, longitude, latitude, date)
+    return Photo(file.name, longitude, latitude, date, null)
 }
 
 
