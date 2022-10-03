@@ -1,8 +1,11 @@
 package de.heikozelt.wegefrei.gui
 
+import de.heikozelt.wegefrei.gui.MainFrame.Companion.NO_BORDER
+import de.heikozelt.wegefrei.gui.MainFrame.Companion.TOOLBAR_BACKGROUND
 import de.heikozelt.wegefrei.log
 import de.heikozelt.wegefrei.scanForNewPhotos
 import mu.KotlinLogging
+import java.awt.Color
 import java.awt.event.ActionEvent
 import java.awt.event.ActionListener
 import javax.swing.ImageIcon
@@ -13,6 +16,10 @@ class MainToolBar: JToolBar() {
 
     private val log = KotlinLogging.logger {}
     init {
+        background = TOOLBAR_BACKGROUND
+        isFloatable = false
+        border = NO_BORDER
+
         val scanButton = JButton()
         val scanImageURL = this::class.java.getResource("scan_icon.gif")
         //button.setActionCommand(UP)

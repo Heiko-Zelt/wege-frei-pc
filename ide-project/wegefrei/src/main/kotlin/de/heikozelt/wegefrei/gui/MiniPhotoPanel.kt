@@ -1,19 +1,22 @@
 package de.heikozelt.wegefrei.gui
 
 import de.heikozelt.wegefrei.entities.Photo
+import de.heikozelt.wegefrei.gui.MainFrame.Companion.ALL_PHOTOS_BACKGROUND
+import de.heikozelt.wegefrei.gui.MainFrame.Companion.HIGHLIGHT_BORDER
+import de.heikozelt.wegefrei.gui.MainFrame.Companion.NORMAL_BORDER
 import mu.KotlinLogging
 import java.awt.Image
 import java.awt.Toolkit
 import java.awt.image.FilteredImageSource
 import javax.swing.*
 
-class PhotoPanel(private val mainFrame: MainFrame, private val photo: Photo, private var active: Boolean): JPanel() {
+class MiniPhotoPanel(private val mainFrame: MainFrame, private val photo: Photo, private var active: Boolean): JPanel() {
 
     private val log = KotlinLogging.logger {}
-
     private val thumbnailLabel: JLabel
-
+    private val mouseListener: MiniPhotoPanelMouseListener
     private val addButton: JButton
+    private var borderVisible = false
 
     private fun makeThumbnailImage(): Image? {
         var scaledImg = photo.getImage()?.getScaledInstance(150,100, Image.SCALE_SMOOTH)
@@ -27,6 +30,7 @@ class PhotoPanel(private val mainFrame: MainFrame, private val photo: Photo, pri
     }
 
     init {
+        background = ALL_PHOTOS_BACKGROUND
         layout = BoxLayout(this, BoxLayout.Y_AXIS);
 
         //val file = File(PHOTO_DIR, photo.filename)
@@ -39,8 +43,14 @@ class PhotoPanel(private val mainFrame: MainFrame, private val photo: Photo, pri
         } else {
             JLabel(ImageIcon(thumbnailImage))
         }
+
         thumbnailLabel.toolTipText = "<html>${photo.filename}<br>${photo?.getDateFormatted()}<br>${photo?.latitude}, ${photo?.longitude}</html>"
         thumbnailLabel.alignmentX = CENTER_ALIGNMENT
+        thumbnailLabel.border = NORMAL_BORDER
+        mouseListener = MiniPhotoPanelMouseListener(mainFrame, this)
+        if(active) {
+            thumbnailLabel.addMouseListener(mouseListener)
+        }
         add(thumbnailLabel)
 
         addButton = JButton("+")
@@ -63,6 +73,7 @@ class PhotoPanel(private val mainFrame: MainFrame, private val photo: Photo, pri
             thumbnailLabel.icon = ImageIcon(thumbnailImage)
         }
         addButton.isEnabled = true
+        thumbnailLabel.addMouseListener(mouseListener)
         log.debug("activate")
     }
 
@@ -71,8 +82,21 @@ class PhotoPanel(private val mainFrame: MainFrame, private val photo: Photo, pri
         val thumbnailImage = makeThumbnailImage()
         if(thumbnailImage != null) {
             thumbnailLabel.icon = ImageIcon(thumbnailImage)
+            thumbnailLabel.removeMouseListener(mouseListener)
         }
         addButton.isEnabled = false
         log.debug("deactivate")
+    }
+
+    fun displayBorder(visible: Boolean) {
+        if(visible && !borderVisible) {
+            thumbnailLabel.border = HIGHLIGHT_BORDER
+            thumbnailLabel.revalidate()
+            borderVisible = true
+        } else if(!visible && borderVisible) {
+            thumbnailLabel.border = NORMAL_BORDER
+            thumbnailLabel.revalidate()
+            borderVisible = false
+        }
     }
 }

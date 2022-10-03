@@ -1,68 +1,102 @@
 package de.heikozelt.wegefrei.gui
 
+import de.heikozelt.wegefrei.entities.Photo
+import de.heikozelt.wegefrei.gui.MainFrame.Companion.ZOOM_PANEL_BACKGROUND
 import mu.KotlinLogging
 import org.jxmapviewer.JXMapViewer
 import org.jxmapviewer.OSMTileFactoryInfo
 import org.jxmapviewer.input.PanMouseInputListener
 import org.jxmapviewer.input.ZoomMouseWheelListenerCenter
 import org.jxmapviewer.viewer.*
+import java.awt.BorderLayout
+import java.awt.BorderLayout.CENTER
+import java.awt.Color.green
 import java.awt.Dimension
 import java.awt.GridBagConstraints
 import java.awt.GridBagLayout
 import javax.swing.JButton
 import javax.swing.JPanel
 
-class ZoomPanel: JPanel() {
+class ZoomPanel(private var mainFrame: MainFrame): JPanel() {
 
     private val log = KotlinLogging.logger {}
 
     init {
-        layout = GridBagLayout();
-        val constraints = GridBagConstraints()
-        constraints.anchor = GridBagConstraints.CENTER
-        constraints.fill = GridBagConstraints.BOTH
-        constraints.gridx = 0
-        constraints.gridy = 0
+        background = ZOOM_PANEL_BACKGROUND
+        border = MainFrame.NO_BORDER
+        layout = BorderLayout();
+        showNothing()
+    }
 
-        val map = JXMapViewer()
-        val info = OSMTileFactoryInfo()
-        map.tileFactory = DefaultTileFactory(info)
-        val mm = PanMouseInputListener(map)
-        val mw = ZoomMouseWheelListenerCenter(map)
-        map.addMouseListener(mm)
-        map.addMouseMotionListener(mm)
-        map.addMouseWheelListener (mw)
+    fun showNothing() {
+        if (componentCount == 1) {
+            remove(0)
+            revalidate()
+        }
+    }
 
-        val frankfurt = GeoPosition(50.11, 8.68)
-        val wiesbaden = GeoPosition(50, 5, 0, 8, 14, 0)
-        val mainz = GeoPosition(50, 0, 0, 8, 16, 0)
+    fun showPhoto(photo: Photo) {
+        log.debug("show photo")
+        if (componentCount == 1) {
+            val comp = getComponent(0)
+            if (comp is MaxiPhotoPanel) {
+                if (comp.getPhoto() != photo) {
+                    remove(0)
+                    addPhoto(photo)
+                }
+            } else {
+                remove(0)
+                addPhoto(photo)
+            }
+        } else {
+            addPhoto(photo)
+        }
+    }
 
-        val fitPoints = HashSet<GeoPosition>()
-        fitPoints.add(frankfurt)
-        fitPoints.add(wiesbaden)
-        fitPoints.add(mainz)
-        log.debug("zoom: " + map.zoom)
-        map.size = Dimension(200,200)
-        map.zoomToBestFit(fitPoints, 0.9)
-        log.debug("zoom: " + map.zoom)
+    private fun addPhoto(photo: Photo) {
+        log.debug("add photo")
+        add(MaxiPhotoPanel(mainFrame, photo))
+        revalidate()
+    }
 
-        //map.zoom = 11 // kleine Zahl = Details, große Zahl = Übersicht
-        //map.addressLocation = frankfurt
+    fun showSelectedPhoto(photo: Photo) {
+        log.debug("show selected photo")
+        if (componentCount == 1) {
+            val comp = getComponent(0)
+            if (comp is MaxiSelectedPhotoPanel) {
+                if (comp.getPhoto() != photo) {
+                    remove(0)
+                    addSelectedPhoto(photo)
+                }
+            } else {
+                remove(0)
+                addSelectedPhoto(photo)
+            }
+        } else {
+            addSelectedPhoto(photo)
+        }
+    }
 
-        val waypoints = HashSet<Waypoint>()
-        waypoints.add(DefaultWaypoint(frankfurt))
-        waypoints.add(DefaultWaypoint(wiesbaden))
-        waypoints.add(DefaultWaypoint(mainz))
-        val painter = WaypointPainter<Waypoint>()
-        painter.waypoints = waypoints
-        map.overlayPainter = painter
-        map.preferredSize = Dimension(200, 200)
+    private fun addSelectedPhoto(photo: Photo) {
+        log.debug("add selected photo")
+        add(MaxiSelectedPhotoPanel(mainFrame, photo))
+        revalidate()
+    }
 
-        constraints.weighty= 1.0
-        add(map, constraints)
+    fun showMap() {
+        if (componentCount == 1) {
+            if (getComponent(0) !is MaxiMap) {
+                remove(0)
+                addMap()
+            }
+        } else {
+            addMap()
+        }
+    }
 
-        constraints.weighty= 0.1
-        constraints.gridy = 1
-        add(JButton("übernehmen"), constraints)
+    private fun addMap() {
+        log.debug("add map")
+        add(MaxiMap(), CENTER)
+        revalidate()
     }
 }

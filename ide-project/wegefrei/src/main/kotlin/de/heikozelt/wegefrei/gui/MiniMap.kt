@@ -7,19 +7,23 @@ import org.jxmapviewer.input.PanMouseInputListener
 import org.jxmapviewer.input.ZoomMouseWheelListenerCenter
 import org.jxmapviewer.viewer.*
 import java.awt.Dimension
+import java.awt.event.MouseListener
+import javax.swing.event.MouseInputAdapter
 
-class MiniMap: JXMapViewer() {
+class MiniMap(private val mainFrame: MainFrame): JXMapViewer() {
 
     private val log = KotlinLogging.logger {}
 
     init {
         val info = OSMTileFactoryInfo()
         tileFactory = DefaultTileFactory(info)
-        val mm = PanMouseInputListener(this)
-        val mw = ZoomMouseWheelListenerCenter(this)
-        addMouseListener(mm)
-        addMouseMotionListener(mm)
-        addMouseWheelListener (mw)
+        //val mm = PanMouseInputListener(this)
+        //val mw = ZoomMouseWheelListenerCenter(this)
+        //addMouseListener(mm)
+        //addMouseMotionListener(mm)
+        //addMouseWheelListener (mw)
+
+        addMouseListener(MiniMapMouseListener(mainFrame))
 
         val frankfurt = GeoPosition(50.11, 8.68)
         val wiesbaden = GeoPosition(50, 5, 0, 8, 14, 0)
