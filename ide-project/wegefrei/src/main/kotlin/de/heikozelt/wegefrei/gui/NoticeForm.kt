@@ -17,6 +17,7 @@ import javax.swing.*
 class NoticeForm(private val mainFrame: MainFrame): JPanel() {
 
     private val log = KotlinLogging.logger {}
+    private val miniMap: MiniMap
 
     init {
         background = FORM_BACKGROUND
@@ -72,7 +73,8 @@ class NoticeForm(private val mainFrame: MainFrame): JPanel() {
         add(coordinatesLabel, constraints)
         constraints.gridx = 1
         constraints.weighty= 1.0
-        add(MiniMap(mainFrame), constraints)
+        miniMap = MiniMap(mainFrame)
+        add(miniMap, constraints)
 
         constraints.gridy++
         val streetLabel = JLabel("Straße, Hausnr:")
@@ -157,5 +159,7 @@ class NoticeForm(private val mainFrame: MainFrame): JPanel() {
         setSize(700, 700)
         isVisible = true
     }
-
+    fun getMiniMap(): MiniMap {
+        return miniMap
+    }
 }

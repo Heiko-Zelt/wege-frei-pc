@@ -123,6 +123,7 @@ class MainFrame: JFrame("Wege frei!") {
      */
     fun showMaxiMap() {
         log.debug("show maxi map")
+        noticeForm.getMiniMap().displayBorder(true)
         zoomPanel.showMap()
         allPhotosPanel.hideBorder()
         selectedPhotosPanel.hideBorder()
@@ -134,6 +135,7 @@ class MainFrame: JFrame("Wege frei!") {
     fun showPhoto(miniPhotoPanel: MiniPhotoPanel) {
         log.debug("show photo")
         zoomPanel.showPhoto(miniPhotoPanel.getPhoto())
+        noticeForm.getMiniMap().displayBorder(false)
         allPhotosPanel.showBorder(miniPhotoPanel)
         selectedPhotosPanel.hideBorder()
     }
@@ -144,13 +146,14 @@ class MainFrame: JFrame("Wege frei!") {
     fun showSelectedPhoto(miniSelectedPhotoPanel: MiniSelectedPhotoPanel) {
         log.debug("show selected photo")
         zoomPanel.showSelectedPhoto(miniSelectedPhotoPanel.getPhoto())
+        noticeForm.getMiniMap().displayBorder(false)
         allPhotosPanel.hideBorder()
         selectedPhotosPanel.showBorder(miniSelectedPhotoPanel)
     }
 
     companion object {
         val NORMAL_BORDER = BorderFactory.createLineBorder(Color.black)
-        val HIGHLIGHT_BORDER = BorderFactory.createLineBorder(Color.white)
+        val HIGHLIGHT_BORDER = BorderFactory.createLineBorder(Color.yellow)
         val NO_BORDER = BorderFactory.createEmptyBorder()
 
         val TEXT_COLOR = Color.white

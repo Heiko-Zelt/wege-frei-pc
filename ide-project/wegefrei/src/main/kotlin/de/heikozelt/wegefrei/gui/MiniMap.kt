@@ -1,5 +1,6 @@
 package de.heikozelt.wegefrei.gui
 
+import de.heikozelt.wegefrei.gui.MainFrame.Companion.NORMAL_BORDER
 import mu.KotlinLogging
 import org.jxmapviewer.JXMapViewer
 import org.jxmapviewer.OSMTileFactoryInfo
@@ -14,7 +15,11 @@ class MiniMap(private val mainFrame: MainFrame): JXMapViewer() {
 
     private val log = KotlinLogging.logger {}
 
+    private var borderVisible = false
+
     init {
+        border = NORMAL_BORDER
+
         val info = OSMTileFactoryInfo()
         tileFactory = DefaultTileFactory(info)
         //val mm = PanMouseInputListener(this)
@@ -49,5 +54,17 @@ class MiniMap(private val mainFrame: MainFrame): JXMapViewer() {
         painter.waypoints = waypoints
         overlayPainter = painter
         preferredSize = Dimension(200, 200)
+    }
+
+    fun displayBorder(visible: Boolean) {
+        if(visible && !borderVisible) {
+            border = MainFrame.HIGHLIGHT_BORDER
+            revalidate()
+            borderVisible = true
+        } else if(!visible && borderVisible) {
+            border = NORMAL_BORDER
+            revalidate()
+            borderVisible = false
+        }
     }
 }
