@@ -57,7 +57,7 @@ class MiniPhotoPanel(private val mainFrame: MainFrame, private val photo: Photo,
         addButton.alignmentX = CENTER_ALIGNMENT
         addButton.isEnabled = active
         addButton.addActionListener {
-           mainFrame.selectPhoto(this)
+           mainFrame.selectPhoto(photo)
         }
         add(addButton)
     }

@@ -1,5 +1,6 @@
 package de.heikozelt.wegefrei.gui
 
+import de.heikozelt.wegefrei.entities.Photo
 import de.heikozelt.wegefrei.gui.MainFrame.Companion.NORMAL_BORDER
 import mu.KotlinLogging
 import org.jxmapviewer.JXMapViewer
@@ -65,6 +66,13 @@ class MiniMap(private val mainFrame: MainFrame): JXMapViewer() {
             border = NORMAL_BORDER
             revalidate()
             borderVisible = false
+        }
+    }
+
+    fun addMarker(photo: Photo) {
+        val pos = photo.getGeoPosition()
+        if(pos != null) {
+            // todo: add marker
         }
     }
 }

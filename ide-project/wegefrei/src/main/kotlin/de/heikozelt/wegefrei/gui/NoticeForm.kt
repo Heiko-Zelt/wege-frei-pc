@@ -8,6 +8,7 @@ import de.heikozelt.wegefrei.gui.MainFrame.Companion.NO_BORDER
 import de.heikozelt.wegefrei.gui.MainFrame.Companion.TEXT_COLOR
 import mu.KotlinLogging
 import java.awt.Color
+import java.awt.Dimension
 import java.awt.GridBagConstraints
 import java.awt.GridBagConstraints.BOTH
 import java.awt.GridBagConstraints.WEST
@@ -25,7 +26,7 @@ class NoticeForm(private val mainFrame: MainFrame): JPanel() {
         layout = GridBagLayout();
         val constraints = GridBagConstraints()
         constraints.anchor = WEST
-        constraints.fill = BOTH
+        //constraints.fill = BOTH
         constraints.weightx=0.5
         constraints.weighty=0.1
 
@@ -44,7 +45,8 @@ class NoticeForm(private val mainFrame: MainFrame): JPanel() {
         licensePlateLabel.foreground = TEXT_COLOR
         constraints.gridx = 0
         add(licensePlateLabel, constraints)
-        val licensePlateTextField = JTextField()
+        val licensePlateTextField = JTextField(10)
+        //licensePlateTextField.size = Dimension(100, 20)
         constraints.gridx = 1
         add(licensePlateTextField, constraints)
 
@@ -82,7 +84,7 @@ class NoticeForm(private val mainFrame: MainFrame): JPanel() {
         constraints.gridx = 0
         constraints.weighty=0.1
         add(streetLabel, constraints)
-        val streetTextField = JTextField()
+        val streetTextField = JTextField(30)
         constraints.gridx = 1
         add(streetTextField, constraints)
 
@@ -91,7 +93,7 @@ class NoticeForm(private val mainFrame: MainFrame): JPanel() {
         zipCodeLabel.foreground = TEXT_COLOR
         constraints.gridx = 0
         add(zipCodeLabel, constraints)
-        val zipCodeTextField = JTextField()
+        val zipCodeTextField = JTextField(5)
         constraints.gridx = 1
         add(zipCodeTextField, constraints)
 
@@ -100,7 +102,7 @@ class NoticeForm(private val mainFrame: MainFrame): JPanel() {
         townLabel.foreground = TEXT_COLOR
         constraints.gridx = 0
         add(townLabel, constraints)
-        val townTextField = JTextField()
+        val townTextField = JTextField(30)
         constraints.gridx = 1
         add(townTextField, constraints)
 
@@ -109,7 +111,7 @@ class NoticeForm(private val mainFrame: MainFrame): JPanel() {
         offenseDateLabel.foreground = TEXT_COLOR
         constraints.gridx = 0
         add(offenseDateLabel, constraints)
-        val offenseDateTextField = JTextField()
+        val offenseDateTextField = JTextField(10)
         constraints.gridx = 1
         add(offenseDateTextField, constraints)
 
@@ -118,16 +120,16 @@ class NoticeForm(private val mainFrame: MainFrame): JPanel() {
         offenseTimeLabel.foreground = TEXT_COLOR
         constraints.gridx = 0
         add(offenseTimeLabel, constraints)
-        val offenseTimeTextField = JTextField()
+        val offenseTimeTextField = JTextField(5)
         constraints.gridx = 1
         add(offenseTimeTextField, constraints)
 
         constraints.gridy++
-        val durationLabel = JLabel("Dauer:")
+        val durationLabel = JLabel("Dauer (in Minuten):")
         durationLabel.foreground = TEXT_COLOR
         constraints.gridx = 0
         add(durationLabel, constraints)
-        val durationTextField = JTextField()
+        val durationTextField = JTextField(3)
         constraints.gridx = 1
         add(durationTextField, constraints)
 

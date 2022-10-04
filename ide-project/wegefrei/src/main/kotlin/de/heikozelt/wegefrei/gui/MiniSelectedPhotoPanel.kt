@@ -34,7 +34,7 @@ class MiniSelectedPhotoPanel(private val mainFrame: MainFrame, private val photo
         val removeButton = JButton("-")
         removeButton.alignmentX = CENTER_ALIGNMENT
         removeButton.addActionListener {
-           mainFrame?.unselectPhoto(this)
+           mainFrame?.unselectPhoto(photo)
         }
 
         add(removeButton)

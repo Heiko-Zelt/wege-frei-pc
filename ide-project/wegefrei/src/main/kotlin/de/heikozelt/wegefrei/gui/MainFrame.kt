@@ -49,7 +49,7 @@ class MainFrame: JFrame("Wege frei!") {
         constraints.anchor = WEST
         constraints.fill = BOTH
         constraints.weightx=1.0
-        constraints.weighty=0.06
+        constraints.weighty=0.04
 
         constraints.gridx = 0
         constraints.gridy = 0
@@ -58,7 +58,7 @@ class MainFrame: JFrame("Wege frei!") {
         add(mainToolBar, constraints)
 
         constraints.gridy++
-        constraints.weighty=0.17
+        constraints.weighty=0.18
         allPhotosPanel = AllPhotosPanel(this, "20220301_184943.jpg", selectedPhotos)
         add(allPhotosPanel, constraints)
 
@@ -84,7 +84,7 @@ class MainFrame: JFrame("Wege frei!") {
 
     /**
      * wählt ein Foto aus
-     */
+
     fun selectPhoto(miniPhotoPanel: MiniPhotoPanel) {
         log.debug("select photo")
         allPhotosPanel.deactivatePhoto(miniPhotoPanel)
@@ -96,6 +96,7 @@ class MainFrame: JFrame("Wege frei!") {
         allPhotosPanel.hideBorder()
         selectedPhotosPanel.showBorder(photo)
     }
+    */
 
     /**
      * wählt ein Foto aus
@@ -109,11 +110,11 @@ class MainFrame: JFrame("Wege frei!") {
         zoomPanel.showSelectedPhoto(photo)
         allPhotosPanel.hideBorder()
         selectedPhotosPanel.showBorder(photo)
+        noticeForm.getMiniMap().addMarker(photo)
     }
 
     /**
      * entfernt ein Foto aus der Auswahl für die Meldung
-     */
     fun unselectPhoto(photoPanel: MiniSelectedPhotoPanel) {
         log.debug("unselect photo")
         selectedPhotosPanel.removePhoto(photoPanel)
@@ -123,6 +124,7 @@ class MainFrame: JFrame("Wege frei!") {
         allPhotosPanel.showBorder(photo)
         selectedPhotosPanel.hideBorder()
     }
+    */
 
     /**
      * entfernt ein Foto aus der Auswahl für die Meldung

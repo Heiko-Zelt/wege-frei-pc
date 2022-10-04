@@ -3,6 +3,7 @@ package de.heikozelt.wegefrei.entities
 import de.heikozelt.wegefrei.PHOTO_DIR
 import de.heikozelt.wegefrei.readPhotoMetadata
 import jakarta.persistence.*
+import org.jxmapviewer.viewer.GeoPosition
 import java.awt.image.BufferedImage
 import java.io.File
 import java.text.SimpleDateFormat
@@ -18,11 +19,17 @@ class Photo (
     @Id
     val filename: String? = null,
 
-    @Column
-    val longitude: Float? = 0f,
-
+    /**
+     * Y-Achse, Richtung Norden, Breitengrad, z.B. 50.08 für Wiesbaden
+     */
     @Column
     val latitude: Float? = 0f,
+
+    /**
+     * X-Achse, Richtung Osten, Längengrad, z.B. 8.24 für Wiesbaden
+     */
+    @Column
+    val longitude: Float? = 0f,
 
     /**
      * Datum und Uhrzeit in UTC
@@ -70,6 +77,14 @@ class Photo (
 
     fun getDateFormatted(): String {
         return fmt.format(date)
+    }
+
+    fun getGeoPosition(): GeoPosition? {
+        return if(latitude != null && longitude != null) {
+            GeoPosition(latitude.toDouble(), longitude.toDouble())
+        } else {
+            null
+        }
     }
 
     companion object {
