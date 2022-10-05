@@ -15,12 +15,15 @@ class DatabaseService {
     }
 
     fun getPhotoByFilename(filename: String): Photo? {
+        log.debug("getPhotoByFilename($filename)")
         val photo = em.find(Photo::class.java, filename)
         if(photo == null) {
             log.debug("image $filename not found in database")
         } else {
             log.debug("image $filename found in database")
         }
+        log.debug("latitude: ${photo.latitude}")
+        log.debug("longitude: ${photo.longitude}")
         return photo
     }
 

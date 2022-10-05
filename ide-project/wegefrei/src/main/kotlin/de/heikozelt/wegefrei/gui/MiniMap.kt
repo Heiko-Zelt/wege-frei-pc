@@ -2,6 +2,7 @@ package de.heikozelt.wegefrei.gui
 
 import de.heikozelt.wegefrei.entities.Photo
 import de.heikozelt.wegefrei.gui.MainFrame.Companion.NORMAL_BORDER
+import de.heikozelt.wegefrei.model.SelectedPhotosObserver
 import mu.KotlinLogging
 import org.jxmapviewer.JXMapViewer
 import org.jxmapviewer.OSMTileFactoryInfo
@@ -9,17 +10,26 @@ import org.jxmapviewer.viewer.*
 import java.awt.Dimension
 import java.util.*
 import kotlin.collections.HashSet
+import kotlin.math.abs
+import kotlin.math.sqrt
 
-class MiniMap(private val mainFrame: MainFrame): JXMapViewer() {
+/**
+ * Beispiele für components:
+ * { } leer
+ * { photoMarker(0) } merkwürdiger Fall
+ * { addressMarker } keine Geo-Location in Photo? manuell gesetzt?
+ * { photoMarker(2), photoMarker(1), photoMarker(0) } merkwürdiger Fall
+ * { addressMarker, photoMarker(2), photoMarker(1), photoMarker(0) } Perfekter Use Case
+ * Sie werden in umgekehrter Reihenfolge gezeichnet.
+ * Letzter Marker unten, erster Marker ganz obendrauf.
+ */
+class MiniMap(private val mainFrame: MainFrame) : JXMapViewer(), SelectedPhotosObserver {
 
     private val log = KotlinLogging.logger {}
-
     private var borderVisible = false
-
-    //val waypoints = HashSet<Marker>()
-    private val photoMarkers = LinkedList<PhotoMarker>()
-    private val addressMarker: AddressMarker
     private val painter = MarkerPainter()
+    private val photoMarkers = LinkedList<PhotoMarker>()
+    private var addressMarker: AddressMarker? = null
 
     init {
         border = NORMAL_BORDER
@@ -29,34 +39,24 @@ class MiniMap(private val mainFrame: MainFrame): JXMapViewer() {
 
         addMouseListener(MiniMapMouseListener(mainFrame))
 
-        val frankfurt = GeoPosition(50.11, 8.68)
-        val wiesbaden = GeoPosition(50, 5, 0, 8, 14, 0)
-        val mainz = GeoPosition(50, 0, 0, 8, 16, 0)
-        val posi = GeoPosition(50.1, 8.5)
-
-        //map.zoom = 11 // kleine Zahl = Details, große Zahl = Übersicht
-        //map.addressLocation = frankfurt
-
-        addressMarker = AddressMarker(posi)
-        photoMarkers.add(PhotoMarker(0, frankfurt))
-        photoMarkers.add(PhotoMarker(1, wiesbaden))
-        photoMarkers.add(PhotoMarker(2, mainz))
-
         updatePainterWaypoints()
         overlayPainter = painter
 
-        add(addressMarker.getLabel())
+        val aM = addressMarker
+        if(aM != null) { // ist Anfangs immer null
+            add(aM.getLabel())
+        }
         val iterator = photoMarkers.descendingIterator()
-        while(iterator.hasNext()) {
+        while (iterator.hasNext()) { // wird nie durchlaufen
             add(iterator.next().getLabel())
         }
 
-        size = Dimension(150,150)
+        size = Dimension(150, 150)
         preferredSize = Dimension(150, 150)
 
-        fitToMarkers()
+        fitToMarkers() // es gibt Anfangs keine Markers
 
-        for(comp in components) {
+        for (comp in components) {
             log.debug("comp: $comp")
         }
     }
@@ -64,16 +64,19 @@ class MiniMap(private val mainFrame: MainFrame): JXMapViewer() {
     private fun updatePainterWaypoints() {
         val markers = mutableSetOf<Marker>()
         markers.addAll(photoMarkers)
-        markers.add(addressMarker)
+        val aM = addressMarker
+        if(aM != null) {
+            markers.add(aM)
+        }
         painter.waypoints = markers
     }
 
     fun displayBorder(visible: Boolean) {
-        if(visible && !borderVisible) {
+        if (visible && !borderVisible) {
             border = MainFrame.HIGHLIGHT_BORDER
             revalidate()
             borderVisible = true
-        } else if(!visible && borderVisible) {
+        } else if (!visible && borderVisible) {
             border = NORMAL_BORDER
             revalidate()
             borderVisible = false
@@ -81,66 +84,93 @@ class MiniMap(private val mainFrame: MainFrame): JXMapViewer() {
     }
 
     /**
-     * index zählt intern ab 0, in der Marker-Darstellung aber ab 1
+     * Observer-Methode
+     * index zählt intern ab 0, in der Marker-Darstellung aber ab "1"
      */
-    fun addMarker(index: Int, photo: Photo) {
+    override fun addedPhoto(index: Int, photo: Photo) {
+        log.debug("addedPhoto()")
         val pos = photo.getGeoPosition()
-        if(pos != null) {
+        if (pos != null) {
             log.debug("add waypoint")
             val marker = PhotoMarker(index, pos)
             photoMarkers.add(index, marker)
-            log.debug("number of photomarkers: " + photoMarkers.size)
-            add(marker.getLabel(), photoMarkers.size - index)
-            for(i in index + 1 until photoMarkers.size) {
+
+            log.debug("number of photo markers: " + photoMarkers.size)
+            var compIndex = componentCount - index
+            add(marker.getLabel(), compIndex)
+            for (i in index + 1 until photoMarkers.size) {
                 photoMarkers[i].updateText(i)
             }
             updatePainterWaypoints()
             updateAddressLocation()
             fitToMarkers()
             revalidate()
-            //repaint()
+            repaint()
         }
-        for(comp in components) {
+        for (comp in components) {
             log.debug("comp: $comp")
         }
     }
 
-    fun removeMarker(index: Int) {
+    /**
+     * Observer-Methode
+     */
+    override fun removedPhoto(index: Int, photo: Photo) {
         log.debug("remove waypoint")
         remove(photoMarkers[index].getLabel())
         photoMarkers.removeAt(index)
         log.debug("number of photo markers: " + photoMarkers.size)
-        for(i in index until photoMarkers.size) {
-           photoMarkers[i].updateText(i)
+        for (i in index until photoMarkers.size) {
+            photoMarkers[i].updateText(i)
         }
         updatePainterWaypoints()
         updateAddressLocation()
         fitToMarkers()
         revalidate()
         repaint()
-        for(comp in components) {
+        for (comp in components) {
             log.debug("comp: $comp")
         }
     }
 
     private fun fitToMarkers() {
-        if(photoMarkers.size > 1) {
-            log.debug("zoom: $zoom")
-            val fitPoints = HashSet<GeoPosition>()
-            for(marker in photoMarkers) {
-                fitPoints.add(marker.position)
+        // 2 identische Geo-Positionen können keine Bounding Box mit Ausdehnung bilden
+        // daher Set statt List
+        val fitPoints = HashSet<GeoPosition>()
+        for (marker in photoMarkers) {
+            fitPoints.add(marker.position)
+        }
+        val aM = addressMarker
+        if(aM != null) {
+            fitPoints.add(aM.position)
+        }
+
+        when (fitPoints.size) {
+            0 -> {
+                zoom = 15 // kleine Zahl = Details, große Zahl = Übersicht
+                addressLocation = GeoPosition(50.11, 8.68) // Frankfurt
             }
-            fitPoints.add(addressMarker.position)
-            zoomToBestFit(fitPoints, 0.8)
-            log.debug("zoom: $zoom")
-        } else {
-            // todo standard zoom level
+
+            1 -> {
+                zoom = 3 // kleine Zahl = Details, große Zahl = Übersicht
+                addressLocation = fitPoints.first()
+            }
+
+            else -> {
+                log.debug("zoom: $zoom")
+                zoomToBestFit(fitPoints, 0.4)
+                log.debug("zoom: $zoom")
+            }
         }
     }
 
+    /**
+     * setzt die Address-Position automatisch auf den Mittelpunkt
+     * der Foto-Geo-Koordinaten
+     */
     private fun updateAddressLocation() {
-        if(photoMarkers.size == 0) {
-            //todo adress marker löschen?
+        if (photoMarkers.size == 0) {
+            // todo: address marker entfernen, oder nicht?
         } else {
             val latitudes = mutableListOf<Double>()
             for (marker in photoMarkers)
@@ -153,7 +183,49 @@ class MiniMap(private val mainFrame: MainFrame): JXMapViewer() {
                 longitudes.add(marker.position.longitude)
             val newLongitude = longitudes.average()
             log.debug("newLongitude: $newLongitude")
-            addressMarker.position = GeoPosition(newLatitude, newLongitude)
+
+            val oldPosition = addressMarker?.position
+            val newPosition = GeoPosition(newLatitude, newLongitude)
+            val aM = addressMarker
+            if (aM == null) {
+                addressMarker = AddressMarker(newPosition)
+                addressMarker?.let {
+                    add(it.getLabel(), 0)
+                }
+            } else {
+                aM.position = newPosition
+            }
+
+            // aus Performance-Gründen:
+            // bei nur minimalen Abweichungen keine neu Addresse suchen
+            if (oldPosition == null || distance(oldPosition, newPosition) > NEARBY_DEGREES)
+                mainFrame.findAddress(newPosition)
+
         }
+    }
+
+    /**
+     * Berechnet die Distanz zwischen 2 Punkten nach dem Satz vom Pythagoras
+     * Die Erdkrümmung wird nicht berücksichtigt
+     * todo: die Erdkrümmung berücksichtigen
+     */
+    private fun distance(positionA: GeoPosition, positionB: GeoPosition): Double {
+        // a = betrag von ( A.longitudeA - B.longitude )
+        // b = betrag von ( A.latitude - B.latitude )
+        // c = wurzel aus ( a im quadrat + b im quadrat)
+        val a = abs(positionA.longitude - positionB.longitude)
+        val b = abs(positionA.latitude - positionA.latitude)
+        val c = sqrt(a * a + b * b)
+        val num1 = " %.7f".format(NEARBY_DEGREES)
+        val num2 = " %.7f".format(c)
+        log.debug("Schwellwert: $num1, distance = $num2")
+        return c
+    }
+
+    companion object {
+        private const val EARTH_CIRCUMFERENCE = 40_075_000.0 // meters
+        private const val WHOLE_CIRCLE = 360.0 // degrees
+        private const val NEARBY_METERS = 6.0 // meters
+        const val NEARBY_DEGREES = NEARBY_METERS * WHOLE_CIRCLE / EARTH_CIRCUMFERENCE
     }
 }

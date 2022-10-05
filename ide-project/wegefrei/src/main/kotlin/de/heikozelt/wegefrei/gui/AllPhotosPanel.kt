@@ -3,16 +3,22 @@ package de.heikozelt.wegefrei.gui
 import de.heikozelt.wegefrei.databaseService
 import de.heikozelt.wegefrei.entities.Photo
 import de.heikozelt.wegefrei.gui.MainFrame.Companion.ALL_PHOTOS_BACKGROUND
+import de.heikozelt.wegefrei.model.SelectedPhotos
+import de.heikozelt.wegefrei.model.SelectedPhotosObserver
 import mu.KotlinLogging
 import java.awt.Color
 import javax.swing.*
 import javax.swing.BoxLayout.X_AXIS
 
-class AllPhotosPanel(private val mainFrame: MainFrame, private var firstPhotoFilename: String, private var selectedPhotos: Set<Photo>): JPanel() {
+class AllPhotosPanel(
+    private val mainFrame: MainFrame,
+    private var firstPhotoFilename: String,
+    private val selectedPhotos: SelectedPhotos
+) : JPanel(), SelectedPhotosObserver {
 
     private val log = KotlinLogging.logger {}
 
-    val miniPhotoPanels = arrayListOf<MiniPhotoPanel>()
+    private val miniPhotoPanels = arrayListOf<MiniPhotoPanel>()
 
     init {
         background = ALL_PHOTOS_BACKGROUND
@@ -22,8 +28,8 @@ class AllPhotosPanel(private val mainFrame: MainFrame, private var firstPhotoFil
         add(backButton)
 
         var photos = databaseService.getPhotos(firstPhotoFilename, 20)
-        for(photo in photos) {
-            val active = !selectedPhotos.contains(photo)
+        for (photo in photos) {
+            val active = !selectedPhotos.getPhotos().contains(photo)
             val miniPhotoPanel = MiniPhotoPanel(mainFrame, photo, active)
             miniPhotoPanels.add(miniPhotoPanel)
             add(miniPhotoPanel)
@@ -34,43 +40,57 @@ class AllPhotosPanel(private val mainFrame: MainFrame, private var firstPhotoFil
     }
 
     private fun panelWithPhoto(photo: Photo): MiniPhotoPanel? {
-        for(photoPanel in miniPhotoPanels) {
-            if(photoPanel.getPhoto() == photo) {
+        for (photoPanel in miniPhotoPanels) {
+            if (photoPanel.getPhoto() == photo) {
                 return photoPanel
             }
         }
         return null
     }
 
-    fun activatePhoto(photo: Photo) {
+    private fun activatePhoto(photo: Photo) {
         log.debug("activate photo")
         panelWithPhoto(photo)?.activate()
     }
 
-    fun deactivatePhoto(miniPhotoPanel: MiniPhotoPanel) {
-        miniPhotoPanel.deactivate()
-    }
-
-    fun deactivatePhoto(photo: Photo) {
+    private fun deactivatePhoto(photo: Photo) {
         panelWithPhoto(photo)?.deactivate()
     }
 
     fun showBorder(miniPhotoPanel: MiniPhotoPanel) {
-        for(panel in miniPhotoPanels) {
+        for (panel in miniPhotoPanels) {
             panel.displayBorder(panel == miniPhotoPanel)
         }
     }
 
-    fun showBorder(photo: Photo) {
-        for(panel in miniPhotoPanels) {
+    private fun showBorder(photo: Photo) {
+        for (panel in miniPhotoPanels) {
             panel.displayBorder(photo == panel.getPhoto())
         }
     }
 
     fun hideBorder() {
         log.debug("hideBorder()")
-        for(panel in miniPhotoPanels) {
+        for (panel in miniPhotoPanels) {
             panel.displayBorder(false)
         }
+    }
+
+    /**
+     * Observer-Methode
+     */
+    override fun addedPhoto(index: Int, photo: Photo) {
+        log.debug("addedPhoto()")
+        hideBorder()
+        deactivatePhoto(photo)
+    }
+
+    /**
+     * Observer-Methode
+     */
+    override fun removedPhoto(index: Int, photo: Photo) {
+        log.debug("removedPhoto()")
+        showBorder(photo)
+        activatePhoto(photo)
     }
 }

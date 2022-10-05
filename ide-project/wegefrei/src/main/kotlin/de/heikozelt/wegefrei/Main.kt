@@ -28,7 +28,7 @@ val VEHICLE_MAKES = arrayOf("--", "Abarth", "Alfa Romeo", "Aston Martin", "Audi"
     "Isuzu", "Jaguar", "Jeep", "Kawasaki", "Kia", "KTM",
     "Lada", "Lamborghini", "Lancia", "Land Rover", "Lexus", "Lotus",
     "Maserati", "Mazda", "Mercedes", "MG", "Mini", "Mitsubishi", "Nissan", "Opel",
-    "Peugeot", "Piaggio", "Porsche", "Renault", "Rolls-Royce",
+    "Peugeot", "Piaggio", "Polestar", "Porsche", "Renault", "Rolls-Royce",
     "Saab", "Scania", "Seat", "Škoda", "Smart", "SsangYong", "Subaru", "Suzuki",
     "Tesla", "Toyota",
     "Vauxhall", "Volkswagen", "Volvo", "Yamaha")

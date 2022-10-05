@@ -6,6 +6,7 @@ import de.heikozelt.wegefrei.VEHICLE_MAKES
 import de.heikozelt.wegefrei.gui.MainFrame.Companion.FORM_BACKGROUND
 import de.heikozelt.wegefrei.gui.MainFrame.Companion.NO_BORDER
 import de.heikozelt.wegefrei.gui.MainFrame.Companion.TEXT_COLOR
+import de.heikozelt.wegefrei.model.SelectedPhotos
 import mu.KotlinLogging
 import java.awt.Color
 import java.awt.Dimension
@@ -15,12 +16,17 @@ import java.awt.GridBagConstraints.WEST
 import java.awt.GridBagLayout
 import javax.swing.*
 
-class NoticeForm(private val mainFrame: MainFrame): JPanel() {
+class NoticeForm(private val mainFrame: MainFrame, selectedPhotos: SelectedPhotos): JPanel() {
 
     private val log = KotlinLogging.logger {}
-    private val miniMap: MiniMap
+    private val miniMap = MiniMap(mainFrame)
+    private var streetTextField = JTextField(30)
+    private var zipCodeTextField = JTextField(5)
+    private var townTextField = JTextField(30)
 
     init {
+        selectedPhotos.registerObserver(miniMap)
+
         background = FORM_BACKGROUND
         border = NO_BORDER
         layout = GridBagLayout();
@@ -75,7 +81,7 @@ class NoticeForm(private val mainFrame: MainFrame): JPanel() {
         add(coordinatesLabel, constraints)
         constraints.gridx = 1
         constraints.weighty= 1.0
-        miniMap = MiniMap(mainFrame)
+
         add(miniMap, constraints)
 
         constraints.gridy++
@@ -84,7 +90,6 @@ class NoticeForm(private val mainFrame: MainFrame): JPanel() {
         constraints.gridx = 0
         constraints.weighty=0.1
         add(streetLabel, constraints)
-        val streetTextField = JTextField(30)
         constraints.gridx = 1
         add(streetTextField, constraints)
 
@@ -93,7 +98,6 @@ class NoticeForm(private val mainFrame: MainFrame): JPanel() {
         zipCodeLabel.foreground = TEXT_COLOR
         constraints.gridx = 0
         add(zipCodeLabel, constraints)
-        val zipCodeTextField = JTextField(5)
         constraints.gridx = 1
         add(zipCodeTextField, constraints)
 
@@ -102,7 +106,6 @@ class NoticeForm(private val mainFrame: MainFrame): JPanel() {
         townLabel.foreground = TEXT_COLOR
         constraints.gridx = 0
         add(townLabel, constraints)
-        val townTextField = JTextField(30)
         constraints.gridx = 1
         add(townTextField, constraints)
 
@@ -163,5 +166,17 @@ class NoticeForm(private val mainFrame: MainFrame): JPanel() {
     }
     fun getMiniMap(): MiniMap {
         return miniMap
+    }
+
+    fun setStreet(street: String) {
+        streetTextField.text = street
+    }
+
+    fun setZipCode(zipCode: String) {
+        zipCodeTextField.text = zipCode
+    }
+
+    fun setTown(town: String) {
+        townTextField.text = town
     }
 }
