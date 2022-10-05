@@ -36,6 +36,9 @@ class SelectedPhotosPanel(private val mainFrame: MainFrame, var photos: TreeSet<
         autoscrolls = true
     }
 
+    /**
+     * get Panel of Photo
+     */
     private fun panelWithPhoto(photo: Photo): MiniSelectedPhotoPanel? {
         for (photoPanel in miniSelectedPhotoPanels) {
             if (photoPanel.getPhoto() == photo) {
@@ -44,6 +47,18 @@ class SelectedPhotosPanel(private val mainFrame: MainFrame, var photos: TreeSet<
         }
         return null
     }
+
+    fun indexOfPhoto(photo: Photo): Int {
+        var i = 0
+        for (photoPanel in miniSelectedPhotoPanels) {
+            if (photoPanel.getPhoto() == photo) {
+                return i
+            }
+            i ++
+        }
+        return i
+    }
+
 
     private fun addPanel(panel: MiniSelectedPhotoPanel) {
         miniSelectedPhotoPanels.add(panel)

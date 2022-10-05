@@ -25,6 +25,13 @@ class MiniSelectedPhotoPanel(private val mainFrame: MainFrame, private val photo
         } else {
             JLabel(ImageIcon(scaledImg))
         }
+
+        /*
+        thumbnailLabel.text = "1"
+        thumbnailLabel.horizontalTextPosition = JLabel.CENTER;
+        thumbnailLabel.verticalTextPosition = JLabel.CENTER;
+         */
+
         thumbnailLabel.toolTipText = "<html>${photo.filename}<br>${photo.getDateFormatted()}<br>${photo.latitude}, ${photo.longitude}</html>"
         thumbnailLabel.alignmentX = CENTER_ALIGNMENT
         thumbnailLabel.border = MainFrame.NORMAL_BORDER

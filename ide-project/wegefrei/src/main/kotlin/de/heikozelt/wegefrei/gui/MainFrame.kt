@@ -110,7 +110,8 @@ class MainFrame: JFrame("Wege frei!") {
         zoomPanel.showSelectedPhoto(photo)
         allPhotosPanel.hideBorder()
         selectedPhotosPanel.showBorder(photo)
-        noticeForm.getMiniMap().addMarker(photo)
+        val index = selectedPhotosPanel.indexOfPhoto(photo)
+        noticeForm.getMiniMap().addMarker(index, photo)
     }
 
     /**
@@ -131,6 +132,8 @@ class MainFrame: JFrame("Wege frei!") {
      */
     fun unselectPhoto(photo: Photo) {
         log.debug("unselect photo")
+        val index = selectedPhotosPanel.indexOfPhoto(photo)
+        noticeForm.getMiniMap().removeMarker(index)
         selectedPhotosPanel.removePhoto(photo)
         allPhotosPanel.activatePhoto(photo)
         zoomPanel.showPhoto(photo)
@@ -177,6 +180,7 @@ class MainFrame: JFrame("Wege frei!") {
         val NO_BORDER = BorderFactory.createEmptyBorder()
 
         val TEXT_COLOR = Color.white
+        val PHOTO_MARKER_BACKGROUND = Color(101, 162, 235)
 
         val TOOLBAR_BACKGROUND = Color(50, 50, 50)
         val ALL_PHOTOS_BACKGROUND = Color(20, 20, 20)
