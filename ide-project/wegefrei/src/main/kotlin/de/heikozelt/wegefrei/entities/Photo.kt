@@ -20,16 +20,18 @@ class Photo (
     val filename: String? = null,
 
     /**
-     * Y-Achse, Richtung Norden, Breitengrad, z.B. 50.08 für Wiesbaden
+     * Breitengrad der Foto-Metadaten
+     * Y-Achse, Richtung Norden, z.B. 50.08 für Wiesbaden
      */
     @Column
-    val latitude: Float? = 0f,
+    val latitude: Float? = null,
 
     /**
-     * X-Achse, Richtung Osten, Längengrad, z.B. 8.24 für Wiesbaden
+     * Längengrad der Foto-Metadaten
+     * X-Achse, Richtung Osten, z.B. 8.24 für Wiesbaden
      */
     @Column
-    val longitude: Float? = 0f,
+    val longitude: Float? = null,
 
     /**
      * Datum und Uhrzeit in UTC

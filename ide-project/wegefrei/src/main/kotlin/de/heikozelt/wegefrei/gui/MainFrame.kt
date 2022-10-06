@@ -2,6 +2,7 @@ package de.heikozelt.wegefrei.gui
 
 import com.beust.klaxon.Klaxon
 import de.heikozelt.wegefrei.databaseService
+import de.heikozelt.wegefrei.entities.Notice
 import de.heikozelt.wegefrei.entities.Photo
 import de.heikozelt.wegefrei.json.NominatimResponse
 import de.heikozelt.wegefrei.model.SelectedPhotos
@@ -18,9 +19,14 @@ import javax.swing.*
 
 /**
  * Haupt-Fenster zum Bearbeiten einer Meldung
- * mit Dispatcher-Funktionen
+ * (mit Dispatcher-Funktionen)
+ * Instanziierung
+ * <ol>
+ *   <li>ohne Parameter zum Bearbeiten einer neuen Meldung. notice.id ist null.</li>
+ *   <li>Instanziierung mit Notice als Parameter zum Bearbeiten einer bestehenden Meldung. notice.id enthält eine Zahl.</li>
+ * </ol>
  */
-class MainFrame : JFrame("Wege frei!") {
+class MainFrame(private val notice: Notice = Notice()) : JFrame() {
 
     private val log = KotlinLogging.logger {}
 
@@ -44,6 +50,13 @@ class MainFrame : JFrame("Wege frei!") {
      */
 
     init {
+        log.debug("notice id: ${notice.id}")
+        if(notice.id == null) {
+            title = "Neue Meldung - Wege frei!"
+        } else {
+            title = "Meldung #${notice.id} - Wege frei!"
+        }
+
         selectedPhotos.registerObserver(selectedPhotosPanel)
         selectedPhotos.registerObserver(allPhotosPanel)
 

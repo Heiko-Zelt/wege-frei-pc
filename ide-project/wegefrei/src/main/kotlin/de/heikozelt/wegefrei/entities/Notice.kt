@@ -1,6 +1,7 @@
 package de.heikozelt.wegefrei.entities
 
 import jakarta.persistence.*
+import org.jxmapviewer.viewer.GeoPosition
 import java.util.*
 
 @Entity
@@ -8,13 +9,13 @@ import java.util.*
 class Notice(
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    val id: Int? = 0,
+    val id: Int? = null,
+
+    @Column(length=3)
+    val countrySymbol: String? = null,
 
     @Column
-    val countrySymbol: Double? = 0.0,
-
-    @Column
-    val licensePlate: Double? = 0.0,
+    val licensePlate: String? = null,
 
     @Column
     val carMake: String? = null,
@@ -23,16 +24,18 @@ class Notice(
     val color: String? = null,
 
     /**
-     * west-east/x-position
+     * Breitengrad des Adress-Markers
+     * Y-Achse, Richtung Norden, , z.B. 50.08 für Wiesbaden
+     */
+    @Column
+    val latitude: Float? = null,
+
+    /**
+     * Längengrad des Adress-Markers
+     * X-Achse, Richtung Osten, , z.B. 8.24 für Wiesbaden
      */
     @Column
     val longitude: Float? = null,
-
-    /**
-     * north-south/y-position
-     */
-    @Column
-    val latitude: Float? = 0f,
 
     @Column
     val street: String? = null,
@@ -66,4 +69,12 @@ class Notice(
     joinColumns = [JoinColumn(name = "id" /*, referencedColumnName = "filename" */) ],
     inverseJoinColumns = [JoinColumn(name = "filename" /*, referencedColumnName = "id" */)])
     val photos: Set<Photo>? = null
-)
+) {
+    fun getGeoPosition(): GeoPosition? {
+        return if (latitude != null && longitude != null) {
+            GeoPosition(latitude.toDouble(), longitude.toDouble())
+        } else {
+            null
+        }
+    }
+}
