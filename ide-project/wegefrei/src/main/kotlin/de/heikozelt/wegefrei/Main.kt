@@ -4,10 +4,14 @@ import com.drew.imaging.ImageMetadataReader
 import com.drew.lang.GeoLocation
 import com.drew.metadata.exif.ExifSubIFDDirectory
 import com.drew.metadata.exif.GpsDirectory
+import de.heikozelt.wegefrei.entities.Notice
 import de.heikozelt.wegefrei.gui.MainFrame
 import de.heikozelt.wegefrei.entities.Photo
 import mu.KotlinLogging
 import java.io.File
+import java.time.Instant
+import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.util.*
 
 val log = KotlinLogging.logger {}
@@ -37,7 +41,8 @@ fun main(args: Array<String>) {
     val shutdownHook = Thread { log.info("exit") }
     Runtime.getRuntime().addShutdownHook(shutdownHook)
 
-    val f = MainFrame()
+    val n = Notice()
+    val f = MainFrame(n)
 
     log.debug("de.heikozelt.wegefrei.main function finished")
 }
@@ -91,8 +96,13 @@ fun readPhotoMetadata(file: File): Photo? {
             log.debug("date: ${date}")
         }
     }
-
-    return Photo(file.name, latitude, longitude, date, null)
+    val datTim = if(date == null) {
+        null
+    } else {
+        ZonedDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault())
+        //Instant.ofEpochMilli(date.time).atZone(ZoneId.systemDefault()).toLocalDateTime()
+    }
+    return Photo(file.name, latitude, longitude, datTim, null)
 }
 
 

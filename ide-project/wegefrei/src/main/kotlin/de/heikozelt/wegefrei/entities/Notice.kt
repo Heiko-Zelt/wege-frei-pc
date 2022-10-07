@@ -2,6 +2,8 @@ package de.heikozelt.wegefrei.entities
 
 import jakarta.persistence.*
 import org.jxmapviewer.viewer.GeoPosition
+import java.time.LocalDateTime
+import java.time.ZonedDateTime
 import java.util.*
 
 @Entity
@@ -46,8 +48,13 @@ class Notice(
     @Column
     var town: String? = null,
 
+    // todo: entscheiden ob UTC oder CET/CEST?
+    // TIMESTAMP WITH TIME ZONE
     @Column
-    var date: Date? = null,
+    var date: ZonedDateTime? = null,
+
+    @Column
+    var duration: Int? = null,
 
     @Column
     var environmentalStickerMissing: Boolean = false,
@@ -56,10 +63,10 @@ class Notice(
     var vehicleInspectionExpired: Boolean = false,
 
     @Column
-    var vehicleInspectionYear: Short = 0,
+    var vehicleInspectionYear: Short? = null,
 
     @Column
-    var vehicleInspectionMonth: Byte = 0,
+    var vehicleInspectionMonth: Byte? = null,
 
     @Column
     var vehicleAbandoned: Boolean = false,

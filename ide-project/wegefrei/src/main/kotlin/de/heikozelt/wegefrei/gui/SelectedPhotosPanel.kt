@@ -26,16 +26,13 @@ class SelectedPhotosPanel(private val mainFrame: MainFrame) : JScrollPane(JPanel
         if (cont != null && cont is Container) {
             cont.layout = BoxLayout(cont, X_AXIS);
             cont.background = SELECTED_PHOTOS_BACKGROUND
-        }
 
-        // nicht notwendig, wenn selectedPhotos anfänglich leer ist und Observer vorher schon registriert ist
-        // aber man weiß ja nie
-        for (photo in mainFrame.getSelectedPhotos().getPhotos()) {
-            log.warn("observer zu spät registriert?")
-            val panel = MiniSelectedPhotoPanel(mainFrame, photo)
-            miniSelectedPhotoPanels.add(panel)
-            val cont = viewport.view
-            if (cont != null && cont is Container) {
+            // nicht notwendig, wenn selectedPhotos anfänglich leer ist und Observer vorher schon registriert ist
+            // aber man weiß ja nie
+            for (photo in mainFrame.getSelectedPhotos().getPhotos()) {
+                log.warn("observer zu spät registriert?")
+                val panel = MiniSelectedPhotoPanel(mainFrame, photo)
+                miniSelectedPhotoPanels.add(panel)
                 cont.add(panel)
             }
         }
@@ -69,19 +66,19 @@ class SelectedPhotosPanel(private val mainFrame: MainFrame) : JScrollPane(JPanel
     */
 
     fun showBorder(miniSelectedPhotoPanel: MiniSelectedPhotoPanel) {
-        for(panel in miniSelectedPhotoPanels) {
+        for (panel in miniSelectedPhotoPanels) {
             panel.displayBorder(panel == miniSelectedPhotoPanel)
         }
     }
 
     fun showBorder(photo: Photo) {
-        for(panel in miniSelectedPhotoPanels) {
+        for (panel in miniSelectedPhotoPanels) {
             panel.displayBorder(photo == panel.getPhoto())
         }
     }
 
     fun hideBorder() {
-        for(panel in miniSelectedPhotoPanels) {
+        for (panel in miniSelectedPhotoPanels) {
             panel.displayBorder(false)
         }
     }

@@ -7,6 +7,9 @@ import org.jxmapviewer.viewer.GeoPosition
 import java.awt.image.BufferedImage
 import java.io.File
 import java.text.SimpleDateFormat
+import java.time.LocalDateTime
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 import java.util.*
 import javax.imageio.ImageIO
 import kotlin.jvm.Transient
@@ -37,7 +40,7 @@ class Photo (
      * Datum und Uhrzeit in UTC
      */
     @Column
-    val date: Date? = null,
+    val date: ZonedDateTime? = null,
 
     @ManyToMany(mappedBy="photos")
     val notices: Set<Notice>? = null
@@ -78,7 +81,11 @@ class Photo (
     }
 
     fun getDateFormatted(): String {
-        return fmt.format(date)
+        return if(date == null) {
+            ""
+        } else {
+            date.format(format)
+        }
     }
 
     fun getGeoPosition(): GeoPosition? {
@@ -90,6 +97,7 @@ class Photo (
     }
 
     companion object {
-        val fmt = SimpleDateFormat("dd.MM.yyyy, HH:mm:ss z")
+        //val fmt = SimpleDateFormat("dd.MM.yyyy, HH:mm:ss z")
+        val format: DateTimeFormatter? = DateTimeFormatter.ofPattern("dd.MM.yyyy, HH:mm:ss z")
     }
 }

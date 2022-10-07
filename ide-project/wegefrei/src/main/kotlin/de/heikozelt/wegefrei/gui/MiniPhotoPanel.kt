@@ -44,7 +44,7 @@ class MiniPhotoPanel(private val mainFrame: MainFrame, private val photo: Photo,
             JLabel(ImageIcon(thumbnailImage))
         }
 
-        thumbnailLabel.toolTipText = "<html>${photo.filename}<br>${photo?.getDateFormatted()}<br>${photo?.latitude}, ${photo?.longitude}</html>"
+        thumbnailLabel.toolTipText = "<html>${photo.filename}<br>${photo.getDateFormatted()}<br>${photo.latitude}, ${photo.longitude}</html>"
         thumbnailLabel.alignmentX = CENTER_ALIGNMENT
         thumbnailLabel.border = NORMAL_BORDER
         mouseListener = MiniPhotoPanelMouseListener(mainFrame, this)

@@ -11,7 +11,10 @@ import java.awt.Color
 import java.awt.GridBagConstraints
 import java.awt.GridBagConstraints.*
 import java.awt.GridBagLayout
-import java.util.Objects
+import java.text.SimpleDateFormat
+import java.time.*
+import java.time.format.DateTimeFormatter
+import java.util.*
 import javax.swing.*
 import javax.swing.text.AbstractDocument
 
@@ -22,11 +25,18 @@ class NoticeForm(private val mainFrame: MainFrame) : JPanel() {
     private val countrySymbolComboBox = JComboBox(COUNTRY_SYMBOLS)
     private val licensePlateTextField = JTextField(10)
     private val vehicleMakeComboBox = JComboBox(VEHICLE_MAKES)
-
+    private val colorComboBox = JComboBox(COLORS)
+    private val miniMap = MiniMap(mainFrame)
     private var streetTextField = JTextField(30)
     private var zipCodeTextField = JTextField(5)
     private var townTextField = JTextField(30)
-    private val miniMap = MiniMap(mainFrame)
+    private val offenseDateTextField = JTextField(10)
+    private val offenseTimeTextField = JTextField(5)
+    private val durationTextField = JTextField(3)
+    private val environmentalStickerCheckBox = JCheckBox("Umweltplakette fehlt")
+    private val vehicleInspectionStickerCheckBox = JCheckBox("HU Plakette abgelaufen")
+    private val abandonedCheckBox = JCheckBox("Fahrzeug war verlassen")
+    private val recipientTextField = JTextField(30)
 
     init {
         background = FORM_BACKGROUND
@@ -73,10 +83,8 @@ class NoticeForm(private val mainFrame: MainFrame) : JPanel() {
         colorLabel.foreground = TEXT_COLOR
         constraints.gridx = 0
         add(colorLabel, constraints)
+        //val modell = DefaultComboBoxModel(COLORS)
 
-        val modell = DefaultComboBoxModel(COLORS)
-        //modell.addAll(LIST_COLORS)
-        val colorComboBox = JComboBox(modell)
         colorComboBox.renderer = ColorListCellRenderer()
         colorComboBox.maximumRowCount = COLORS.size
         constraints.gridx = 1
@@ -121,7 +129,7 @@ class NoticeForm(private val mainFrame: MainFrame) : JPanel() {
         offenseDateLabel.foreground = TEXT_COLOR
         constraints.gridx = 0
         add(offenseDateLabel, constraints)
-        val offenseDateTextField = JTextField(10)
+
         constraints.gridx = 1
         add(offenseDateTextField, constraints)
 
@@ -130,7 +138,7 @@ class NoticeForm(private val mainFrame: MainFrame) : JPanel() {
         offenseTimeLabel.foreground = TEXT_COLOR
         constraints.gridx = 0
         add(offenseTimeLabel, constraints)
-        val offenseTimeTextField = JTextField(5)
+
         constraints.gridx = 1
         add(offenseTimeTextField, constraints)
 
@@ -139,25 +147,21 @@ class NoticeForm(private val mainFrame: MainFrame) : JPanel() {
         durationLabel.foreground = TEXT_COLOR
         constraints.gridx = 0
         add(durationLabel, constraints)
-        val durationTextField = JTextField(3)
         constraints.gridx = 1
         add(durationTextField, constraints)
 
         constraints.gridy++
-        val environmentalStickerCheckBox = JCheckBox("Umweltplakette fehlt")
         environmentalStickerCheckBox.foreground = TEXT_COLOR
         environmentalStickerCheckBox.background = FORM_BACKGROUND
         constraints.gridx = 0
         add(environmentalStickerCheckBox, constraints)
 
-        val vehicleInspectionStickerCheckBox = JCheckBox("HU Plakette abgelaufen")
         vehicleInspectionStickerCheckBox.foreground = TEXT_COLOR
         vehicleInspectionStickerCheckBox.background = FORM_BACKGROUND
         constraints.gridx = 1
         add(vehicleInspectionStickerCheckBox, constraints)
 
         constraints.gridy++
-        val abandonedCheckBox = JCheckBox("Fahrzeug war verlassen")
         abandonedCheckBox.foreground = TEXT_COLOR
         abandonedCheckBox.background = FORM_BACKGROUND
         constraints.gridx = 0
@@ -168,7 +172,6 @@ class NoticeForm(private val mainFrame: MainFrame) : JPanel() {
         recipientLabel.foreground = TEXT_COLOR
         constraints.gridx = 0
         add(recipientLabel, constraints)
-        val recipientTextField = JTextField(30)
         constraints.gridx = 1
         add(recipientTextField, constraints)
 
@@ -203,6 +206,32 @@ class NoticeForm(private val mainFrame: MainFrame) : JPanel() {
         if(selectedObj is String) {
             notice.vehicleMake = selectedObj
         }
+
+        selectedObj = colorComboBox.selectedObjects[0]
+        if(selectedObj is ListColor) {
+            notice.color = selectedObj.colorName
+        }
+
+        // todo map addressLocation
+
+        notice.street = streetTextField.text
+        notice.zipCode = zipCodeTextField.text
+        notice.town = townTextField.text
+
+        val format = DateTimeFormatter.ofPattern("dd.MM.yyyy")
+        val dat: LocalDate = LocalDate.parse(offenseDateTextField.text, format)
+        val tim = LocalTime.parse(offenseTimeTextField.text)
+        val datTim = ZonedDateTime.of(dat, tim, ZoneId.systemDefault())
+        notice.date = datTim
+        //notice.date = Date.from(datTim.atZone(ZoneId.systemDefault()).toInstant())
+
+        notice.duration = durationTextField.text.toInt()
+        notice.environmentalStickerMissing = environmentalStickerCheckBox.isSelected
+        notice.vehicleInspectionExpired = vehicleInspectionStickerCheckBox.isSelected
+
+        // todo: Jahr & Monat
+
+        notice.vehicleAbandoned = abandonedCheckBox.isSelected
 
         mainFrame.saveNotice()
     }

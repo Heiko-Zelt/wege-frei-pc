@@ -5,7 +5,7 @@ import java.awt.event.MouseListener
 
 class MiniSelectedPhotoPanelMouseListener(private val mainFrame: MainFrame, private val miniSelectedPhotoPanel: MiniSelectedPhotoPanel): MouseListener {
     override fun mouseClicked(e: MouseEvent) {
-        mainFrame?.showSelectedPhoto(miniSelectedPhotoPanel)
+        mainFrame.showSelectedPhoto(miniSelectedPhotoPanel)
     }
 
     override fun mousePressed(e: MouseEvent?) {}

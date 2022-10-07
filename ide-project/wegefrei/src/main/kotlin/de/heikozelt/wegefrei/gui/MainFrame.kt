@@ -28,7 +28,7 @@ import javax.swing.border.Border
  *   <li>Instanziierung mit Notice als Parameter zum Bearbeiten einer bestehenden Meldung. notice.id enthält eine Zahl.</li>
  * </ol>
  */
-class MainFrame(private val notice: Notice = Notice()) : JFrame() {
+class MainFrame(private val notice: Notice) : JFrame() {
 
     private val log = KotlinLogging.logger {}
 
