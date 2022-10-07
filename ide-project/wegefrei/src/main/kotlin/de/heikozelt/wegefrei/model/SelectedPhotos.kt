@@ -3,11 +3,11 @@ package de.heikozelt.wegefrei.model
 import de.heikozelt.wegefrei.entities.Photo
 import java.util.*
 
-class SelectedPhotos {
-    /**
-     * Fotos sind immer nach Dateiname (also in der Regel auch chronologisch) sortiert
-     */
-    private val photos = TreeSet<Photo>()
+/**
+ * Fotos sind immer nach Dateiname (also in der Regel auch chronologisch) sortiert
+ */
+class SelectedPhotos(private val photos: TreeSet<Photo> = TreeSet<Photo>()) {
+
     private val observers = HashSet<SelectedPhotosObserver>()
 
     fun add(photo: Photo) {

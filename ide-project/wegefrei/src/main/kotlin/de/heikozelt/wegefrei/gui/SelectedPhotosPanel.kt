@@ -12,7 +12,7 @@ import java.util.*
 import javax.swing.*
 import javax.swing.BoxLayout.X_AXIS
 
-class SelectedPhotosPanel(private val mainFrame: MainFrame, private var selectedPhotos: SelectedPhotos) : JScrollPane(JPanel()),
+class SelectedPhotosPanel(private val mainFrame: MainFrame) : JScrollPane(JPanel()),
     SelectedPhotosObserver {
 
     private val log = KotlinLogging.logger {}
@@ -30,7 +30,7 @@ class SelectedPhotosPanel(private val mainFrame: MainFrame, private var selected
 
         // nicht notwendig, wenn selectedPhotos anfänglich leer ist und Observer vorher schon registriert ist
         // aber man weiß ja nie
-        for (photo in selectedPhotos.getPhotos()) {
+        for (photo in mainFrame.getSelectedPhotos().getPhotos()) {
             log.warn("observer zu spät registriert?")
             val panel = MiniSelectedPhotoPanel(mainFrame, photo)
             miniSelectedPhotoPanels.add(panel)

@@ -2,6 +2,7 @@ package de.heikozelt.wegefrei.gui
 
 import de.heikozelt.wegefrei.entities.Photo
 import de.heikozelt.wegefrei.gui.MainFrame.Companion.NORMAL_BORDER
+import de.heikozelt.wegefrei.model.SelectedPhotos
 import de.heikozelt.wegefrei.model.SelectedPhotosObserver
 import mu.KotlinLogging
 import org.jxmapviewer.JXMapViewer
@@ -23,15 +24,29 @@ import kotlin.math.sqrt
  * Sie werden in umgekehrter Reihenfolge gezeichnet.
  * Letzter Marker unten, erster Marker ganz obendrauf.
  */
-class MiniMap(private val mainFrame: MainFrame) : JXMapViewer(), SelectedPhotosObserver {
+class MiniMap(
+    private val mainFrame: MainFrame
+) : JXMapViewer(), SelectedPhotosObserver {
 
     private val log = KotlinLogging.logger {}
     private var borderVisible = false
     private val painter = MarkerPainter()
     private val photoMarkers = LinkedList<PhotoMarker>()
     private var addressMarker: AddressMarker? = null
+    private var selectedPhotos = mainFrame.getSelectedPhotos()
 
     init {
+        log.debug("register")
+        selectedPhotos.registerObserver(this)
+
+        val photosIter = selectedPhotos.getPhotos().iterator()
+        var i = 0
+        while(photosIter.hasNext()) {
+            log.debug("add photo marker #$i")
+            photoMarkers.add(PhotoMarker(i, photosIter.next().getGeoPosition()))
+            i++
+        }
+
         border = NORMAL_BORDER
 
         val info = OSMTileFactoryInfo()
@@ -43,11 +58,12 @@ class MiniMap(private val mainFrame: MainFrame) : JXMapViewer(), SelectedPhotosO
         overlayPainter = painter
 
         val aM = addressMarker
-        if(aM != null) { // ist Anfangs immer null
+        if (aM != null) { // ist Anfangs immer null
             add(aM.getLabel())
         }
         val iterator = photoMarkers.descendingIterator()
         while (iterator.hasNext()) { // wird nie durchlaufen
+            log.debug("add to panel #$i")
             add(iterator.next().getLabel())
         }
 
@@ -65,7 +81,7 @@ class MiniMap(private val mainFrame: MainFrame) : JXMapViewer(), SelectedPhotosO
         val markers = mutableSetOf<Marker>()
         markers.addAll(photoMarkers)
         val aM = addressMarker
-        if(aM != null) {
+        if (aM != null) {
             markers.add(aM)
         }
         painter.waypoints = markers
@@ -96,7 +112,7 @@ class MiniMap(private val mainFrame: MainFrame) : JXMapViewer(), SelectedPhotosO
             photoMarkers.add(index, marker)
 
             log.debug("number of photo markers: " + photoMarkers.size)
-            var compIndex = componentCount - index
+            val compIndex = componentCount - index
             add(marker.getLabel(), compIndex)
             for (i in index + 1 until photoMarkers.size) {
                 photoMarkers[i].updateText(i)
@@ -141,7 +157,7 @@ class MiniMap(private val mainFrame: MainFrame) : JXMapViewer(), SelectedPhotosO
             fitPoints.add(marker.position)
         }
         val aM = addressMarker
-        if(aM != null) {
+        if (aM != null) {
             fitPoints.add(aM.position)
         }
 

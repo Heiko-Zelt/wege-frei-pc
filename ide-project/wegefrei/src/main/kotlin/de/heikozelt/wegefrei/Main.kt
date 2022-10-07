@@ -14,11 +14,6 @@ val log = KotlinLogging.logger {}
 
 val PHOTO_DIR = "/media/veracrypt1/_Fotos/2022/03"
 
-val COLORS = arrayOf( "--", "blau", "braun", "gelb", "grau", "grün", "rot", "schwarz", "silber", "weiß")
-
-val COUNTRY_SYMBOLS = arrayOf("--", "A - Österreich", "AL - Albanien", "AND - Andorra", "B - Belgien", "BG - Bulgarien",
-    "BIH - Bosnien-Herzegowina", "BY - Belaruz", "CH - Schweiz", "CY - Zypern", "CZ - Tschechische Republik", "D - Deutschland")
-
 val VEHICLE_MAKES = arrayOf("--", "Abarth", "Alfa Romeo", "Aston Martin", "Audi",
     "Bentley", "BMW", "Bugatti",
     "Cadillac", "Chevrolet", "Chrysler", "Citroën", "Crysler",
@@ -73,8 +68,8 @@ fun scanForNewPhotos() {
 }
 
 fun readPhotoMetadata(file: File): Photo? {
-    var longitude: Float? = null
     var latitude: Float? = null
+    var longitude: Float? = null
     var date: Date? = null
     val metadata = ImageMetadataReader.readMetadata(file)
     log.debug("metadata: $metadata")
@@ -83,9 +78,10 @@ fun readPhotoMetadata(file: File): Photo? {
     for(gpsDir in gpsDirs) {
         val geoLocation: GeoLocation? = gpsDir.geoLocation
         if(geoLocation != null && !geoLocation.isZero) {
-            log.debug("longitude: ${geoLocation.longitude}, latitude: ${geoLocation.latitude}")
-            longitude = geoLocation.longitude.toFloat()
+            log.debug("latitude: ${geoLocation.latitude}, longitude: ${geoLocation.longitude}")
             latitude = geoLocation.latitude.toFloat()
+            longitude = geoLocation.longitude.toFloat()
+
         }
     }
     val exifDirs = metadata.getDirectoriesOfType(ExifSubIFDDirectory::class.java)
@@ -96,7 +92,7 @@ fun readPhotoMetadata(file: File): Photo? {
         }
     }
 
-    return Photo(file.name, longitude, latitude, date, null)
+    return Photo(file.name, latitude, longitude, date, null)
 }
 
 

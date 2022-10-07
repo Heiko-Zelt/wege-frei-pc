@@ -12,12 +12,11 @@ import javax.swing.BoxLayout.X_AXIS
 
 class AllPhotosPanel(
     private val mainFrame: MainFrame,
-    private var firstPhotoFilename: String,
-    private val selectedPhotos: SelectedPhotos
+    private var firstPhotoFilename: String
 ) : JPanel(), SelectedPhotosObserver {
 
     private val log = KotlinLogging.logger {}
-
+    private val selectedPhotos = mainFrame.getSelectedPhotos()
     private val miniPhotoPanels = arrayListOf<MiniPhotoPanel>()
 
     init {

@@ -1,7 +1,7 @@
 package de.heikozelt.wegefrei.gui
 
-import de.heikozelt.wegefrei.COUNTRY_SYMBOLS
 import de.heikozelt.wegefrei.VEHICLE_MAKES
+import de.heikozelt.wegefrei.entities.Notice
 import de.heikozelt.wegefrei.gui.MainFrame.Companion.FORM_BACKGROUND
 import de.heikozelt.wegefrei.gui.MainFrame.Companion.NO_BORDER
 import de.heikozelt.wegefrei.gui.MainFrame.Companion.TEXT_COLOR
@@ -11,19 +11,24 @@ import java.awt.Color
 import java.awt.GridBagConstraints
 import java.awt.GridBagConstraints.*
 import java.awt.GridBagLayout
+import java.util.Objects
 import javax.swing.*
+import javax.swing.text.AbstractDocument
 
-class NoticeForm(private val mainFrame: MainFrame, selectedPhotos: SelectedPhotos) : JPanel() {
+class NoticeForm(private val mainFrame: MainFrame) : JPanel() {
 
     private val log = KotlinLogging.logger {}
-    private val miniMap = MiniMap(mainFrame)
+
+    private val countrySymbolComboBox = JComboBox(COUNTRY_SYMBOLS)
+    private val licensePlateTextField = JTextField(10)
+    private val vehicleMakeComboBox = JComboBox(VEHICLE_MAKES)
+
     private var streetTextField = JTextField(30)
     private var zipCodeTextField = JTextField(5)
     private var townTextField = JTextField(30)
+    private val miniMap = MiniMap(mainFrame)
 
     init {
-        selectedPhotos.registerObserver(miniMap)
-
         background = FORM_BACKGROUND
         border = NO_BORDER
         layout = GridBagLayout();
@@ -34,13 +39,13 @@ class NoticeForm(private val mainFrame: MainFrame, selectedPhotos: SelectedPhoto
         constraints.weighty = 0.1
 
         constraints.gridy++
-        val countrySymbolLabel = JLabel("Länderkennzeichen:")
+        val countrySymbolLabel = JLabel("Landeskennzeichen:")
         countrySymbolLabel.foreground = TEXT_COLOR
         constraints.gridx = 0
         constraints.gridwidth = 1
         add(countrySymbolLabel, constraints)
-        val countrySymbolComboBox = JComboBox(COUNTRY_SYMBOLS)
         constraints.gridx = 1
+        countrySymbolComboBox.renderer = CountrySymbolListCellRenderer()
         add(countrySymbolComboBox, constraints)
 
         constraints.gridy++
@@ -48,9 +53,11 @@ class NoticeForm(private val mainFrame: MainFrame, selectedPhotos: SelectedPhoto
         licensePlateLabel.foreground = TEXT_COLOR
         constraints.gridx = 0
         add(licensePlateLabel, constraints)
-        val licensePlateTextField = JTextField(10)
-        //licensePlateTextField.size = Dimension(100, 20)
         constraints.gridx = 1
+        val doc = licensePlateTextField.document
+        if(doc is AbstractDocument) {
+            doc.documentFilter = UppercaseDocumentFilter()
+        }
         add(licensePlateTextField, constraints)
 
         constraints.gridy++
@@ -58,7 +65,6 @@ class NoticeForm(private val mainFrame: MainFrame, selectedPhotos: SelectedPhoto
         vehicleMakeLabel.foreground = TEXT_COLOR
         constraints.gridx = 0
         add(vehicleMakeLabel, constraints)
-        val vehicleMakeComboBox = JComboBox(VEHICLE_MAKES)
         constraints.gridx = 1
         add(vehicleMakeComboBox, constraints)
 
@@ -68,11 +74,11 @@ class NoticeForm(private val mainFrame: MainFrame, selectedPhotos: SelectedPhoto
         constraints.gridx = 0
         add(colorLabel, constraints)
 
-        val modell = DefaultComboBoxModel(LIST_COLORS)
+        val modell = DefaultComboBoxModel(COLORS)
         //modell.addAll(LIST_COLORS)
         val colorComboBox = JComboBox(modell)
         colorComboBox.renderer = ColorListCellRenderer()
-        colorComboBox.maximumRowCount = LIST_COLORS.size
+        colorComboBox.maximumRowCount = COLORS.size
         constraints.gridx = 1
         add(colorComboBox, constraints)
 
@@ -83,7 +89,6 @@ class NoticeForm(private val mainFrame: MainFrame, selectedPhotos: SelectedPhoto
         add(coordinatesLabel, constraints)
         constraints.gridx = 1
         constraints.weighty = 1.0
-
         add(miniMap, constraints)
 
         constraints.gridy++
@@ -169,6 +174,7 @@ class NoticeForm(private val mainFrame: MainFrame, selectedPhotos: SelectedPhoto
 
         constraints.gridy++
         val saveButton = JButton("speichern")
+        saveButton.addActionListener { saveNotice() }
         constraints.anchor = EAST
         constraints.gridx = 0
         add(saveButton, constraints)
@@ -180,6 +186,25 @@ class NoticeForm(private val mainFrame: MainFrame, selectedPhotos: SelectedPhoto
 
         setSize(700, 700)
         isVisible = true
+    }
+
+    private fun saveNotice() {
+        val notice = mainFrame.getNotice()
+        notice.photos = mainFrame.getSelectedPhotos().getPhotos()
+
+        var selectedObj = countrySymbolComboBox.selectedObjects[0]
+        if(selectedObj is ListCountrySymbol) {
+            notice.countrySymbol = selectedObj.abbreviation
+        }
+
+        notice.licensePlate = licensePlateTextField.text
+
+        selectedObj = vehicleMakeComboBox.selectedObjects[0]
+        if(selectedObj is String) {
+            notice.vehicleMake = selectedObj
+        }
+
+        mainFrame.saveNotice()
     }
 
     fun getMiniMap(): MiniMap {
@@ -199,7 +224,7 @@ class NoticeForm(private val mainFrame: MainFrame, selectedPhotos: SelectedPhoto
     }
 
     companion object {
-        val LIST_COLORS = arrayOf(
+        val COLORS = arrayOf(
             ListColor("--", null),
             ListColor("Weiß", Color.white),
             ListColor("Silber", Color(192, 192, 192)),
@@ -215,6 +240,21 @@ class NoticeForm(private val mainFrame: MainFrame, selectedPhotos: SelectedPhoto
             ListColor("Blau", Color.blue),
             ListColor("Pink", Color.pink),
             ListColor("Violett/Lila", Color(136,0,255))
+        )
+
+        val COUNTRY_SYMBOLS = arrayOf(
+            ListCountrySymbol("--", null),
+            ListCountrySymbol("A", "Österreich"),
+            ListCountrySymbol("AL", "Albanien"),
+            ListCountrySymbol("AND", "Andorra"),
+            ListCountrySymbol("B", "Belgien"),
+            ListCountrySymbol("BG", "Bulgarien"),
+            ListCountrySymbol("BIH", "Bosnien-Herzegowina"),
+            ListCountrySymbol("BY", "Belarus"),
+            ListCountrySymbol("CH", "Schweiz"),
+            ListCountrySymbol("CY", "Zypern"),
+            ListCountrySymbol("CZ", "Tschechische Republik"),
+            ListCountrySymbol("D", "Deutschland")
         )
     }
 }

@@ -15,7 +15,9 @@ import java.awt.GridBagConstraints.WEST
 import java.awt.GridBagLayout
 import java.net.HttpURLConnection
 import java.net.URL
+import java.util.*
 import javax.swing.*
+import javax.swing.border.Border
 
 /**
  * Haupt-Fenster zum Bearbeiten einer Meldung
@@ -30,12 +32,11 @@ class MainFrame(private val notice: Notice = Notice()) : JFrame() {
 
     private val log = KotlinLogging.logger {}
 
-    private val selectedPhotos = SelectedPhotos()
-
+    private val selectedPhotos = SelectedPhotos(TreeSet(notice.photos))
     private var mainToolBar = MainToolBar()
-    private var allPhotosPanel = AllPhotosPanel(this, "20220301_184952.jpg", selectedPhotos)
-    private var selectedPhotosPanel = SelectedPhotosPanel(this, selectedPhotos)
-    private var noticeForm = NoticeForm(this, selectedPhotos)
+    private var allPhotosPanel = AllPhotosPanel(this, "20220301_184952.jpg")
+    private var selectedPhotosPanel = SelectedPhotosPanel(this)
+    private var noticeForm = NoticeForm(this)
     private var zoomPanel: ZoomPanel
 
     // todo sinnvoll initialisieren anhand der vorhandenen Fotos
@@ -51,10 +52,10 @@ class MainFrame(private val notice: Notice = Notice()) : JFrame() {
 
     init {
         log.debug("notice id: ${notice.id}")
-        if(notice.id == null) {
-            title = "Neue Meldung - Wege frei!"
+        title = if(notice.id == null) {
+            "Neue Meldung - Wege frei!"
         } else {
-            title = "Meldung #${notice.id} - Wege frei!"
+            "Meldung #${notice.id} - Wege frei!"
         }
 
         selectedPhotos.registerObserver(selectedPhotosPanel)
@@ -69,6 +70,7 @@ class MainFrame(private val notice: Notice = Notice()) : JFrame() {
 
         background = Color.green
 
+        /*
         val selectedPhoto1 = databaseService.getPhotoByFilename("20220301_184952.jpg")
         val selectedPhoto2 = databaseService.getPhotoByFilename("20220301_185001.jpg")
         val selectedPhoto3 = databaseService.getPhotoByFilename("20220301_185010.jpg")
@@ -81,6 +83,7 @@ class MainFrame(private val notice: Notice = Notice()) : JFrame() {
         if (selectedPhoto3 != null) {
             selectedPhotos.add(selectedPhoto3)
         }
+         */
 
         defaultCloseOperation = JFrame.EXIT_ON_CLOSE;
 
@@ -135,6 +138,14 @@ class MainFrame(private val notice: Notice = Notice()) : JFrame() {
     selectedPhotosPanel.showBorder(photo)
     }
      */
+
+    fun getSelectedPhotos(): SelectedPhotos {
+        return selectedPhotos
+    }
+
+    fun getNotice(): Notice {
+        return notice
+    }
 
     /**
      * wählt ein Foto aus
@@ -246,12 +257,18 @@ class MainFrame(private val notice: Notice = Notice()) : JFrame() {
         }
     }
 
-    companion object {
-        val NORMAL_BORDER = BorderFactory.createLineBorder(Color.black)
-        val HIGHLIGHT_BORDER = BorderFactory.createLineBorder(Color.yellow)
-        val NO_BORDER = BorderFactory.createEmptyBorder()
+    fun saveNotice() {
+        databaseService.addOrUpdateNotice(notice)
+        // todo implement
+    }
 
-        val TEXT_COLOR = Color.white
+
+    companion object {
+        val NORMAL_BORDER: Border? = BorderFactory.createLineBorder(Color.black)
+        val HIGHLIGHT_BORDER: Border? = BorderFactory.createLineBorder(Color.yellow)
+        val NO_BORDER: Border? = BorderFactory.createEmptyBorder()
+
+        val TEXT_COLOR: Color? = Color.white
         val PHOTO_MARKER_BACKGROUND = Color(101, 162, 235)
 
         val TOOLBAR_BACKGROUND = Color(50, 50, 50)

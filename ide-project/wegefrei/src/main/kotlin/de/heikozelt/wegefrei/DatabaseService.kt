@@ -1,5 +1,6 @@
 package de.heikozelt.wegefrei
 
+import de.heikozelt.wegefrei.entities.Notice
 import de.heikozelt.wegefrei.entities.Photo
 import jakarta.persistence.EntityManager
 import jakarta.persistence.Persistence
@@ -21,9 +22,9 @@ class DatabaseService {
             log.debug("image $filename not found in database")
         } else {
             log.debug("image $filename found in database")
+            log.debug("latitude: ${photo.latitude}")
+            log.debug("longitude: ${photo.longitude}")
         }
-        log.debug("latitude: ${photo.latitude}")
-        log.debug("longitude: ${photo.longitude}")
         return photo
     }
 
@@ -40,6 +41,28 @@ class DatabaseService {
         //em.merge(photo)
         em.transaction.begin()
         em.persist(photo)
+        em.transaction.commit()
+    }
+
+    fun addNotice(notice: Notice) {
+        em.transaction.begin()
+        em.persist(notice)
+        em.transaction.commit()
+    }
+
+    fun updateNotice(notice: Notice) {
+        em.transaction.begin()
+        em.merge(notice)
+        em.transaction.commit()
+    }
+
+    fun addOrUpdateNotice(notice: Notice) {
+        em.transaction.begin()
+        if(notice.id == null) {
+            em.persist(notice)
+        } else {
+            em.merge(notice)
+        }
         em.transaction.commit()
     }
 

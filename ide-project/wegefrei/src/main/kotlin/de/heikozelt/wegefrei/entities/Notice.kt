@@ -8,71 +8,73 @@ import java.util.*
 @Table(name="NOTICES")
 class Notice(
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    val id: Int? = null,
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    var id: Int? = null,
 
     @Column(length=3)
-    val countrySymbol: String? = null,
+    var countrySymbol: String? = null,
 
     @Column
-    val licensePlate: String? = null,
+    var licensePlate: String? = null,
 
     @Column
-    val carMake: String? = null,
+    var vehicleMake: String? = null,
 
     @Column
-    val color: String? = null,
+    var color: String? = null,
 
     /**
      * Breitengrad des Adress-Markers
      * Y-Achse, Richtung Norden, , z.B. 50.08 für Wiesbaden
      */
     @Column
-    val latitude: Float? = null,
+    var latitude: Float? = null,
 
     /**
      * Längengrad des Adress-Markers
      * X-Achse, Richtung Osten, , z.B. 8.24 für Wiesbaden
      */
     @Column
-    val longitude: Float? = null,
+    var longitude: Float? = null,
 
     @Column
-    val street: String? = null,
+    var street: String? = null,
 
     @Column
-    val zipCode: String? = null,
+    var zipCode: String? = null,
 
     @Column
-    val town: String? = null,
+    var town: String? = null,
 
     @Column
-    val date: Date? = null,
+    var date: Date? = null,
 
     @Column
-    val environmentalStickerMissing: Boolean = false,
+    var environmentalStickerMissing: Boolean = false,
 
     @Column
-    val vehicleInspectionExpired: Boolean = false,
+    var vehicleInspectionExpired: Boolean = false,
 
     @Column
-    val vehicleInspectionYear: Short = 0,
+    var vehicleInspectionYear: Short = 0,
 
     @Column
-    val vehicleInspectionMonth: Byte = 0,
+    var vehicleInspectionMonth: Byte = 0,
 
     @Column
-    val vehicleAbandoned: Boolean = false,
+    var vehicleAbandoned: Boolean = false,
 
     @ManyToMany
     @JoinTable(name= "NOTICES_PHOTOS",
     joinColumns = [JoinColumn(name = "id" /*, referencedColumnName = "filename" */) ],
     inverseJoinColumns = [JoinColumn(name = "filename" /*, referencedColumnName = "id" */)])
-    val photos: Set<Photo>? = null
+    var photos: Set<Photo> = setOf()
 ) {
     fun getGeoPosition(): GeoPosition? {
-        return if (latitude != null && longitude != null) {
-            GeoPosition(latitude.toDouble(), longitude.toDouble())
+        val lat = latitude
+        val lon = longitude
+        return if (lat != null && lon != null) {
+            GeoPosition(lat.toDouble(), lon.toDouble())
         } else {
             null
         }
