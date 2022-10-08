@@ -37,6 +37,14 @@ class DatabaseService {
         return TreeSet<Photo>(resultList)
     }
 
+    /**
+     * liefert ein sortiertes Set von Fotos
+     */
+    fun getAllNotices(): List<Notice> {
+        val resultList: List<Notice> = em.createQuery("SELECT n FROM Notice n ORDER BY n.id", Notice::class.java).resultList
+        return resultList
+    }
+
     fun addPhoto(photo: Photo) {
         //em.merge(photo)
         em.transaction.begin()

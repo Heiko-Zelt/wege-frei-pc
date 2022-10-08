@@ -68,6 +68,7 @@ class NoticeTest {
             2010,
             12,
             true,
+            "recipient@notice-j-unit-test.de",
             photos
         )
         n.apply {
@@ -88,6 +89,7 @@ class NoticeTest {
             assertEquals(2010, vehicleInspectionYear)
             assertEquals(12, vehicleInspectionMonth)
             assertTrue(vehicleAbandoned)
+            assertEquals("recipient@notice-j-unit-test.de", recipient)
             assertEquals(2, photos.size)
         }
     }

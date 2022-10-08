@@ -18,14 +18,16 @@ import java.util.*
 import javax.swing.*
 import javax.swing.text.AbstractDocument
 
+/**
+ * todo: Button Meldung löschen
+ */
 class NoticeForm(private val mainFrame: MainFrame) : JPanel() {
 
     private val log = KotlinLogging.logger {}
-
-    private val countrySymbolComboBox = JComboBox(COUNTRY_SYMBOLS)
+    private val countrySymbolComboBox = JComboBox(ListCountrySymbol.COUNTRY_SYMBOLS)
     private val licensePlateTextField = JTextField(10)
     private val vehicleMakeComboBox = JComboBox(VEHICLE_MAKES)
-    private val colorComboBox = JComboBox(COLORS)
+    private val colorComboBox = JComboBox(ListColor.COLORS)
     private val miniMap = MiniMap(mainFrame)
     private var streetTextField = JTextField(30)
     private var zipCodeTextField = JTextField(5)
@@ -65,7 +67,7 @@ class NoticeForm(private val mainFrame: MainFrame) : JPanel() {
         add(licensePlateLabel, constraints)
         constraints.gridx = 1
         val doc = licensePlateTextField.document
-        if(doc is AbstractDocument) {
+        if (doc is AbstractDocument) {
             doc.documentFilter = UppercaseDocumentFilter()
         }
         add(licensePlateTextField, constraints)
@@ -86,7 +88,7 @@ class NoticeForm(private val mainFrame: MainFrame) : JPanel() {
         //val modell = DefaultComboBoxModel(COLORS)
 
         colorComboBox.renderer = ColorListCellRenderer()
-        colorComboBox.maximumRowCount = COLORS.size
+        colorComboBox.maximumRowCount = ListColor.COLORS.size
         constraints.gridx = 1
         add(colorComboBox, constraints)
 
@@ -187,51 +189,119 @@ class NoticeForm(private val mainFrame: MainFrame) : JPanel() {
         constraints.gridx = 1
         add(sendButton, constraints)
 
+        loadNotice()
+
         setSize(700, 700)
         isVisible = true
     }
 
+    /**
+     * Initialisieren der einzelnen Eingabe-Felder
+     * Mapping von Notice zu GUI-Components
+     */
+    private fun loadNotice() {
+        val notice = mainFrame.getNotice()
+        // macht schon MainFrame.init()
+        //mainFrame.setSelectedPhotos(SelectedPhotos(TreeSet(notice.photos)))
+
+        val listCountrySymbol = ListCountrySymbol.fromAbbreviation(notice.countrySymbol)
+        countrySymbolComboBox.selectedItem = listCountrySymbol
+
+        licensePlateTextField.text = notice.licensePlate
+
+        val make = VEHICLE_MAKES.find { it == notice.vehicleMake }
+        make?.let {
+            vehicleMakeComboBox.selectedItem = make
+        }
+
+        val listColor = ListColor.fromColorName(notice.color)
+        colorComboBox.selectedItem = listColor
+
+        streetTextField.text = notice.street
+        zipCodeTextField.text = notice.zipCode
+        townTextField.text = notice.town
+
+        offenseDateTextField.text = if(notice.date == null) {
+            ""
+        } else {
+            val fmt = DateTimeFormatter.ofPattern("dd.MM.yyyy")
+            fmt.format(notice.date)
+        }
+
+        offenseTimeTextField.text = if(notice.date == null) {
+            ""
+        } else {
+            val fmt = DateTimeFormatter.ofPattern("HH:mm")
+            fmt.format(notice.date)
+        }
+
+        durationTextField.text = if(notice.duration == null) {
+            ""
+        } else {
+            notice.duration.toString()
+        }
+
+        environmentalStickerCheckBox.isSelected = notice.environmentalStickerMissing
+        vehicleInspectionStickerCheckBox.isSelected = notice.vehicleInspectionExpired
+        //todo Jahr und Monat
+
+        abandonedCheckBox.isSelected = notice.vehicleAbandoned
+        recipientTextField.text = notice.recipient
+    }
+
+    /**
+     * Mapping der Werte der GUI-Komponenten zu Notice
+     */
+    // todo: form validation, Validierungsfehler bei Eingabefeldern anzeigen
     private fun saveNotice() {
         val notice = mainFrame.getNotice()
         notice.photos = mainFrame.getSelectedPhotos().getPhotos()
 
-        var selectedObj = countrySymbolComboBox.selectedObjects[0]
-        if(selectedObj is ListCountrySymbol) {
-            notice.countrySymbol = selectedObj.abbreviation
+        val selectedCountry = countrySymbolComboBox.selectedObjects[0] as ListCountrySymbol
+        notice.countrySymbol = if (selectedCountry.countryName == null) {
+            null
+        } else {
+            selectedCountry.abbreviation
         }
 
-        notice.licensePlate = licensePlateTextField.text
+        notice.licensePlate = trimmedOrNull(licensePlateTextField.text)
 
-        selectedObj = vehicleMakeComboBox.selectedObjects[0]
-        if(selectedObj is String) {
-            notice.vehicleMake = selectedObj
+        val selectedVehicleMake = vehicleMakeComboBox.selectedObjects[0] as String
+        notice.vehicleMake = if (selectedVehicleMake == "--") {
+            null
+        } else {
+            selectedVehicleMake
         }
 
-        selectedObj = colorComboBox.selectedObjects[0]
-        if(selectedObj is ListColor) {
-            notice.color = selectedObj.colorName
+        val selectedColor = colorComboBox.selectedObjects[0] as ListColor
+        notice.color = if (selectedColor.color == null) {
+            null
+        } else {
+            selectedColor.colorName
         }
 
         // todo map addressLocation
 
-        notice.street = streetTextField.text
-        notice.zipCode = zipCodeTextField.text
-        notice.town = townTextField.text
+        notice.street = trimmedOrNull(streetTextField.text)
+        notice.zipCode = trimmedOrNull(zipCodeTextField.text)
+        notice.town = trimmedOrNull(townTextField.text)
 
+        // todo: Validierung, ob Datum
         val format = DateTimeFormatter.ofPattern("dd.MM.yyyy")
         val dat: LocalDate = LocalDate.parse(offenseDateTextField.text, format)
+        // todo: Validierung, ob Uhrzeit
+        // todo Problem lösen: Sommer- oder Winterzeit, eine Stunde im Jahr ist zweideutig
         val tim = LocalTime.parse(offenseTimeTextField.text)
         val datTim = ZonedDateTime.of(dat, tim, ZoneId.systemDefault())
         notice.date = datTim
         //notice.date = Date.from(datTim.atZone(ZoneId.systemDefault()).toInstant())
 
-        notice.duration = durationTextField.text.toInt()
+        // todo: Validierung, ob Zahl
+        notice.duration = (trimmedOrNull(durationTextField.text) as String).toInt()
         notice.environmentalStickerMissing = environmentalStickerCheckBox.isSelected
         notice.vehicleInspectionExpired = vehicleInspectionStickerCheckBox.isSelected
-
-        // todo: Jahr & Monat
-
         notice.vehicleAbandoned = abandonedCheckBox.isSelected
+        notice.recipient = trimmedOrNull(recipientTextField.text)
 
         mainFrame.saveNotice()
     }
@@ -253,37 +323,29 @@ class NoticeForm(private val mainFrame: MainFrame) : JPanel() {
     }
 
     companion object {
-        val COLORS = arrayOf(
-            ListColor("--", null),
-            ListColor("Weiß", Color.white),
-            ListColor("Silber", Color(192, 192, 192)),
-            ListColor("Grau", Color.gray),
-            ListColor("Schwarz", Color.black),
-            ListColor("Beige", Color(240, 240, 210)),
-            ListColor("Gelb", Color.yellow),
-            ListColor("Orange", Color.orange),
-            ListColor("Gold", Color(218,165,32)),
-            ListColor("Braun", Color(139,69,19)),
-            ListColor("Rot", Color(240, 0,0)),
-            ListColor("Grün", Color(0,200,0)),
-            ListColor("Blau", Color.blue),
-            ListColor("Pink", Color.pink),
-            ListColor("Violett/Lila", Color(136,0,255))
-        )
-
-        val COUNTRY_SYMBOLS = arrayOf(
-            ListCountrySymbol("--", null),
-            ListCountrySymbol("A", "Österreich"),
-            ListCountrySymbol("AL", "Albanien"),
-            ListCountrySymbol("AND", "Andorra"),
-            ListCountrySymbol("B", "Belgien"),
-            ListCountrySymbol("BG", "Bulgarien"),
-            ListCountrySymbol("BIH", "Bosnien-Herzegowina"),
-            ListCountrySymbol("BY", "Belarus"),
-            ListCountrySymbol("CH", "Schweiz"),
-            ListCountrySymbol("CY", "Zypern"),
-            ListCountrySymbol("CZ", "Tschechische Republik"),
-            ListCountrySymbol("D", "Deutschland")
-        )
+        /**
+         * trimms String and returns null if blank
+         * to be used before storing a String to the database
+         * examples:
+         * <ul>
+         *   <li>null -> null</li>
+         *   <li>"" -> null</li>
+         *   <li>" " -> null</li>
+         *   <li>" Hello " -> "Hello"</li>
+         *   <li>"Hello\n" -> "Hello"</li>
+         * </ul>
+         */
+        fun trimmedOrNull(str: String?): String? {
+            return if (str == null) {
+                null
+            } else {
+                val trimmed = str.trim()
+                if (trimmed == "") {
+                    null
+                } else {
+                    trimmed
+                }
+            }
+        }
     }
 }

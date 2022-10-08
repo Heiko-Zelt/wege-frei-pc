@@ -1,10 +1,12 @@
 package de.heikozelt.wegefrei.gui
 
+import de.heikozelt.wegefrei.entities.Notice
 import de.heikozelt.wegefrei.gui.MainFrame.Companion.NO_BORDER
 import de.heikozelt.wegefrei.gui.MainFrame.Companion.TOOLBAR_BACKGROUND
 import de.heikozelt.wegefrei.log
 import de.heikozelt.wegefrei.scanForNewPhotos
 import mu.KotlinLogging
+import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.event.ActionEvent
 import java.awt.event.ActionListener
@@ -20,9 +22,12 @@ class MainToolBar: JToolBar() {
         isFloatable = false
         border = NO_BORDER
 
+        val newButton = JButton("neue Meldung erfassen")
+        newButton.addActionListener { MainFrame(Notice()) }
+        add(newButton, BorderLayout.SOUTH)
+
         val scanButton = JButton()
         val scanImageURL = this::class.java.getResource("scan_icon.gif")
-        //button.setActionCommand(UP)
         scanButton.toolTipText = "Scan"
         scanButton.addActionListener { scanForNewPhotos() }
         if(scanImageURL != null) {

@@ -32,23 +32,11 @@ class MainFrame(private val notice: Notice) : JFrame() {
 
     private val log = KotlinLogging.logger {}
 
-    private val selectedPhotos = SelectedPhotos(TreeSet(notice.photos))
-    private var mainToolBar = MainToolBar()
+    private var selectedPhotos = SelectedPhotos(TreeSet(notice.photos))
     private var allPhotosPanel = AllPhotosPanel(this, "20220301_184952.jpg")
     private var selectedPhotosPanel = SelectedPhotosPanel(this)
     private var noticeForm = NoticeForm(this)
     private var zoomPanel: ZoomPanel
-
-    // todo sinnvoll initialisieren anhand der vorhandenen Fotos
-    /*
-    private val frankfurt = GeoPosition(50.11, 8.68)
-    private val wiesbaden = GeoPosition(50, 5, 0, 8, 14, 0)
-    private val mainz = GeoPosition(50, 0, 0, 8, 16, 0)
-    private val posi = GeoPosition(50.1, 8.5)
-
-    private val photoMarkers = LinkedList<PhotoMarker>()
-    private val addressMarker: AddressMarker = AddressMarker(posi)
-     */
 
     init {
         log.debug("notice id: ${notice.id}")
@@ -61,57 +49,26 @@ class MainFrame(private val notice: Notice) : JFrame() {
         selectedPhotos.registerObserver(selectedPhotosPanel)
         selectedPhotos.registerObserver(allPhotosPanel)
 
-        /*
-        photoMarkers.add(PhotoMarker(0, frankfurt))
-        photoMarkers.add(PhotoMarker(1, wiesbaden))
-        photoMarkers.add(PhotoMarker(2, mainz))
-
-         */
-
         background = Color.green
-
-        /*
-        val selectedPhoto1 = databaseService.getPhotoByFilename("20220301_184952.jpg")
-        val selectedPhoto2 = databaseService.getPhotoByFilename("20220301_185001.jpg")
-        val selectedPhoto3 = databaseService.getPhotoByFilename("20220301_185010.jpg")
-        if (selectedPhoto1 != null) {
-            selectedPhotos.add(selectedPhoto1)
-        }
-        if (selectedPhoto2 != null) {
-            selectedPhotos.add(selectedPhoto2)
-        }
-        if (selectedPhoto3 != null) {
-            selectedPhotos.add(selectedPhoto3)
-        }
-         */
-
-        defaultCloseOperation = JFrame.EXIT_ON_CLOSE;
-
-        layout = GridBagLayout();
+        defaultCloseOperation = DISPOSE_ON_CLOSE;
+        layout = GridBagLayout()
         val constraints = GridBagConstraints()
         constraints.anchor = WEST
         constraints.fill = BOTH
-        constraints.weightx = 1.0
-        constraints.weighty = 0.04
-
         constraints.gridx = 0
         constraints.gridy = 0
-        constraints.gridwidth = 2
-        add(mainToolBar, constraints)
-
-        constraints.gridy++
+        constraints.weightx = 1.0
         constraints.weighty = 0.18
+        constraints.gridwidth = 2
         add(allPhotosPanel, constraints)
 
         constraints.gridy++
-        //doppelt selectedPhotosPanel = SelectedPhotosPanel(this, selectedPhotos)
         add(selectedPhotosPanel, constraints)
 
         constraints.gridy++
         constraints.weightx = 0.5
-        constraints.weighty = 0.60
+        constraints.weighty = 0.64
         constraints.gridwidth = 1
-
         add(noticeForm, constraints)
 
         constraints.gridx = 1
@@ -141,6 +98,10 @@ class MainFrame(private val notice: Notice) : JFrame() {
 
     fun getSelectedPhotos(): SelectedPhotos {
         return selectedPhotos
+    }
+
+    fun setSelectedPhotos(selectedPhotos: SelectedPhotos) {
+        this.selectedPhotos = selectedPhotos
     }
 
     fun getNotice(): Notice {

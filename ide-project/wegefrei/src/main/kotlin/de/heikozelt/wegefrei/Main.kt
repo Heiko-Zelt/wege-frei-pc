@@ -7,6 +7,7 @@ import com.drew.metadata.exif.GpsDirectory
 import de.heikozelt.wegefrei.entities.Notice
 import de.heikozelt.wegefrei.gui.MainFrame
 import de.heikozelt.wegefrei.entities.Photo
+import de.heikozelt.wegefrei.gui.NoticesFrame
 import mu.KotlinLogging
 import java.io.File
 import java.time.Instant
@@ -41,8 +42,9 @@ fun main(args: Array<String>) {
     val shutdownHook = Thread { log.info("exit") }
     Runtime.getRuntime().addShutdownHook(shutdownHook)
 
-    val n = Notice()
-    val f = MainFrame(n)
+    //val n = Notice()
+    //val f = MainFrame(n)
+    val f = NoticesFrame()
 
     log.debug("de.heikozelt.wegefrei.main function finished")
 }

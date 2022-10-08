@@ -56,9 +56,18 @@ class Notice(
     @Column
     var duration: Int? = null,
 
+    /**
+     * Umweltplakette fehlte in Umweltzone
+     * keine Angabe (null) und false sind gleichbedeutend,
+     * deswegen ist null nicht erlaubt und false der Standardwert.
+     */
     @Column
     var environmentalStickerMissing: Boolean = false,
 
+    /**
+     * TÜV/HU-Plakette war abgelaufen
+     * keine Angabe (null) und false sind gleichbedeutend
+     */
     @Column
     var vehicleInspectionExpired: Boolean = false,
 
@@ -68,8 +77,15 @@ class Notice(
     @Column
     var vehicleInspectionMonth: Byte? = null,
 
+    /**
+     * Fahrzeug war verlassen
+     * keine Angabe (null) und false sind gleichbedeutend
+     */
     @Column
     var vehicleAbandoned: Boolean = false,
+
+    @Column
+    var recipient: String? = null,
 
     @ManyToMany
     @JoinTable(name= "NOTICES_PHOTOS",
@@ -77,6 +93,15 @@ class Notice(
     inverseJoinColumns = [JoinColumn(name = "filename" /*, referencedColumnName = "id" */)])
     var photos: Set<Photo> = setOf()
 ) {
+    fun getDateFormatted(): String {
+        val d = date
+        return if(d == null) {
+            ""
+        } else {
+            d.format(Photo.format)
+        }
+    }
+
     fun getGeoPosition(): GeoPosition? {
         val lat = latitude
         val lon = longitude
