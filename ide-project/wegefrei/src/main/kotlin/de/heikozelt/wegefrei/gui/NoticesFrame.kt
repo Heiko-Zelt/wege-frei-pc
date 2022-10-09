@@ -14,20 +14,23 @@ class NoticesFrame(private val app: App) : JFrame("Meldungen - Wege frei!") {
     private val scrollPanel = JPanel(BorderLayout())
     private val noticesTableModel = NoticesTableModel(LinkedList(app.getDatabaseService().getAllNoticesDesc()))
     private val noticesTable = JTable(noticesTableModel)
-    private val mainToolBar = MainToolBar(app)
+    private val noticesToolBar = NoticesToolBar(app)
 
     init {
-        layout = BorderLayout()
+        layout = BorderLayout(5,5)
         setSize(1000, 700)
         defaultCloseOperation = EXIT_ON_CLOSE
-
-        add(mainToolBar, BorderLayout.NORTH)
+        background = Styles.FRAME_BACKGROUND
 
         noticesTable.addMouseListener(NoticesTableMouseAdapter(app))
+        //noticesTable.setDefaultRenderer(ListColor::class.java, NoticesTableCellRenderer())
+        noticesTable.getColumn("Farbe").cellRenderer = NoticesTableCellRenderer()
         //TableCellRenderer für Farbe als Icon
         scrollPanel.add(noticesTable.tableHeader, BorderLayout.NORTH)
         scrollPanel.add(noticesTable, BorderLayout.CENTER)
+
         add(scrollPanel)
+        add(noticesToolBar, BorderLayout.SOUTH)
 
         isVisible = true
     }
@@ -36,17 +39,15 @@ class NoticesFrame(private val app: App) : JFrame("Meldungen - Wege frei!") {
      * called, when new notice is saved, added to database
      */
     fun noticeAdded(notice: Notice) {
-        // todo update Übersichtsseite
         noticesTableModel.addNotice(notice)
     }
 
     fun noticeUpdated(notice: Notice) {
-        // todo update Übersichtsseite
-        // noticesTableModel ...
+        noticesTableModel.updateNotice(notice)
     }
 
     fun noticeDeleted(notice: Notice) {
-        // todo implement
+        noticesTableModel.removeNotice(notice)
     }
 
 }

@@ -3,9 +3,9 @@ package de.heikozelt.wegefrei.gui
 import java.awt.event.MouseEvent
 import java.awt.event.MouseListener
 
-class MiniMapMouseListener(private val mainFrame: MainFrame): MouseListener {
+class MiniMapMouseListener(private val noticeFrame: NoticeFrame): MouseListener {
     override fun mouseClicked(e: MouseEvent) {
-        mainFrame.showMaxiMap()
+        noticeFrame.showMaxiMap()
     }
 
     override fun mousePressed(e: MouseEvent?) {}

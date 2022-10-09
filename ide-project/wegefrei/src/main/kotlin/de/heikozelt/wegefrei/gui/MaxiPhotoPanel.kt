@@ -1,13 +1,13 @@
 package de.heikozelt.wegefrei.gui
 
 import de.heikozelt.wegefrei.entities.Photo
-import de.heikozelt.wegefrei.gui.MainFrame.Companion.NO_BORDER
-import de.heikozelt.wegefrei.gui.MainFrame.Companion.ZOOM_PANEL_BACKGROUND
+import de.heikozelt.wegefrei.gui.Styles.Companion.NO_BORDER
+import de.heikozelt.wegefrei.gui.Styles.Companion.ZOOM_PANEL_BACKGROUND
 import mu.KotlinLogging
 import java.awt.Image
 import javax.swing.*
 
-class MaxiPhotoPanel(private val mainFrame: MainFrame, private val photo: Photo): JPanel() {
+class MaxiPhotoPanel(private val noticeFrame: NoticeFrame, private val photo: Photo): JPanel() {
 
     private val log = KotlinLogging.logger {}
 
@@ -41,7 +41,7 @@ class MaxiPhotoPanel(private val mainFrame: MainFrame, private val photo: Photo)
         addButton = JButton("+")
         addButton.alignmentX = CENTER_ALIGNMENT
         addButton.addActionListener {
-           mainFrame.selectPhoto(photo)
+           noticeFrame.selectPhoto(photo)
         }
         add(addButton)
     }

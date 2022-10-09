@@ -1,7 +1,7 @@
 package de.heikozelt.wegefrei.gui
 
-import de.heikozelt.wegefrei.gui.MainFrame.Companion.NORMAL_BORDER
-import de.heikozelt.wegefrei.gui.MainFrame.Companion.PHOTO_MARKER_BACKGROUND
+import de.heikozelt.wegefrei.gui.Styles.Companion.NORMAL_BORDER
+import de.heikozelt.wegefrei.gui.Styles.Companion.PHOTO_MARKER_BACKGROUND
 import org.jxmapviewer.viewer.GeoPosition
 
 

@@ -2,25 +2,30 @@ package de.heikozelt.wegefrei.gui
 
 import de.heikozelt.wegefrei.App
 import de.heikozelt.wegefrei.entities.Notice
-import de.heikozelt.wegefrei.gui.MainFrame.Companion.NO_BORDER
-import de.heikozelt.wegefrei.gui.MainFrame.Companion.TOOLBAR_BACKGROUND
+import de.heikozelt.wegefrei.gui.Styles.Companion.BUTTONS_SEPARATOR_DIMENSION
+import de.heikozelt.wegefrei.gui.Styles.Companion.TOOLBAR_BACKGROUND
+import de.heikozelt.wegefrei.gui.Styles.Companion.TOOLBAR_BORDER
 import mu.KotlinLogging
-import java.awt.BorderLayout
+import javax.swing.Box
 import javax.swing.ImageIcon
 import javax.swing.JButton
 import javax.swing.JToolBar
 
-class MainToolBar(private val app: App): JToolBar() {
+class NoticesToolBar(private val app: App): JToolBar() {
 
     private val log = KotlinLogging.logger {}
     init {
         background = TOOLBAR_BACKGROUND
         isFloatable = false
-        border = NO_BORDER
+        border = TOOLBAR_BORDER
+
+        add(Box.createHorizontalGlue())
 
         val newButton = JButton("neue Meldung erfassen")
-        newButton.addActionListener { MainFrame(app, Notice()) }
-        add(newButton, BorderLayout.SOUTH)
+        newButton.addActionListener { NoticeFrame(app, Notice()) }
+        add(newButton)
+
+        addSeparator(BUTTONS_SEPARATOR_DIMENSION)
 
         val scanButton = JButton()
         val scanImageURL = this::class.java.getResource("scan_icon.gif")
@@ -32,6 +37,8 @@ class MainToolBar(private val app: App): JToolBar() {
             scanButton.text = "Scan"
         }
         add(scanButton)
+
+        addSeparator(BUTTONS_SEPARATOR_DIMENSION)
 
         val settingsButton = JButton()
         val settingsImageURL = this::class.java.getResource("settings_icon.gif")
@@ -45,6 +52,8 @@ class MainToolBar(private val app: App): JToolBar() {
         }
         add(settingsButton)
 
+        addSeparator(BUTTONS_SEPARATOR_DIMENSION)
+
         val helpButton = JButton()
         val helpImageURL = this::class.java.getResource("help_icon.gif")
         //button.setActionCommand(UP)
@@ -56,6 +65,8 @@ class MainToolBar(private val app: App): JToolBar() {
             helpButton.text = "Hilfe"
         }
         add(helpButton)
+
+        addSeparator(BUTTONS_SEPARATOR_DIMENSION)
     }
 
 }

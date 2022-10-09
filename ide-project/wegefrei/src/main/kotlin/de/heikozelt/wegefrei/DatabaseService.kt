@@ -54,14 +54,14 @@ class DatabaseService {
         return resultList
     }
 
-    fun addPhoto(photo: Photo) {
+    fun insertPhoto(photo: Photo) {
         //em.merge(photo)
         em.transaction.begin()
         em.persist(photo)
         em.transaction.commit()
     }
 
-    fun addNotice(notice: Notice) {
+    fun insertNotice(notice: Notice) {
         em.transaction.begin()
         em.persist(notice)
         em.transaction.commit()
@@ -73,13 +73,9 @@ class DatabaseService {
         em.transaction.commit()
     }
 
-    fun addOrUpdateNotice(notice: Notice) {
+    fun deleteNotice(notice: Notice) {
         em.transaction.begin()
-        if(notice.id == null) {
-            em.persist(notice)
-        } else {
-            em.merge(notice)
-        }
+        em.remove(notice)
         em.transaction.commit()
     }
 

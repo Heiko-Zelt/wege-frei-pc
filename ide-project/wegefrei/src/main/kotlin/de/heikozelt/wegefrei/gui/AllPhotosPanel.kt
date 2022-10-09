@@ -1,7 +1,7 @@
 package de.heikozelt.wegefrei.gui
 
 import de.heikozelt.wegefrei.entities.Photo
-import de.heikozelt.wegefrei.gui.MainFrame.Companion.ALL_PHOTOS_BACKGROUND
+import de.heikozelt.wegefrei.gui.Styles.Companion.ALL_PHOTOS_BACKGROUND
 import de.heikozelt.wegefrei.model.SelectedPhotosObserver
 import mu.KotlinLogging
 import javax.swing.BoxLayout
@@ -10,12 +10,12 @@ import javax.swing.JButton
 import javax.swing.JPanel
 
 class AllPhotosPanel(
-    private val mainFrame: MainFrame,
+    private val noticeFrame: NoticeFrame,
     private var firstPhotoFilename: String
 ) : JPanel(), SelectedPhotosObserver {
 
     private val log = KotlinLogging.logger {}
-    private val selectedPhotos = mainFrame.getSelectedPhotos()
+    private val selectedPhotos = noticeFrame.getSelectedPhotos()
     private val miniPhotoPanels = arrayListOf<MiniPhotoPanel>()
 
     init {
@@ -25,10 +25,10 @@ class AllPhotosPanel(
         val backButton = JButton("<")
         add(backButton)
 
-        var photos = mainFrame.getDatabaseService().getPhotos(firstPhotoFilename, 20)
+        var photos = noticeFrame.getDatabaseService().getPhotos(firstPhotoFilename, 20)
         for (photo in photos) {
             val active = !selectedPhotos.getPhotos().contains(photo)
-            val miniPhotoPanel = MiniPhotoPanel(mainFrame, photo, active)
+            val miniPhotoPanel = MiniPhotoPanel(noticeFrame, photo, active)
             miniPhotoPanels.add(miniPhotoPanel)
             add(miniPhotoPanel)
         }

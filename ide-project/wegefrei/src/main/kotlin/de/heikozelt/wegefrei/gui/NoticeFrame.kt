@@ -5,11 +5,11 @@ import de.heikozelt.wegefrei.App
 import de.heikozelt.wegefrei.DatabaseService
 import de.heikozelt.wegefrei.entities.Notice
 import de.heikozelt.wegefrei.entities.Photo
+import de.heikozelt.wegefrei.gui.Styles.Companion.FRAME_BACKGROUND
 import de.heikozelt.wegefrei.json.NominatimResponse
 import de.heikozelt.wegefrei.model.SelectedPhotos
 import mu.KotlinLogging
 import org.jxmapviewer.viewer.GeoPosition
-import java.awt.Color
 import java.awt.GridBagConstraints
 import java.awt.GridBagConstraints.BOTH
 import java.awt.GridBagConstraints.WEST
@@ -17,9 +17,7 @@ import java.awt.GridBagLayout
 import java.net.HttpURLConnection
 import java.net.URL
 import java.util.*
-import javax.swing.BorderFactory
 import javax.swing.JFrame
-import javax.swing.border.Border
 
 /**
  * Haupt-Fenster zum Bearbeiten einer Meldung
@@ -30,10 +28,9 @@ import javax.swing.border.Border
  *   <li>Instanziierung mit Notice als Parameter zum Bearbeiten einer bestehenden Meldung. notice.id enthält eine Zahl.</li>
  * </ol>
  */
-class MainFrame(private val app: App, private val notice: Notice) : JFrame() {
+class NoticeFrame(private val app: App, private val notice: Notice) : JFrame() {
 
     private val log = KotlinLogging.logger {}
-
     private var selectedPhotos = SelectedPhotos(TreeSet(notice.photos))
     private var allPhotosPanel = AllPhotosPanel(this, "20220301_184952.jpg")
     private var selectedPhotosPanel = SelectedPhotosPanel(this)
@@ -51,7 +48,7 @@ class MainFrame(private val app: App, private val notice: Notice) : JFrame() {
         selectedPhotos.registerObserver(selectedPhotosPanel)
         selectedPhotos.registerObserver(allPhotosPanel)
 
-        background = Color.green
+        background = FRAME_BACKGROUND
         defaultCloseOperation = DISPOSE_ON_CLOSE
         layout = GridBagLayout()
         val constraints = GridBagConstraints()
@@ -163,7 +160,7 @@ class MainFrame(private val app: App, private val notice: Notice) : JFrame() {
      */
     fun showMaxiMap() {
         log.debug("show maxi map")
-        noticeForm.getMiniMap().displayBorder(true)
+        noticeForm.getNoticeFormFields().getMiniMap().displayBorder(true)
         zoomPanel.showMap()
         selectedPhotosPanel.hideBorder()
     }
@@ -174,7 +171,7 @@ class MainFrame(private val app: App, private val notice: Notice) : JFrame() {
     fun showPhoto(miniPhotoPanel: MiniPhotoPanel) {
         log.debug("show photo")
         zoomPanel.showPhoto(miniPhotoPanel.getPhoto())
-        noticeForm.getMiniMap().displayBorder(false)
+        noticeForm.getNoticeFormFields().getMiniMap().displayBorder(false)
         allPhotosPanel.showBorder(miniPhotoPanel)
         selectedPhotosPanel.hideBorder()
     }
@@ -185,7 +182,7 @@ class MainFrame(private val app: App, private val notice: Notice) : JFrame() {
     fun showSelectedPhoto(miniSelectedPhotoPanel: MiniSelectedPhotoPanel) {
         log.debug("show selected photo")
         zoomPanel.showSelectedPhoto(miniSelectedPhotoPanel.getPhoto())
-        noticeForm.getMiniMap().displayBorder(false)
+        noticeForm.getNoticeFormFields().getMiniMap().displayBorder(false)
         allPhotosPanel.hideBorder()
         selectedPhotosPanel.showBorder(miniSelectedPhotoPanel)
     }
@@ -213,22 +210,22 @@ class MainFrame(private val app: App, private val notice: Notice) : JFrame() {
                 if (it.houseNumber != null) {
                     street += " " + it.houseNumber
                 }
-                noticeForm.setStreet(street)
+                noticeForm.getNoticeFormFields().setStreet(street)
             }
             if (it.postcode != null) {
-                noticeForm.setZipCode(it.postcode)
+                noticeForm.getNoticeFormFields().setZipCode(it.postcode)
             }
             if (it.city != null) {
-                noticeForm.setTown(it.city)
+                noticeForm.getNoticeFormFields().setTown(it.city)
             }
         }
     }
 
     fun saveNotice() {
-        noticeForm.saveNotice()
+        noticeForm.getNoticeFormFields().saveNotice()
         val dbService = app.getDatabaseService()
         if(notice.id == null) {
-            dbService.addNotice(notice)
+            dbService.insertNotice(notice)
             app.noticeAdded(notice)
         } else {
             dbService.updateNotice(notice)
@@ -236,19 +233,9 @@ class MainFrame(private val app: App, private val notice: Notice) : JFrame() {
         }
     }
 
-
-    companion object {
-        val NORMAL_BORDER: Border? = BorderFactory.createLineBorder(Color.black)
-        val HIGHLIGHT_BORDER: Border? = BorderFactory.createLineBorder(Color.yellow)
-        val NO_BORDER: Border? = BorderFactory.createEmptyBorder()
-
-        val TEXT_COLOR: Color? = Color.white
-        val PHOTO_MARKER_BACKGROUND = Color(101, 162, 235)
-
-        val TOOLBAR_BACKGROUND = Color(50, 50, 50)
-        val ALL_PHOTOS_BACKGROUND = Color(20, 20, 20)
-        val SELECTED_PHOTOS_BACKGROUND = Color(50, 50, 50)
-        val FORM_BACKGROUND = Color(20, 20, 20)
-        val ZOOM_PANEL_BACKGROUND = Color(35, 35, 35)
+    fun deleteNotice() {
+        val dbService = app.getDatabaseService()
+        dbService.deleteNotice(notice)
+        app.noticeDeleted(notice)
     }
 }

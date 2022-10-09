@@ -1,8 +1,8 @@
 package de.heikozelt.wegefrei.gui
 
 import de.heikozelt.wegefrei.entities.Photo
-import de.heikozelt.wegefrei.gui.MainFrame.Companion.NO_BORDER
-import de.heikozelt.wegefrei.gui.MainFrame.Companion.SELECTED_PHOTOS_BACKGROUND
+import de.heikozelt.wegefrei.gui.Styles.Companion.NO_BORDER
+import de.heikozelt.wegefrei.gui.Styles.Companion.SELECTED_PHOTOS_BACKGROUND
 import de.heikozelt.wegefrei.model.SelectedPhotosObserver
 import mu.KotlinLogging
 import java.awt.Container
@@ -11,7 +11,7 @@ import javax.swing.BoxLayout.X_AXIS
 import javax.swing.JPanel
 import javax.swing.JScrollPane
 
-class SelectedPhotosPanel(private val mainFrame: MainFrame) : JScrollPane(JPanel()),
+class SelectedPhotosPanel(private val noticeFrame: NoticeFrame) : JScrollPane(JPanel()),
     SelectedPhotosObserver {
 
     private val log = KotlinLogging.logger {}
@@ -28,9 +28,9 @@ class SelectedPhotosPanel(private val mainFrame: MainFrame) : JScrollPane(JPanel
 
             // nicht notwendig, wenn selectedPhotos anfänglich leer ist und Observer vorher schon registriert ist
             // aber man weiß ja nie
-            for (photo in mainFrame.getSelectedPhotos().getPhotos()) {
+            for (photo in noticeFrame.getSelectedPhotos().getPhotos()) {
                 log.warn("observer zu spät registriert?")
-                val panel = MiniSelectedPhotoPanel(mainFrame, photo)
+                val panel = MiniSelectedPhotoPanel(noticeFrame, photo)
                 miniSelectedPhotoPanels.add(panel)
                 cont.add(panel)
             }
@@ -84,7 +84,7 @@ class SelectedPhotosPanel(private val mainFrame: MainFrame) : JScrollPane(JPanel
 
     override fun addedPhoto(index: Int, photo: Photo) {
         log.debug("added photo")
-        val panel = MiniSelectedPhotoPanel(mainFrame, photo)
+        val panel = MiniSelectedPhotoPanel(noticeFrame, photo)
         miniSelectedPhotoPanels.add(index, panel)
         val cont = viewport.view
         if (cont != null && cont is Container) {

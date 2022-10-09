@@ -1,13 +1,13 @@
 package de.heikozelt.wegefrei.gui
 
 import de.heikozelt.wegefrei.entities.Photo
-import de.heikozelt.wegefrei.gui.MainFrame.Companion.NO_BORDER
-import de.heikozelt.wegefrei.gui.MainFrame.Companion.ZOOM_PANEL_BACKGROUND
+import de.heikozelt.wegefrei.gui.Styles.Companion.NO_BORDER
+import de.heikozelt.wegefrei.gui.Styles.Companion.ZOOM_PANEL_BACKGROUND
 import mu.KotlinLogging
 import java.awt.Image
 import javax.swing.*
 
-class MaxiSelectedPhotoPanel(private val mainFrame: MainFrame, private val photo: Photo): JPanel() {
+class MaxiSelectedPhotoPanel(private val noticeFrame: NoticeFrame, private val photo: Photo): JPanel() {
 
     private val log = KotlinLogging.logger {}
 
@@ -32,7 +32,7 @@ class MaxiSelectedPhotoPanel(private val mainFrame: MainFrame, private val photo
         val removeButton = JButton("-")
         removeButton.alignmentX = CENTER_ALIGNMENT
         removeButton.addActionListener {
-            mainFrame.unselectPhoto(photo)
+            noticeFrame.unselectPhoto(photo)
         }
 
         add(removeButton)

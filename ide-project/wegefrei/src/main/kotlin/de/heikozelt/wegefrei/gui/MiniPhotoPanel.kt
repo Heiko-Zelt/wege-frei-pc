@@ -1,16 +1,16 @@
 package de.heikozelt.wegefrei.gui
 
 import de.heikozelt.wegefrei.entities.Photo
-import de.heikozelt.wegefrei.gui.MainFrame.Companion.ALL_PHOTOS_BACKGROUND
-import de.heikozelt.wegefrei.gui.MainFrame.Companion.HIGHLIGHT_BORDER
-import de.heikozelt.wegefrei.gui.MainFrame.Companion.NORMAL_BORDER
+import de.heikozelt.wegefrei.gui.Styles.Companion.ALL_PHOTOS_BACKGROUND
+import de.heikozelt.wegefrei.gui.Styles.Companion.HIGHLIGHT_BORDER
+import de.heikozelt.wegefrei.gui.Styles.Companion.NORMAL_BORDER
 import mu.KotlinLogging
 import java.awt.Image
 import java.awt.Toolkit
 import java.awt.image.FilteredImageSource
 import javax.swing.*
 
-class MiniPhotoPanel(private val mainFrame: MainFrame, private val photo: Photo, private var active: Boolean): JPanel() {
+class MiniPhotoPanel(private val noticeFrame: NoticeFrame, private val photo: Photo, private var active: Boolean): JPanel() {
 
     private val log = KotlinLogging.logger {}
     private val thumbnailLabel: JLabel
@@ -47,7 +47,7 @@ class MiniPhotoPanel(private val mainFrame: MainFrame, private val photo: Photo,
         thumbnailLabel.toolTipText = "<html>${photo.filename}<br>${photo.getDateFormatted()}<br>${photo.latitude}, ${photo.longitude}</html>"
         thumbnailLabel.alignmentX = CENTER_ALIGNMENT
         thumbnailLabel.border = NORMAL_BORDER
-        mouseListener = MiniPhotoPanelMouseListener(mainFrame, this)
+        mouseListener = MiniPhotoPanelMouseListener(noticeFrame, this)
         if(active) {
             thumbnailLabel.addMouseListener(mouseListener)
         }
@@ -57,7 +57,7 @@ class MiniPhotoPanel(private val mainFrame: MainFrame, private val photo: Photo,
         addButton.alignmentX = CENTER_ALIGNMENT
         addButton.isEnabled = active
         addButton.addActionListener {
-           mainFrame.selectPhoto(photo)
+           noticeFrame.selectPhoto(photo)
         }
         add(addButton)
     }

@@ -66,7 +66,7 @@ class App {
                 val photo = readPhotoMetadata(File(PHOTO_DIR, filename))
                 //    ProofPhoto(filename, null, null, null)
                 if (photo != null) {
-                    databaseService.addPhoto(photo)
+                    databaseService.insertPhoto(photo)
                 }
             } else {
                 log.debug("image in filesystem is already in database")

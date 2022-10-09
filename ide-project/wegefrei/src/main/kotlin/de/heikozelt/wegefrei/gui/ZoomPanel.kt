@@ -1,19 +1,20 @@
 package de.heikozelt.wegefrei.gui
 
 import de.heikozelt.wegefrei.entities.Photo
-import de.heikozelt.wegefrei.gui.MainFrame.Companion.ZOOM_PANEL_BACKGROUND
+import de.heikozelt.wegefrei.gui.Styles.Companion.NO_BORDER
+import de.heikozelt.wegefrei.gui.Styles.Companion.ZOOM_PANEL_BACKGROUND
 import mu.KotlinLogging
 import java.awt.BorderLayout
 import java.awt.BorderLayout.CENTER
 import javax.swing.JPanel
 
-class ZoomPanel(private var mainFrame: MainFrame): JPanel() {
+class ZoomPanel(private var noticeFrame: NoticeFrame): JPanel() {
 
     private val log = KotlinLogging.logger {}
 
     init {
         background = ZOOM_PANEL_BACKGROUND
-        border = MainFrame.NO_BORDER
+        border = NO_BORDER
         layout = BorderLayout()
         showNothing()
     }
@@ -45,7 +46,7 @@ class ZoomPanel(private var mainFrame: MainFrame): JPanel() {
 
     private fun addPhoto(photo: Photo) {
         log.debug("add photo")
-        add(MaxiPhotoPanel(mainFrame, photo))
+        add(MaxiPhotoPanel(noticeFrame, photo))
         revalidate()
     }
 
@@ -69,7 +70,7 @@ class ZoomPanel(private var mainFrame: MainFrame): JPanel() {
 
     private fun addSelectedPhoto(photo: Photo) {
         log.debug("add selected photo")
-        add(MaxiSelectedPhotoPanel(mainFrame, photo))
+        add(MaxiSelectedPhotoPanel(noticeFrame, photo))
         revalidate()
     }
 

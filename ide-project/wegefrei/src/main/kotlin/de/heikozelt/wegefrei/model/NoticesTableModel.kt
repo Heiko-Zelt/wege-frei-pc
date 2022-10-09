@@ -31,12 +31,33 @@ class NoticesTableModel(private val notices: MutableList<Notice>) : AbstractTabl
     }
 
     /**
-     * fügt eine Meldung am Anfang der Tabelle hinzu
+     * fügt eine Meldung am Anfang der Tabelle hinzu,
+     * und aktualisiert die View(s)
      */
     fun addNotice(notice: Notice) {
-        log.debug("add notice")
+        log.debug("add notice #${notice.id}")
         notices.add(0, notice)
         fireTableRowsInserted(0,0)
+    }
+
+    /**
+     * aktualisiert die View(s) nach Änderungen
+     */
+    fun updateNotice(notice: Notice) {
+        log.debug("update notice #${notice.id}")
+        val rowIndex = notices.indexOf(notice)
+        fireTableRowsUpdated(rowIndex, rowIndex)
+    }
+
+    /**
+     * entfernt eine Meldung
+     * und aktualisiert die View(s)
+     */
+    fun removeNotice(notice: Notice) {
+        log.debug("remove notice #${notice.id}")
+        val rowIndex = notices.indexOf(notice)
+        notices.remove(notice)
+        fireTableRowsDeleted(rowIndex, rowIndex)
     }
 
     override fun getValueAt(rowIndex: Int, columnIndex: Int): Any? {
@@ -47,7 +68,7 @@ class NoticesTableModel(private val notices: MutableList<Notice>) : AbstractTabl
             2 -> notice.countrySymbol
             3 -> notice.licensePlate
             4 -> notice.vehicleMake
-            5 -> notice.color
+            5 -> ListColor.fromColorName(notice.color)
             else -> IndexOutOfBoundsException()
         }
     }

@@ -1,12 +1,14 @@
 package de.heikozelt.wegefrei.gui
 
 import de.heikozelt.wegefrei.entities.Photo
-import de.heikozelt.wegefrei.gui.MainFrame.Companion.SELECTED_PHOTOS_BACKGROUND
+import de.heikozelt.wegefrei.gui.Styles.Companion.HIGHLIGHT_BORDER
+import de.heikozelt.wegefrei.gui.Styles.Companion.NORMAL_BORDER
+import de.heikozelt.wegefrei.gui.Styles.Companion.SELECTED_PHOTOS_BACKGROUND
 import mu.KotlinLogging
 import java.awt.Image
 import javax.swing.*
 
-class MiniSelectedPhotoPanel(private val mainFrame: MainFrame, private val photo: Photo): JPanel() {
+class MiniSelectedPhotoPanel(private val noticeFrame: NoticeFrame, private val photo: Photo): JPanel() {
 
     private val log = KotlinLogging.logger {}
     private val thumbnailLabel: JLabel
@@ -34,14 +36,14 @@ class MiniSelectedPhotoPanel(private val mainFrame: MainFrame, private val photo
 
         thumbnailLabel.toolTipText = "<html>${photo.filename}<br>${photo.getDateFormatted()}<br>${photo.latitude}, ${photo.longitude}</html>"
         thumbnailLabel.alignmentX = CENTER_ALIGNMENT
-        thumbnailLabel.border = MainFrame.NORMAL_BORDER
-        thumbnailLabel.addMouseListener(MiniSelectedPhotoPanelMouseListener(mainFrame, this))
+        thumbnailLabel.border = NORMAL_BORDER
+        thumbnailLabel.addMouseListener(MiniSelectedPhotoPanelMouseListener(noticeFrame, this))
         add(thumbnailLabel)
 
         val removeButton = JButton("-")
         removeButton.alignmentX = CENTER_ALIGNMENT
         removeButton.addActionListener {
-            mainFrame.unselectPhoto(photo)
+            noticeFrame.unselectPhoto(photo)
         }
 
         add(removeButton)
@@ -49,11 +51,11 @@ class MiniSelectedPhotoPanel(private val mainFrame: MainFrame, private val photo
 
     fun displayBorder(visible: Boolean) {
         if(visible && !borderVisible) {
-            thumbnailLabel.border = MainFrame.HIGHLIGHT_BORDER
+            thumbnailLabel.border = HIGHLIGHT_BORDER
             thumbnailLabel.revalidate()
             borderVisible = true
         } else if(!visible && borderVisible) {
-            thumbnailLabel.border = MainFrame.NORMAL_BORDER
+            thumbnailLabel.border = NORMAL_BORDER
             thumbnailLabel.revalidate()
             borderVisible = false
         }

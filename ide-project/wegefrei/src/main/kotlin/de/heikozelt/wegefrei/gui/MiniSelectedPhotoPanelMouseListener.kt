@@ -3,9 +3,9 @@ package de.heikozelt.wegefrei.gui
 import java.awt.event.MouseEvent
 import java.awt.event.MouseListener
 
-class MiniSelectedPhotoPanelMouseListener(private val mainFrame: MainFrame, private val miniSelectedPhotoPanel: MiniSelectedPhotoPanel): MouseListener {
+class MiniSelectedPhotoPanelMouseListener(private val noticeFrame: NoticeFrame, private val miniSelectedPhotoPanel: MiniSelectedPhotoPanel): MouseListener {
     override fun mouseClicked(e: MouseEvent) {
-        mainFrame.showSelectedPhoto(miniSelectedPhotoPanel)
+        noticeFrame.showSelectedPhoto(miniSelectedPhotoPanel)
     }
 
     override fun mousePressed(e: MouseEvent?) {}

@@ -1,7 +1,8 @@
 package de.heikozelt.wegefrei.gui
 
 import de.heikozelt.wegefrei.entities.Photo
-import de.heikozelt.wegefrei.gui.MainFrame.Companion.NORMAL_BORDER
+import de.heikozelt.wegefrei.gui.Styles.Companion.HIGHLIGHT_BORDER
+import de.heikozelt.wegefrei.gui.Styles.Companion.NORMAL_BORDER
 import de.heikozelt.wegefrei.model.SelectedPhotosObserver
 import mu.KotlinLogging
 import org.jxmapviewer.JXMapViewer
@@ -24,7 +25,7 @@ import kotlin.math.sqrt
  * Letzter Marker unten, erster Marker ganz obendrauf.
  */
 class MiniMap(
-    private val mainFrame: MainFrame
+    private val noticeFrame: NoticeFrame
 ) : JXMapViewer(), SelectedPhotosObserver {
 
     private val log = KotlinLogging.logger {}
@@ -32,7 +33,7 @@ class MiniMap(
     private val painter = MarkerPainter()
     private val photoMarkers = LinkedList<PhotoMarker>()
     private var addressMarker: AddressMarker? = null
-    private var selectedPhotos = mainFrame.getSelectedPhotos()
+    private var selectedPhotos = noticeFrame.getSelectedPhotos()
 
     init {
         log.debug("register")
@@ -51,7 +52,7 @@ class MiniMap(
         val info = OSMTileFactoryInfo()
         tileFactory = DefaultTileFactory(info)
 
-        addMouseListener(MiniMapMouseListener(mainFrame))
+        addMouseListener(MiniMapMouseListener(noticeFrame))
 
         updatePainterWaypoints()
         overlayPainter = painter
@@ -88,7 +89,7 @@ class MiniMap(
 
     fun displayBorder(visible: Boolean) {
         if (visible && !borderVisible) {
-            border = MainFrame.HIGHLIGHT_BORDER
+            border = HIGHLIGHT_BORDER
             revalidate()
             borderVisible = true
         } else if (!visible && borderVisible) {
@@ -214,7 +215,7 @@ class MiniMap(
             // aus Performance-Gründen:
             // bei nur minimalen Abweichungen keine neu Addresse suchen
             if (oldPosition == null || distance(oldPosition, newPosition) > NEARBY_DEGREES)
-                mainFrame.findAddress(newPosition)
+                noticeFrame.findAddress(newPosition)
 
         }
     }
