@@ -3,14 +3,13 @@ package de.heikozelt.wegefrei.gui
 import de.heikozelt.wegefrei.entities.Photo
 import de.heikozelt.wegefrei.gui.MainFrame.Companion.NO_BORDER
 import de.heikozelt.wegefrei.gui.MainFrame.Companion.SELECTED_PHOTOS_BACKGROUND
-import de.heikozelt.wegefrei.model.SelectedPhotos
 import de.heikozelt.wegefrei.model.SelectedPhotosObserver
 import mu.KotlinLogging
-import java.awt.Color
 import java.awt.Container
-import java.util.*
-import javax.swing.*
+import javax.swing.BoxLayout
 import javax.swing.BoxLayout.X_AXIS
+import javax.swing.JPanel
+import javax.swing.JScrollPane
 
 class SelectedPhotosPanel(private val mainFrame: MainFrame) : JScrollPane(JPanel()),
     SelectedPhotosObserver {
@@ -24,7 +23,7 @@ class SelectedPhotosPanel(private val mainFrame: MainFrame) : JScrollPane(JPanel
         border = NO_BORDER
         val cont = viewport.view
         if (cont != null && cont is Container) {
-            cont.layout = BoxLayout(cont, X_AXIS);
+            cont.layout = BoxLayout(cont, X_AXIS)
             cont.background = SELECTED_PHOTOS_BACKGROUND
 
             // nicht notwendig, wenn selectedPhotos anfänglich leer ist und Observer vorher schon registriert ist

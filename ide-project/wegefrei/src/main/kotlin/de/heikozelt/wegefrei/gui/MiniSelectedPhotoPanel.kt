@@ -14,7 +14,7 @@ class MiniSelectedPhotoPanel(private val mainFrame: MainFrame, private val photo
 
     init {
         background = SELECTED_PHOTOS_BACKGROUND
-        layout = BoxLayout(this, BoxLayout.Y_AXIS);
+        layout = BoxLayout(this, BoxLayout.Y_AXIS)
 
         //val file = File(PHOTO_DIR, filename)
         //val photo = readPhotoMetadata(file)
@@ -41,7 +41,7 @@ class MiniSelectedPhotoPanel(private val mainFrame: MainFrame, private val photo
         val removeButton = JButton("-")
         removeButton.alignmentX = CENTER_ALIGNMENT
         removeButton.addActionListener {
-           mainFrame?.unselectPhoto(photo)
+            mainFrame.unselectPhoto(photo)
         }
 
         add(removeButton)

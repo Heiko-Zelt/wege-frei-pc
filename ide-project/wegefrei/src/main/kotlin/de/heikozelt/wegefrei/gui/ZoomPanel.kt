@@ -14,7 +14,7 @@ class ZoomPanel(private var mainFrame: MainFrame): JPanel() {
     init {
         background = ZOOM_PANEL_BACKGROUND
         border = MainFrame.NO_BORDER
-        layout = BorderLayout();
+        layout = BorderLayout()
         showNothing()
     }
 

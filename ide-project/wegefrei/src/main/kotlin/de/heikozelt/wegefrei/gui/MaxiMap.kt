@@ -21,7 +21,7 @@ class MaxiMap: JPanel() {
     init {
         background = ZOOM_PANEL_BACKGROUND
         border = NO_BORDER
-        layout = GridBagLayout();
+        layout = GridBagLayout()
         val constraints = GridBagConstraints()
         constraints.anchor = GridBagConstraints.CENTER
         constraints.fill = GridBagConstraints.BOTH

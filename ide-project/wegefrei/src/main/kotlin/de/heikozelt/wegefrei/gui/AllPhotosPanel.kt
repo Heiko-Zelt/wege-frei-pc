@@ -20,7 +20,7 @@ class AllPhotosPanel(
 
     init {
         background = ALL_PHOTOS_BACKGROUND
-        layout = BoxLayout(this, X_AXIS);
+        layout = BoxLayout(this, X_AXIS)
 
         val backButton = JButton("<")
         add(backButton)

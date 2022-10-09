@@ -31,7 +31,7 @@ class MiniPhotoPanel(private val mainFrame: MainFrame, private val photo: Photo,
 
     init {
         background = ALL_PHOTOS_BACKGROUND
-        layout = BoxLayout(this, BoxLayout.Y_AXIS);
+        layout = BoxLayout(this, BoxLayout.Y_AXIS)
 
         //val file = File(PHOTO_DIR, photo.filename)
         //val photo = readPhotoMetadata(file)

@@ -40,7 +40,7 @@ class NoticeForm(private val mainFrame: MainFrame) : JPanel() {
     init {
         background = FORM_BACKGROUND
         border = NO_BORDER
-        layout = GridBagLayout();
+        layout = GridBagLayout()
         val constraints = GridBagConstraints()
         constraints.anchor = WEST
         //constraints.fill = BOTH

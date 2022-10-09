@@ -1,20 +1,16 @@
 package de.heikozelt.wegefrei.gui
 
+import de.heikozelt.wegefrei.App
 import de.heikozelt.wegefrei.entities.Notice
 import de.heikozelt.wegefrei.gui.MainFrame.Companion.NO_BORDER
 import de.heikozelt.wegefrei.gui.MainFrame.Companion.TOOLBAR_BACKGROUND
-import de.heikozelt.wegefrei.log
-import de.heikozelt.wegefrei.scanForNewPhotos
 import mu.KotlinLogging
 import java.awt.BorderLayout
-import java.awt.Color
-import java.awt.event.ActionEvent
-import java.awt.event.ActionListener
 import javax.swing.ImageIcon
 import javax.swing.JButton
 import javax.swing.JToolBar
 
-class MainToolBar: JToolBar() {
+class MainToolBar(private val app: App): JToolBar() {
 
     private val log = KotlinLogging.logger {}
     init {
@@ -23,31 +19,19 @@ class MainToolBar: JToolBar() {
         border = NO_BORDER
 
         val newButton = JButton("neue Meldung erfassen")
-        newButton.addActionListener { MainFrame(Notice()) }
+        newButton.addActionListener { MainFrame(app, Notice()) }
         add(newButton, BorderLayout.SOUTH)
 
         val scanButton = JButton()
         val scanImageURL = this::class.java.getResource("scan_icon.gif")
         scanButton.toolTipText = "Scan"
-        scanButton.addActionListener { scanForNewPhotos() }
+        scanButton.addActionListener { app.scanForNewPhotos() }
         if(scanImageURL != null) {
             scanButton.icon = ImageIcon(scanImageURL, "Scan")
         } else {
             scanButton.text = "Scan"
         }
         add(scanButton)
-
-        val indexButton = JButton()
-        val indexImageURL = this::class.java.getResource("index_icon.gif")
-        //button.setActionCommand(UP)
-        indexButton.toolTipText = "Übersicht"
-        indexButton.addActionListener{ log.debug("unhandled event")}
-        if(indexImageURL != null) {
-            indexButton.icon = ImageIcon(indexImageURL, "Übersicht")
-        } else {
-            indexButton.text = "Übersicht"
-        }
-        add(indexButton)
 
         val settingsButton = JButton()
         val settingsImageURL = this::class.java.getResource("settings_icon.gif")

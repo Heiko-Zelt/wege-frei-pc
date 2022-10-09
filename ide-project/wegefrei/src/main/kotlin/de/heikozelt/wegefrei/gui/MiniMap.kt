@@ -2,15 +2,14 @@ package de.heikozelt.wegefrei.gui
 
 import de.heikozelt.wegefrei.entities.Photo
 import de.heikozelt.wegefrei.gui.MainFrame.Companion.NORMAL_BORDER
-import de.heikozelt.wegefrei.model.SelectedPhotos
 import de.heikozelt.wegefrei.model.SelectedPhotosObserver
 import mu.KotlinLogging
 import org.jxmapviewer.JXMapViewer
 import org.jxmapviewer.OSMTileFactoryInfo
-import org.jxmapviewer.viewer.*
+import org.jxmapviewer.viewer.DefaultTileFactory
+import org.jxmapviewer.viewer.GeoPosition
 import java.awt.Dimension
 import java.util.*
-import kotlin.collections.HashSet
 import kotlin.math.abs
 import kotlin.math.sqrt
 
@@ -18,7 +17,7 @@ import kotlin.math.sqrt
  * Beispiele für components:
  * { } leer
  * { photoMarker(0) } merkwürdiger Fall
- * { addressMarker } keine Geo-Location in Photo? manuell gesetzt?
+ * { addressMarker } keine Geo-Location in Foto? manuell gesetzt?
  * { photoMarker(2), photoMarker(1), photoMarker(0) } merkwürdiger Fall
  * { addressMarker, photoMarker(2), photoMarker(1), photoMarker(0) } Perfekter Use Case
  * Sie werden in umgekehrter Reihenfolge gezeichnet.

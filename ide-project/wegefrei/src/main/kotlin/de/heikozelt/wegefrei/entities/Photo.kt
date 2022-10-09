@@ -19,14 +19,14 @@ class Photo (
 
     /**
      * Breitengrad der Foto-Metadaten
-     * Y-Achse, Richtung Norden, z.B. 50.08 für Wiesbaden
+     * y-Achse, Richtung Norden, z.B. 50.08 für Wiesbaden
      */
     @Column
     val latitude: Float? = null,
 
     /**
      * Längengrad der Foto-Metadaten
-     * X-Achse, Richtung Osten, z.B. 8.24 für Wiesbaden
+     * x-Achse, Richtung Osten, z.B. 8.24 für Wiesbaden
      */
     @Column
     val longitude: Float? = null,

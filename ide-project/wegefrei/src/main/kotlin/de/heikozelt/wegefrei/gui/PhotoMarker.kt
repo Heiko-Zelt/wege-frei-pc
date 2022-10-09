@@ -1,16 +1,8 @@
 package de.heikozelt.wegefrei.gui
 
 import de.heikozelt.wegefrei.gui.MainFrame.Companion.NORMAL_BORDER
-import de.heikozelt.wegefrei.gui.MainFrame.Companion.NO_BORDER
 import de.heikozelt.wegefrei.gui.MainFrame.Companion.PHOTO_MARKER_BACKGROUND
-import org.jxmapviewer.viewer.DefaultWaypoint
 import org.jxmapviewer.viewer.GeoPosition
-import java.awt.Color
-import java.awt.Dimension
-import javax.imageio.ImageIO
-import javax.swing.ImageIcon
-import javax.swing.JButton
-import javax.swing.JLabel
 
 
 class PhotoMarker(index: Int, coord: GeoPosition?) : Marker(coord) {

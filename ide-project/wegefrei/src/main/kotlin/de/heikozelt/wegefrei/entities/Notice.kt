@@ -2,9 +2,7 @@ package de.heikozelt.wegefrei.entities
 
 import jakarta.persistence.*
 import org.jxmapviewer.viewer.GeoPosition
-import java.time.LocalDateTime
 import java.time.ZonedDateTime
-import java.util.*
 
 @Entity
 @Table(name="NOTICES")

@@ -34,7 +34,7 @@ class DatabaseService {
     fun getPhotos(firstPhotoFilename: String, limit: Int): Set<Photo> {
         val resultList: List<Photo> = em.createQuery("SELECT ph FROM Photo ph WHERE ph.filename >= :filename ORDER BY ph.filename", Photo::class.java)
             .setParameter("filename", firstPhotoFilename).setMaxResults(limit).resultList
-        return TreeSet<Photo>(resultList)
+        return TreeSet(resultList)
     }
 
     /**

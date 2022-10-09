@@ -1,9 +1,11 @@
 package de.heikozelt.wegefrei.model
 
 import de.heikozelt.wegefrei.entities.Notice
-import javax.swing.table.AbstractTableModel;
+import mu.KotlinLogging
+import javax.swing.table.AbstractTableModel
 
-class NoticesTableModel(private val notices: List<Notice>) : AbstractTableModel() {
+class NoticesTableModel(private val notices: MutableList<Notice>) : AbstractTableModel() {
+    private val log = KotlinLogging.logger {}
 
     override fun getRowCount(): Int {
         return notices.size
@@ -15,6 +17,16 @@ class NoticesTableModel(private val notices: List<Notice>) : AbstractTableModel(
 
     fun getNoticeAt(rowIndex: Int): Notice {
         return notices[rowIndex]
+    }
+
+    /**
+     * fügt eine Meldung am Anfang der Tabelle hinzu
+     */
+    fun addNotice(notice: Notice) {
+        log.debug("add notice")
+        notices.add(0, notice)
+
+
     }
 
     override fun getValueAt(rowIndex: Int, columnIndex: Int): Any? {

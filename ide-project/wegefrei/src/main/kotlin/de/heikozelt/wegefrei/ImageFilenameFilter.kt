@@ -9,6 +9,6 @@ class ImageFilenameFilter: FilenameFilter {
             return false
         }
         val lower = filename.lowercase()
-        return lower.endsWith(".jpg") || lower.endsWith(".jpeg");
+        return lower.endsWith(".jpg") || lower.endsWith(".jpeg")
     }
 }

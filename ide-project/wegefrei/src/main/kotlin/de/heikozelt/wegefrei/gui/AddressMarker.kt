@@ -7,9 +7,7 @@ import java.awt.Dimension
 import java.awt.Toolkit
 import java.awt.image.FilteredImageSource
 import javax.imageio.ImageIO
-import javax.swing.GrayFilter
 import javax.swing.ImageIcon
-import javax.swing.JLabel
 
 
 class AddressMarker(coord: GeoPosition?) : Marker(coord) {
@@ -21,7 +19,7 @@ class AddressMarker(coord: GeoPosition?) : Marker(coord) {
     }
 
     companion object {
-        val icn: ImageIcon;
+        val icn: ImageIcon
 
         private val log = KotlinLogging.logger {}
 

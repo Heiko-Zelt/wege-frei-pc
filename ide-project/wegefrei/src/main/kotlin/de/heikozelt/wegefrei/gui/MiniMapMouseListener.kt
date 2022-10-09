@@ -5,7 +5,7 @@ import java.awt.event.MouseListener
 
 class MiniMapMouseListener(private val mainFrame: MainFrame): MouseListener {
     override fun mouseClicked(e: MouseEvent) {
-        mainFrame?.showMaxiMap()
+        mainFrame.showMaxiMap()
     }
 
     override fun mousePressed(e: MouseEvent?) {}

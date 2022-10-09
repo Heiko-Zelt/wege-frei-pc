@@ -17,7 +17,8 @@ import java.awt.GridBagLayout
 import java.net.HttpURLConnection
 import java.net.URL
 import java.util.*
-import javax.swing.*
+import javax.swing.BorderFactory
+import javax.swing.JFrame
 import javax.swing.border.Border
 
 /**
@@ -51,7 +52,7 @@ class MainFrame(private val app: App, private val notice: Notice) : JFrame() {
         selectedPhotos.registerObserver(allPhotosPanel)
 
         background = Color.green
-        defaultCloseOperation = DISPOSE_ON_CLOSE;
+        defaultCloseOperation = DISPOSE_ON_CLOSE
         layout = GridBagLayout()
         val constraints = GridBagConstraints()
         constraints.anchor = WEST
@@ -228,10 +229,10 @@ class MainFrame(private val app: App, private val notice: Notice) : JFrame() {
         val dbService = app.getDatabaseService()
         if(notice.id == null) {
             dbService.addNotice(notice)
-            app.noticeAdded()
+            app.noticeAdded(notice)
         } else {
             dbService.updateNotice(notice)
-            app.noticeUpdated()
+            app.noticeUpdated(notice)
         }
     }
 

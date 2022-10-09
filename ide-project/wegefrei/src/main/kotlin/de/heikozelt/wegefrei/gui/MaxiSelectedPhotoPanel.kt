@@ -4,7 +4,6 @@ import de.heikozelt.wegefrei.entities.Photo
 import de.heikozelt.wegefrei.gui.MainFrame.Companion.NO_BORDER
 import de.heikozelt.wegefrei.gui.MainFrame.Companion.ZOOM_PANEL_BACKGROUND
 import mu.KotlinLogging
-import java.awt.Color
 import java.awt.Image
 import javax.swing.*
 
@@ -15,7 +14,7 @@ class MaxiSelectedPhotoPanel(private val mainFrame: MainFrame, private val photo
     init {
         background = ZOOM_PANEL_BACKGROUND
         border = NO_BORDER
-        layout = BoxLayout(this, BoxLayout.Y_AXIS);
+        layout = BoxLayout(this, BoxLayout.Y_AXIS)
 
         //val file = File(PHOTO_DIR, filename)
         //val photo = readPhotoMetadata(file)
@@ -33,7 +32,7 @@ class MaxiSelectedPhotoPanel(private val mainFrame: MainFrame, private val photo
         val removeButton = JButton("-")
         removeButton.alignmentX = CENTER_ALIGNMENT
         removeButton.addActionListener {
-           mainFrame?.unselectPhoto(photo)
+            mainFrame.unselectPhoto(photo)
         }
 
         add(removeButton)
