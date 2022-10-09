@@ -1,19 +1,14 @@
 package de.heikozelt.wegefrei.entities
 
-import de.heikozelt.wegefrei.PHOTO_DIR
-import de.heikozelt.wegefrei.readPhotoMetadata
+import de.heikozelt.wegefrei.App
 import jakarta.persistence.*
 import org.jxmapviewer.viewer.GeoPosition
 import java.awt.image.BufferedImage
 import java.io.File
-import java.text.SimpleDateFormat
-import java.time.LocalDateTime
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
-import java.util.*
 import javax.imageio.ImageIO
 import kotlin.jvm.Transient
-
 
 @Entity
 @Table(name="PHOTOS")
@@ -65,7 +60,7 @@ class Photo (
     }
 
     fun loadImage() {
-        val file = File(PHOTO_DIR, filename)
+        val file = File(App.PHOTO_DIR, filename)
         //val photo = readPhotoMetadata(file)
         img = ImageIO.read(file)
     }

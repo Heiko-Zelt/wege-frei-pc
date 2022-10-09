@@ -38,10 +38,19 @@ class DatabaseService {
     }
 
     /**
-     * liefert ein sortiertes Set von Fotos
+     * liefert ein sortiertes Set von Meldungen
      */
     fun getAllNotices(): List<Notice> {
         val resultList: List<Notice> = em.createQuery("SELECT n FROM Notice n ORDER BY n.id", Notice::class.java).resultList
+        return resultList
+    }
+
+    /**
+     * liefert ein umgekehrt sortiertes Set von Meldungen
+     * neueste (mit der höchsten ID) zuerst
+     */
+    fun getAllNoticesDesc(): List<Notice> {
+        val resultList: List<Notice> = em.createQuery("SELECT n FROM Notice n ORDER BY n.id DESC", Notice::class.java).resultList
         return resultList
     }
 

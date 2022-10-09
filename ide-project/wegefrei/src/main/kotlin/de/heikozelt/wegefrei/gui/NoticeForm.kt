@@ -1,20 +1,17 @@
 package de.heikozelt.wegefrei.gui
 
-import de.heikozelt.wegefrei.VEHICLE_MAKES
-import de.heikozelt.wegefrei.entities.Notice
 import de.heikozelt.wegefrei.gui.MainFrame.Companion.FORM_BACKGROUND
 import de.heikozelt.wegefrei.gui.MainFrame.Companion.NO_BORDER
 import de.heikozelt.wegefrei.gui.MainFrame.Companion.TEXT_COLOR
-import de.heikozelt.wegefrei.model.SelectedPhotos
+import de.heikozelt.wegefrei.model.ListColor
+import de.heikozelt.wegefrei.model.ListCountrySymbol
+import de.heikozelt.wegefrei.model.ListVehicleMakes
 import mu.KotlinLogging
-import java.awt.Color
 import java.awt.GridBagConstraints
 import java.awt.GridBagConstraints.*
 import java.awt.GridBagLayout
-import java.text.SimpleDateFormat
 import java.time.*
 import java.time.format.DateTimeFormatter
-import java.util.*
 import javax.swing.*
 import javax.swing.text.AbstractDocument
 
@@ -26,7 +23,7 @@ class NoticeForm(private val mainFrame: MainFrame) : JPanel() {
     private val log = KotlinLogging.logger {}
     private val countrySymbolComboBox = JComboBox(ListCountrySymbol.COUNTRY_SYMBOLS)
     private val licensePlateTextField = JTextField(10)
-    private val vehicleMakeComboBox = JComboBox(VEHICLE_MAKES)
+    private val vehicleMakeComboBox = JComboBox(ListVehicleMakes.VEHICLE_MAKES)
     private val colorComboBox = JComboBox(ListColor.COLORS)
     private val miniMap = MiniMap(mainFrame)
     private var streetTextField = JTextField(30)
@@ -179,7 +176,7 @@ class NoticeForm(private val mainFrame: MainFrame) : JPanel() {
 
         constraints.gridy++
         val saveButton = JButton("speichern")
-        saveButton.addActionListener { saveNotice() }
+        saveButton.addActionListener { mainFrame.saveNotice() }
         constraints.anchor = EAST
         constraints.gridx = 0
         add(saveButton, constraints)
@@ -209,7 +206,7 @@ class NoticeForm(private val mainFrame: MainFrame) : JPanel() {
 
         licensePlateTextField.text = notice.licensePlate
 
-        val make = VEHICLE_MAKES.find { it == notice.vehicleMake }
+        val make = ListVehicleMakes.VEHICLE_MAKES.find { it == notice.vehicleMake }
         make?.let {
             vehicleMakeComboBox.selectedItem = make
         }
@@ -253,7 +250,7 @@ class NoticeForm(private val mainFrame: MainFrame) : JPanel() {
      * Mapping der Werte der GUI-Komponenten zu Notice
      */
     // todo: form validation, Validierungsfehler bei Eingabefeldern anzeigen
-    private fun saveNotice() {
+    fun saveNotice() {
         val notice = mainFrame.getNotice()
         notice.photos = mainFrame.getSelectedPhotos().getPhotos()
 
@@ -286,7 +283,7 @@ class NoticeForm(private val mainFrame: MainFrame) : JPanel() {
         notice.zipCode = trimmedOrNull(zipCodeTextField.text)
         notice.town = trimmedOrNull(townTextField.text)
 
-        // todo: Validierung, ob Datum
+        // todo: Validierung, ob Datum oder Blank/Null
         val format = DateTimeFormatter.ofPattern("dd.MM.yyyy")
         val dat: LocalDate = LocalDate.parse(offenseDateTextField.text, format)
         // todo: Validierung, ob Uhrzeit
@@ -302,8 +299,6 @@ class NoticeForm(private val mainFrame: MainFrame) : JPanel() {
         notice.vehicleInspectionExpired = vehicleInspectionStickerCheckBox.isSelected
         notice.vehicleAbandoned = abandonedCheckBox.isSelected
         notice.recipient = trimmedOrNull(recipientTextField.text)
-
-        mainFrame.saveNotice()
     }
 
     fun getMiniMap(): MiniMap {

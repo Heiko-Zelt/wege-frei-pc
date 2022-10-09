@@ -1,4 +1,4 @@
-package de.heikozelt.wegefrei.gui
+package de.heikozelt.wegefrei.model
 
 class ListCountrySymbol(val abbreviation: String, val countryName: String?) {
 

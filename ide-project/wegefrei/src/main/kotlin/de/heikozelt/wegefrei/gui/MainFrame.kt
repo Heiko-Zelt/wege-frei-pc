@@ -1,7 +1,8 @@
 package de.heikozelt.wegefrei.gui
 
 import com.beust.klaxon.Klaxon
-import de.heikozelt.wegefrei.databaseService
+import de.heikozelt.wegefrei.App
+import de.heikozelt.wegefrei.DatabaseService
 import de.heikozelt.wegefrei.entities.Notice
 import de.heikozelt.wegefrei.entities.Photo
 import de.heikozelt.wegefrei.json.NominatimResponse
@@ -28,7 +29,7 @@ import javax.swing.border.Border
  *   <li>Instanziierung mit Notice als Parameter zum Bearbeiten einer bestehenden Meldung. notice.id enthält eine Zahl.</li>
  * </ol>
  */
-class MainFrame(private val notice: Notice) : JFrame() {
+class MainFrame(private val app: App, private val notice: Notice) : JFrame() {
 
     private val log = KotlinLogging.logger {}
 
@@ -80,6 +81,10 @@ class MainFrame(private val notice: Notice) : JFrame() {
         isVisible = true
     }
 
+    fun getDatabaseService(): DatabaseService {
+        return app.getDatabaseService()
+    }
+
     /**
      * wählt ein Foto aus
 
@@ -121,7 +126,7 @@ class MainFrame(private val notice: Notice) : JFrame() {
         selectedPhotosPanel.showBorder(photo)
 
         //val index = selectedPhotosPanel.indexOfPhoto(photo)
-        val index = selectedPhotos.getPhotos().indexOf(photo)
+        //val index = selectedPhotos.getPhotos().indexOf(photo)
         //noticeForm.getMiniMap().addMarker(index, photo)
     }
 
@@ -144,7 +149,7 @@ class MainFrame(private val notice: Notice) : JFrame() {
     fun unselectPhoto(photo: Photo) {
         log.debug("unselect photo")
         //val index = selectedPhotosPanel.indexOfPhoto(photo)
-        val index = selectedPhotos.getPhotos().indexOf(photo)
+        //val index = selectedPhotos.getPhotos().indexOf(photo)
         //noticeForm.getMiniMap().removeMarker(index)
         //selectedPhotosPanel.removePhoto(photo)
         selectedPhotos.remove(photo)
@@ -219,8 +224,15 @@ class MainFrame(private val notice: Notice) : JFrame() {
     }
 
     fun saveNotice() {
-        databaseService.addOrUpdateNotice(notice)
-        // todo implement
+        noticeForm.saveNotice()
+        val dbService = app.getDatabaseService()
+        if(notice.id == null) {
+            dbService.addNotice(notice)
+            app.noticeAdded()
+        } else {
+            dbService.updateNotice(notice)
+            app.noticeUpdated()
+        }
     }
 
 

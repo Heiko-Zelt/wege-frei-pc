@@ -1,13 +1,9 @@
-package de.heikozelt.wegefrei.gui
+package de.heikozelt.wegefrei.model
 
-import de.heikozelt.wegefrei.databaseService
 import de.heikozelt.wegefrei.entities.Notice
-import javax.swing.JLabel
 import javax.swing.table.AbstractTableModel;
 
-class NoticesTableModel : AbstractTableModel() {
-
-    private val notices = databaseService.getAllNotices()
+class NoticesTableModel(private val notices: List<Notice>) : AbstractTableModel() {
 
     override fun getRowCount(): Int {
         return notices.size

@@ -1,14 +1,13 @@
 package de.heikozelt.wegefrei.gui
 
-import de.heikozelt.wegefrei.databaseService
 import de.heikozelt.wegefrei.entities.Photo
 import de.heikozelt.wegefrei.gui.MainFrame.Companion.ALL_PHOTOS_BACKGROUND
-import de.heikozelt.wegefrei.model.SelectedPhotos
 import de.heikozelt.wegefrei.model.SelectedPhotosObserver
 import mu.KotlinLogging
-import java.awt.Color
-import javax.swing.*
+import javax.swing.BoxLayout
 import javax.swing.BoxLayout.X_AXIS
+import javax.swing.JButton
+import javax.swing.JPanel
 
 class AllPhotosPanel(
     private val mainFrame: MainFrame,
@@ -26,7 +25,7 @@ class AllPhotosPanel(
         val backButton = JButton("<")
         add(backButton)
 
-        var photos = databaseService.getPhotos(firstPhotoFilename, 20)
+        var photos = mainFrame.getDatabaseService().getPhotos(firstPhotoFilename, 20)
         for (photo in photos) {
             val active = !selectedPhotos.getPhotos().contains(photo)
             val miniPhotoPanel = MiniPhotoPanel(mainFrame, photo, active)
