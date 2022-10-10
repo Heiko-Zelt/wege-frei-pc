@@ -2,32 +2,42 @@ package de.heikozelt.wegefrei.gui
 
 import de.heikozelt.wegefrei.App
 import de.heikozelt.wegefrei.entities.Notice
-import de.heikozelt.wegefrei.gui.Styles.Companion.BUTTONS_SEPARATOR_DIMENSION
-import de.heikozelt.wegefrei.gui.Styles.Companion.TOOLBAR_BACKGROUND
-import de.heikozelt.wegefrei.gui.Styles.Companion.TOOLBAR_BORDER
+import de.heikozelt.wegefrei.gui.Styles.Companion.BUTTONS_DISTANCE
+import de.heikozelt.wegefrei.gui.Styles.Companion.BUTTON_MARGIN
 import mu.KotlinLogging
+import java.awt.FlowLayout
 import javax.swing.Box
 import javax.swing.ImageIcon
 import javax.swing.JButton
-import javax.swing.JToolBar
+import javax.swing.JPanel
 
-class NoticesToolBar(private val app: App): JToolBar() {
+class NoticesToolBar(private val app: App): JPanel() {
 
     private val log = KotlinLogging.logger {}
     init {
-        background = TOOLBAR_BACKGROUND
-        isFloatable = false
-        border = TOOLBAR_BORDER
+        //background = TOOLBAR_BACKGROUND
+        //isFloatable = false
+        //border = TOOLBAR_BORDER
 
-        add(Box.createHorizontalGlue())
+        layout = FlowLayout(FlowLayout.RIGHT, 5,0)
+
+        log.debug("layout " + layout)
+        //JToolBar: javax.swing.plaf.synth.SynthToolBarUI$SynthToolBarLayoutManager
+        //JPanel: java.awt.FlowLayout[hgap=5,vgap=5,align=center]
+
+        //add(Box.createHorizontalGlue())
 
         val newButton = JButton("neue Meldung erfassen")
+        newButton.margin = BUTTON_MARGIN
         newButton.addActionListener { NoticeFrame(app, Notice()) }
         add(newButton)
 
-        addSeparator(BUTTONS_SEPARATOR_DIMENSION)
+        //addSeparator(BUTTONS_SEPARATOR_DIMENSION)
+        add(Box.createHorizontalStrut(BUTTONS_DISTANCE));
+        //add(BUTTONS_SEPARATOR)
 
         val scanButton = JButton()
+        scanButton.margin = BUTTON_MARGIN
         val scanImageURL = this::class.java.getResource("scan_icon.gif")
         scanButton.toolTipText = "Scan"
         scanButton.addActionListener { app.scanForNewPhotos() }
@@ -38,9 +48,12 @@ class NoticesToolBar(private val app: App): JToolBar() {
         }
         add(scanButton)
 
-        addSeparator(BUTTONS_SEPARATOR_DIMENSION)
+        //add(Box.createHorizontalStrut(25));
+        add(Box.createHorizontalStrut(BUTTONS_DISTANCE));
+        //add(BUTTONS_SEPARATOR)
 
         val settingsButton = JButton()
+        settingsButton.margin = BUTTON_MARGIN
         val settingsImageURL = this::class.java.getResource("settings_icon.gif")
         //button.setActionCommand(UP)
         settingsButton.toolTipText = "Einstellungen"
@@ -52,9 +65,12 @@ class NoticesToolBar(private val app: App): JToolBar() {
         }
         add(settingsButton)
 
-        addSeparator(BUTTONS_SEPARATOR_DIMENSION)
+        //add(Box.createHorizontalStrut(25));
+        add(Box.createHorizontalStrut(BUTTONS_DISTANCE));
+        //add(BUTTONS_SEPARATOR)
 
         val helpButton = JButton()
+        helpButton.margin = BUTTON_MARGIN
         val helpImageURL = this::class.java.getResource("help_icon.gif")
         //button.setActionCommand(UP)
         helpButton.toolTipText = "Hilfe"
@@ -66,7 +82,9 @@ class NoticesToolBar(private val app: App): JToolBar() {
         }
         add(helpButton)
 
-        addSeparator(BUTTONS_SEPARATOR_DIMENSION)
+        //add(Box.createHorizontalStrut(25));
+        add(Box.createHorizontalStrut(BUTTONS_DISTANCE));
+        //add(BUTTONS_SEPARATOR)
     }
 
 }

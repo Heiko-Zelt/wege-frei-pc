@@ -1,8 +1,8 @@
 package de.heikozelt.wegefrei.gui
 
 import java.awt.Color
-import java.awt.Dimension
 import java.awt.Font
+import java.awt.Insets
 import javax.swing.*
 import javax.swing.border.Border
 
@@ -15,7 +15,9 @@ class Styles {
         val LABEL_FONT = JLabel().font ?: Font("Dialog", Font.BOLD, 12)
         val TEXTFIELD_FONT = JTextField().font ?: Font("Dialog", Font.PLAIN, 12)
 
-        val BUTTONS_SEPARATOR_DIMENSION = Dimension(20, 20)
+        //val BUTTONS_SEPARATOR_DIMENSION = Dimension(20, 20)
+        const val BUTTONS_DISTANCE = 15
+        val BUTTON_MARGIN = Insets(0, 5, 0, 5)
 
         val NORMAL_BORDER: Border = BorderFactory.createLineBorder(Color.black)
         val HIGHLIGHT_BORDER: Border? = BorderFactory.createLineBorder(Color.yellow)
