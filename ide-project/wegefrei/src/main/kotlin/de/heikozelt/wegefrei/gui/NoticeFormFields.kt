@@ -2,6 +2,7 @@ package de.heikozelt.wegefrei.gui
 
 import de.heikozelt.wegefrei.gui.Styles.Companion.FORM_BACKGROUND
 import de.heikozelt.wegefrei.gui.Styles.Companion.NO_BORDER
+import de.heikozelt.wegefrei.gui.Styles.Companion.TEXTFIELD_FONT
 import de.heikozelt.wegefrei.gui.Styles.Companion.TEXT_COLOR
 import de.heikozelt.wegefrei.model.ListColor
 import de.heikozelt.wegefrei.model.ListCountrySymbol
@@ -11,6 +12,7 @@ import java.awt.BorderLayout
 import java.awt.GridBagConstraints
 import java.awt.GridBagConstraints.WEST
 import java.awt.GridBagLayout
+import java.awt.Insets
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
@@ -48,6 +50,7 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel() {
         border = NO_BORDER
         layout = GridBagLayout()
         val constraints = GridBagConstraints()
+        constraints.insets = Insets(0,5,0,0)
         constraints.anchor = WEST
         //constraints.fill = BOTH
         constraints.weightx = 0.5
@@ -61,6 +64,7 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel() {
         add(countrySymbolLabel, constraints)
         constraints.gridx = 1
         countrySymbolComboBox.renderer = CountrySymbolListCellRenderer()
+        countrySymbolComboBox.font = TEXTFIELD_FONT
         add(countrySymbolComboBox, constraints)
 
         constraints.gridy++
@@ -81,6 +85,7 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel() {
         constraints.gridx = 0
         add(vehicleMakeLabel, constraints)
         constraints.gridx = 1
+        vehicleMakeComboBox.font = TEXTFIELD_FONT
         add(vehicleMakeComboBox, constraints)
 
         constraints.gridy++
@@ -92,6 +97,7 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel() {
 
         colorComboBox.renderer = ColorListCellRenderer()
         colorComboBox.maximumRowCount = ListColor.COLORS.size
+        colorComboBox.font = TEXTFIELD_FONT
         constraints.gridx = 1
         add(colorComboBox, constraints)
 
