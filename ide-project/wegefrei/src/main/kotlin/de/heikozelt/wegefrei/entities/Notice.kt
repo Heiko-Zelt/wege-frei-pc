@@ -1,8 +1,10 @@
 package de.heikozelt.wegefrei.entities
 
+import de.heikozelt.wegefrei.model.NoticeState
 import jakarta.persistence.*
 import org.jxmapviewer.viewer.GeoPosition
 import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 
 @Entity
 @Table(name="NOTICES")
@@ -10,6 +12,13 @@ class Notice(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Int? = null,
+
+    // todo: entscheiden ob UTC oder CET/CEST?
+    // TIMESTAMP WITH TIME ZONE
+    @Column
+    var observationTime: ZonedDateTime? = null,
+
+    var sentTime: ZonedDateTime? = null,
 
     @Column(length=3)
     var countrySymbol: String? = null,
@@ -45,11 +54,6 @@ class Notice(
 
     @Column
     var town: String? = null,
-
-    // todo: entscheiden ob UTC oder CET/CEST?
-    // TIMESTAMP WITH TIME ZONE
-    @Column
-    var date: ZonedDateTime? = null,
 
     @Column
     var duration: Int? = null,
@@ -91,12 +95,29 @@ class Notice(
     inverseJoinColumns = [JoinColumn(name = "filename" /*, referencedColumnName = "id" */)])
     var photos: Set<Photo> = setOf()
 ) {
-    fun getDateFormatted(): String {
-        val d = date
+
+    @Column
+    val createdTime = ZonedDateTime.now()
+
+    fun getCreatedTimeFormatted(): String {
+        val d = createdTime
         return if(d == null) {
             ""
         } else {
-            d.format(Photo.format)
+            d.format(dateTimeFormat)
+        }
+    }
+
+    /**
+     * Die Beobachtungszeit muss nicht mit der Tatzeit identisch sein.
+     * Das Fahrzeug kann vorher schon falsch gehalten/geparkt haben und/oder nachher immer noch.
+     */
+    fun getObservationTimeFormatted(): String {
+        val d = observationTime
+        return if(d == null) {
+            ""
+        } else {
+            d.format(dateTimeFormat)
         }
     }
 
@@ -108,5 +129,38 @@ class Notice(
         } else {
             null
         }
+    }
+
+    /**
+     * Sind alle Pflichtfelder ausgefüllt?
+     * (Zwischenspeichern geht immer,
+     * aber zum Absenden einer E-Mail müssen bestimmte Felder ausgefüllt sein. )
+     */
+    fun isComplete(): Boolean {
+        return licensePlate != null && street != null && zipCode != null && town != null && observationTime != null && photos.isNotEmpty()
+    }
+
+    /**
+     * Wurde schon eine E-Mail abgesendet?
+     * todo Prio 2: mehrmals versenden ggf. an unterschiedliche Empfänger oder BCC, eigene Datenbank-Tabelle
+     * todo Prio 3: Outbox. Nachricht erst in den Postausgang legen. Im Hintergrund-Thread wird versendet.
+     * isSent() liefert dann true, wenn mindestend eine E-Mail erfolgreich versendet wurde
+     */
+    fun isSent(): Boolean {
+        return sentTime != null
+    }
+
+    fun getState(): NoticeState {
+        return if(isSent()) {
+            NoticeState.SENT
+        } else if(isComplete()) {
+            NoticeState.COMPLETE
+        } else {
+            NoticeState.INCOMPLETE
+        }
+    }
+
+    companion object {
+        val dateTimeFormat: DateTimeFormatter? = DateTimeFormatter.ofPattern("dd.MM.yyyy, HH:mm z")
     }
 }

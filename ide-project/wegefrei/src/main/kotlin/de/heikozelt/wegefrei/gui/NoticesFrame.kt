@@ -24,10 +24,10 @@ class NoticesFrame(private val app: App) : JFrame("Meldungen - Wege frei!") {
 
         noticesTable.addMouseListener(NoticesTableMouseAdapter(app))
         //noticesTable.setDefaultRenderer(ListColor::class.java, NoticesTableCellRenderer())
-        noticesTable.getColumn("Farbe").cellRenderer = NoticesTableCellRenderer()
+        noticesTable.getColumn("Farbe").cellRenderer = NoticesTableColorCellRenderer()
+        noticesTable.getColumn("Status").cellRenderer = NoticesTableStateCellRenderer()
         noticesTable.background = Styles.NOTICES_TABLE_BACKGROUND
         noticesTable.foreground = Styles.TEXT_COLOR
-        //TableCellRenderer für Farbe als Icon
         scrollPanel.add(noticesTable.tableHeader, BorderLayout.NORTH)
         scrollPanel.add(noticesTable, BorderLayout.CENTER)
 

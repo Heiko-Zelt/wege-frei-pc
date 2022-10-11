@@ -64,11 +64,13 @@ class NoticesTableModel(private val notices: MutableList<Notice>) : AbstractTabl
         val notice = notices[rowIndex]
         return when (columnIndex) {
             0 -> notice.id
-            1 -> notice.getDateFormatted()
-            2 -> notice.countrySymbol
-            3 -> notice.licensePlate
-            4 -> notice.vehicleMake
-            5 -> ListColor.fromColorName(notice.color)
+            1 -> notice.countrySymbol
+            2 -> notice.licensePlate
+            3 -> notice.vehicleMake
+            4 -> ListColor.fromColorName(notice.color)
+            5 -> notice.getCreatedTimeFormatted()
+            6 -> notice.getObservationTimeFormatted()
+            7 -> notice.getState()
             else -> IndexOutOfBoundsException()
         }
     }
@@ -80,7 +82,7 @@ class NoticesTableModel(private val notices: MutableList<Notice>) : AbstractTabl
 
     companion object {
         val COLUMN_NAMES = arrayOf(
-            "#", "Datum/Zeit", "Land", "Kennzeichen", "Marke", "Farbe"
+            "#", "Land", "Kennzeichen", "Marke", "Farbe", "Erstellt", "Beobachtet", "Status"
         )
     }
 

@@ -54,7 +54,7 @@ class App {
 
         val dir = File(PHOTO_DIR)
         if (!dir.isDirectory) {
-            log.error(PHOTO_DIR + "ist kein Verzeichnis.")
+            log.error(PHOTO_DIR + " ist kein Verzeichnis.")
             return
         }
         val filenames = dir.list(ImageFilenameFilter())

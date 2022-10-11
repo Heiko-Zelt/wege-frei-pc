@@ -233,18 +233,18 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel() {
         zipCodeTextField.text = notice.zipCode
         townTextField.text = notice.town
 
-        offenseDateTextField.text = if(notice.date == null) {
+        offenseDateTextField.text = if(notice.observationTime == null) {
             ""
         } else {
             val fmt = DateTimeFormatter.ofPattern("dd.MM.yyyy")
-            fmt.format(notice.date)
+            fmt.format(notice.observationTime)
         }
 
-        offenseTimeTextField.text = if(notice.date == null) {
+        offenseTimeTextField.text = if(notice.observationTime == null) {
             ""
         } else {
             val fmt = DateTimeFormatter.ofPattern("HH:mm")
-            fmt.format(notice.date)
+            fmt.format(notice.observationTime)
         }
 
         durationTextField.text = if(notice.duration == null) {
@@ -298,18 +298,32 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel() {
         notice.zipCode = trimmedOrNull(zipCodeTextField.text)
         notice.town = trimmedOrNull(townTextField.text)
 
-        // todo: Validierung, ob Datum oder Blank/Null
         val format = DateTimeFormatter.ofPattern("dd.MM.yyyy")
-        val dat: LocalDate = LocalDate.parse(offenseDateTextField.text, format)
-        // todo: Validierung, ob Uhrzeit
-        // todo Problem lösen: Sommer- oder Winterzeit, eine Stunde im Jahr ist zweideutig
-        val tim = LocalTime.parse(offenseTimeTextField.text)
-        val datTim = ZonedDateTime.of(dat, tim, ZoneId.systemDefault())
-        notice.date = datTim
-        //notice.date = Date.from(datTim.atZone(ZoneId.systemDefault()).toInstant())
+        val obsDateTxt = offenseDateTextField.text
+        notice.observationTime = if(obsDateTxt.isBlank()) {
+            null
+        } else {
+            val dat: LocalDate = LocalDate.parse(obsDateTxt, format)
+            // todo Prio 2: Validierung, ob Format von Datum und Uhrzeit korrekt sind. Fehlermeldung anzeigen.
+            // todo Prio 3: Problem lösen: Sommer- oder Winterzeit, eine Stunde im Jahr ist zweideutig
+            // todo Prio 3: Datum/Uhrzeit darf nicht in der Zukunft liegen
+            val obsTimeTxt = offenseTimeTextField.text
+            val tim = if(obsTimeTxt.isBlank()) {
+                LocalTime.parse("00:00")
+            } else {
+                LocalTime.parse(obsTimeTxt)
+            }
+            ZonedDateTime.of(dat, tim, ZoneId.systemDefault())
+        }
 
-        // todo: Validierung, ob Zahl
-        notice.duration = (trimmedOrNull(durationTextField.text) as String).toInt()
+        val durTxt = durationTextField.text
+        notice.duration = if(durTxt.isBlank()) {
+            null
+        } else {
+            // todo: Prio 2: Validierung, ob Zahl
+            durTxt.toInt()
+        }
+
         notice.environmentalStickerMissing = environmentalStickerCheckBox.isSelected
         notice.vehicleInspectionExpired = vehicleInspectionStickerCheckBox.isSelected
         notice.vehicleAbandoned = abandonedCheckBox.isSelected

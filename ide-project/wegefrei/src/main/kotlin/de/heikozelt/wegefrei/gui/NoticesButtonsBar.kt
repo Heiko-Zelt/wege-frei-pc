@@ -29,7 +29,11 @@ class NoticesButtonsBar(private val app: App): JPanel() {
 
         val newButton = JButton("neue Meldung erfassen")
         newButton.margin = BUTTON_MARGIN
-        newButton.addActionListener { NoticeFrame(app, Notice()) }
+
+        newButton.addActionListener {
+            val newNotice = Notice()
+            NoticeFrame(app, newNotice)
+        }
         add(newButton)
 
         //addSeparator(BUTTONS_SEPARATOR_DIMENSION)

@@ -1,6 +1,6 @@
 package de.heikozelt.wegefrei.gui
 
-import de.heikozelt.wegefrei.model.ListColor
+import de.heikozelt.wegefrei.model.NoticeState
 import mu.KotlinLogging
 import java.awt.Component
 import javax.swing.JLabel
@@ -11,7 +11,7 @@ import javax.swing.border.EmptyBorder
 import javax.swing.table.TableCellRenderer
 
 
-class NoticesTableCellRenderer : JLabel(), TableCellRenderer {
+class NoticesTableStateCellRenderer : JLabel(), TableCellRenderer {
 
     private val log = KotlinLogging.logger {}
 
@@ -26,7 +26,7 @@ class NoticesTableCellRenderer : JLabel(), TableCellRenderer {
      */
     override fun getTableCellRendererComponent(
         table: JTable?,
-        value: Any,
+        value: Any?,
         isSelected: Boolean,
         hasFocus: Boolean,
         row: Int,
@@ -69,9 +69,15 @@ class NoticesTableCellRenderer : JLabel(), TableCellRenderer {
         //isOpaque = background != null && !(background.equals(table.background));
         super.setOpaque(true)
 
-        if (value is ListColor) {
-            icon = ColorIcon(value.color)
-            text = value.colorName
+        // todo icon & Farbe
+        text = if (value is NoticeState) {
+            when(value) {
+                NoticeState.INCOMPLETE -> "unvollständig"
+                NoticeState.COMPLETE -> "offen"
+                NoticeState.SENT -> "gemeldet"
+            }
+        } else {
+            "?"
         }
         return this
     }
