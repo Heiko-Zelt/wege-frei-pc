@@ -1,5 +1,8 @@
 package de.heikozelt.wegefrei.gui
 
+import de.heikozelt.wegefrei.docfilters.DateDocFilter
+import de.heikozelt.wegefrei.docfilters.OnlyDigitsDocFilter
+import de.heikozelt.wegefrei.docfilters.TimeDocFilter
 import de.heikozelt.wegefrei.gui.Styles.Companion.FORM_BACKGROUND
 import de.heikozelt.wegefrei.gui.Styles.Companion.NO_BORDER
 import de.heikozelt.wegefrei.gui.Styles.Companion.TEXTFIELD_FONT
@@ -18,10 +21,7 @@ import java.time.LocalTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
-import javax.swing.JCheckBox
-import javax.swing.JComboBox
-import javax.swing.JLabel
-import javax.swing.JPanel
+import javax.swing.*
 import javax.swing.text.AbstractDocument
 
 /**
@@ -38,9 +38,9 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel() {
     private var streetTextField = TrimmingTextField(30)
     private var zipCodeTextField = TrimmingTextField(5)
     private var townTextField = TrimmingTextField(30)
-    private val offenseDateTextField = TrimmingTextField(10)
+    private val offenseDateTextField = JTextField(10)
     private val offenseTimeTextField = TrimmingTextField(5)
-    private val durationTextField = TrimmingTextField(3)
+    private val durationTextField = JTextField(3)
     private val environmentalStickerCheckBox = JCheckBox("Umweltplakette fehlt")
     private val vehicleInspectionStickerCheckBox = JCheckBox("HU Plakette abgelaufen")
     private val abandonedCheckBox = JCheckBox("Fahrzeug war verlassen")
@@ -76,9 +76,9 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel() {
         constraints.gridx = 0
         add(licensePlateLabel, constraints)
         constraints.gridx = 1
-        val doc = licensePlateTextField.document
-        if (doc is AbstractDocument) {
-            doc.documentFilter = UppercaseDocumentFilter()
+        val doc1 = licensePlateTextField.document
+        if (doc1 is AbstractDocument) {
+            doc1.documentFilter = UppercaseDocumentFilter()
         }
         add(licensePlateTextField, constraints)
 
@@ -145,6 +145,10 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel() {
         add(offenseDateLabel, constraints)
 
         constraints.gridx = 1
+        val doc2 = offenseDateTextField.document
+        if (doc2 is AbstractDocument) {
+            doc2.documentFilter = DateDocFilter()
+        }
         add(offenseDateTextField, constraints)
 
         constraints.gridy++
@@ -154,6 +158,10 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel() {
         add(offenseTimeLabel, constraints)
 
         constraints.gridx = 1
+        val doc3 = offenseTimeTextField.document
+        if (doc3 is AbstractDocument) {
+            doc3.documentFilter = TimeDocFilter()
+        }
         add(offenseTimeTextField, constraints)
 
         constraints.gridy++
@@ -162,6 +170,10 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel() {
         constraints.gridx = 0
         add(durationLabel, constraints)
         constraints.gridx = 1
+        val doc4 = durationTextField.document
+        if (doc4 is AbstractDocument) {
+            doc4.documentFilter = OnlyDigitsDocFilter()
+        }
         add(durationTextField, constraints)
 
         constraints.gridy++
