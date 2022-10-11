@@ -8,7 +8,7 @@ import javax.swing.JPanel
 /**
  * Button-Leiste unterhalb des Meldungs-Formulars
  */
-class NoticeFormToolBar(private val noticeFrame: NoticeFrame): JPanel() {
+class NoticeFormButtonsBar(private val noticeFrame: NoticeFrame): JPanel() {
     init {
         //background = TOOLBAR_BACKGROUND
         //isFloatable = false
@@ -39,18 +39,22 @@ class NoticeFormToolBar(private val noticeFrame: NoticeFrame): JPanel() {
         }
         add(cancelButton)
 
-        //addSeparator(BUTTONS_SEPARATOR_DIMENSION)
-        add(Box.createHorizontalStrut(Styles.BUTTONS_DISTANCE));
 
-        // nur beim Bearbeiten einer existierenden Meldung
-        val deleteButton = JButton("Löschen")
-        deleteButton.margin = Styles.BUTTON_MARGIN
-        deleteButton.addActionListener {
-            noticeFrame.deleteNotice()
-            noticeFrame.isVisible = false
-            noticeFrame.dispose()
+        // Nur beim Bearbeiten einer existierenden Meldung
+        // einen Lösch-Button anzeigen.
+        if(noticeFrame.getNotice().id != null) {
+            //addSeparator(BUTTONS_SEPARATOR_DIMENSION)
+            add(Box.createHorizontalStrut(Styles.BUTTONS_DISTANCE));
+
+            val deleteButton = JButton("Löschen")
+            deleteButton.margin = Styles.BUTTON_MARGIN
+            deleteButton.addActionListener {
+                noticeFrame.deleteNotice()
+                noticeFrame.isVisible = false
+                noticeFrame.dispose()
+            }
+            add(deleteButton)
         }
-        add(deleteButton)
 
         //addSeparator(BUTTONS_SEPARATOR_DIMENSION)
         add(Box.createHorizontalStrut(Styles.BUTTONS_DISTANCE));

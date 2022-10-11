@@ -11,7 +11,7 @@ import javax.swing.ImageIcon
 import javax.swing.JButton
 import javax.swing.JPanel
 
-class NoticesToolBar(private val app: App): JPanel() {
+class NoticesButtonsBar(private val app: App): JPanel() {
 
     private val log = KotlinLogging.logger {}
     init {

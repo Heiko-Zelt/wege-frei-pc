@@ -18,7 +18,10 @@ import java.time.LocalTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
-import javax.swing.*
+import javax.swing.JCheckBox
+import javax.swing.JComboBox
+import javax.swing.JLabel
+import javax.swing.JPanel
 import javax.swing.text.AbstractDocument
 
 /**
@@ -28,20 +31,20 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel() {
 
     private val log = KotlinLogging.logger {}
     private val countrySymbolComboBox = JComboBox(ListCountrySymbol.COUNTRY_SYMBOLS)
-    private val licensePlateTextField = JTextField(10)
+    private val licensePlateTextField = TrimmingTextField(10)
     private val vehicleMakeComboBox = JComboBox(ListVehicleMakes.VEHICLE_MAKES)
     private val colorComboBox = JComboBox(ListColor.COLORS)
     private val miniMap = MiniMap(noticeFrame)
-    private var streetTextField = JTextField(30)
-    private var zipCodeTextField = JTextField(5)
-    private var townTextField = JTextField(30)
-    private val offenseDateTextField = JTextField(10)
-    private val offenseTimeTextField = JTextField(5)
-    private val durationTextField = JTextField(3)
+    private var streetTextField = TrimmingTextField(30)
+    private var zipCodeTextField = TrimmingTextField(5)
+    private var townTextField = TrimmingTextField(30)
+    private val offenseDateTextField = TrimmingTextField(10)
+    private val offenseTimeTextField = TrimmingTextField(5)
+    private val durationTextField = TrimmingTextField(3)
     private val environmentalStickerCheckBox = JCheckBox("Umweltplakette fehlt")
     private val vehicleInspectionStickerCheckBox = JCheckBox("HU Plakette abgelaufen")
     private val abandonedCheckBox = JCheckBox("Fahrzeug war verlassen")
-    private val recipientTextField = JTextField(30)
+    private val recipientTextField = TrimmingTextField(30)
 
     init {
         layout = BorderLayout()

@@ -14,7 +14,7 @@ class NoticesFrame(private val app: App) : JFrame("Meldungen - Wege frei!") {
     private val scrollPanel = JPanel(BorderLayout())
     private val noticesTableModel = NoticesTableModel(LinkedList(app.getDatabaseService().getAllNoticesDesc()))
     private val noticesTable = JTable(noticesTableModel)
-    private val noticesToolBar = NoticesToolBar(app)
+    private val noticesToolBar = NoticesButtonsBar(app)
 
     init {
         layout = BorderLayout(5,5)

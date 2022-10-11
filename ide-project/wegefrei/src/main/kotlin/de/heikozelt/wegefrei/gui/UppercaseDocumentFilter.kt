@@ -1,5 +1,6 @@
 package de.heikozelt.wegefrei.gui
 
+import mu.KotlinLogging
 import java.util.*
 import javax.swing.text.AttributeSet
 import javax.swing.text.BadLocationException
@@ -10,19 +11,31 @@ import javax.swing.text.DocumentFilter
  * z.B. beim Kfz-Kennzeichen
  */
 class UppercaseDocumentFilter: DocumentFilter() {
+    private val log = KotlinLogging.logger {}
+
     @Throws(BadLocationException::class)
     override fun insertString(
-        fb: FilterBypass?, offset: Int,
-        string: String, attr: AttributeSet?
+        fb: FilterBypass?,
+        offset: Int,
+        string: String,
+        attr: AttributeSet?
     ) {
-        super.insertString(fb, offset, string.uppercase(Locale.getDefault()), attr)
+        log.debug("insert")
+        fb?.insertString(offset, string.uppercase(Locale.getDefault()), attr)
     }
 
     @Throws(BadLocationException::class)
     override fun replace(
-        fb: FilterBypass?, offset: Int, length: Int,
-        text: String, attrs: AttributeSet?
+        fb: FilterBypass?,
+        offset: Int,
+        length: Int,
+        text: String,
+        attrs: AttributeSet?
     ) {
-        super.insertString(fb, offset, text.uppercase(Locale.getDefault()), attrs)
+        log.debug("replace")
+        log.debug("text before replace: >>>$text<<<")
+        fb?.replace(offset, length, text.uppercase(Locale.getDefault()), attrs)
+        log.debug("text after replace: >>>$text<<<")
     }
+
 }

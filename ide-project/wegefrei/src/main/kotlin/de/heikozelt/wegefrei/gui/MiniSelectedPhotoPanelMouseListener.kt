@@ -5,7 +5,11 @@ import java.awt.event.MouseListener
 
 class MiniSelectedPhotoPanelMouseListener(private val noticeFrame: NoticeFrame, private val miniSelectedPhotoPanel: MiniSelectedPhotoPanel): MouseListener {
     override fun mouseClicked(e: MouseEvent) {
-        noticeFrame.showSelectedPhoto(miniSelectedPhotoPanel)
+        if(e.clickCount == 1) { // einfacher Klick, nur zoomen
+            noticeFrame.showSelectedPhoto(miniSelectedPhotoPanel)
+        } else { // Doppelklick, zoomen und auswählen
+            miniSelectedPhotoPanel.unselectPhoto()
+        }
     }
 
     override fun mousePressed(e: MouseEvent?) {}

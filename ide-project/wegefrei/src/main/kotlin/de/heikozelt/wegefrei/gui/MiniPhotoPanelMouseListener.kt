@@ -1,11 +1,20 @@
 package de.heikozelt.wegefrei.gui
 
+import mu.KotlinLogging
 import java.awt.event.MouseEvent
 import java.awt.event.MouseListener
 
 class MiniPhotoPanelMouseListener(private val noticeFrame: NoticeFrame, private val miniPhotoPanel: MiniPhotoPanel): MouseListener {
+
+    private val log = KotlinLogging.logger {}
     override fun mouseClicked(e: MouseEvent) {
-        noticeFrame.showPhoto(miniPhotoPanel)
+        if(e.clickCount == 1) {
+            log.debug("einfacher Klick, nur zoomen")
+            noticeFrame.showPhoto(miniPhotoPanel)
+        } else { //
+            log.debug("Doppelklick, zoomen und auswählen")
+            miniPhotoPanel.selectPhoto()
+        }
     }
 
     override fun mousePressed(e: MouseEvent?) {}

@@ -13,7 +13,7 @@ class NoticeForm(private val noticeFrame: NoticeFrame) : JPanel() {
 
     private val log = KotlinLogging.logger {}
     private val noticeFormFields = NoticeFormFields(noticeFrame)
-    private val noticeFormToolBar = NoticeFormToolBar(noticeFrame)
+    private val noticeFormButtonBar = NoticeFormButtonsBar(noticeFrame)
 
     init {
         layout = BorderLayout()
@@ -21,7 +21,7 @@ class NoticeForm(private val noticeFrame: NoticeFrame) : JPanel() {
         border = NO_BORDER
 
         add(noticeFormFields, BorderLayout.CENTER)
-        add(noticeFormToolBar, BorderLayout.SOUTH)
+        add(noticeFormButtonBar, BorderLayout.SOUTH)
 
         isVisible = true
     }
