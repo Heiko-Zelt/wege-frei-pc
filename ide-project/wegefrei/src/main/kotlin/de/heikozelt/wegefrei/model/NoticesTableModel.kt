@@ -67,7 +67,7 @@ class NoticesTableModel(private val notices: MutableList<Notice>) : AbstractTabl
             1 -> notice.countrySymbol
             2 -> notice.licensePlate
             3 -> notice.vehicleMake
-            4 -> ListColor.fromColorName(notice.color)
+            4 -> VehicleColor.fromColorName(notice.color)
             5 -> notice.getCreatedTimeFormatted()
             6 -> notice.getObservationTimeFormatted()
             7 -> notice.getState()

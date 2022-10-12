@@ -1,17 +1,17 @@
 package de.heikozelt.wegefrei.gui
 
-import de.heikozelt.wegefrei.model.ListColor
+import de.heikozelt.wegefrei.model.VehicleColor
 import java.awt.Component
 import javax.swing.JLabel
 import javax.swing.JList
 import javax.swing.ListCellRenderer
 
 //class ColorListCellRenderer: JLabel(), DefaultListCellRenderer {
-class ColorListCellRenderer: JLabel(), ListCellRenderer<ListColor> {
+class ColorListCellRenderer: JLabel(), ListCellRenderer<VehicleColor> {
 
     override fun getListCellRendererComponent(
-        list: JList<out ListColor>?,
-        value: ListColor?,
+        list: JList<out VehicleColor>?,
+        value: VehicleColor?,
         index: Int,
         isSelected: Boolean,
         cellHasFocus: Boolean

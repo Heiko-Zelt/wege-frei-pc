@@ -1,17 +1,17 @@
 package de.heikozelt.wegefrei.gui
 
-import de.heikozelt.wegefrei.model.ListCountrySymbol
+import de.heikozelt.wegefrei.model.CountrySymbol
 import java.awt.Component
 import javax.swing.JLabel
 import javax.swing.JList
 import javax.swing.ListCellRenderer
 
 //class ColorListCellRenderer: JLabel(), DefaultListCellRenderer {
-class CountrySymbolListCellRenderer: JLabel(), ListCellRenderer<ListCountrySymbol> {
+class CountrySymbolListCellRenderer: JLabel(), ListCellRenderer<CountrySymbol> {
 
     override fun getListCellRendererComponent(
-        list: JList<out ListCountrySymbol>?,
-        value: ListCountrySymbol?,
+        list: JList<out CountrySymbol>?,
+        value: CountrySymbol?,
         index: Int,
         isSelected: Boolean,
         cellHasFocus: Boolean

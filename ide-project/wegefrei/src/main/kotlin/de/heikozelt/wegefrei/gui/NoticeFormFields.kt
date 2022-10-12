@@ -6,10 +6,10 @@ import de.heikozelt.wegefrei.docfilters.TimeDocFilter
 import de.heikozelt.wegefrei.gui.Styles.Companion.FORM_BACKGROUND
 import de.heikozelt.wegefrei.gui.Styles.Companion.NO_BORDER
 import de.heikozelt.wegefrei.gui.Styles.Companion.TEXTFIELD_FONT
-import de.heikozelt.wegefrei.gui.Styles.Companion.TEXT_COLOR
-import de.heikozelt.wegefrei.model.ListColor
-import de.heikozelt.wegefrei.model.ListCountrySymbol
+import de.heikozelt.wegefrei.model.CountrySymbol
 import de.heikozelt.wegefrei.model.ListVehicleMakes
+import de.heikozelt.wegefrei.model.Offense
+import de.heikozelt.wegefrei.model.VehicleColor
 import mu.KotlinLogging
 import java.awt.BorderLayout
 import java.awt.GridBagConstraints
@@ -30,16 +30,18 @@ import javax.swing.text.AbstractDocument
 class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel() {
 
     private val log = KotlinLogging.logger {}
-    private val countrySymbolComboBox = JComboBox(ListCountrySymbol.COUNTRY_SYMBOLS)
+    private val countrySymbolComboBox = JComboBox(CountrySymbol.COUNTRY_SYMBOLS)
     private val licensePlateTextField = TrimmingTextField(10)
     private val vehicleMakeComboBox = JComboBox(ListVehicleMakes.VEHICLE_MAKES)
-    private val colorComboBox = JComboBox(ListColor.COLORS)
+    private val colorComboBox = JComboBox(VehicleColor.COLORS)
     private val miniMap = MiniMap(noticeFrame)
     private var streetTextField = TrimmingTextField(30)
     private var zipCodeTextField = TrimmingTextField(5)
     private var townTextField = TrimmingTextField(30)
-    private val offenseDateTextField = JTextField(10)
-    private val offenseTimeTextField = TrimmingTextField(5)
+    private var locationDescriptionTextField = TrimmingTextField(40)
+    private var offenseComboBox = JComboBox(Offense.selectableOffenses())
+    private val observationDateTextField = JTextField(10)
+    private val observationTimeTextField = TrimmingTextField(5)
     private val durationTextField = JTextField(3)
     private val environmentalStickerCheckBox = JCheckBox("Umweltplakette fehlt")
     private val vehicleInspectionStickerCheckBox = JCheckBox("HU Plakette abgelaufen")
@@ -61,7 +63,7 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel() {
 
         constraints.gridy++
         val countrySymbolLabel = JLabel("Landeskennzeichen:")
-        countrySymbolLabel.foreground = TEXT_COLOR
+        //countrySymbolLabel.foreground = TEXT_COLOR
         constraints.gridx = 0
         constraints.gridwidth = 1
         add(countrySymbolLabel, constraints)
@@ -71,8 +73,8 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel() {
         add(countrySymbolComboBox, constraints)
 
         constraints.gridy++
-        val licensePlateLabel = JLabel("Kfz-Kennzeichen:")
-        licensePlateLabel.foreground = TEXT_COLOR
+        val licensePlateLabel = JLabel("<html>Kfz-Kennzeichen:<sup>*</sup></html>")
+        //licensePlateLabel.foreground = TEXT_COLOR
         constraints.gridx = 0
         add(licensePlateLabel, constraints)
         constraints.gridx = 1
@@ -84,7 +86,7 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel() {
 
         constraints.gridy++
         val vehicleMakeLabel = JLabel("Fahrzeugmarke:")
-        vehicleMakeLabel.foreground = TEXT_COLOR
+        //vehicleMakeLabel.foreground = TEXT_COLOR
         constraints.gridx = 0
         add(vehicleMakeLabel, constraints)
         constraints.gridx = 1
@@ -93,80 +95,104 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel() {
 
         constraints.gridy++
         val colorLabel = JLabel("Farbe:")
-        colorLabel.foreground = TEXT_COLOR
+        //colorLabel.foreground = TEXT_COLOR
         constraints.gridx = 0
         add(colorLabel, constraints)
         //val modell = DefaultComboBoxModel(COLORS)
 
         colorComboBox.renderer = ColorListCellRenderer()
-        colorComboBox.maximumRowCount = ListColor.COLORS.size
+        colorComboBox.maximumRowCount = VehicleColor.COLORS.size
         colorComboBox.font = TEXTFIELD_FONT
         constraints.gridx = 1
         add(colorComboBox, constraints)
 
         constraints.gridy++
         val coordinatesLabel = JLabel("Koordinaten:")
-        coordinatesLabel.foreground = TEXT_COLOR
+        //coordinatesLabel.foreground = TEXT_COLOR
         constraints.gridx = 0
         add(coordinatesLabel, constraints)
         constraints.gridx = 1
         constraints.weighty = 1.0
+        miniMap.toolTipText = "Bitte positionieren Sie den roten Pin."
         add(miniMap, constraints)
 
         constraints.gridy++
-        val streetLabel = JLabel("Straße, Hausnr:")
-        streetLabel.foreground = TEXT_COLOR
+        val streetLabel = JLabel("<html>Straße & Hausnummer.:<sup>*</sup></html>")
+        //streetLabel.foreground = TEXT_COLOR
         constraints.gridx = 0
         constraints.weighty = 0.1
         add(streetLabel, constraints)
         constraints.gridx = 1
+        streetTextField.toolTipText = "z.B. Taunusstraße 7"
         add(streetTextField, constraints)
 
         constraints.gridy++
-        val zipCodeLabel = JLabel("PLZ:")
-        zipCodeLabel.foreground = TEXT_COLOR
+        val zipCodeLabel = JLabel("<html>PLZ:<sup>*</sup></html>")
+        //zipCodeLabel.foreground = TEXT_COLOR
         constraints.gridx = 0
         add(zipCodeLabel, constraints)
         constraints.gridx = 1
+        zipCodeTextField.toolTipText = "z.B. 65183"
         add(zipCodeTextField, constraints)
 
         constraints.gridy++
-        val townLabel = JLabel("Ort:")
-        townLabel.foreground = TEXT_COLOR
+        val townLabel = JLabel("<html>Ort:<sup>*</sup></html>")
+        //townLabel.foreground = TEXT_COLOR
         constraints.gridx = 0
         add(townLabel, constraints)
         constraints.gridx = 1
+        townTextField.toolTipText = "z.B. Wiesbaden"
         add(townTextField, constraints)
 
         constraints.gridy++
-        val offenseDateLabel = JLabel("Datum:")
-        offenseDateLabel.foreground = TEXT_COLOR
+        val locationDescriptionLabel = JLabel("Tatort:")
+        //locationDescriptionLabel.foreground = TEXT_COLOR
+        constraints.gridx = 0
+        add(locationDescriptionLabel, constraints)
+        constraints.gridx = 1
+        locationDescriptionTextField.toolTipText = "z.B. Bushaltestelle Kochbrunnen"
+        add(locationDescriptionTextField, constraints)
+
+        constraints.gridy++
+        val offenseLabel = JLabel("<html>Verstoß:<sup>*</sup></html>")
+        constraints.gridx = 0
+        add(offenseLabel, constraints)
+        constraints.gridx = 1
+        //offenseComboBox.prototypeDisplayValue = Offense.withLongestText();
+        offenseComboBox.font = TEXTFIELD_FONT
+
+        offenseComboBox.renderer = OffenseListCellRenderer()
+        add(offenseComboBox, constraints)
+
+        constraints.gridy++
+        val offenseDateLabel = JLabel("<html>Beobachtungs-Datum:<sup>*</sup></html>")
+        //offenseDateLabel.foreground = TEXT_COLOR
         constraints.gridx = 0
         add(offenseDateLabel, constraints)
-
         constraints.gridx = 1
-        val doc2 = offenseDateTextField.document
+        val doc2 = observationDateTextField.document
         if (doc2 is AbstractDocument) {
             doc2.documentFilter = DateDocFilter()
         }
-        add(offenseDateTextField, constraints)
+        observationDateTextField.toolTipText = "z.B. 31.12.2001"
+        add(observationDateTextField, constraints)
 
         constraints.gridy++
-        val offenseTimeLabel = JLabel("Uhrzeit:")
-        offenseTimeLabel.foreground = TEXT_COLOR
+        val offenseTimeLabel = JLabel("<html>Beobachtungs-Uhrzeit:<sup>*</sup></html>")
+        //offenseTimeLabel.foreground = TEXT_COLOR
         constraints.gridx = 0
         add(offenseTimeLabel, constraints)
-
         constraints.gridx = 1
-        val doc3 = offenseTimeTextField.document
+        val doc3 = observationTimeTextField.document
         if (doc3 is AbstractDocument) {
             doc3.documentFilter = TimeDocFilter()
         }
-        add(offenseTimeTextField, constraints)
+        observationTimeTextField.toolTipText = "z.B. 23:59"
+        add(observationTimeTextField, constraints)
 
         constraints.gridy++
-        val durationLabel = JLabel("Dauer (in Minuten):")
-        durationLabel.foreground = TEXT_COLOR
+        val durationLabel = JLabel("<html>Beobachtungs-Dauer (in Minuten):<sup>*</sup></html>")
+        //durationLabel.foreground = TEXT_COLOR
         constraints.gridx = 0
         add(durationLabel, constraints)
         constraints.gridx = 1
@@ -174,34 +200,41 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel() {
         if (doc4 is AbstractDocument) {
             doc4.documentFilter = OnlyDigitsDocFilter()
         }
+        durationTextField.toolTipText = "Ganzzahl"
         add(durationTextField, constraints)
 
         constraints.gridy++
-        environmentalStickerCheckBox.foreground = TEXT_COLOR
+        //environmentalStickerCheckBox.foreground = TEXT_COLOR
         environmentalStickerCheckBox.background = FORM_BACKGROUND
         constraints.gridx = 0
         add(environmentalStickerCheckBox, constraints)
 
-        vehicleInspectionStickerCheckBox.foreground = TEXT_COLOR
+        //vehicleInspectionStickerCheckBox.foreground = TEXT_COLOR
         vehicleInspectionStickerCheckBox.background = FORM_BACKGROUND
         constraints.gridx = 1
         add(vehicleInspectionStickerCheckBox, constraints)
 
         constraints.gridy++
-        abandonedCheckBox.foreground = TEXT_COLOR
+        //abandonedCheckBox.foreground = TEXT_COLOR
         abandonedCheckBox.background = FORM_BACKGROUND
         constraints.gridx = 0
         add(abandonedCheckBox, constraints)
 
         constraints.gridy++
-        val recipientLabel = JLabel("Empfänger:")
-        recipientLabel.foreground = TEXT_COLOR
+        val recipientLabel = JLabel("<html>Empfänger:<sup>*</sup></html>")
+        //recipientLabel.foreground = TEXT_COLOR
         constraints.gridx = 0
         add(recipientLabel, constraints)
         constraints.gridx = 1
+        recipientTextField.toolTipText = "z.B. verwarngeldstelle@wiesbaden.de"
         add(recipientTextField, constraints)
 
         loadNotice()
+
+        val notice = noticeFrame.getNotice()
+        if(notice.isSent()) {
+            disableFormFields()
+        }
 
         setSize(700, 700)
         isVisible = true
@@ -216,8 +249,8 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel() {
         // macht schon MainFrame.init()
         //mainFrame.setSelectedPhotos(SelectedPhotos(TreeSet(notice.photos)))
 
-        val listCountrySymbol = ListCountrySymbol.fromAbbreviation(notice.countrySymbol)
-        countrySymbolComboBox.selectedItem = listCountrySymbol
+        val countrySymbol = CountrySymbol.fromAbbreviation(notice.countrySymbol)
+        countrySymbolComboBox.selectedItem = countrySymbol
 
         licensePlateTextField.text = notice.licensePlate
 
@@ -226,21 +259,23 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel() {
             vehicleMakeComboBox.selectedItem = make
         }
 
-        val listColor = ListColor.fromColorName(notice.color)
-        colorComboBox.selectedItem = listColor
+        val vehicleColor = VehicleColor.fromColorName(notice.color)
+        colorComboBox.selectedItem = vehicleColor
 
         streetTextField.text = notice.street
         zipCodeTextField.text = notice.zipCode
         townTextField.text = notice.town
+        locationDescriptionTextField.text = notice.locationDescription
+        offenseComboBox.selectedItem = Offense.fromId(notice.offense)
 
-        offenseDateTextField.text = if(notice.observationTime == null) {
+        observationDateTextField.text = if(notice.observationTime == null) {
             ""
         } else {
             val fmt = DateTimeFormatter.ofPattern("dd.MM.yyyy")
             fmt.format(notice.observationTime)
         }
 
-        offenseTimeTextField.text = if(notice.observationTime == null) {
+        observationTimeTextField.text = if(notice.observationTime == null) {
             ""
         } else {
             val fmt = DateTimeFormatter.ofPattern("HH:mm")
@@ -269,7 +304,7 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel() {
         val notice = noticeFrame.getNotice()
         notice.photos = noticeFrame.getSelectedPhotos().getPhotos()
 
-        val selectedCountry = countrySymbolComboBox.selectedObjects[0] as ListCountrySymbol
+        val selectedCountry = countrySymbolComboBox.selectedObjects[0] as CountrySymbol
         notice.countrySymbol = if (selectedCountry.countryName == null) {
             null
         } else {
@@ -285,7 +320,7 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel() {
             selectedVehicleMake
         }
 
-        val selectedColor = colorComboBox.selectedObjects[0] as ListColor
+        val selectedColor = colorComboBox.selectedObjects[0] as VehicleColor
         notice.color = if (selectedColor.color == null) {
             null
         } else {
@@ -297,9 +332,16 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel() {
         notice.street = trimmedOrNull(streetTextField.text)
         notice.zipCode = trimmedOrNull(zipCodeTextField.text)
         notice.town = trimmedOrNull(townTextField.text)
+        notice.locationDescription = trimmedOrNull(locationDescriptionTextField.text)
+        val selectedOffense = offenseComboBox.selectedItem
+        notice.offense = if(selectedOffense is Offense) {
+            selectedOffense.id
+        } else {
+            null
+        }
 
         val format = DateTimeFormatter.ofPattern("dd.MM.yyyy")
-        val obsDateTxt = offenseDateTextField.text
+        val obsDateTxt = observationDateTextField.text
         notice.observationTime = if(obsDateTxt.isBlank()) {
             null
         } else {
@@ -307,7 +349,7 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel() {
             // todo Prio 2: Validierung, ob Format von Datum und Uhrzeit korrekt sind. Fehlermeldung anzeigen.
             // todo Prio 3: Problem lösen: Sommer- oder Winterzeit, eine Stunde im Jahr ist zweideutig
             // todo Prio 3: Datum/Uhrzeit darf nicht in der Zukunft liegen
-            val obsTimeTxt = offenseTimeTextField.text
+            val obsTimeTxt = observationTimeTextField.text
             val tim = if(obsTimeTxt.isBlank()) {
                 LocalTime.parse("00:00")
             } else {
@@ -344,6 +386,28 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel() {
 
     fun setTown(town: String) {
         townTextField.text = town
+    }
+
+    /**
+     * keine weitere Bearbeitung mehr zulassen,
+     * wenn die Meldung bereits versendet wurde.
+     */
+    fun disableFormFields() {
+        countrySymbolComboBox.isEnabled = false
+        licensePlateTextField.isEnabled = false
+        vehicleMakeComboBox.isEnabled = false
+        colorComboBox.isEnabled = false
+        streetTextField.isEnabled = false
+        zipCodeTextField.isEnabled = false
+        townTextField.isEnabled = false
+        locationDescriptionTextField.isEnabled = false
+        observationDateTextField.isEnabled = false
+        observationTimeTextField.isEnabled = false
+        durationTextField.isEnabled = false
+        environmentalStickerCheckBox.isEnabled = false
+        vehicleInspectionStickerCheckBox.isEnabled = false
+        abandonedCheckBox.isEnabled = false
+        recipientTextField.isEnabled = false
     }
 
     companion object {

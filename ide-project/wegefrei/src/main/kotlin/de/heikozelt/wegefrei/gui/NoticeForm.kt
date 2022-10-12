@@ -29,4 +29,8 @@ class NoticeForm(private val noticeFrame: NoticeFrame) : JPanel() {
     fun getNoticeFormFields(): NoticeFormFields {
         return noticeFormFields
     }
+
+    fun disableFormFields() {
+        noticeFormFields.disableFormFields()
+    }
 }

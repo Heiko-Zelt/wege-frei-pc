@@ -61,7 +61,7 @@ class NoticeFormButtonsBar(private val noticeFrame: NoticeFrame): JPanel() {
 
         val sendButton = JButton("E-Mail absenden")
         sendButton.margin = Styles.BUTTON_MARGIN
-        sendButton.addActionListener { /* todo Meldung löschen */ }
+        sendButton.addActionListener { noticeFrame.sendNotice() }
         add(sendButton)
 
         //addSeparator(BUTTONS_SEPARATOR_DIMENSION)

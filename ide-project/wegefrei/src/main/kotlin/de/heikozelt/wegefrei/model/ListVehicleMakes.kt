@@ -1,5 +1,9 @@
 package de.heikozelt.wegefrei.model
 
+/**
+ * Fahrzeugmarken
+ * todo Prio 3: Logos als Icon hinzufügen
+ */
 class ListVehicleMakes {
 
     companion object {

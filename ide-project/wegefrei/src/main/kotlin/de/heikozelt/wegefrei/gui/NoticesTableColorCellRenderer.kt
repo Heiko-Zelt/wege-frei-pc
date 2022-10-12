@@ -1,6 +1,6 @@
 package de.heikozelt.wegefrei.gui
 
-import de.heikozelt.wegefrei.model.ListColor
+import de.heikozelt.wegefrei.model.VehicleColor
 import mu.KotlinLogging
 import java.awt.Component
 import javax.swing.JLabel
@@ -69,7 +69,7 @@ class NoticesTableColorCellRenderer : JLabel(), TableCellRenderer {
         //isOpaque = background != null && !(background.equals(table.background));
         super.setOpaque(true)
 
-        if (value is ListColor) {
+        if (value is VehicleColor) {
             icon = ColorIcon(value.color)
             text = value.colorName
         }

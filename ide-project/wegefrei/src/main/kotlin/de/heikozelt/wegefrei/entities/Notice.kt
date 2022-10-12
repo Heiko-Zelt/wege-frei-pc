@@ -55,16 +55,49 @@ class Notice(
     @Column
     var town: String? = null,
 
+    /**
+     * Beispiele:
+     * <ul>
+     *   <li>"in der Hauptstraße an der Ecke Schulstraße"</li>
+     *   <li>"am Staatstheater"</li>
+     *   <li>"Bushaltestelle Museum"</li>
+     * </ul>
+     */
+    @Column
+    var locationDescription: String? = null,
+
     @Column
     var duration: Int? = null,
 
+    @Column
+    var offense: Int? = null,
+
     /**
-     * Umweltplakette fehlte in Umweltzone
-     * keine Angabe (null) und false sind gleichbedeutend,
-     * deswegen ist null nicht erlaubt und false der Standardwert.
+     * mit Behinderung
+     * keine Angabe (null) und negative Angabe (false) sind gleichbedeutend
+     * Deswegen nur true oder false, aber kein null erlaubt.
      */
     @Column
-    var environmentalStickerMissing: Boolean = false,
+    var obstruction: Boolean = false,
+
+    /**
+     * mit Gefaehrdung
+     */
+    @Column
+    var endangering: Boolean = false,
+
+    /**
+     * Fahrzeug war verlassen
+     * keine Angabe (null) und false sind gleichbedeutend
+     */
+    @Column
+    var vehicleAbandoned: Boolean = false,
+
+    /**
+     * Warnblinkanlage eingeschaltet
+     */
+    @Column
+    var warningLights: Boolean = false,
 
     /**
      * TÜV/HU-Plakette war abgelaufen
@@ -80,11 +113,12 @@ class Notice(
     var vehicleInspectionMonth: Byte? = null,
 
     /**
-     * Fahrzeug war verlassen
-     * keine Angabe (null) und false sind gleichbedeutend
+     * Umweltplakette fehlte in Umweltzone
+     * keine Angabe (null) und false sind gleichbedeutend,
+     * deswegen ist null nicht erlaubt und false der Standardwert.
      */
     @Column
-    var vehicleAbandoned: Boolean = false,
+    var environmentalStickerMissing: Boolean = false,
 
     @Column
     var recipient: String? = null,
@@ -93,7 +127,10 @@ class Notice(
     @JoinTable(name= "NOTICES_PHOTOS",
     joinColumns = [JoinColumn(name = "id" /*, referencedColumnName = "filename" */) ],
     inverseJoinColumns = [JoinColumn(name = "filename" /*, referencedColumnName = "id" */)])
-    var photos: Set<Photo> = setOf()
+    var photos: Set<Photo> = setOf(),
+
+    @Column
+    var note: String? = null
 ) {
 
     @Column

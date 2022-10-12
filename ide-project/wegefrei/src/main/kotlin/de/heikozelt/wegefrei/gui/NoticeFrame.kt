@@ -16,6 +16,7 @@ import java.awt.GridBagConstraints.WEST
 import java.awt.GridBagLayout
 import java.net.HttpURLConnection
 import java.net.URL
+import java.time.ZonedDateTime
 import java.util.*
 import javax.swing.JFrame
 
@@ -237,5 +238,23 @@ class NoticeFrame(private val app: App, private val notice: Notice) : JFrame() {
         val dbService = app.getDatabaseService()
         dbService.deleteNotice(notice)
         app.noticeDeleted(notice)
+    }
+
+    fun sendNotice() {
+        sendEmail()
+        disableFormFields()
+        notice.sentTime = ZonedDateTime.now()
+        saveNotice()
+    }
+
+    fun disableFormFields() {
+        log.debug("disabling form fields is not yet implemented")
+        // todo Prio 2 implementieren Eingabefelder deaktivieren
+        noticeForm.disableFormFields()
+    }
+
+    fun sendEmail() {
+        log.debug("sending email is not yet implemented")
+        // todo Prio 2 E-Mail versenden
     }
 }
