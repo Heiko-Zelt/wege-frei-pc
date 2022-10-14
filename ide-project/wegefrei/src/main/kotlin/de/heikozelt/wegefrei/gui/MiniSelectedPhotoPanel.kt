@@ -4,13 +4,13 @@ import de.heikozelt.wegefrei.entities.Photo
 import de.heikozelt.wegefrei.gui.Styles.Companion.HIGHLIGHT_BORDER
 import de.heikozelt.wegefrei.gui.Styles.Companion.NORMAL_BORDER
 import de.heikozelt.wegefrei.gui.Styles.Companion.SELECTED_PHOTOS_BACKGROUND
-import mu.KotlinLogging
+import org.slf4j.LoggerFactory
 import java.awt.Image
 import javax.swing.*
 
 class MiniSelectedPhotoPanel(private val noticeFrame: NoticeFrame, private val photo: Photo): JPanel() {
 
-    private val log = KotlinLogging.logger {}
+    private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
     private val thumbnailLabel: JLabel
     private var borderVisible = false
 

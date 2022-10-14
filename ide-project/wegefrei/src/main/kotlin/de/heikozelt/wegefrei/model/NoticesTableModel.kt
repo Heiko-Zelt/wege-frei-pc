@@ -1,7 +1,7 @@
 package de.heikozelt.wegefrei.model
 
 import de.heikozelt.wegefrei.entities.Notice
-import mu.KotlinLogging
+import org.slf4j.LoggerFactory
 import javax.swing.table.AbstractTableModel
 
 /**
@@ -16,7 +16,7 @@ import javax.swing.table.AbstractTableModel
  */
 
 class NoticesTableModel(private val notices: MutableList<Notice>) : AbstractTableModel() {
-    private val log = KotlinLogging.logger {}
+    private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
 
     override fun getRowCount(): Int {
         return notices.size

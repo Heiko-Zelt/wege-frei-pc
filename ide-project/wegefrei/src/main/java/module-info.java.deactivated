@@ -1,0 +1,10 @@
+module de.heikozelt.wegefrei {
+    requires kotlin.stdlib;
+    requires jakarta.persistence;
+    requires java.desktop;
+    requires jxmapviewer2; // autsch
+    requires metadata.extractor; // autsch
+    requires org.slf4j;
+    exports de.heikozelt.wegefrei;
+    //uses org.jxmapviewer.JXMapViewer;
+}

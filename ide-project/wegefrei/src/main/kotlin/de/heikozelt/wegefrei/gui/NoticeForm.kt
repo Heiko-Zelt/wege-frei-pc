@@ -2,7 +2,7 @@ package de.heikozelt.wegefrei.gui
 
 import de.heikozelt.wegefrei.gui.Styles.Companion.FORM_BACKGROUND
 import de.heikozelt.wegefrei.gui.Styles.Companion.NO_BORDER
-import mu.KotlinLogging
+import org.slf4j.LoggerFactory
 import java.awt.BorderLayout
 import javax.swing.JPanel
 
@@ -11,7 +11,7 @@ import javax.swing.JPanel
  */
 class NoticeForm(private val noticeFrame: NoticeFrame) : JPanel() {
 
-    private val log = KotlinLogging.logger {}
+    private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
     private val noticeFormFields = NoticeFormFields(noticeFrame)
     private val noticeFormButtonBar = NoticeFormButtonsBar(noticeFrame)
 

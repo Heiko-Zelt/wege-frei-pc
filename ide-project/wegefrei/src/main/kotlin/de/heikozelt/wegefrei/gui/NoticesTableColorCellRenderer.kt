@@ -1,7 +1,7 @@
 package de.heikozelt.wegefrei.gui
 
 import de.heikozelt.wegefrei.model.VehicleColor
-import mu.KotlinLogging
+import org.slf4j.LoggerFactory
 import java.awt.Component
 import javax.swing.JLabel
 import javax.swing.JTable
@@ -13,7 +13,7 @@ import javax.swing.table.TableCellRenderer
 
 class NoticesTableColorCellRenderer : JLabel(), TableCellRenderer {
 
-    private val log = KotlinLogging.logger {}
+    private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
 
     private var noFocusBorder: Border = EmptyBorder(1, 1, 1, 1)
 

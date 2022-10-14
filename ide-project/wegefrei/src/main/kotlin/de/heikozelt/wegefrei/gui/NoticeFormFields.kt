@@ -10,7 +10,7 @@ import de.heikozelt.wegefrei.model.CountrySymbol
 import de.heikozelt.wegefrei.model.ListVehicleMakes
 import de.heikozelt.wegefrei.model.Offense
 import de.heikozelt.wegefrei.model.VehicleColor
-import mu.KotlinLogging
+import org.slf4j.LoggerFactory
 import java.awt.BorderLayout
 import java.awt.GridBagConstraints
 import java.awt.GridBagConstraints.WEST
@@ -29,7 +29,7 @@ import javax.swing.text.AbstractDocument
  */
 class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel() {
 
-    private val log = KotlinLogging.logger {}
+    private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
     private val countrySymbolComboBox = JComboBox(CountrySymbol.COUNTRY_SYMBOLS)
     private val licensePlateTextField = TrimmingTextField(10)
     private val vehicleMakeComboBox = JComboBox(ListVehicleMakes.VEHICLE_MAKES)

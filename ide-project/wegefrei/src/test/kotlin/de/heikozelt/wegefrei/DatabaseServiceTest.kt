@@ -1,13 +1,13 @@
 package de.heikozelt.wegefrei
 
-import mu.KotlinLogging
+import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-
-import org.junit.jupiter.api.Assertions.*
+import org.slf4j.LoggerFactory
 
 internal class DatabaseServiceTest {
 
-    private val log = KotlinLogging.logger {}
+    private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
 
     private val databaseService = DatabaseService()
 

@@ -2,12 +2,12 @@ package de.heikozelt.wegefrei.gui
 
 import de.heikozelt.wegefrei.gui.Styles.Companion.NO_BORDER
 import de.heikozelt.wegefrei.gui.Styles.Companion.ZOOM_PANEL_BACKGROUND
-import mu.KotlinLogging
 import org.jxmapviewer.JXMapViewer
 import org.jxmapviewer.OSMTileFactoryInfo
 import org.jxmapviewer.input.PanMouseInputListener
 import org.jxmapviewer.input.ZoomMouseWheelListenerCenter
 import org.jxmapviewer.viewer.*
+import org.slf4j.LoggerFactory
 import java.awt.Dimension
 import java.awt.GridBagConstraints
 import java.awt.GridBagLayout
@@ -16,7 +16,7 @@ import javax.swing.JPanel
 
 class MaxiMap: JPanel() {
 
-    private val log = KotlinLogging.logger {}
+    private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
 
     init {
         background = ZOOM_PANEL_BACKGROUND

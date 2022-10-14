@@ -41,15 +41,19 @@ class NoticeTest {
         cal.set(2021, 12, 31, 19, 49, 59)
         val dat = cal.time
          */
-        val datTim = ZonedDateTime.of(2021, 12, 31, 19, 49, 59, 0, ZoneId.of("CET"))
+        val photoTime1 = ZonedDateTime.of(2021, 12, 30, 19, 49, 50, 0, ZoneId.of("CET"))
+        val photoTime2 = ZonedDateTime.of(2021, 12, 30, 19, 49, 59, 0, ZoneId.of("CET"))
+        val expectedSentTime = ZonedDateTime.of(2021, 12, 31, 19, 49, 59, 0, ZoneId.of("CET"))
 
         val photos = hashSetOf(
-            Photo("img1.jpeg", 50.111f, 8.111f, datTim),
-            Photo("img2.jpeg", 50.222f, 8.222f, datTim)
+            Photo("img1.jpeg", 50.111f, 8.111f, photoTime1),
+            Photo("img2.jpeg", 50.222f, 8.222f, photoTime2)
         )
 
         val n = Notice(
             123,
+            photoTime1,
+            expectedSentTime,
             "D",
             "WI JA 233",
             "Honda",
@@ -59,14 +63,18 @@ class NoticeTest {
             "Wilhelmstraße 13",
             "65193",
             "Wiesbaden",
-            datTim,
+            "gegenüber Bäcker",
             3,
-            false,
+            1,
+            true,
+            true,
+            true,
+            true,
             true,
             2010,
             12,
-            true,
-            "recipient@notice-j-unit-test.de",
+            false,
+            "verwarngeldstelle@notice-j-unit-test.de",
             photos
         )
         n.apply {
@@ -80,14 +88,14 @@ class NoticeTest {
             assertEquals("Wilhelmstraße 13", street)
             assertEquals("65193", zipCode)
             assertEquals("Wiesbaden", town)
-            assertEquals(datTim, observationTime)
+            assertEquals(photoTime1, observationTime)
             assertEquals(3, duration)
             assertFalse(environmentalStickerMissing)
             assertTrue(vehicleInspectionExpired)
             assertEquals(2010, vehicleInspectionYear)
             assertEquals(12, vehicleInspectionMonth)
             assertTrue(vehicleAbandoned)
-            assertEquals("recipient@notice-j-unit-test.de", recipient)
+            assertEquals("verwarngeldstelle@notice-j-unit-test.de", recipient)
             assertEquals(2, photos.size)
         }
     }

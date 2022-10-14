@@ -3,14 +3,14 @@ package de.heikozelt.wegefrei.gui
 import de.heikozelt.wegefrei.entities.Photo
 import de.heikozelt.wegefrei.gui.Styles.Companion.NO_BORDER
 import de.heikozelt.wegefrei.gui.Styles.Companion.ZOOM_PANEL_BACKGROUND
-import mu.KotlinLogging
+import org.slf4j.LoggerFactory
 import java.awt.BorderLayout
 import java.awt.BorderLayout.CENTER
 import javax.swing.JPanel
 
 class ZoomPanel(private var noticeFrame: NoticeFrame): JPanel() {
 
-    private val log = KotlinLogging.logger {}
+    private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
 
     init {
         background = ZOOM_PANEL_BACKGROUND

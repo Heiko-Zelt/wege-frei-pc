@@ -1,12 +1,12 @@
 package de.heikozelt.wegefrei.gui
 
-import mu.KotlinLogging
+import org.slf4j.LoggerFactory
 import java.awt.event.FocusEvent
 import java.awt.event.FocusListener
 import javax.swing.JTextField
 
 class TrimmingTextFieldFocusListener: FocusListener {
-    private val log = KotlinLogging.logger {}
+    private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
 
     override fun focusGained(e: FocusEvent?) {
         // do noting

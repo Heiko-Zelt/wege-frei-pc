@@ -3,13 +3,13 @@ package de.heikozelt.wegefrei.gui
 import de.heikozelt.wegefrei.entities.Photo
 import de.heikozelt.wegefrei.gui.Styles.Companion.NO_BORDER
 import de.heikozelt.wegefrei.gui.Styles.Companion.ZOOM_PANEL_BACKGROUND
-import mu.KotlinLogging
+import org.slf4j.LoggerFactory
 import java.awt.Image
 import javax.swing.*
 
 class MaxiSelectedPhotoPanel(private val noticeFrame: NoticeFrame, private val photo: Photo): JPanel() {
 
-    private val log = KotlinLogging.logger {}
+    private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
 
     init {
         background = ZOOM_PANEL_BACKGROUND

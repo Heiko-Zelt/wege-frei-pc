@@ -7,14 +7,17 @@ import com.drew.metadata.exif.GpsDirectory
 import de.heikozelt.wegefrei.entities.Notice
 import de.heikozelt.wegefrei.entities.Photo
 import de.heikozelt.wegefrei.gui.NoticesFrame
-import mu.KotlinLogging
+import org.slf4j.LoggerFactory
 import java.io.File
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.*
 
 class App {
-    private val log = KotlinLogging.logger {}
+
+    private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
+    //kotlin-logging: private val log = KotlinLogging.logger {}
+    //JUL: private val logger = Logger.getLogger(this::class.java.name)
 
     private val databaseService = DatabaseService()
 
@@ -54,20 +57,19 @@ class App {
 
         val dir = File(PHOTO_DIR)
         if (!dir.isDirectory) {
-            log.error(PHOTO_DIR + " ist kein Verzeichnis.")
+            log.error("$PHOTO_DIR ist kein Verzeichnis.")
             return
         }
         val filenames = dir.list(ImageFilenameFilter())
         for (filename in filenames) {
             log.debug(filename)
+            //JUL logger.log(Level.FINE, filename)
             if (databaseService.getPhotoByFilename(filename) == null) {
                 log.debug("image in filesystem is new")
 
                 val photo = readPhotoMetadata(File(PHOTO_DIR, filename))
                 //    ProofPhoto(filename, null, null, null)
-                if (photo != null) {
-                    databaseService.insertPhoto(photo)
-                }
+                databaseService.insertPhoto(photo)
             } else {
                 log.debug("image in filesystem is already in database")
             }

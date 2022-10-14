@@ -1,8 +1,8 @@
 package de.heikozelt.wegefrei.gui
 
-import mu.KotlinLogging
 import org.jxmapviewer.viewer.DefaultWaypoint
 import org.jxmapviewer.viewer.GeoPosition
+import org.slf4j.LoggerFactory
 import java.awt.Dimension
 import java.awt.Toolkit
 import java.awt.image.FilteredImageSource
@@ -21,11 +21,11 @@ class AddressMarker(coord: GeoPosition?) : Marker(coord) {
     companion object {
         val icn: ImageIcon
 
-        private val log = KotlinLogging.logger {}
+        private val LOG = LoggerFactory.getLogger(this::class.java.canonicalName)
 
         init {
             val img = ImageIO.read(DefaultWaypoint::class.java.getResource("/images/standard_waypoint.png"))
-            log.debug("img height: ${img.height}, width: ${img.width}")
+            LOG.debug("img height: ${img.height}, width: ${img.width}")
             val filter = RedBlueSwapFilter()
             val producer = FilteredImageSource(img.source, filter)
             val grayImg = Toolkit.getDefaultToolkit().createImage(producer)

@@ -4,7 +4,7 @@ import de.heikozelt.wegefrei.App
 import de.heikozelt.wegefrei.entities.Notice
 import de.heikozelt.wegefrei.gui.Styles.Companion.BUTTONS_DISTANCE
 import de.heikozelt.wegefrei.gui.Styles.Companion.BUTTON_MARGIN
-import mu.KotlinLogging
+import org.slf4j.LoggerFactory
 import java.awt.FlowLayout
 import javax.swing.Box
 import javax.swing.ImageIcon
@@ -13,7 +13,7 @@ import javax.swing.JPanel
 
 class NoticesButtonsBar(private val app: App): JPanel() {
 
-    private val log = KotlinLogging.logger {}
+    private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
     init {
         //background = TOOLBAR_BACKGROUND
         //isFloatable = false

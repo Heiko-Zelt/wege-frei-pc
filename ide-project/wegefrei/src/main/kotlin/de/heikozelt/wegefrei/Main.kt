@@ -1,27 +1,26 @@
 package de.heikozelt.wegefrei
 
-import mu.KotlinLogging
+import org.slf4j.LoggerFactory
 import javax.swing.UIManager
 
-val log = KotlinLogging.logger {}
-
+private val LOG = LoggerFactory.getLogger("de.heikozelt.wegefrei.MainKt")
 
 fun main(args: Array<String>) {
-    log.info("Wege frei!")
-    log.debug("Program arguments: ${args.joinToString()}")
+    LOG.info("Wege frei!")
+    LOG.debug("Program arguments: ${args.joinToString()}")
 
     try {
         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
     } catch (e: Exception) {
-        log.error("exception while setting look and feel", e)
+        LOG.error("exception while setting look and feel", e)
     }
 
-    val shutdownHook = Thread { log.info("exit") }
+    val shutdownHook = Thread { LOG.info("exit") }
     Runtime.getRuntime().addShutdownHook(shutdownHook)
 
     App()
 
-    log.debug("de.heikozelt.wegefrei.main function finished")
+    LOG.debug("de.heikozelt.wegefrei.main function finished")
 }
 
 

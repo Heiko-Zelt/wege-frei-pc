@@ -4,11 +4,13 @@ import de.heikozelt.wegefrei.entities.Notice
 import de.heikozelt.wegefrei.entities.Photo
 import jakarta.persistence.EntityManager
 import jakarta.persistence.Persistence
+import org.slf4j.LoggerFactory
 import java.util.*
 
 
 class DatabaseService {
     private val em: EntityManager
+    private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
 
     init {
         val factory = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME)

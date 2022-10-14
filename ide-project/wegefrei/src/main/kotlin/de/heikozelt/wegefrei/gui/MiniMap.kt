@@ -4,11 +4,11 @@ import de.heikozelt.wegefrei.entities.Photo
 import de.heikozelt.wegefrei.gui.Styles.Companion.HIGHLIGHT_BORDER
 import de.heikozelt.wegefrei.gui.Styles.Companion.NORMAL_BORDER
 import de.heikozelt.wegefrei.model.SelectedPhotosObserver
-import mu.KotlinLogging
 import org.jxmapviewer.JXMapViewer
 import org.jxmapviewer.OSMTileFactoryInfo
 import org.jxmapviewer.viewer.DefaultTileFactory
 import org.jxmapviewer.viewer.GeoPosition
+import org.slf4j.LoggerFactory
 import java.awt.Dimension
 import java.util.*
 import kotlin.math.abs
@@ -28,7 +28,7 @@ class MiniMap(
     private val noticeFrame: NoticeFrame
 ) : JXMapViewer(), SelectedPhotosObserver {
 
-    private val log = KotlinLogging.logger {}
+    private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
     private var borderVisible = false
     private val painter = MarkerPainter()
     private val photoMarkers = LinkedList<PhotoMarker>()

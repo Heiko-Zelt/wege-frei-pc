@@ -4,7 +4,7 @@ import de.heikozelt.wegefrei.entities.Photo
 import de.heikozelt.wegefrei.gui.Styles.Companion.ALL_PHOTOS_BACKGROUND
 import de.heikozelt.wegefrei.gui.Styles.Companion.HIGHLIGHT_BORDER
 import de.heikozelt.wegefrei.gui.Styles.Companion.NORMAL_BORDER
-import mu.KotlinLogging
+import org.slf4j.LoggerFactory
 import java.awt.Image
 import java.awt.Toolkit
 import java.awt.image.FilteredImageSource
@@ -12,7 +12,7 @@ import javax.swing.*
 
 class MiniPhotoPanel(private val noticeFrame: NoticeFrame, private val photo: Photo, private var active: Boolean): JPanel() {
 
-    private val log = KotlinLogging.logger {}
+    private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
     private val thumbnailLabel: JLabel
     private val mouseListener: MiniPhotoPanelMouseListener
     private val addButton: JButton

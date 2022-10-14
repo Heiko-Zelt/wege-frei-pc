@@ -1,6 +1,6 @@
 package de.heikozelt.wegefrei.gui
 
-import mu.KotlinLogging
+import org.slf4j.LoggerFactory
 import java.util.*
 import javax.swing.text.AttributeSet
 import javax.swing.text.BadLocationException
@@ -11,7 +11,7 @@ import javax.swing.text.DocumentFilter
  * z.B. beim Kfz-Kennzeichen
  */
 class UppercaseDocumentFilter: DocumentFilter() {
-    private val log = KotlinLogging.logger {}
+    private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
 
     @Throws(BadLocationException::class)
     override fun insertString(

@@ -4,7 +4,7 @@ import de.heikozelt.wegefrei.entities.Photo
 import de.heikozelt.wegefrei.gui.Styles.Companion.NO_BORDER
 import de.heikozelt.wegefrei.gui.Styles.Companion.SELECTED_PHOTOS_BACKGROUND
 import de.heikozelt.wegefrei.model.SelectedPhotosObserver
-import mu.KotlinLogging
+import org.slf4j.LoggerFactory
 import java.awt.Container
 import javax.swing.BoxLayout
 import javax.swing.BoxLayout.X_AXIS
@@ -14,7 +14,7 @@ import javax.swing.JScrollPane
 class SelectedPhotosPanel(private val noticeFrame: NoticeFrame) : JScrollPane(JPanel()),
     SelectedPhotosObserver {
 
-    private val log = KotlinLogging.logger {}
+    private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
 
     private val miniSelectedPhotoPanels = arrayListOf<MiniSelectedPhotoPanel>()
 

@@ -3,7 +3,7 @@ package de.heikozelt.wegefrei.gui
 import de.heikozelt.wegefrei.entities.Photo
 import de.heikozelt.wegefrei.gui.Styles.Companion.ALL_PHOTOS_BACKGROUND
 import de.heikozelt.wegefrei.model.SelectedPhotosObserver
-import mu.KotlinLogging
+import org.slf4j.LoggerFactory
 import javax.swing.BoxLayout
 import javax.swing.BoxLayout.X_AXIS
 import javax.swing.JButton
@@ -14,7 +14,7 @@ class AllPhotosPanel(
     private var firstPhotoFilename: String
 ) : JPanel(), SelectedPhotosObserver {
 
-    private val log = KotlinLogging.logger {}
+    private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
     private val selectedPhotos = noticeFrame.getSelectedPhotos()
     private val miniPhotoPanels = arrayListOf<MiniPhotoPanel>()
 

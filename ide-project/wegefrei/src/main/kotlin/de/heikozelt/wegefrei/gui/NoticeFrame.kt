@@ -8,8 +8,8 @@ import de.heikozelt.wegefrei.entities.Photo
 import de.heikozelt.wegefrei.gui.Styles.Companion.FRAME_BACKGROUND
 import de.heikozelt.wegefrei.json.NominatimResponse
 import de.heikozelt.wegefrei.model.SelectedPhotos
-import mu.KotlinLogging
 import org.jxmapviewer.viewer.GeoPosition
+import org.slf4j.LoggerFactory
 import java.awt.GridBagConstraints
 import java.awt.GridBagConstraints.BOTH
 import java.awt.GridBagConstraints.WEST
@@ -31,7 +31,7 @@ import javax.swing.JFrame
  */
 class NoticeFrame(private val app: App, private val notice: Notice) : JFrame() {
 
-    private val log = KotlinLogging.logger {}
+    private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
     private var selectedPhotos = SelectedPhotos(TreeSet(notice.photos))
     private var allPhotosPanel = AllPhotosPanel(this, "20220301_184952.jpg")
     private var selectedPhotosPanel = SelectedPhotosPanel(this)
