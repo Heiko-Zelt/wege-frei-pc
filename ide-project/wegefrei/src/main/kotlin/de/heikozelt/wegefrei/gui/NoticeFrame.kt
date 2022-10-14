@@ -58,11 +58,12 @@ class NoticeFrame(private val app: App, private val notice: Notice) : JFrame() {
         constraints.gridx = 0
         constraints.gridy = 0
         constraints.weightx = 1.0
-        constraints.weighty = 0.18
+        constraints.weighty = 0.16
         constraints.gridwidth = 2
         add(allPhotosPanel, constraints)
 
         constraints.gridy++
+        constraints.weighty = 0.20
         add(selectedPhotosPanel, constraints)
 
         constraints.gridy++

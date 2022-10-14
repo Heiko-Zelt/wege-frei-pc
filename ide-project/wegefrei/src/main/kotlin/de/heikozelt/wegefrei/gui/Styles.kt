@@ -17,6 +17,8 @@ class Styles {
 
         //val BUTTONS_SEPARATOR_DIMENSION = Dimension(20, 20)
         const val BUTTONS_DISTANCE = 15
+        const val THUMBNAIL_SIZE = 140
+        const val SELECT_BUTTON_SIZE = 30
         val BUTTON_MARGIN = Insets(0, 5, 0, 5)
 
         val NORMAL_BORDER: Border = BorderFactory.createLineBorder(Color.black)
@@ -34,6 +36,8 @@ class Styles {
         val FORM_BACKGROUND = FRAME_BACKGROUND
         val ZOOM_PANEL_BACKGROUND = FRAME_BACKGROUND
         val NOTICES_TABLE_BACKGROUND = JTable().background ?: Color(255, 255, 255)
+        val PHOTO_SQUARE_BACKGROUND = Color(128, 128, 128)
+
 
         /*
         todo: dark mode
