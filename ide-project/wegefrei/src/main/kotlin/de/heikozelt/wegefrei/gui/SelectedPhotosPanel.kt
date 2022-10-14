@@ -5,13 +5,11 @@ import de.heikozelt.wegefrei.gui.Styles.Companion.NO_BORDER
 import de.heikozelt.wegefrei.gui.Styles.Companion.SELECTED_PHOTOS_BACKGROUND
 import de.heikozelt.wegefrei.model.SelectedPhotosObserver
 import org.slf4j.LoggerFactory
-import java.awt.Container
 import javax.swing.BoxLayout
 import javax.swing.BoxLayout.X_AXIS
 import javax.swing.JPanel
-import javax.swing.JScrollPane
 
-class SelectedPhotosPanel(private val noticeFrame: NoticeFrame) : JScrollPane(JPanel()),
+class SelectedPhotosPanel(private val noticeFrame: NoticeFrame) : JPanel(),
     SelectedPhotosObserver {
 
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
@@ -19,21 +17,17 @@ class SelectedPhotosPanel(private val noticeFrame: NoticeFrame) : JScrollPane(JP
     private val miniSelectedPhotoPanels = arrayListOf<MiniSelectedPhotoPanel>()
 
     init {
-        log.debug("viewport.view" + viewport.view)
         border = NO_BORDER
-        val cont = viewport.view
-        if (cont != null && cont is Container) {
-            cont.layout = BoxLayout(cont, X_AXIS)
-            cont.background = SELECTED_PHOTOS_BACKGROUND
+        layout = BoxLayout(this, X_AXIS)
+        background = SELECTED_PHOTOS_BACKGROUND
 
-            // nicht notwendig, wenn selectedPhotos anfänglich leer ist und Observer vorher schon registriert ist
-            // aber man weiß ja nie
-            for (photo in noticeFrame.getSelectedPhotos().getPhotos()) {
-                log.warn("observer zu spät registriert?")
-                val panel = MiniSelectedPhotoPanel(noticeFrame, photo)
-                miniSelectedPhotoPanels.add(panel)
-                cont.add(panel)
-            }
+        // nicht notwendig, wenn selectedPhotos anfänglich leer ist und Observer vorher schon registriert ist
+        // aber man weiß ja nie
+        for (photo in noticeFrame.getSelectedPhotos().getPhotos()) {
+            log.warn("observer zu spät registriert?")
+            val panel = MiniSelectedPhotoPanel(noticeFrame, photo)
+            miniSelectedPhotoPanels.add(panel)
+            add(panel)
         }
         autoscrolls = true
     }
@@ -86,29 +80,23 @@ class SelectedPhotosPanel(private val noticeFrame: NoticeFrame) : JScrollPane(JP
         log.debug("added photo")
         val panel = MiniSelectedPhotoPanel(noticeFrame, photo)
         miniSelectedPhotoPanels.add(index, panel)
-        val cont = viewport.view
-        if (cont != null && cont is Container) {
-            log.debug("add selected photo panel to container. component count: ${cont.componentCount}")
-            cont.add(panel, index)
-            log.debug("after add: component count: ${cont.componentCount}")
-            cont.revalidate()
-            cont.repaint()
-            revalidate()
-            repaint()
-        }
+        log.debug("add selected photo panel to container. component count: $componentCount")
+        add(panel, index)
+        log.debug("after add: component count: $componentCount")
+        revalidate()
+        repaint()
+        revalidate()
+        repaint()
     }
 
     override fun removedPhoto(index: Int, photo: Photo) {
         log.debug("removed photo")
-        val cont = viewport.view
         val panel = panelWithPhoto(photo)
         miniSelectedPhotoPanels.remove(panel)
-        if (cont != null && cont is Container) {
-            log.debug("remove selected photo panel to container. component count: ${cont.componentCount}")
-            cont.remove(panel)
-            log.debug("after remove: component count: ${cont.componentCount}")
-            cont.revalidate()
-            cont.repaint()
-        }
+        log.debug("remove selected photo panel to container. component count: $componentCount")
+        remove(panel)
+        log.debug("after remove: component count: $componentCount")
+        revalidate()
+        repaint()
     }
 }

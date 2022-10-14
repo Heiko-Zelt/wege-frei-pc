@@ -15,6 +15,7 @@ import java.net.URL
 import java.time.ZonedDateTime
 import java.util.*
 import javax.swing.JFrame
+import javax.swing.JScrollPane
 import javax.swing.JSplitPane
 
 /**
@@ -32,10 +33,11 @@ class NoticeFrame(private val app: App, private val notice: Notice) : JFrame() {
     private var selectedPhotos = SelectedPhotos(TreeSet(notice.photos))
     private var allPhotosPanel = AllPhotosPanel(this, "20220301_184952.jpg")
     private var selectedPhotosPanel = SelectedPhotosPanel(this)
+    private var selectedPhotosScrollPane = JScrollPane(selectedPhotosPanel)
     private var noticeForm = NoticeForm(this)
     private var zoomPanel = ZoomPanel(this)
 
-    private var topSplitPane = JSplitPane(JSplitPane.VERTICAL_SPLIT, allPhotosPanel, selectedPhotosPanel)
+    private var topSplitPane = JSplitPane(JSplitPane.VERTICAL_SPLIT, allPhotosPanel, selectedPhotosScrollPane)
     private var bottomSplitPane = JSplitPane(JSplitPane.HORIZONTAL_SPLIT, noticeForm, zoomPanel)
     private var mainSplitPane = JSplitPane(JSplitPane.VERTICAL_SPLIT, topSplitPane, bottomSplitPane)
 
