@@ -401,6 +401,7 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel() {
         zipCodeTextField.isEnabled = false
         townTextField.isEnabled = false
         locationDescriptionTextField.isEnabled = false
+        offenseComboBox.isEnabled = false
         observationDateTextField.isEnabled = false
         observationTimeTextField.isEnabled = false
         durationTextField.isEnabled = false

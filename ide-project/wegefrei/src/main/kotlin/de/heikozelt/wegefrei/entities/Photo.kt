@@ -3,6 +3,7 @@ package de.heikozelt.wegefrei.entities
 import de.heikozelt.wegefrei.App
 import jakarta.persistence.*
 import org.jxmapviewer.viewer.GeoPosition
+import org.slf4j.LoggerFactory
 import java.awt.image.BufferedImage
 import java.io.File
 import java.time.ZonedDateTime
@@ -40,6 +41,9 @@ class Photo (
     @ManyToMany(mappedBy="photos")
     val notices: Set<Notice>? = null
 ): Comparable<Photo> {
+
+    @jakarta.persistence.Transient
+    private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
 
     // null is kleiner als ein String
     override fun compareTo(other: Photo): Int {
@@ -89,6 +93,33 @@ class Photo (
         } else {
             null
         }
+    }
+
+    /**
+     * liefert einen ToolTipText
+     * Beispiel:
+     * <code>
+     *   "<html>
+     *     20220301_185137.jpg<br>
+     *     01.03.2022, 18:51:37 CET<br>
+     *     50.079174, 8.241951
+     *   </html>"
+     * </code>
+     */
+    fun getToolTipText(): String {
+        val lines = mutableListOf<String>()
+        if(filename != null) {
+            lines.add(filename)
+        }
+        if (date != null) {
+            lines.add(getDateFormatted())
+        }
+        if (latitude != null && longitude != null) {
+            lines.add("$latitude, $longitude")
+        }
+        val text = "<html>${lines.joinToString("<br>")}</html>"
+        log.debug(text)
+        return text
     }
 
     companion object {

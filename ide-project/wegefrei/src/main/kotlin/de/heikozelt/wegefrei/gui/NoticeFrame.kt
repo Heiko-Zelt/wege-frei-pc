@@ -10,15 +10,12 @@ import de.heikozelt.wegefrei.json.NominatimResponse
 import de.heikozelt.wegefrei.model.SelectedPhotos
 import org.jxmapviewer.viewer.GeoPosition
 import org.slf4j.LoggerFactory
-import java.awt.GridBagConstraints
-import java.awt.GridBagConstraints.BOTH
-import java.awt.GridBagConstraints.WEST
-import java.awt.GridBagLayout
 import java.net.HttpURLConnection
 import java.net.URL
 import java.time.ZonedDateTime
 import java.util.*
 import javax.swing.JFrame
+import javax.swing.JSplitPane
 
 /**
  * Haupt-Fenster zum Bearbeiten einer Meldung
@@ -36,7 +33,11 @@ class NoticeFrame(private val app: App, private val notice: Notice) : JFrame() {
     private var allPhotosPanel = AllPhotosPanel(this, "20220301_184952.jpg")
     private var selectedPhotosPanel = SelectedPhotosPanel(this)
     private var noticeForm = NoticeForm(this)
-    private var zoomPanel: ZoomPanel
+    private var zoomPanel = ZoomPanel(this)
+
+    private var topSplitPane = JSplitPane(JSplitPane.VERTICAL_SPLIT, allPhotosPanel, selectedPhotosPanel)
+    private var bottomSplitPane = JSplitPane(JSplitPane.HORIZONTAL_SPLIT, noticeForm, zoomPanel)
+    private var mainSplitPane = JSplitPane(JSplitPane.VERTICAL_SPLIT, topSplitPane, bottomSplitPane)
 
     init {
         log.debug("notice id: ${notice.id}")
@@ -51,33 +52,23 @@ class NoticeFrame(private val app: App, private val notice: Notice) : JFrame() {
 
         background = FRAME_BACKGROUND
         defaultCloseOperation = DISPOSE_ON_CLOSE
-        layout = GridBagLayout()
-        val constraints = GridBagConstraints()
-        constraints.anchor = WEST
-        constraints.fill = BOTH
-        constraints.gridx = 0
-        constraints.gridy = 0
-        constraints.weightx = 1.0
-        constraints.weighty = 0.16
-        constraints.gridwidth = 2
-        add(allPhotosPanel, constraints)
-
-        constraints.gridy++
-        constraints.weighty = 0.20
-        add(selectedPhotosPanel, constraints)
-
-        constraints.gridy++
-        constraints.weightx = 0.5
-        constraints.weighty = 0.64
-        constraints.gridwidth = 1
-        add(noticeForm, constraints)
-
-        constraints.gridx = 1
-        constraints.fill = BOTH
-        zoomPanel = ZoomPanel(this)
-        add(zoomPanel, constraints)
-
         setSize(1000, 700)
+
+        topSplitPane.apply {
+            isOneTouchExpandable = true
+            setDividerLocation(0.5)
+        }
+
+        bottomSplitPane.apply {
+            isOneTouchExpandable = true
+            setDividerLocation(0.5)
+        }
+
+        mainSplitPane.apply {
+            isOneTouchExpandable = true
+            setDividerLocation(0.4)
+        }
+        add(mainSplitPane)
         isVisible = true
     }
 

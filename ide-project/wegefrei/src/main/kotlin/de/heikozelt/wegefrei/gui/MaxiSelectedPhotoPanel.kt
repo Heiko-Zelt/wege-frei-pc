@@ -5,6 +5,7 @@ import de.heikozelt.wegefrei.gui.Styles.Companion.NO_BORDER
 import de.heikozelt.wegefrei.gui.Styles.Companion.ZOOM_PANEL_BACKGROUND
 import org.slf4j.LoggerFactory
 import java.awt.Image
+import java.awt.Insets
 import javax.swing.*
 
 class MaxiSelectedPhotoPanel(private val noticeFrame: NoticeFrame, private val photo: Photo): JPanel() {
@@ -29,13 +30,14 @@ class MaxiSelectedPhotoPanel(private val noticeFrame: NoticeFrame, private val p
         label.alignmentX = CENTER_ALIGNMENT
         add(label)
 
-        val removeButton = JButton("-")
-        removeButton.alignmentX = CENTER_ALIGNMENT
-        removeButton.addActionListener {
+        val button = JButton("-")
+        button.margin = Insets(0, 0, 0, 0)
+        button.alignmentX = CENTER_ALIGNMENT
+        button.addActionListener {
             noticeFrame.unselectPhoto(photo)
         }
 
-        add(removeButton)
+        add(button)
     }
 
     fun getPhoto(): Photo {

@@ -5,6 +5,7 @@ import de.heikozelt.wegefrei.gui.Styles.Companion.NO_BORDER
 import de.heikozelt.wegefrei.gui.Styles.Companion.ZOOM_PANEL_BACKGROUND
 import org.slf4j.LoggerFactory
 import java.awt.Image
+import java.awt.Insets
 import javax.swing.*
 
 class MaxiPhotoPanel(private val noticeFrame: NoticeFrame, private val photo: Photo): JPanel() {
@@ -13,7 +14,7 @@ class MaxiPhotoPanel(private val noticeFrame: NoticeFrame, private val photo: Ph
 
     private val label: JLabel
 
-    private val addButton: JButton
+    private val button: JButton
 
     private fun makeThumbnailImage(): Image? {
         return photo.getImage()?.getScaledInstance(600, 400, Image.SCALE_SMOOTH)
@@ -38,12 +39,13 @@ class MaxiPhotoPanel(private val noticeFrame: NoticeFrame, private val photo: Ph
         label.alignmentX = CENTER_ALIGNMENT
         add(label)
 
-        addButton = JButton("+")
-        addButton.alignmentX = CENTER_ALIGNMENT
-        addButton.addActionListener {
+        button = JButton("+")
+        button.margin = Insets(0, 0, 0, 0)
+        button.alignmentX = CENTER_ALIGNMENT
+        button.addActionListener {
            noticeFrame.selectPhoto(photo)
         }
-        add(addButton)
+        add(button)
     }
 
     fun getPhoto(): Photo {

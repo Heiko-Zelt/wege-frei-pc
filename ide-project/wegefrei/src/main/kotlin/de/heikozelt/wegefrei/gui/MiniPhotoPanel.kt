@@ -8,9 +8,11 @@ import de.heikozelt.wegefrei.gui.Styles.Companion.THUMBNAIL_SIZE
 import org.slf4j.LoggerFactory
 import java.awt.Dimension
 import java.awt.Image
+import java.awt.Insets
 import java.awt.Toolkit
 import java.awt.image.FilteredImageSource
 import javax.swing.*
+
 
 class MiniPhotoPanel(private val noticeFrame: NoticeFrame, private val photo: Photo, private var active: Boolean): JPanel() {
 
@@ -58,9 +60,26 @@ class MiniPhotoPanel(private val noticeFrame: NoticeFrame, private val photo: Ph
         }
     }
 
+    fun buildToolTipText() {
+        val text: String
+        photo.apply {
+            val lines = mutableListOf<String>()
+            if(filename != null) {
+                lines.add(filename)
+            }
+            if (date != null) {
+                lines.add(getDateFormatted())
+            }
+            if (latitude != null && longitude != null) {
+                lines.add("$latitude, $longitude")
+            }
+            text = "<html>${lines.joinToString("<br>")}</html>"
+        }
+        thumbnailLabel.toolTipText = text
+    }
+
     init {
         layout = null
-        //background = Styles.PHOTO_SQUARE_BACKGROUND
         // + 2 wegen Border
         preferredSize = Dimension(THUMBNAIL_SIZE + 2, THUMBNAIL_SIZE + 2)
         minimumSize = preferredSize
@@ -77,8 +96,7 @@ class MiniPhotoPanel(private val noticeFrame: NoticeFrame, private val photo: Ph
 
         log.debug("setBounds($thumbnailX, $thumbnailY, $thumbnailWidth, $thumbnailHeight)")
         thumbnailLabel.setBounds(thumbnailX, thumbnailY, thumbnailWidth, thumbnailHeight)
-
-        thumbnailLabel.toolTipText = "<html>${photo.filename}<br>${photo.getDateFormatted()}<br>${photo.latitude}, ${photo.longitude}</html>"
+        thumbnailLabel.toolTipText = photo.getToolTipText()
         thumbnailLabel.border = NORMAL_BORDER
         mouseListener = MiniPhotoPanelMouseListener(noticeFrame, this)
         if(active) {
@@ -90,6 +108,7 @@ class MiniPhotoPanel(private val noticeFrame: NoticeFrame, private val photo: Ph
         // + 1 wegen Border
         val buttonXY = THUMBNAIL_SIZE - SELECT_BUTTON_SIZE + 1
         button.setBounds(buttonXY, buttonXY, SELECT_BUTTON_SIZE, SELECT_BUTTON_SIZE)
+        button.margin = Insets(0, 0, 0, 0)
 
         add(button)
         add(thumbnailLabel)

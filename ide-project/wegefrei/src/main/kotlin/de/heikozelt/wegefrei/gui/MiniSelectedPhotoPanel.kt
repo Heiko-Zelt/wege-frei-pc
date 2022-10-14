@@ -6,6 +6,7 @@ import de.heikozelt.wegefrei.gui.Styles.Companion.NORMAL_BORDER
 import org.slf4j.LoggerFactory
 import java.awt.Dimension
 import java.awt.Image
+import java.awt.Insets
 import javax.swing.ImageIcon
 import javax.swing.JButton
 import javax.swing.JLabel
@@ -48,8 +49,7 @@ class MiniSelectedPhotoPanel(private val noticeFrame: NoticeFrame, private val p
 
     init {
         layout = null
-        //background = SELECTED_PHOTOS_BACKGROUND
-
+        // + 2 wegen Border
         preferredSize = Dimension(Styles.THUMBNAIL_SIZE + 2, Styles.THUMBNAIL_SIZE + 2)
         minimumSize = preferredSize
         maximumSize = preferredSize
@@ -65,15 +65,15 @@ class MiniSelectedPhotoPanel(private val noticeFrame: NoticeFrame, private val p
 
         log.debug("setBounds($thumbnailX, $thumbnailY, $thumbnailWidth, $thumbnailHeight)")
         thumbnailLabel.setBounds(thumbnailX, thumbnailY, thumbnailWidth, thumbnailHeight)
-
-        thumbnailLabel.toolTipText = "<html>${photo.filename}<br>${photo.getDateFormatted()}<br>${photo.latitude}, ${photo.longitude}</html>"
+        thumbnailLabel.toolTipText = photo.getToolTipText()
         thumbnailLabel.border = NORMAL_BORDER
         thumbnailLabel.addMouseListener(MiniSelectedPhotoPanelMouseListener(noticeFrame, this))
 
         // + 1 wegen Border
+        button.addActionListener { unselectPhoto() }
         val buttonXY = Styles.THUMBNAIL_SIZE - Styles.SELECT_BUTTON_SIZE + 1
         button.setBounds(buttonXY, buttonXY, Styles.SELECT_BUTTON_SIZE, Styles.SELECT_BUTTON_SIZE)
-        button.addActionListener { unselectPhoto() }
+        button.margin = Insets(0, 0, 0, 0)
 
         add(button)
         add(thumbnailLabel)
