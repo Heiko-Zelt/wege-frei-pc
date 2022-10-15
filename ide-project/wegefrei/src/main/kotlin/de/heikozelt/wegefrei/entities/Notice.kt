@@ -7,7 +7,7 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
 @Entity
-@Table(name="NOTICES")
+@Table(name = "NOTICES")
 class Notice(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,7 +20,7 @@ class Notice(
 
     var sentTime: ZonedDateTime? = null,
 
-    @Column(length=3)
+    @Column(length = 3)
     var countrySymbol: String? = null,
 
     @Column
@@ -124,9 +124,11 @@ class Notice(
     var recipient: String? = null,
 
     @ManyToMany
-    @JoinTable(name= "NOTICES_PHOTOS",
-    joinColumns = [JoinColumn(name = "id" /*, referencedColumnName = "filename" */) ],
-    inverseJoinColumns = [JoinColumn(name = "filename" /*, referencedColumnName = "id" */)])
+    @JoinTable(
+        name = "NOTICES_PHOTOS",
+        joinColumns = [JoinColumn(name = "id" /*, referencedColumnName = "filename" */)],
+        inverseJoinColumns = [JoinColumn(name = "filename" /*, referencedColumnName = "id" */)]
+    )
     var photos: Set<Photo> = setOf(),
 
     @Column
@@ -138,7 +140,7 @@ class Notice(
 
     fun getCreatedTimeFormatted(): String {
         val d = createdTime
-        return if(d == null) {
+        return if (d == null) {
             ""
         } else {
             d.format(dateTimeFormat)
@@ -151,7 +153,7 @@ class Notice(
      */
     fun getObservationTimeFormatted(): String {
         val d = observationTime
-        return if(d == null) {
+        return if (d == null) {
             ""
         } else {
             d.format(dateTimeFormat)
@@ -174,7 +176,17 @@ class Notice(
      * aber zum Absenden einer E-Mail müssen bestimmte Felder ausgefüllt sein. )
      */
     fun isComplete(): Boolean {
-        return licensePlate != null && street != null && zipCode != null && town != null && observationTime != null && photos.isNotEmpty()
+        val isOffenseComplete = when (offense) {
+            null -> false // keine Angabe
+            1 -> note != null // sonstiges Vergehen, siehe Hinweis
+            else -> true // Vergehen aus Katalog
+        }
+        val isVehicleInspectionComplete = when (vehicleInspectionExpired) {
+            false -> true
+            else -> vehicleInspectionMonth != null && vehicleInspectionYear != null
+        }
+        return isOffenseComplete && isVehicleInspectionComplete && licensePlate != null && street != null
+                && zipCode != null && town != null && observationTime != null && photos.isNotEmpty()
     }
 
     /**
@@ -188,9 +200,9 @@ class Notice(
     }
 
     fun getState(): NoticeState {
-        return if(isSent()) {
+        return if (isSent()) {
             NoticeState.SENT
-        } else if(isComplete()) {
+        } else if (isComplete()) {
             NoticeState.COMPLETE
         } else {
             NoticeState.INCOMPLETE

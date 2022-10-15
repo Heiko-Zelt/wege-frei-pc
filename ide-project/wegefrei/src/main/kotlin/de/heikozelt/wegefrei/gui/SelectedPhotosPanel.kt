@@ -44,20 +44,6 @@ class SelectedPhotosPanel(private val noticeFrame: NoticeFrame) : JPanel(),
         return null
     }
 
-    /*
-    selectedPhotos.getPhotos().indexOf(photo)
-    fun indexOfPhoto(photo: Photo): Int {
-        var i = 0
-        for (photoPanel in miniSelectedPhotoPanels) {
-            if (photoPanel.getPhoto() == photo) {
-                return i
-            }
-            i ++
-        }
-        return i
-    }
-    */
-
     fun showBorder(miniSelectedPhotoPanel: MiniSelectedPhotoPanel) {
         for (panel in miniSelectedPhotoPanels) {
             panel.displayBorder(panel == miniSelectedPhotoPanel)

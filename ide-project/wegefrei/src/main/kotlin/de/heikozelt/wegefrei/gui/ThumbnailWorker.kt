@@ -64,7 +64,11 @@ class ThumbnailWorker(
     override fun doInBackground(): ImageIcon? {
         calculateThumbnail()
         makeThumbnailImage()
-        icon = ImageIcon(thumbnailImage)
+        icon = if(thumbnailImage == null) {
+            null
+        } else {
+            ImageIcon(thumbnailImage)
+        }
         return icon
     }
 
@@ -72,10 +76,12 @@ class ThumbnailWorker(
      * this is done in the Swing Event Dispatcher Thread
      */
     override fun done() {
-        label.text = null
-        label.icon = ImageIcon(thumbnailImage)
-        log.debug("setBounds($thumbnailX, $thumbnailY, $thumbnailWidth, $thumbnailHeight)")
-        label.setBounds(thumbnailX, thumbnailY, thumbnailWidth, thumbnailHeight)
+        if(thumbnailImage != null) {
+            label.text = null
+            label.icon = ImageIcon(thumbnailImage)
+            log.debug("setBounds($thumbnailX, $thumbnailY, $thumbnailWidth, $thumbnailHeight)")
+            label.setBounds(thumbnailX, thumbnailY, thumbnailWidth, thumbnailHeight)
+        }
     }
 
 }

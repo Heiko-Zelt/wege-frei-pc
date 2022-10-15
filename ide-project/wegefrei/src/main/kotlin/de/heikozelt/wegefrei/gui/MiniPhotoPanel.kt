@@ -7,45 +7,26 @@ import de.heikozelt.wegefrei.gui.Styles.Companion.SELECT_BUTTON_SIZE
 import de.heikozelt.wegefrei.gui.Styles.Companion.THUMBNAIL_SIZE
 import org.slf4j.LoggerFactory
 import java.awt.Dimension
-import java.awt.EventQueue
 import java.awt.Insets
 import javax.swing.JButton
 import javax.swing.JLabel
 import javax.swing.JPanel
+import javax.swing.SwingConstants
 
 
 class MiniPhotoPanel(private val noticeFrame: NoticeFrame, private val photo: Photo, private var active: Boolean) :
     JPanel() {
 
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
-    private val thumbnailLabel = JLabel("not loaded")
+    private val thumbnailLabel = JLabel("not loaded", SwingConstants.CENTER)
     private val mouseListener: MiniPhotoPanelMouseListener
     private val button = JButton("+")
     private var borderVisible = false
 
     /**
-     * macht aus dem Photo-Image ein Thumbnail-Image.
+     * macht aus dem Foto-Image ein Thumbnail-Image.
      * scalieren und ggf. grau machen
      */
-
-
-    fun buildToolTipText() {
-        val text: String
-        photo.apply {
-            val lines = mutableListOf<String>()
-            if (filename != null) {
-                lines.add(filename)
-            }
-            if (date != null) {
-                lines.add(getDateFormatted())
-            }
-            if (latitude != null && longitude != null) {
-                lines.add("$latitude, $longitude")
-            }
-            text = "<html>${lines.joinToString("<br>")}</html>"
-        }
-        thumbnailLabel.toolTipText = text
-    }
 
     init {
         layout = null
@@ -89,12 +70,6 @@ class MiniPhotoPanel(private val noticeFrame: NoticeFrame, private val photo: Ph
     fun activate() {
         active = true
 
-        /*
-        makeThumbnailImage()
-        if (thumbnailImage != null) {
-            thumbnailLabel.icon = ImageIcon(thumbnailImage)
-        }
-        */
         val worker = ThumbnailWorker(photo, active, thumbnailLabel)
         worker.execute()
 
@@ -105,14 +80,6 @@ class MiniPhotoPanel(private val noticeFrame: NoticeFrame, private val photo: Ph
 
     fun deactivate() {
         active = false
-
-        /*
-        makeThumbnailImage()
-        if (thumbnailImage != null) {
-            thumbnailLabel.icon = ImageIcon(thumbnailImage)
-            thumbnailLabel.removeMouseListener(mouseListener)
-        }
-         */
 
         val worker = ThumbnailWorker(photo, active, thumbnailLabel)
         worker.execute()
@@ -131,9 +98,5 @@ class MiniPhotoPanel(private val noticeFrame: NoticeFrame, private val photo: Ph
             thumbnailLabel.revalidate()
             borderVisible = false
         }
-    }
-
-    companion object {
-        val eq = EventQueue::class
     }
 }
