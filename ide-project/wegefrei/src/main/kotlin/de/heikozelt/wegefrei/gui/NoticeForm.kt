@@ -8,7 +8,7 @@ import javax.swing.JPanel
 import javax.swing.JScrollPane
 
 /**
- * todo: Button Meldung löschen
+ * Meldungs-Formular mit Eingabe-Feldern und Buttonleiste
  */
 class NoticeForm(private val noticeFrame: NoticeFrame) : JPanel() {
 
