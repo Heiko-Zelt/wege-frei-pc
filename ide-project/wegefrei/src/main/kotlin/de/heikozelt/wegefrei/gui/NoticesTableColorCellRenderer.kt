@@ -39,11 +39,11 @@ class NoticesTableColorCellRenderer : JLabel(), TableCellRenderer {
         }
 
         if (isSelected) {
-            log.debug("is selected")
+            //log.debug("is selected")
             super.setBackground(table.selectionBackground) // r=184, g=207, b=229 also hellblau
             super.setForeground(table.selectionForeground)
         } else {
-            log.debug("is not selected")
+            //log.debug("is not selected")
             super.setBackground(table.background) // JTable Background
             super.setForeground(table.foreground)
         }

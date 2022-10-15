@@ -36,7 +36,7 @@ class MiniMap(
     private var selectedPhotos = noticeFrame.getSelectedPhotos()
 
     init {
-        log.debug("register")
+        log.debug("init")
         selectedPhotos.registerObserver(this)
 
         val photosIter = selectedPhotos.getPhotos().iterator()

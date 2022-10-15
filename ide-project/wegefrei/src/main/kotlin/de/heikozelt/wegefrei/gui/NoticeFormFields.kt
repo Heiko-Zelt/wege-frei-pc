@@ -49,6 +49,7 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel() {
     private val recipientTextField = TrimmingTextField(30)
 
     init {
+        log.debug("init")
         layout = BorderLayout()
 
         background = FORM_BACKGROUND

@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory
 import java.awt.Dimension
 import java.awt.Image
 import java.awt.Insets
-import javax.swing.ImageIcon
 import javax.swing.JButton
 import javax.swing.JLabel
 import javax.swing.JPanel
@@ -15,7 +14,7 @@ import javax.swing.JPanel
 class MiniSelectedPhotoPanel(private val noticeFrame: NoticeFrame, private val photo: Photo): JPanel() {
 
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
-    private val thumbnailLabel: JLabel
+    private val thumbnailLabel = JLabel("not loaded")
     private val button = JButton("-")
     private var borderVisible = false
     private var thumbnailX = 0
@@ -54,17 +53,6 @@ class MiniSelectedPhotoPanel(private val noticeFrame: NoticeFrame, private val p
         minimumSize = preferredSize
         maximumSize = preferredSize
 
-        calculateThumbnail()
-        makeThumbnailImage()
-
-        thumbnailLabel = if(thumbnailImage == null) {
-            JLabel("not loaded")
-        } else {
-            JLabel(ImageIcon(thumbnailImage))
-        }
-
-        log.debug("setBounds($thumbnailX, $thumbnailY, $thumbnailWidth, $thumbnailHeight)")
-        thumbnailLabel.setBounds(thumbnailX, thumbnailY, thumbnailWidth, thumbnailHeight)
         thumbnailLabel.toolTipText = photo.getToolTipText()
         thumbnailLabel.border = NORMAL_BORDER
         thumbnailLabel.addMouseListener(MiniSelectedPhotoPanelMouseListener(noticeFrame, this))
@@ -77,6 +65,20 @@ class MiniSelectedPhotoPanel(private val noticeFrame: NoticeFrame, private val p
 
         add(button)
         add(thumbnailLabel)
+
+        // Loading the image from the filesystem and resizing it is time-consuming. So, do it later...
+        val worker = SelectedThumbnailWorker(photo, thumbnailLabel)
+        worker.execute()
+        /*
+        EventQueue.invokeLater {
+            calculateThumbnail()
+            makeThumbnailImage()
+            thumbnailLabel.text = null
+            thumbnailLabel.icon = ImageIcon(thumbnailImage)
+            log.debug("setBounds($thumbnailX, $thumbnailY, $thumbnailWidth, $thumbnailHeight)")
+            thumbnailLabel.setBounds(thumbnailX, thumbnailY, thumbnailWidth, thumbnailHeight)
+        }
+        */
     }
 
     fun unselectPhoto() {

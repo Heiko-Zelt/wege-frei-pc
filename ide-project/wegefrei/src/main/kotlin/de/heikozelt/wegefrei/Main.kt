@@ -1,6 +1,7 @@
 package de.heikozelt.wegefrei
 
 import org.slf4j.LoggerFactory
+import java.awt.EventQueue
 
 private val LOG = LoggerFactory.getLogger("de.heikozelt.wegefrei.MainKt")
 
@@ -19,7 +20,7 @@ fun main(args: Array<String>) {
     val shutdownHook = Thread { LOG.info("exit") }
     Runtime.getRuntime().addShutdownHook(shutdownHook)
 
-    App()
+    EventQueue.invokeLater { App() }
 
     LOG.debug("de.heikozelt.wegefrei.main function finished")
 }

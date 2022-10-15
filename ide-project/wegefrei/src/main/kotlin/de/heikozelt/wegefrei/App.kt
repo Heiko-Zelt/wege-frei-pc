@@ -24,7 +24,7 @@ class App {
     private val noticesFrame = NoticesFrame(this)
 
     init{
-        //...?
+        log.debug("initializing")
     }
 
     fun getDatabaseService(): DatabaseService {

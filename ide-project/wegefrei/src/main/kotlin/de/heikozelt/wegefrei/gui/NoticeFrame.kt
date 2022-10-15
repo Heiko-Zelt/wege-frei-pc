@@ -1,17 +1,13 @@
 package de.heikozelt.wegefrei.gui
 
-import com.beust.klaxon.Klaxon
 import de.heikozelt.wegefrei.App
 import de.heikozelt.wegefrei.DatabaseService
 import de.heikozelt.wegefrei.entities.Notice
 import de.heikozelt.wegefrei.entities.Photo
 import de.heikozelt.wegefrei.gui.Styles.Companion.FRAME_BACKGROUND
-import de.heikozelt.wegefrei.json.NominatimResponse
 import de.heikozelt.wegefrei.model.SelectedPhotos
 import org.jxmapviewer.viewer.GeoPosition
 import org.slf4j.LoggerFactory
-import java.net.HttpURLConnection
-import java.net.URL
 import java.time.ZonedDateTime
 import java.util.*
 import javax.swing.JFrame
@@ -42,7 +38,7 @@ class NoticeFrame(private val app: App, private val notice: Notice) : JFrame() {
     private var mainSplitPane = JSplitPane(JSplitPane.VERTICAL_SPLIT, topSplitPane, bottomSplitPane)
 
     init {
-        log.debug("notice id: ${notice.id}")
+        log.debug("init, notice id: ${notice.id}")
         title = if(notice.id == null) {
             "Neue Meldung - Wege frei!"
         } else {
@@ -72,6 +68,7 @@ class NoticeFrame(private val app: App, private val notice: Notice) : JFrame() {
         }
         add(mainSplitPane)
         isVisible = true
+        log.debug("NoticeFrame.init() finished")
     }
 
     fun getDatabaseService(): DatabaseService {
@@ -184,36 +181,8 @@ class NoticeFrame(private val app: App, private val notice: Notice) : JFrame() {
 
 
     fun findAddress(position: GeoPosition) {
-        val lat = "%.8f".format(position.latitude)
-        val lon = "%.8f".format(position.longitude)
-        val url =
-            URL("https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=$lat&lon=$lon&email=hz@heikozelt.de")
-        val connection = url.openConnection() as HttpURLConnection
-        connection.connect()
-        println(connection.responseCode)
-        println(connection.getHeaderField("Content-Type"))
-        val text = connection.inputStream.use { it.reader().use { reader -> reader.readText() } }
-        log.debug(text)
-
-        val nominatimResponse = Klaxon().parse<NominatimResponse>(text)
-        log.debug("displayName: ${nominatimResponse?.displayName}")
-        log.debug("houseNumber: ${nominatimResponse?.address?.houseNumber}")
-
-        nominatimResponse?.address?.let {
-            if (it.road != null) {
-                var street = it.road
-                if (it.houseNumber != null) {
-                    street += " " + it.houseNumber
-                }
-                noticeForm.getNoticeFormFields().setStreet(street)
-            }
-            if (it.postcode != null) {
-                noticeForm.getNoticeFormFields().setZipCode(it.postcode)
-            }
-            if (it.city != null) {
-                noticeForm.getNoticeFormFields().setTown(it.city)
-            }
-        }
+        val worker = AddressWorker(position, noticeForm)
+        worker.execute()
     }
 
     fun saveNotice() {
