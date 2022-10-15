@@ -214,8 +214,10 @@ class MiniMap(
 
             // aus Performance-Gründen:
             // bei nur minimalen Abweichungen keine neu Addresse suchen
-            if (oldPosition == null || distance(oldPosition, newPosition) > NEARBY_DEGREES)
+            if (oldPosition == null || distance(oldPosition, newPosition) > NEARBY_DEGREES) {
+                log.info("findAddress()")
                 noticeFrame.findAddress(newPosition)
+            }
 
         }
     }

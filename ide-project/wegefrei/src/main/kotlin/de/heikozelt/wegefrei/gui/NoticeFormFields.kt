@@ -47,12 +47,13 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel() {
     private val endangeringCheckBox = JCheckBox("mit Gefährdung")
     private val environmentalStickerCheckBox = JCheckBox("Umweltplakette fehlt/ungültig")
     private val vehicleInspectionStickerCheckBox = JCheckBox("HU Plakette abgelaufen")
+    private val inspectionYearLabel = JLabel("HU-Fälligkeit Jahr:")
     private val inspectionYearTextField = JTextField(4)
+    private val inspectionMonthLabel = JLabel("HU-Fälligkeit Monat:")
     private val inspectionMonthTextField = JTextField(2)
     private val abandonedCheckBox = JCheckBox("Fahrzeug war verlassen")
     private val recipientTextField = TrimmingTextField(30)
     private val noteTextArea = JTextArea(3, 50)
-
 
     init {
         log.debug("init")
@@ -181,7 +182,8 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel() {
         if (observationDateDoc is AbstractDocument) {
             observationDateDoc.documentFilter = DateDocFilter()
         }
-        observationDateTextField.toolTipText = "z.B. 31.12.2001"
+        observationDateTextField.toolTipText = "z.B. 31.12.2021"
+        observationDateTextField.inputVerifier = Verifiers.dateVerifier
         add(observationDateTextField, constraints)
 
         constraints.gridy++
@@ -195,6 +197,7 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel() {
             observationTimeDoc.documentFilter = TimeDocFilter()
         }
         observationTimeTextField.toolTipText = "z.B. 23:59"
+        observationTimeTextField.inputVerifier = Verifiers.timeVerifier
         add(observationTimeTextField, constraints)
 
         constraints.gridy++
@@ -231,10 +234,16 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel() {
         constraints.gridy++
         vehicleInspectionStickerCheckBox.background = FORM_BACKGROUND
         constraints.gridx = 0
+        vehicleInspectionStickerCheckBox.addChangeListener {
+            val src = it.source as JCheckBox
+            inspectionYearLabel.isVisible = src.isSelected
+            inspectionYearTextField.isVisible = src.isSelected
+            inspectionMonthLabel.isVisible = src.isSelected
+            inspectionMonthTextField.isVisible = src.isSelected
+        }
         add(vehicleInspectionStickerCheckBox, constraints)
 
         constraints.gridy++
-        val inspectionYearLabel = JLabel("HU-Fälligkeit Jahr:")
         constraints.gridx = 0
         add(inspectionYearLabel, constraints)
         constraints.gridx = 1
@@ -243,10 +252,11 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel() {
             inspectionYearDoc.documentFilter = OnlyDigitsDocFilter()
         }
         inspectionYearTextField.toolTipText = "Ganzzahl 4-stellig"
+        inspectionYearTextField.inputVerifier = Verifiers.inspectionYearVerifier
+        inspectionYearTextField.isVisible = false
         add(inspectionYearTextField, constraints)
 
         constraints.gridy++
-        val inspectionMonthLabel = JLabel("HU-Fälligkeit Monat:")
         constraints.gridx = 0
         add(inspectionMonthLabel, constraints)
         constraints.gridx = 1
@@ -255,15 +265,17 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel() {
             inspectionMonthDoc.documentFilter = OnlyDigitsDocFilter()
         }
         inspectionMonthTextField.toolTipText = "Ganzzahl 1-12"
+        inspectionMonthTextField.inputVerifier = Verifiers.inspectionMonthVerifier
+        inspectionMonthTextField.isVisible = false
         add(inspectionMonthTextField, constraints)
 
         constraints.gridy++
         val recipientLabel = JLabel("<html>Empfänger:<sup>*</sup></html>")
-        //recipientLabel.foreground = TEXT_COLOR
         constraints.gridx = 0
         add(recipientLabel, constraints)
         constraints.gridx = 1
         recipientTextField.toolTipText = "z.B. verwarngeldstelle@wiesbaden.de"
+        recipientTextField.inputVerifier = Verifiers.eMailVerifier
         add(recipientTextField, constraints)
 
         constraints.gridy++
@@ -316,7 +328,11 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel() {
         endangeringCheckBox.isSelected = notice.endangering
         environmentalStickerCheckBox.isSelected = notice.environmentalStickerMissing
         vehicleInspectionStickerCheckBox.isSelected = notice.vehicleInspectionExpired
+        inspectionYearLabel.isVisible = inspectionYearTextField.text.isNotBlank()
+        inspectionYearTextField.isVisible = inspectionYearTextField.text.isNotBlank()
         inspectionYearTextField.text = blankOrShortString(notice.vehicleInspectionYear)
+        inspectionMonthLabel.isVisible = inspectionMonthTextField.text.isNotBlank()
+        inspectionMonthTextField.isVisible = inspectionMonthTextField.text.isNotBlank()
         inspectionMonthTextField.text = blankOrByteString(notice.vehicleInspectionMonth)
         abandonedCheckBox.isSelected = notice.vehicleAbandoned
         recipientTextField.text = notice.recipient
@@ -367,7 +383,7 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel() {
             null
         }
 
-        val format = DateTimeFormatter.ofPattern("dd.MM.yyyy")
+        val format = DateTimeFormatter.ofPattern("d.M.yyyy")
         val obsDateTxt = observationDateTextField.text
         notice.observationTime = if (obsDateTxt.isBlank()) {
             null
@@ -380,7 +396,9 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel() {
             val tim = if (obsTimeTxt.isBlank()) {
                 LocalTime.parse("00:00")
             } else {
-                LocalTime.parse(obsTimeTxt)
+                val tFormat = DateTimeFormatter.ofPattern("H:m")
+                LocalTime.parse(obsTimeTxt, tFormat)
+                //LocalTime.parse(obsTimeTxt)
             }
             ZonedDateTime.of(dat, tim, ZoneId.systemDefault())
         }
@@ -390,8 +408,16 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel() {
         notice.endangering = endangeringCheckBox.isSelected
         notice.environmentalStickerMissing = environmentalStickerCheckBox.isSelected
         notice.vehicleInspectionExpired = vehicleInspectionStickerCheckBox.isSelected
-        notice.vehicleInspectionYear = shortOrNull(inspectionYearTextField.text)
-        notice.vehicleInspectionMonth = byteOrNull(inspectionMonthTextField.text)
+        notice.vehicleInspectionYear = if(notice.vehicleInspectionExpired) {
+            shortOrNull(inspectionYearTextField.text)
+        } else {
+            null
+        }
+        notice.vehicleInspectionMonth = if(notice.vehicleInspectionExpired) {
+            byteOrNull(inspectionMonthTextField.text)
+        } else {
+            null
+        }
         notice.vehicleAbandoned = abandonedCheckBox.isSelected
         notice.recipient = trimmedOrNull(recipientTextField.text)
         notice.note = trimmedOrNull(noteTextArea.text)

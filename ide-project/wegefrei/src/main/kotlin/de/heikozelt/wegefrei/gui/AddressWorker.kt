@@ -27,10 +27,12 @@ class AddressWorker(
      * This is done in own Thread
      */
     override fun doInBackground(): NominatimResponse? {
+        log.info("doInBackground()")
         val lat = "%.8f".format(position.latitude)
         val lon = "%.8f".format(position.longitude)
         val url =
             URL("https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=$lat&lon=$lon&email=hz@heikozelt.de")
+        log.debug("url: $url")
         val connection = url.openConnection() as HttpURLConnection
         connection.connect()
         println(connection.responseCode)
@@ -40,6 +42,7 @@ class AddressWorker(
 
         val nominatimResponse = Klaxon().parse<NominatimResponse>(text)
         log.debug("displayName: ${nominatimResponse?.displayName}")
+        log.debug("road: ${nominatimResponse?.address?.road}")
         log.debug("houseNumber: ${nominatimResponse?.address?.houseNumber}")
         return nominatimResponse
     }
