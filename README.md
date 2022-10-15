@@ -1,6 +1,6 @@
 # Wege-frei PC
 
-Wege-frei PC ist ein Programm für den PC, um Falschparker_innen zu melden. Die Idee zu diesem Projekt basiert auf der Wegeheld-App und der Weg.li-Website.
+Wege-frei PC ist ein Programm für den PC/Mac, um Falschparker_innen zu melden. Die Idee zu diesem Projekt basiert auf der Wegeheld-App und der Weg.li-Website.
 
 ## Besonderheit
 
