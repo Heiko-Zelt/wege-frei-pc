@@ -45,13 +45,14 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel() {
     private val durationTextField = JTextField(3)
     private val obstructionCheckBox = JCheckBox("mit Behinderung")
     private val endangeringCheckBox = JCheckBox("mit Gefährdung")
-    private val environmentalStickerCheckBox = JCheckBox("Umweltplakette fehlt")
+    private val environmentalStickerCheckBox = JCheckBox("Umweltplakette fehlt/ungültig")
     private val vehicleInspectionStickerCheckBox = JCheckBox("HU Plakette abgelaufen")
     private val inspectionYearTextField = JTextField(4)
     private val inspectionMonthTextField = JTextField(2)
-
     private val abandonedCheckBox = JCheckBox("Fahrzeug war verlassen")
     private val recipientTextField = TrimmingTextField(30)
+    private val noteTextArea = JTextArea(3, 50)
+
 
     init {
         log.debug("init")
@@ -61,7 +62,7 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel() {
         border = NO_BORDER
         layout = GridBagLayout()
         val constraints = GridBagConstraints()
-        constraints.insets = Insets(0,5,0,0)
+        constraints.insets = Insets(0, 5, 0, 0)
         constraints.anchor = WEST
         //constraints.fill = BOTH
         constraints.weightx = 0.5
@@ -210,22 +211,22 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel() {
         add(durationTextField, constraints)
 
         constraints.gridy++
-        obstructionCheckBox.background = FORM_BACKGROUND
+        abandonedCheckBox.background = FORM_BACKGROUND
         constraints.gridx = 0
-        add(obstructionCheckBox, constraints)
+        add(abandonedCheckBox, constraints)
 
-        endangeringCheckBox.background = FORM_BACKGROUND
+        obstructionCheckBox.background = FORM_BACKGROUND
         constraints.gridx = 1
-        add(endangeringCheckBox, constraints)
+        add(obstructionCheckBox, constraints)
 
         constraints.gridy++
         environmentalStickerCheckBox.background = FORM_BACKGROUND
         constraints.gridx = 0
         add(environmentalStickerCheckBox, constraints)
 
-        abandonedCheckBox.background = FORM_BACKGROUND
+        endangeringCheckBox.background = FORM_BACKGROUND
         constraints.gridx = 1
-        add(abandonedCheckBox, constraints)
+        add(endangeringCheckBox, constraints)
 
         constraints.gridy++
         vehicleInspectionStickerCheckBox.background = FORM_BACKGROUND
@@ -265,10 +266,18 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel() {
         recipientTextField.toolTipText = "z.B. verwarngeldstelle@wiesbaden.de"
         add(recipientTextField, constraints)
 
+        constraints.gridy++
+        val noteLabel = JLabel("Hinweis:")
+        constraints.gridx = 0
+        add(noteLabel, constraints)
+        constraints.gridx = 1
+        noteTextArea.toolTipText = "z.B. Behinderung / Gefährdung beschreiben"
+        add(noteTextArea, constraints)
+
         loadNotice()
 
         val notice = noticeFrame.getNotice()
-        if(notice.isSent()) {
+        if (notice.isSent()) {
             disableFormFields()
         }
 
@@ -311,6 +320,7 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel() {
         inspectionMonthTextField.text = blankOrByteString(notice.vehicleInspectionMonth)
         abandonedCheckBox.isSelected = notice.vehicleAbandoned
         recipientTextField.text = notice.recipient
+        noteTextArea.text = notice.note
     }
 
     /**
@@ -351,7 +361,7 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel() {
         notice.town = trimmedOrNull(townTextField.text)
         notice.locationDescription = trimmedOrNull(locationDescriptionTextField.text)
         val selectedOffense = offenseComboBox.selectedItem
-        notice.offense = if(selectedOffense is Offense) {
+        notice.offense = if (selectedOffense is Offense) {
             selectedOffense.id
         } else {
             null
@@ -359,7 +369,7 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel() {
 
         val format = DateTimeFormatter.ofPattern("dd.MM.yyyy")
         val obsDateTxt = observationDateTextField.text
-        notice.observationTime = if(obsDateTxt.isBlank()) {
+        notice.observationTime = if (obsDateTxt.isBlank()) {
             null
         } else {
             val dat: LocalDate = LocalDate.parse(obsDateTxt, format)
@@ -367,7 +377,7 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel() {
             // todo Prio 3: Problem lösen: Sommer- oder Winterzeit, eine Stunde im Jahr ist zweideutig
             // todo Prio 3: Datum/Uhrzeit darf nicht in der Zukunft liegen
             val obsTimeTxt = observationTimeTextField.text
-            val tim = if(obsTimeTxt.isBlank()) {
+            val tim = if (obsTimeTxt.isBlank()) {
                 LocalTime.parse("00:00")
             } else {
                 LocalTime.parse(obsTimeTxt)
@@ -384,6 +394,7 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel() {
         notice.vehicleInspectionMonth = byteOrNull(inspectionMonthTextField.text)
         notice.vehicleAbandoned = abandonedCheckBox.isSelected
         notice.recipient = trimmedOrNull(recipientTextField.text)
+        notice.note = trimmedOrNull(noteTextArea.text)
     }
 
     fun getMiniMap(): MiniMap {
@@ -427,6 +438,7 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel() {
         inspectionMonthTextField.isEnabled = false
         abandonedCheckBox.isEnabled = false
         recipientTextField.isEnabled = false
+        noteTextArea.isEnabled = false
     }
 
     companion object {
@@ -455,8 +467,17 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel() {
             }
         }
 
+        /**
+         * <ul>
+         *   <li>null -> null</li>
+         *   <li>"" -> null</li>
+         *   <li>" " -> null</li>
+         *   <li>"1" -> 1</li>
+         *   <li>"01" -> 1</li>
+         * </ul>
+         */
         fun intOrNull(str: String?): Int? {
-            return if(str.isNullOrBlank()) {
+            return if (str.isNullOrBlank()) {
                 null
             } else {
                 str.toInt()
@@ -464,7 +485,7 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel() {
         }
 
         fun shortOrNull(str: String?): Short? {
-            return if(str.isNullOrBlank()) {
+            return if (str.isNullOrBlank()) {
                 null
             } else {
                 str.toShort()
@@ -472,7 +493,7 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel() {
         }
 
         fun byteOrNull(str: String?): Byte? {
-            return if(str.isNullOrBlank()) {
+            return if (str.isNullOrBlank()) {
                 null
             } else {
                 str.toByte()
@@ -486,6 +507,7 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel() {
         fun blankOrIntString(i: Int?): String {
             return i?.toString() ?: ""
         }
+
         fun blankOrShortString(s: Short?): String {
             return s?.toString() ?: ""
         }
@@ -495,7 +517,7 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel() {
         }
 
         fun blankOrDateString(zdt: ZonedDateTime?): String {
-            return if(zdt == null) {
+            return if (zdt == null) {
                 ""
             } else {
                 val fmt = DateTimeFormatter.ofPattern("dd.MM.yyyy")
@@ -504,7 +526,7 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel() {
         }
 
         fun blankOrTimeString(zdt: ZonedDateTime?): String {
-            return if(zdt == null) {
+            return if (zdt == null) {
                 ""
             } else {
                 val fmt = DateTimeFormatter.ofPattern("HH:mm")
