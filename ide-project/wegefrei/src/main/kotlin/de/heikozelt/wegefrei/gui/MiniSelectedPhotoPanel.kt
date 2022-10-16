@@ -3,6 +3,7 @@ package de.heikozelt.wegefrei.gui
 import de.heikozelt.wegefrei.entities.Photo
 import de.heikozelt.wegefrei.gui.Styles.Companion.HIGHLIGHT_BORDER
 import de.heikozelt.wegefrei.gui.Styles.Companion.NORMAL_BORDER
+import de.heikozelt.wegefrei.jobs.SelectedThumbnailWorker
 import org.slf4j.LoggerFactory
 import java.awt.Dimension
 import java.awt.Insets

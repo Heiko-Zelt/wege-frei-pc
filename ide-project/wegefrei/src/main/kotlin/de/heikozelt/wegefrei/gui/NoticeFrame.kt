@@ -5,6 +5,7 @@ import de.heikozelt.wegefrei.DatabaseService
 import de.heikozelt.wegefrei.entities.Notice
 import de.heikozelt.wegefrei.entities.Photo
 import de.heikozelt.wegefrei.gui.Styles.Companion.FRAME_BACKGROUND
+import de.heikozelt.wegefrei.jobs.AddressWorker
 import de.heikozelt.wegefrei.model.SelectedPhotos
 import org.jxmapviewer.viewer.GeoPosition
 import org.slf4j.LoggerFactory

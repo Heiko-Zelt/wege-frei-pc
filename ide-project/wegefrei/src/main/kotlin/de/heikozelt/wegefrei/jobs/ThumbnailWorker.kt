@@ -1,6 +1,7 @@
-package de.heikozelt.wegefrei.gui
+package de.heikozelt.wegefrei.jobs
 
 import de.heikozelt.wegefrei.entities.Photo
+import de.heikozelt.wegefrei.gui.Styles
 import org.slf4j.LoggerFactory
 import java.awt.Image
 import java.awt.Toolkit

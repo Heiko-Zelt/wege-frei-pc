@@ -2,6 +2,7 @@ package de.heikozelt.wegefrei.gui
 
 import de.heikozelt.wegefrei.App
 import de.heikozelt.wegefrei.entities.Notice
+import de.heikozelt.wegefrei.jobs.LoadNoticesWorker
 import de.heikozelt.wegefrei.model.NoticesTableModel
 import org.slf4j.LoggerFactory
 import java.awt.BorderLayout

@@ -1,4 +1,4 @@
-package de.heikozelt.wegefrei.gui
+package de.heikozelt.wegefrei.jobs
 
 import de.heikozelt.wegefrei.DatabaseService
 import de.heikozelt.wegefrei.entities.Notice
@@ -8,7 +8,9 @@ import java.util.*
 import javax.swing.SwingWorker
 
 /**
- * Läd die Meldungen im Übersichts-Fenster
+ * Läd die Meldungen aus der Datenbank
+ * und übermittelt sie an das Datenmodell
+ * der Tabelle im Übersichts-Fenster.
  */
 class LoadNoticesWorker(
     private val databaseService: DatabaseService,
