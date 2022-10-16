@@ -15,8 +15,15 @@ import javax.swing.table.AbstractTableModel
  * Aus dem AbstractTableModel wird z.B. die Funktionalität der Event-Benachrichtigung an die View JTable übernommen.
  */
 
-class NoticesTableModel(private val notices: MutableList<Notice>) : AbstractTableModel() {
+class NoticesTableModel: AbstractTableModel() {
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
+
+    private var notices: MutableList<Notice> = mutableListOf<Notice>()
+
+    fun setNoticesList(notices: MutableList<Notice>) {
+        this.notices = notices
+        fireTableDataChanged()
+    }
 
     override fun getRowCount(): Int {
         return notices.size

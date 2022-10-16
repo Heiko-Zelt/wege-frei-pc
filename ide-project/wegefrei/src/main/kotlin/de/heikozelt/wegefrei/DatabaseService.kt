@@ -52,7 +52,10 @@ class DatabaseService {
      * neueste (mit der höchsten ID) zuerst
      */
     fun getAllNoticesDesc(): List<Notice> {
+        log.debug("getAllNoticesDesc()")
+        //Thread.sleep(5000) Simulation langsamer Datenbank
         val resultList: List<Notice> = em.createQuery("SELECT n FROM Notice n ORDER BY n.id DESC", Notice::class.java).resultList
+        log.debug("got result")
         return resultList
     }
 

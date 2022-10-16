@@ -25,6 +25,7 @@ class App {
 
     init{
         log.debug("initializing")
+        noticesFrame.loadData()
     }
 
     fun getDatabaseService(): DatabaseService {
