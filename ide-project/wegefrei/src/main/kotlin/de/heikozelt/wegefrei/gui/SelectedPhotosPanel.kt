@@ -5,6 +5,7 @@ import de.heikozelt.wegefrei.gui.Styles.Companion.NO_BORDER
 import de.heikozelt.wegefrei.gui.Styles.Companion.SELECTED_PHOTOS_BACKGROUND
 import de.heikozelt.wegefrei.model.SelectedPhotosObserver
 import org.slf4j.LoggerFactory
+import java.util.*
 import javax.swing.BoxLayout
 import javax.swing.BoxLayout.X_AXIS
 import javax.swing.JPanel
@@ -84,5 +85,15 @@ class SelectedPhotosPanel(private val noticeFrame: NoticeFrame) : JPanel(),
         log.debug("after remove: component count: $componentCount")
         revalidate()
         repaint()
+    }
+
+    override fun replacedAllPhotos(photos: TreeSet<Photo>) {
+        removeAll()
+        miniSelectedPhotoPanels.clear()
+        for (photo in photos) {
+            val panel = MiniSelectedPhotoPanel(noticeFrame, photo)
+            miniSelectedPhotoPanels.add(panel)
+            add(panel)
+        }
     }
 }

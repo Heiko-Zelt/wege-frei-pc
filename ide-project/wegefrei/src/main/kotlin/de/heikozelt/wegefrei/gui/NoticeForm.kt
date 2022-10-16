@@ -1,5 +1,6 @@
 package de.heikozelt.wegefrei.gui
 
+import de.heikozelt.wegefrei.entities.Notice
 import de.heikozelt.wegefrei.gui.Styles.Companion.FORM_BACKGROUND
 import de.heikozelt.wegefrei.gui.Styles.Companion.NO_BORDER
 import org.slf4j.LoggerFactory
@@ -26,6 +27,11 @@ class NoticeForm(private val noticeFrame: NoticeFrame) : JPanel() {
         add(noticeFormButtonBar, BorderLayout.SOUTH)
 
         isVisible = true
+    }
+
+    fun loadData(notice: Notice) {
+        noticeFormFields.loadData()
+        noticeFormButtonBar.loadData(notice)
     }
 
     fun getNoticeFormFields(): NoticeFormFields {

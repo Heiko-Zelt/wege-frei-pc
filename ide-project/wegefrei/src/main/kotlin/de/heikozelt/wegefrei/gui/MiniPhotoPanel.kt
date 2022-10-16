@@ -68,6 +68,10 @@ class MiniPhotoPanel(private val noticeFrame: NoticeFrame, private val photo: Ph
         return photo
     }
 
+    fun isActive(): Boolean {
+        return active
+    }
+
     fun activate() {
         active = true
 

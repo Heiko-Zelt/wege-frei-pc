@@ -4,17 +4,16 @@ import de.heikozelt.wegefrei.entities.Photo
 import de.heikozelt.wegefrei.gui.Styles.Companion.ALL_PHOTOS_BACKGROUND
 import de.heikozelt.wegefrei.model.SelectedPhotosObserver
 import org.slf4j.LoggerFactory
+import java.util.*
 import javax.swing.BoxLayout
 import javax.swing.BoxLayout.X_AXIS
 import javax.swing.JButton
 import javax.swing.JPanel
 
-class AllPhotosPanel(
-    private val noticeFrame: NoticeFrame,
-    private var firstPhotoFilename: String
-) : JPanel(), SelectedPhotosObserver {
+class AllPhotosPanel(private val noticeFrame: NoticeFrame) : JPanel(), SelectedPhotosObserver {
 
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
+    private var firstPhotoFilename: String? = null
     private val selectedPhotos = noticeFrame.getSelectedPhotos()
     private val miniPhotoPanels = arrayListOf<MiniPhotoPanel>()
 
@@ -25,16 +24,19 @@ class AllPhotosPanel(
         val backButton = JButton("<")
         add(backButton)
 
-        var photos = noticeFrame.getDatabaseService().getPhotos(firstPhotoFilename, 20)
+        val forwardButton = JButton(">")
+        add(forwardButton)
+    }
+
+    // todo Prio 2: load from database as background job
+    fun loadData(firstPhotoFilename: String) {
+        val photos = noticeFrame.getDatabaseService().getPhotos(firstPhotoFilename, 20)
         for (photo in photos) {
             val active = !selectedPhotos.getPhotos().contains(photo)
             val miniPhotoPanel = MiniPhotoPanel(noticeFrame, photo, active)
             miniPhotoPanels.add(miniPhotoPanel)
-            add(miniPhotoPanel)
+            add(miniPhotoPanel, 1) // hinter backButton
         }
-
-        val forwardButton = JButton(">")
-        add(forwardButton)
     }
 
     private fun panelWithPhoto(photo: Photo): MiniPhotoPanel? {
@@ -91,4 +93,21 @@ class AllPhotosPanel(
         showBorder(photo)
         activatePhoto(photo)
     }
+
+    /**
+     * all selected photos have been replaced
+     * active or deactivate panels
+     */
+    override fun replacedAllPhotos(photos: TreeSet<Photo>) {
+        for(panel in miniPhotoPanels) {
+            val photo = panel.getPhoto()
+            if(photo in photos && panel.isActive()) {
+                panel.deactivate()
+            }
+            if(photo !in photos && !panel.isActive()) {
+                panel.activate()
+            }
+        }
+    }
+
 }

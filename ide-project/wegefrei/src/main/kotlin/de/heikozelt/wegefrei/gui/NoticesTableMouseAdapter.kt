@@ -19,7 +19,9 @@ class NoticesTableMouseAdapter(private val app: App): MouseAdapter() {
             //JOptionPane.showMessageDialog(null, "$row, $column, $id")
             val model = table.model as NoticesTableModel
             // open new Window to edit existing notice
-            NoticeFrame(app, model.getNoticeAt(rowIndex))
+            val notice = model.getNoticeAt(rowIndex)
+            val editNoticeFrame = NoticeFrame(app)
+            editNoticeFrame.loadData(notice)
         }
     }
 }

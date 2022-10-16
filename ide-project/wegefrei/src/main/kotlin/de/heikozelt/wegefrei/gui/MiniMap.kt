@@ -23,6 +23,10 @@ import kotlin.math.sqrt
  * { addressMarker, photoMarker(2), photoMarker(1), photoMarker(0) } Perfekter Use Case
  * Sie werden in umgekehrter Reihenfolge gezeichnet.
  * Letzter Marker unten, erster Marker ganz obendrauf.
+ *
+ * Die Karte ist Anfangs beim Konstruktor-Aufruf komplett leer.
+ * Erst mit load()-Data wird ggf. ein Adress-Marker gesetzt und ggf. Foto-Markers hinzugefügt.
+ * Die Foto-Markers werden indirekt über das Observer-Pattern hinzugefügt oder entfernt.
  */
 class MiniMap(
     private val noticeFrame: NoticeFrame
@@ -37,44 +41,39 @@ class MiniMap(
 
     init {
         log.debug("init")
-        selectedPhotos.registerObserver(this)
-
-        val photosIter = selectedPhotos.getPhotos().iterator()
-        var i = 0
-        while(photosIter.hasNext()) {
-            log.debug("add photo marker #$i")
-            photoMarkers.add(PhotoMarker(i, photosIter.next().getGeoPosition()))
-            i++
-        }
-
         border = NORMAL_BORDER
-
         val info = OSMTileFactoryInfo()
         tileFactory = DefaultTileFactory(info)
-
         addMouseListener(MiniMapMouseListener(noticeFrame))
-
-        updatePainterWaypoints()
         overlayPainter = painter
-
-        val aM = addressMarker
-        if (aM != null) { // ist Anfangs immer null
-            add(aM.getLabel())
-        }
-        val iterator = photoMarkers.descendingIterator()
-        while (iterator.hasNext()) { // wird nie durchlaufen
-            log.debug("add to panel #$i")
-            add(iterator.next().getLabel())
-        }
-
         size = Dimension(150, 150)
         preferredSize = Dimension(150, 150)
+    }
 
-        fitToMarkers() // es gibt Anfangs keine Markers
+    /**
+     * Der Adress-Marker wird gesetzt, falls vorhanden.
+     * Die Foto-Markers werden indirekt über Observer-Pattern aktualisiert.
+     */
+    fun setAddrLocation(addressLocation: GeoPosition?) {
+        log.debug("setAddrLocation")
 
-        for (comp in components) {
-            log.debug("comp: $comp")
+        if (addressLocation == null) {
+            addressMarker?.let {
+                remove(it.getLabel())
+                addressMarker = null
+            }
+        } else {
+            addressMarker?.let {
+                it.position = addressLocation
+            } ?:run {
+                val newAddressMarker = AddressMarker(addressLocation)
+                add(newAddressMarker.getLabel(), 0)
+                addressMarker = newAddressMarker
+            }
         }
+
+        updatePainterWaypoints()
+        fitToMarkers()
     }
 
     private fun updatePainterWaypoints() {
@@ -117,8 +116,8 @@ class MiniMap(
             for (i in index + 1 until photoMarkers.size) {
                 photoMarkers[i].updateText(i)
             }
-            updatePainterWaypoints()
             updateAddressLocation()
+            updatePainterWaypoints()
             fitToMarkers()
             revalidate()
             repaint()
@@ -139,14 +138,48 @@ class MiniMap(
         for (i in index until photoMarkers.size) {
             photoMarkers[i].updateText(i)
         }
-        updatePainterWaypoints()
         updateAddressLocation()
+        updatePainterWaypoints()
         fitToMarkers()
         revalidate()
         repaint()
         for (comp in components) {
             log.debug("comp: $comp")
         }
+    }
+
+    /**
+     * alle Foto-Markers müssen ersetzt werden
+     */
+    override fun replacedAllPhotos(photos: TreeSet<Photo>) {
+        // alle bestehenden Foto-Marker entfernen
+        // (aber den ggf. existieren Adress-Marker behalten)
+        for (photoMarker in photoMarkers) {
+            remove(photoMarker.getLabel())
+        }
+        photoMarkers.clear()
+
+        // neue Foto-Markers zur Liste hinzufügen
+        val photosIter = selectedPhotos.getPhotos().iterator()
+        var i = 0
+        while(photosIter.hasNext()) {
+            log.debug("add photo marker #$i")
+            photoMarkers.add(PhotoMarker(i, photosIter.next().getGeoPosition()))
+            i++
+        }
+
+        // neue Foto-Markers zum Container hinzufügen
+        // (in umgekehrter Reihenfolge, wegen Z-Order)
+        val iterator = photoMarkers.descendingIterator()
+        while (iterator.hasNext()) { // wird nie durchlaufen
+            log.debug("add to panel")
+            add(iterator.next().getLabel())
+        }
+
+        // ggf. Adress-Location anpassen und Karten-Bereich neu justieren
+        updateAddressLocation()
+        updatePainterWaypoints()
+        fitToMarkers()
     }
 
     private fun fitToMarkers() {

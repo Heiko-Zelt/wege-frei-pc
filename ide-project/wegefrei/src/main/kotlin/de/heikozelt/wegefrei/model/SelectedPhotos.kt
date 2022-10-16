@@ -6,8 +6,13 @@ import java.util.*
 /**
  * Fotos sind immer nach Dateiname (also in der Regel auch chronologisch) sortiert
  */
-class SelectedPhotos(private val photos: TreeSet<Photo> = TreeSet<Photo>()) {
+class SelectedPhotos(private var photos: TreeSet<Photo> = TreeSet<Photo>()) {
 
+    /**
+     * Jeder Observer kann nur einmal registriert sein.
+     * Die Reihenfolge sollte egal sein.
+     * Deswegen ein HashSet.
+     */
     private val observers = HashSet<SelectedPhotosObserver>()
 
     fun add(photo: Photo) {
@@ -32,6 +37,16 @@ class SelectedPhotos(private val photos: TreeSet<Photo> = TreeSet<Photo>()) {
      */
     fun getPhotos(): TreeSet<Photo> {
         return photos
+    }
+
+    /**
+     * Observers benachrichtigen?
+     */
+    fun setPhotos(photos: TreeSet<Photo>) {
+        this.photos = photos
+        for(observer in observers) {
+            observer.replacedAllPhotos(photos)
+        }
     }
 
     fun registerObserver(observer: SelectedPhotosObserver) {

@@ -32,7 +32,8 @@ class NoticesButtonsBar(private val app: App): JPanel() {
 
         newButton.addActionListener {
             val newNotice = Notice()
-            NoticeFrame(app, newNotice)
+            val newNoticeFrame = NoticeFrame(app)
+            newNoticeFrame.loadData(newNotice)
         }
         add(newButton)
 

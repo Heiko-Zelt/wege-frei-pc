@@ -25,7 +25,7 @@ import javax.swing.*
 import javax.swing.text.AbstractDocument
 
 /**
- * todo: Button Meldung löschen
+ * Panel mit den Formular-Feldern
  */
 class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel() {
 
@@ -286,13 +286,6 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel() {
         noteTextArea.toolTipText = "z.B. Behinderung / Gefährdung beschreiben"
         add(noteTextArea, constraints)
 
-        loadNotice()
-
-        val notice = noticeFrame.getNotice()
-        if (notice.isSent()) {
-            disableFormFields()
-        }
-
         setSize(700, 700)
         isVisible = true
     }
@@ -301,10 +294,17 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel() {
      * Initialisieren der einzelnen Eingabe-Felder
      * Mapping von Notice zu GUI-Components
      */
-    private fun loadNotice() {
-        val notice = noticeFrame.getNotice()
-        // macht schon MainFrame.init()
-        //mainFrame.setSelectedPhotos(SelectedPhotos(TreeSet(notice.photos)))
+    fun loadData() {
+        val notice = noticeFrame.getNotice() ?: return
+
+        if (notice.isSent()) {
+            disableFormFields()
+        }
+
+        val addrLocation = notice.getGeoPosition()
+        if(addrLocation != null) {
+            miniMap.setAddrLocation(addrLocation)
+        }
 
         val countrySymbol = CountrySymbol.fromAbbreviation(notice.countrySymbol)
         countrySymbolComboBox.selectedItem = countrySymbol
@@ -344,7 +344,8 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel() {
      */
     // todo: form validation, Validierungsfehler bei Eingabefeldern anzeigen
     fun saveNotice() {
-        val notice = noticeFrame.getNotice()
+        val notice = noticeFrame.getNotice() ?: return
+
         notice.photos = noticeFrame.getSelectedPhotos().getPhotos()
 
         val selectedCountry = countrySymbolComboBox.selectedObjects[0] as CountrySymbol

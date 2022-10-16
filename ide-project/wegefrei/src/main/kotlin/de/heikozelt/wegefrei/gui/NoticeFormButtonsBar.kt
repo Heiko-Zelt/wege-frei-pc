@@ -1,5 +1,6 @@
 package de.heikozelt.wegefrei.gui
 
+import de.heikozelt.wegefrei.entities.Notice
 import java.awt.FlowLayout
 import javax.swing.Box
 import javax.swing.JButton
@@ -9,6 +10,10 @@ import javax.swing.JPanel
  * Button-Leiste unterhalb des Meldungs-Formulars
  */
 class NoticeFormButtonsBar(private val noticeFrame: NoticeFrame): JPanel() {
+
+    private val deleteButtonStruts = Box.createHorizontalStrut(Styles.BUTTONS_DISTANCE)
+    private val deleteButton = JButton("Löschen")
+
     init {
         //background = TOOLBAR_BACKGROUND
         //isFloatable = false
@@ -39,24 +44,18 @@ class NoticeFormButtonsBar(private val noticeFrame: NoticeFrame): JPanel() {
         }
         add(cancelButton)
 
+        deleteButtonStruts.isVisible = false
+        add(deleteButtonStruts);
 
-        // Nur beim Bearbeiten einer existierenden Meldung
-        // einen Lösch-Button anzeigen.
-        if(noticeFrame.getNotice().id != null) {
-            //addSeparator(BUTTONS_SEPARATOR_DIMENSION)
-            add(Box.createHorizontalStrut(Styles.BUTTONS_DISTANCE));
-
-            val deleteButton = JButton("Löschen")
-            deleteButton.margin = Styles.BUTTON_MARGIN
-            deleteButton.addActionListener {
+        deleteButton.isVisible = false
+        deleteButton.margin = Styles.BUTTON_MARGIN
+        deleteButton.addActionListener {
                 noticeFrame.deleteNotice()
                 noticeFrame.isVisible = false
                 noticeFrame.dispose()
             }
-            add(deleteButton)
-        }
+        add(deleteButton)
 
-        //addSeparator(BUTTONS_SEPARATOR_DIMENSION)
         add(Box.createHorizontalStrut(Styles.BUTTONS_DISTANCE));
 
         val sendButton = JButton("E-Mail absenden")
@@ -66,5 +65,14 @@ class NoticeFormButtonsBar(private val noticeFrame: NoticeFrame): JPanel() {
 
         //addSeparator(BUTTONS_SEPARATOR_DIMENSION)
         add(Box.createHorizontalStrut(Styles.BUTTONS_DISTANCE));
+    }
+
+    fun loadData(notice: Notice) {
+        // Nur beim Bearbeiten einer existierenden Meldung
+        // einen Lösch-Button anzeigen.
+        if(notice.id != null) {
+            deleteButtonStruts.isVisible = true
+            deleteButton.isVisible = true
+        }
     }
 }

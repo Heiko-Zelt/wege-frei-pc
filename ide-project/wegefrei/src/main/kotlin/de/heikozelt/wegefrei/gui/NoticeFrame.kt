@@ -24,11 +24,12 @@ import javax.swing.JSplitPane
  *   <li>Instanziierung mit Notice als Parameter zum Bearbeiten einer bestehenden Meldung. notice.id enthält eine Zahl.</li>
  * </ol>
  */
-class NoticeFrame(private val app: App, private val notice: Notice) : JFrame() {
+class NoticeFrame(private val app: App) : JFrame() {
 
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
-    private var selectedPhotos = SelectedPhotos(TreeSet(notice.photos))
-    private var allPhotosPanel = AllPhotosPanel(this, "20220301_184952.jpg")
+    private var notice: Notice? = null
+    private var selectedPhotos: SelectedPhotos = SelectedPhotos()
+    private var allPhotosPanel = AllPhotosPanel(this)
     private var selectedPhotosPanel = SelectedPhotosPanel(this)
     private var selectedPhotosScrollPane = JScrollPane(selectedPhotosPanel)
     private var noticeForm = NoticeForm(this)
@@ -39,16 +40,8 @@ class NoticeFrame(private val app: App, private val notice: Notice) : JFrame() {
     private var mainSplitPane = JSplitPane(JSplitPane.VERTICAL_SPLIT, topSplitPane, bottomSplitPane)
 
     init {
-        log.debug("init, notice id: ${notice.id}")
-        title = if(notice.id == null) {
-            "Neue Meldung - Wege frei!"
-        } else {
-            "Meldung #${notice.id} - Wege frei!"
-        }
-
-        selectedPhotos.registerObserver(selectedPhotosPanel)
-        selectedPhotos.registerObserver(allPhotosPanel)
-
+        log.debug("init")
+        title = "Meldung - Wege frei!"
         background = FRAME_BACKGROUND
         defaultCloseOperation = DISPOSE_ON_CLOSE
         setSize(1000, 700)
@@ -69,28 +62,34 @@ class NoticeFrame(private val app: App, private val notice: Notice) : JFrame() {
         }
         add(mainSplitPane)
         isVisible = true
-        log.debug("NoticeFrame.init() finished")
+        log.debug("init finished")
+    }
+
+    /**
+     * SelectedPhotosObservers werden frühzeitig registriert.
+     * Fotos werden direkt danach ersetzt.
+     * Zuletzt werden sonstige Daten geladen.
+     */
+    fun loadData(notice: Notice) {
+        log.debug("loadData(notice id: ${notice.id})")
+        selectedPhotos.registerObserver(selectedPhotosPanel)
+        selectedPhotos.registerObserver(allPhotosPanel)
+        selectedPhotos.registerObserver(noticeForm.getNoticeFormFields().getMiniMap())
+        selectedPhotos.setPhotos(TreeSet(notice.photos))
+
+        title = if(notice.id == null) {
+            "Neue Meldung - Wege frei!"
+        } else {
+            "Meldung #${notice.id} - Wege frei!"
+        }
+        this.notice = notice
+        allPhotosPanel.loadData("20220301_184952.jpg")
+        noticeForm.loadData(notice)
     }
 
     fun getDatabaseService(): DatabaseService {
         return app.getDatabaseService()
     }
-
-    /**
-     * wählt ein Foto aus
-
-    fun selectPhoto(miniPhotoPanel: MiniPhotoPanel) {
-    log.debug("select photo")
-    allPhotosPanel.deactivatePhoto(miniPhotoPanel)
-    val photo = miniPhotoPanel.getPhoto()
-    selectedPhotosPanel.addPhoto(photo)
-    log.debug("selected photo: $photo")
-    log.debug("zoomed photo: ${zoomPanel.getMaxiPhoto()}")
-    zoomPanel.showSelectedPhoto(photo)
-    allPhotosPanel.hideBorder()
-    selectedPhotosPanel.showBorder(photo)
-    }
-     */
 
     fun getSelectedPhotos(): SelectedPhotos {
         return selectedPhotos
@@ -100,7 +99,7 @@ class NoticeFrame(private val app: App, private val notice: Notice) : JFrame() {
         this.selectedPhotos = selectedPhotos
     }
 
-    fun getNotice(): Notice {
+    fun getNotice(): Notice? {
         return notice
     }
 
@@ -189,35 +188,41 @@ class NoticeFrame(private val app: App, private val notice: Notice) : JFrame() {
     fun saveNotice() {
         noticeForm.getNoticeFormFields().saveNotice()
         val dbService = app.getDatabaseService()
-        if(notice.id == null) {
-            dbService.insertNotice(notice)
-            app.noticeAdded(notice)
-        } else {
-            dbService.updateNotice(notice)
-            app.noticeUpdated(notice)
+        notice?.let {
+            if (it.id == null) {
+                dbService.insertNotice(it)
+                app.noticeAdded(it)
+            } else {
+                dbService.updateNotice(it)
+                app.noticeUpdated(it)
+            }
         }
     }
 
     fun deleteNotice() {
         val dbService = app.getDatabaseService()
-        dbService.deleteNotice(notice)
-        app.noticeDeleted(notice)
+        notice?.let {
+            dbService.deleteNotice(it)
+            app.noticeDeleted(it)
+        }
     }
 
     fun sendNotice() {
-        sendEmail()
-        disableFormFields()
-        notice.sentTime = ZonedDateTime.now()
-        saveNotice()
+        notice?.let {
+            sendEmail()
+            disableFormFields()
+            it.sentTime = ZonedDateTime.now()
+            saveNotice()
+        }
     }
 
-    fun disableFormFields() {
+    private fun disableFormFields() {
         log.debug("disabling form fields is not yet implemented")
         // todo Prio 2 implementieren Eingabefelder deaktivieren
         noticeForm.disableFormFields()
     }
 
-    fun sendEmail() {
+    private fun sendEmail() {
         log.debug("sending email is not yet implemented")
         // todo Prio 2 E-Mail versenden
     }
