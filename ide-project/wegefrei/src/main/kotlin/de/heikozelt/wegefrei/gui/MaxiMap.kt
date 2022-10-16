@@ -1,42 +1,24 @@
 package de.heikozelt.wegefrei.gui
 
-import de.heikozelt.wegefrei.gui.Styles.Companion.NO_BORDER
-import de.heikozelt.wegefrei.gui.Styles.Companion.ZOOM_PANEL_BACKGROUND
 import org.jxmapviewer.JXMapViewer
 import org.jxmapviewer.OSMTileFactoryInfo
 import org.jxmapviewer.input.PanMouseInputListener
 import org.jxmapviewer.input.ZoomMouseWheelListenerCenter
 import org.jxmapviewer.viewer.*
 import org.slf4j.LoggerFactory
-import java.awt.Dimension
-import java.awt.GridBagConstraints
-import java.awt.GridBagLayout
-import javax.swing.JButton
-import javax.swing.JPanel
 
-class MaxiMap: JPanel() {
+class MaxiMap: JXMapViewer() {
 
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
 
     init {
-        background = ZOOM_PANEL_BACKGROUND
-        border = NO_BORDER
-        layout = GridBagLayout()
-        val constraints = GridBagConstraints()
-        constraints.anchor = GridBagConstraints.CENTER
-        constraints.fill = GridBagConstraints.BOTH
-        constraints.gridwidth = 2
-        constraints.gridx = 0
-        constraints.gridy = 0
-
-        val map = JXMapViewer()
         val info = OSMTileFactoryInfo()
-        map.tileFactory = DefaultTileFactory(info)
-        val mm = PanMouseInputListener(map)
-        val mw = ZoomMouseWheelListenerCenter(map)
-        map.addMouseListener(mm)
-        map.addMouseMotionListener(mm)
-        map.addMouseWheelListener (mw)
+        tileFactory = DefaultTileFactory(info)
+        val mm = PanMouseInputListener(this)
+        val mw = ZoomMouseWheelListenerCenter(this)
+        addMouseListener(mm)
+        addMouseMotionListener(mm)
+        addMouseWheelListener (mw)
 
         val frankfurt = GeoPosition(50.11, 8.68)
         val wiesbaden = GeoPosition(50, 5, 0, 8, 14, 0)
@@ -46,10 +28,9 @@ class MaxiMap: JPanel() {
         fitPoints.add(frankfurt)
         fitPoints.add(wiesbaden)
         fitPoints.add(mainz)
-        log.debug("zoom: " + map.zoom)
-        map.size = Dimension(600,600)
-        map.zoomToBestFit(fitPoints, 0.9)
-        log.debug("zoom: " + map.zoom)
+        log.debug("zoom: " + zoom)
+        zoomToBestFit(fitPoints, 0.9)
+        log.debug("zoom: " + zoom)
 
         //map.zoom = 11 // kleine Zahl = Details, große Zahl = Übersicht
         //map.addressLocation = frankfurt
@@ -60,18 +41,6 @@ class MaxiMap: JPanel() {
         waypoints.add(DefaultWaypoint(mainz))
         val painter = WaypointPainter<Waypoint>()
         painter.waypoints = waypoints
-        map.overlayPainter = painter
-        map.preferredSize = Dimension(600, 600)
-
-        constraints.weighty= 1.0
-        add(map, constraints)
-
-        constraints.gridwidth = 1
-        constraints.weighty= 0.1
-        constraints.gridy = 1
-        add(JButton("anpassen"), constraints)
-
-        constraints.gridx = 1
-        add(JButton("zentrieren"), constraints)
+        overlayPainter = painter
     }
 }

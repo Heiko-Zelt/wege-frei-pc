@@ -19,7 +19,7 @@ class SelectedPhotos(private var photos: TreeSet<Photo> = TreeSet<Photo>()) {
         photos.add(photo)
         val index = photos.indexOf(photo)
         for(observer in observers) {
-            observer.addedPhoto(index, photo)
+            observer.selectedPhoto(index, photo)
         }
     }
 
@@ -27,7 +27,7 @@ class SelectedPhotos(private var photos: TreeSet<Photo> = TreeSet<Photo>()) {
         val index = photos.indexOf(photo)
         photos.remove(photo)
         for(observer in observers) {
-            observer.removedPhoto(index, photo)
+            observer.unselectedPhoto(index, photo)
         }
     }
 
@@ -45,7 +45,7 @@ class SelectedPhotos(private var photos: TreeSet<Photo> = TreeSet<Photo>()) {
     fun setPhotos(photos: TreeSet<Photo>) {
         this.photos = photos
         for(observer in observers) {
-            observer.replacedAllPhotos(photos)
+            observer.replacedPhotoSelection(photos)
         }
     }
 
@@ -53,6 +53,10 @@ class SelectedPhotos(private var photos: TreeSet<Photo> = TreeSet<Photo>()) {
         observers.add(observer)
     }
 
+    /**
+     * Wichtig, um Memory-Leaks zu vermeiden
+     * todo: wenn MaxiMap nicht mehr im Zoom-Bereich angezeigt wird
+     */
     fun unregisterObserver(observer: SelectedPhotosObserver) {
         observers.remove(observer)
     }

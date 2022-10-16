@@ -63,7 +63,7 @@ class SelectedPhotosPanel(private val noticeFrame: NoticeFrame) : JPanel(),
         }
     }
 
-    override fun addedPhoto(index: Int, photo: Photo) {
+    override fun selectedPhoto(index: Int, photo: Photo) {
         log.debug("added photo")
         val panel = MiniSelectedPhotoPanel(noticeFrame, photo)
         miniSelectedPhotoPanels.add(index, panel)
@@ -76,7 +76,7 @@ class SelectedPhotosPanel(private val noticeFrame: NoticeFrame) : JPanel(),
         repaint()
     }
 
-    override fun removedPhoto(index: Int, photo: Photo) {
+    override fun unselectedPhoto(index: Int, photo: Photo) {
         log.debug("removed photo")
         val panel = panelWithPhoto(photo)
         miniSelectedPhotoPanels.remove(panel)
@@ -87,7 +87,7 @@ class SelectedPhotosPanel(private val noticeFrame: NoticeFrame) : JPanel(),
         repaint()
     }
 
-    override fun replacedAllPhotos(photos: TreeSet<Photo>) {
+    override fun replacedPhotoSelection(photos: TreeSet<Photo>) {
         removeAll()
         miniSelectedPhotoPanels.clear()
         for (photo in photos) {

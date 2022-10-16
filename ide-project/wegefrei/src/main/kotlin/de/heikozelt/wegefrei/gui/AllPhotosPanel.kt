@@ -2,6 +2,7 @@ package de.heikozelt.wegefrei.gui
 
 import de.heikozelt.wegefrei.entities.Photo
 import de.heikozelt.wegefrei.gui.Styles.Companion.ALL_PHOTOS_BACKGROUND
+import de.heikozelt.wegefrei.jobs.LoadPhotosWorker
 import de.heikozelt.wegefrei.model.SelectedPhotosObserver
 import org.slf4j.LoggerFactory
 import java.util.*
@@ -30,13 +31,25 @@ class AllPhotosPanel(private val noticeFrame: NoticeFrame) : JPanel(), SelectedP
 
     // todo Prio 2: load from database as background job
     fun loadData(firstPhotoFilename: String) {
+        /*
         val photos = noticeFrame.getDatabaseService().getPhotos(firstPhotoFilename, 20)
         for (photo in photos) {
-            val active = !selectedPhotos.getPhotos().contains(photo)
-            val miniPhotoPanel = MiniPhotoPanel(noticeFrame, photo, active)
-            miniPhotoPanels.add(miniPhotoPanel)
-            add(miniPhotoPanel, 1) // hinter backButton
+        appendPhoto
         }
+        */
+
+        val worker = LoadPhotosWorker(noticeFrame.getDatabaseService(), firstPhotoFilename, this)
+        worker.execute()
+    }
+
+    /**
+     * called from LoadPhotosWorker
+     */
+    fun appendPhoto(photo: Photo) {
+        val active = !selectedPhotos.getPhotos().contains(photo)
+        val miniPhotoPanel = MiniPhotoPanel(noticeFrame, photo, active)
+        miniPhotoPanels.add(miniPhotoPanel)
+        add(miniPhotoPanel, componentCount - 1) // am Ende, aber vor forwardButton
     }
 
     private fun panelWithPhoto(photo: Photo): MiniPhotoPanel? {
@@ -79,8 +92,8 @@ class AllPhotosPanel(private val noticeFrame: NoticeFrame) : JPanel(), SelectedP
     /**
      * Observer-Methode
      */
-    override fun addedPhoto(index: Int, photo: Photo) {
-        log.debug("addedPhoto()")
+    override fun selectedPhoto(index: Int, photo: Photo) {
+        log.debug("selectedPhoto(index = $index)")
         hideBorder()
         deactivatePhoto(photo)
     }
@@ -88,8 +101,8 @@ class AllPhotosPanel(private val noticeFrame: NoticeFrame) : JPanel(), SelectedP
     /**
      * Observer-Methode
      */
-    override fun removedPhoto(index: Int, photo: Photo) {
-        log.debug("removedPhoto()")
+    override fun unselectedPhoto(index: Int, photo: Photo) {
+        log.debug("unselectedPhoto(index = $index)")
         showBorder(photo)
         activatePhoto(photo)
     }
@@ -98,7 +111,8 @@ class AllPhotosPanel(private val noticeFrame: NoticeFrame) : JPanel(), SelectedP
      * all selected photos have been replaced
      * active or deactivate panels
      */
-    override fun replacedAllPhotos(photos: TreeSet<Photo>) {
+    override fun replacedPhotoSelection(photos: TreeSet<Photo>) {
+        log.debug("replacedPhotoSelection()")
         for(panel in miniPhotoPanels) {
             val photo = panel.getPhoto()
             if(photo in photos && panel.isActive()) {

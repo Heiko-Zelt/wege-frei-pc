@@ -102,7 +102,7 @@ class MiniMap(
      * Observer-Methode
      * index zählt intern ab 0, in der Marker-Darstellung aber ab "1"
      */
-    override fun addedPhoto(index: Int, photo: Photo) {
+    override fun selectedPhoto(index: Int, photo: Photo) {
         log.debug("addedPhoto()")
         val pos = photo.getGeoPosition()
         if (pos != null) {
@@ -130,7 +130,7 @@ class MiniMap(
     /**
      * Observer-Methode
      */
-    override fun removedPhoto(index: Int, photo: Photo) {
+    override fun unselectedPhoto(index: Int, photo: Photo) {
         log.debug("remove waypoint")
         remove(photoMarkers[index].getLabel())
         photoMarkers.removeAt(index)
@@ -151,7 +151,7 @@ class MiniMap(
     /**
      * alle Foto-Markers müssen ersetzt werden
      */
-    override fun replacedAllPhotos(photos: TreeSet<Photo>) {
+    override fun replacedPhotoSelection(photos: TreeSet<Photo>) {
         // alle bestehenden Foto-Marker entfernen
         // (aber den ggf. existieren Adress-Marker behalten)
         for (photoMarker in photoMarkers) {

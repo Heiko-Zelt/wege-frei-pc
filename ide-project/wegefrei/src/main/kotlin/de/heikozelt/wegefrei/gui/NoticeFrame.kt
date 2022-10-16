@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory
 import java.time.ZonedDateTime
 import java.util.*
 import javax.swing.JFrame
+import javax.swing.JPanel
 import javax.swing.JScrollPane
 import javax.swing.JSplitPane
 
@@ -33,10 +34,9 @@ class NoticeFrame(private val app: App) : JFrame() {
     private var selectedPhotosPanel = SelectedPhotosPanel(this)
     private var selectedPhotosScrollPane = JScrollPane(selectedPhotosPanel)
     private var noticeForm = NoticeForm(this)
-    private var zoomPanel = ZoomPanel(this)
 
     private var topSplitPane = JSplitPane(JSplitPane.VERTICAL_SPLIT, allPhotosPanel, selectedPhotosScrollPane)
-    private var bottomSplitPane = JSplitPane(JSplitPane.HORIZONTAL_SPLIT, noticeForm, zoomPanel)
+    private var bottomSplitPane = JSplitPane(JSplitPane.HORIZONTAL_SPLIT, noticeForm, JPanel())
     private var mainSplitPane = JSplitPane(JSplitPane.VERTICAL_SPLIT, topSplitPane, bottomSplitPane)
 
     init {
@@ -111,13 +111,8 @@ class NoticeFrame(private val app: App) : JFrame() {
         selectedPhotos.add(photo)
         //allPhotosPanel.deactivatePhoto(photo)
         log.debug("selected photo: $photo")
-        log.debug("zoomed photo: ${zoomPanel.getMaxiPhoto()}")
-        zoomPanel.showSelectedPhoto(photo)
         selectedPhotosPanel.showBorder(photo)
-
-        //val index = selectedPhotosPanel.indexOfPhoto(photo)
-        //val index = selectedPhotos.getPhotos().indexOf(photo)
-        //noticeForm.getMiniMap().addMarker(index, photo)
+        bottomSplitPane.rightComponent = MaxiSelectedPhotoPanel(this, photo)
     }
 
     /**
@@ -143,8 +138,9 @@ class NoticeFrame(private val app: App) : JFrame() {
         //noticeForm.getMiniMap().removeMarker(index)
         //selectedPhotosPanel.removePhoto(photo)
         selectedPhotos.remove(photo)
-        zoomPanel.showPhoto(photo)
+        //todo scrollpane und photo zoomPanel.showPhoto(photo)
         selectedPhotosPanel.hideBorder()
+        bottomSplitPane.rightComponent = MaxiPhotoPanel(this, photo)
     }
 
     /**
@@ -152,8 +148,15 @@ class NoticeFrame(private val app: App) : JFrame() {
      */
     fun showMaxiMap() {
         log.debug("show maxi map")
+        val maxiMapForm = MaxiMapForm(this)
+        bottomSplitPane.rightComponent = maxiMapForm
+        notice?.let {
+            maxiMapForm.setAddressMarker(it.getGeoPosition())
+            maxiMapForm.setPhotoMarkers(selectedPhotos)
+        }
+
         noticeForm.getNoticeFormFields().getMiniMap().displayBorder(true)
-        zoomPanel.showMap()
+        allPhotosPanel.hideBorder()
         selectedPhotosPanel.hideBorder()
     }
 
@@ -162,7 +165,10 @@ class NoticeFrame(private val app: App) : JFrame() {
      */
     fun showPhoto(miniPhotoPanel: MiniPhotoPanel) {
         log.debug("show photo")
-        zoomPanel.showPhoto(miniPhotoPanel.getPhoto())
+        val photoPanel = MaxiPhotoPanel(this, miniPhotoPanel.getPhoto())
+        val scrollPane = JScrollPane(photoPanel)
+        bottomSplitPane.rightComponent = scrollPane
+
         noticeForm.getNoticeFormFields().getMiniMap().displayBorder(false)
         allPhotosPanel.showBorder(miniPhotoPanel)
         selectedPhotosPanel.hideBorder()
@@ -173,7 +179,12 @@ class NoticeFrame(private val app: App) : JFrame() {
      */
     fun showSelectedPhoto(miniSelectedPhotoPanel: MiniSelectedPhotoPanel) {
         log.debug("show selected photo")
-        zoomPanel.showSelectedPhoto(miniSelectedPhotoPanel.getPhoto())
+
+        //todo scollpane und photo zoomPanel.showSelectedPhoto(miniSelectedPhotoPanel.getPhoto())
+        val photoPanel = MaxiSelectedPhotoPanel(this, miniSelectedPhotoPanel.getPhoto())
+        val scrollPane = JScrollPane(photoPanel)
+        bottomSplitPane.rightComponent = scrollPane
+
         noticeForm.getNoticeFormFields().getMiniMap().displayBorder(false)
         allPhotosPanel.hideBorder()
         selectedPhotosPanel.showBorder(miniSelectedPhotoPanel)
