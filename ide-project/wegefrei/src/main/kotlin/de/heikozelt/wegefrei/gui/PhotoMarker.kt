@@ -5,10 +5,10 @@ import de.heikozelt.wegefrei.gui.Styles.Companion.PHOTO_MARKER_BACKGROUND
 import org.jxmapviewer.viewer.GeoPosition
 
 
-class PhotoMarker(index: Int, coord: GeoPosition?) : Marker(coord) {
+class PhotoMarker(private var photoIndex: Int, coord: GeoPosition?) : Marker(coord) {
 
     init {
-        updateText(index)
+        updateText()
         lbl.border = NORMAL_BORDER
         lbl.background = PHOTO_MARKER_BACKGROUND
         //lbl.horizontalTextPosition = JLabel.RIGHT // keine Auswirkung
@@ -17,8 +17,18 @@ class PhotoMarker(index: Int, coord: GeoPosition?) : Marker(coord) {
         //label.addMouseListener(SwingWaypointMouseListener(text))
     }
 
-    fun updateText(index: Int) {
-        lbl.text = " ${index + 1} "
+    fun incrementPhotoIndex() {
+        photoIndex++
+        updateText()
+    }
+
+    fun decrementPhotoIndex() {
+        photoIndex--
+        updateText()
+    }
+
+    fun updateText() {
+        lbl.text = " ${photoIndex + 1} "
     }
 
     /*

@@ -1,4 +1,4 @@
-package de.heikozelt.wegefrei
+package de.heikozelt.wegefrei.model
 
 import de.heikozelt.wegefrei.entities.Notice
 import de.heikozelt.wegefrei.entities.Photo

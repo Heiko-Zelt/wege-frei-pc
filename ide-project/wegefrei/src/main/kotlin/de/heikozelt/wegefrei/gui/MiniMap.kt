@@ -67,7 +67,7 @@ class MiniMap(
         } else {
             addressMarker?.let {
                 it.position = addressLocation
-            } ?:run {
+            } ?: run {
                 val newAddressMarker = AddressMarker(addressLocation)
                 add(newAddressMarker.getLabel(), 0)
                 addressMarker = newAddressMarker
@@ -105,40 +105,64 @@ class MiniMap(
      * index zählt intern ab 0, in der Marker-Darstellung aber ab "1"
      */
     override fun selectedPhoto(index: Int, photo: Photo) {
-        log.debug("addedPhoto()")
+        log.debug("selectedPhoto(index=$index)")
+
+        // Marker hinzufügen, falls Geo-Position vorhanden ist
+        val markerIndex = selectedPhotos.calculateMarkerIndex(index)
+        log.debug("markerIndex: $markerIndex")
+
+        // Bei allen darauffolgenden Photos/Markers die angezeigte Nummer um eins erhöhen
+        for (i in markerIndex until photoMarkers.size) {
+            log.debug("increment marker $i")
+            photoMarkers[i].incrementPhotoIndex()
+        }
+
         val pos = photo.getGeoPosition()
         if (pos != null) {
             log.debug("add waypoint")
             val marker = PhotoMarker(index, pos)
-            photoMarkers.add(index, marker)
+            photoMarkers.add(markerIndex, marker)
 
             log.debug("number of photo markers: " + photoMarkers.size)
-            val compIndex = componentCount - index
+            val compIndex = componentCount - markerIndex
             add(marker.getLabel(), compIndex)
-            for (i in index + 1 until photoMarkers.size) {
-                photoMarkers[i].updateText(i)
-            }
-            updateAddressLocation()
-            updatePainterWaypoints()
-            fitToMarkers()
-            revalidate()
-            repaint()
         }
+
+        updateAddressLocation()
+        updatePainterWaypoints()
+        fitToMarkers()
+        revalidate()
+        repaint()
+
         for (comp in components) {
             log.debug("comp: $comp")
         }
+        for (m in photoMarkers) {
+            log.debug("photoMarker: ${m.getLabel().text}")
+        }
     }
+
+
 
     /**
      * Observer-Methode
      */
     override fun unselectedPhoto(index: Int, photo: Photo) {
-        log.debug("remove waypoint")
-        remove(photoMarkers[index].getLabel())
-        photoMarkers.removeAt(index)
+        log.debug("unselectedPhoto(index=$index)")
+
+        val markerIndex = selectedPhotos.calculateMarkerIndex(index)
+        log.debug("markerIndex: $markerIndex")
+
+        // Marker und dessen Label entfernen, falls er/es existiert hat
+        if (photo.getGeoPosition() != null) {
+            remove(photoMarkers[markerIndex].getLabel())
+            photoMarkers.removeAt(markerIndex)
+        }
+
         log.debug("number of photo markers: " + photoMarkers.size)
-        for (i in index until photoMarkers.size) {
-            photoMarkers[i].updateText(i)
+        // Bei allen darauffolgenden Photos/Markers die angezeigte Nummer um eins erniedrigen
+        for (i in markerIndex until photoMarkers.size) {
+            photoMarkers[i].decrementPhotoIndex()
         }
         updateAddressLocation()
         updatePainterWaypoints()
@@ -147,6 +171,9 @@ class MiniMap(
         repaint()
         for (comp in components) {
             log.debug("comp: $comp")
+        }
+        for (m in photoMarkers) {
+            log.debug("photoMarker: ${m.getLabel().text}")
         }
     }
 
@@ -161,14 +188,23 @@ class MiniMap(
         }
         photoMarkers.clear()
 
-        // neue Foto-Markers zur Liste hinzufügen
+        for ((i, photo) in photos.withIndex()) {
+            var position = photo.getGeoPosition()
+            if (position != null) {
+                log.debug("add photo marker #$i")
+                photoMarkers.add(PhotoMarker(i, position))
+            }
+        }
+
+        /*
         val photosIter = selectedPhotos.getPhotos().iterator()
         var i = 0
         while(photosIter.hasNext()) {
-            log.debug("add photo marker #$i")
+
             photoMarkers.add(PhotoMarker(i, photosIter.next().getGeoPosition()))
             i++
         }
+        */
 
         // neue Foto-Markers zum Container hinzufügen
         // (in umgekehrter Reihenfolge, wegen Z-Order)
@@ -179,6 +215,7 @@ class MiniMap(
         }
 
         // ggf. Adress-Location anpassen und Karten-Bereich neu justieren
+        // todo adress-location nur updaten, wenn Foto hinzugefügt oder entfernt wird, nicht hier
         updateAddressLocation()
         updatePainterWaypoints()
         fitToMarkers()

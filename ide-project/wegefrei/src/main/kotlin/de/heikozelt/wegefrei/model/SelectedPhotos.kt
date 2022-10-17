@@ -63,11 +63,17 @@ class SelectedPhotos(private var photos: TreeSet<Photo> = TreeSet<Photo>()) {
         observers.remove(observer)
     }
 
+    /**
+     * from all photos with a date, get the earliest date
+     */
     fun getStartTime(): ZonedDateTime? {
         val firstPhotoWithDate = photos.find { it.date != null }
         return firstPhotoWithDate?.date
     }
 
+    /**
+     * from all photos with a date, get the latest date
+     */
     fun getEndTime(): ZonedDateTime? {
         val reversedList = photos.reversed()
         val lastPhotoWithDate = reversedList.find { it.date != null }
@@ -86,5 +92,36 @@ class SelectedPhotos(private var photos: TreeSet<Photo> = TreeSet<Photo>()) {
             val unit = ChronoUnit.MINUTES
             unit.between(start, end).toInt()
         }
+    }
+
+    /**
+     * Die Methode liefert zu einem Foto mit dem angegebenen Index den entsprechenden Index des Markers.
+     * Wenn alle Fotos eine Geo-Position haben, dann ist der Marker-Index gleich dem Foto-Index.
+     * Ansonsten kann der Marker-Index kleiner sein als der Foto-Index.
+     * Ist der Foto-Index größer als der Index des letzten Fotos, dann wird ein Marker-Index zurückgeliefert,
+     * der um eins größer ist als der letzte Marker-Index.
+     */
+    fun calculateMarkerIndex(photoIndex: Int): Int {
+        var markerIndex = 0
+        var photoIter = photos.iterator()
+        var i = 0
+        while(photoIter.hasNext() && i < photoIndex) {
+            i++
+            if (photoIter.next().getGeoPosition() != null) {
+                markerIndex++
+            }
+        }
+        return markerIndex
+    }
+
+    fun calculateMarkerIndex_alternativ(photoIndex: Int): Int {
+        var markerIndex = 0
+        val photosArray: Array<Photo> = photos.toTypedArray()
+        for (i in 0 until photoIndex) {
+            if (photosArray[i].getGeoPosition() != null) {
+                markerIndex++
+            }
+        }
+        return markerIndex
     }
 }
