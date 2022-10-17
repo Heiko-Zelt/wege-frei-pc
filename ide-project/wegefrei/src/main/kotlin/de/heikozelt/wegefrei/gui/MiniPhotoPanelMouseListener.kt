@@ -4,7 +4,7 @@ import org.slf4j.LoggerFactory
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 
-class MiniPhotoPanelMouseAdapter(private val noticeFrame: NoticeFrame, private val miniPhotoPanel: MiniPhotoPanel): MouseAdapter() {
+class MiniPhotoPanelMouseListener(private val noticeFrame: NoticeFrame, private val miniPhotoPanel: MiniPhotoPanel): MouseAdapter() {
 
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
     override fun mouseClicked(e: MouseEvent) {

@@ -32,7 +32,7 @@ class MiniSelectedPhotoPanel(private val noticeFrame: NoticeFrame, private val p
         thumbnailLabel.toolTipText = photo.getToolTipText()
         thumbnailLabel.setBounds(0, 0, Styles.THUMBNAIL_SIZE, Styles.THUMBNAIL_SIZE)
         thumbnailLabel.border = NORMAL_BORDER
-        thumbnailLabel.addMouseListener(MiniSelectedPhotoPanelMouseAdapter(noticeFrame, this))
+        thumbnailLabel.addMouseListener(MiniSelectedPhotoPanelMouseListener(noticeFrame, this))
 
         // + 1 wegen Border
         button.addActionListener { unselectPhoto() }

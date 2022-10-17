@@ -1,16 +1,12 @@
 package de.heikozelt.wegefrei.gui
 
 import org.slf4j.LoggerFactory
+import java.awt.event.FocusAdapter
 import java.awt.event.FocusEvent
-import java.awt.event.FocusListener
 import javax.swing.JTextField
 
-class TrimmingTextFieldFocusListener: FocusListener {
+class TrimmingTextFieldFocusListener: FocusAdapter() {
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
-
-    override fun focusGained(e: FocusEvent?) {
-        // do noting
-    }
 
     // entfernt Whitespaces am Anfang und Ende der Eingabe
     // z.B. wichtig um Zahlen oder Datum/Uhrzeit zu parsen

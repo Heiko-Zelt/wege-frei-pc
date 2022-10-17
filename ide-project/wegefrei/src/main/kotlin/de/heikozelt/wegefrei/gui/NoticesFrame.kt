@@ -35,7 +35,7 @@ class NoticesFrame(private val app: App) : JFrame("Meldungen - Wege frei!") {
         defaultCloseOperation = EXIT_ON_CLOSE
         background = Styles.FRAME_BACKGROUND
 
-        noticesTable.addMouseListener(NoticesTableMouseAdapter(app))
+        noticesTable.addMouseListener(NoticesTableMouseListener(app))
         noticesTable.getColumn("Farbe").cellRenderer = NoticesTableColorCellRenderer()
         noticesTable.getColumn("Status").cellRenderer = NoticesTableStateCellRenderer()
         noticesTable.background = Styles.NOTICES_TABLE_BACKGROUND

@@ -46,7 +46,7 @@ class MiniMap(
         border = NORMAL_BORDER
         val info = OSMTileFactoryInfo()
         tileFactory = DefaultTileFactory(info)
-        addMouseListener(MiniMapMouseAdapter(noticeFrame))
+        addMouseListener(MiniMapMouseListener(noticeFrame))
         overlayPainter = painter
         size = Dimension(150, 150)
         preferredSize = Dimension(150, 150)
@@ -195,16 +195,6 @@ class MiniMap(
                 photoMarkers.add(PhotoMarker(i, position))
             }
         }
-
-        /*
-        val photosIter = selectedPhotos.getPhotos().iterator()
-        var i = 0
-        while(photosIter.hasNext()) {
-
-            photoMarkers.add(PhotoMarker(i, photosIter.next().getGeoPosition()))
-            i++
-        }
-        */
 
         // neue Foto-Markers zum Container hinzufügen
         // (in umgekehrter Reihenfolge, wegen Z-Order)
