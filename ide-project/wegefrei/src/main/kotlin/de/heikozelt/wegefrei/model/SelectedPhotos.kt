@@ -20,17 +20,13 @@ class SelectedPhotos(private var photos: TreeSet<Photo> = TreeSet<Photo>()) {
     fun add(photo: Photo) {
         photos.add(photo)
         val index = photos.indexOf(photo)
-        for(observer in observers) {
-            observer.selectedPhoto(index, photo)
-        }
+        observers.forEach { it.selectedPhoto(index, photo) }
     }
 
     fun remove(photo: Photo) {
         val index = photos.indexOf(photo)
         photos.remove(photo)
-        for(observer in observers) {
-            observer.unselectedPhoto(index, photo)
-        }
+        observers.forEach { it.unselectedPhoto(index, photo) }
     }
 
     /**
@@ -46,9 +42,7 @@ class SelectedPhotos(private var photos: TreeSet<Photo> = TreeSet<Photo>()) {
      */
     fun setPhotos(photos: TreeSet<Photo>) {
         this.photos = photos
-        for(observer in observers) {
-            observer.replacedPhotoSelection(photos)
-        }
+        observers.forEach { it.replacedPhotoSelection(photos) }
     }
 
     fun registerObserver(observer: SelectedPhotosObserver) {
@@ -103,7 +97,7 @@ class SelectedPhotos(private var photos: TreeSet<Photo> = TreeSet<Photo>()) {
      */
     fun calculateMarkerIndex(photoIndex: Int): Int {
         var markerIndex = 0
-        var photoIter = photos.iterator()
+        val photoIter = photos.iterator()
         var i = 0
         while(photoIter.hasNext() && i < photoIndex) {
             i++
