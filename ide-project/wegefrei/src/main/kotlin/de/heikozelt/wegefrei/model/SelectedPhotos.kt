@@ -1,6 +1,8 @@
 package de.heikozelt.wegefrei.model
 
 import de.heikozelt.wegefrei.entities.Photo
+import java.time.ZonedDateTime
+import java.time.temporal.ChronoUnit
 import java.util.*
 
 /**
@@ -59,5 +61,30 @@ class SelectedPhotos(private var photos: TreeSet<Photo> = TreeSet<Photo>()) {
      */
     fun unregisterObserver(observer: SelectedPhotosObserver) {
         observers.remove(observer)
+    }
+
+    fun getStartTime(): ZonedDateTime? {
+        val firstPhotoWithDate = photos.find { it.date != null }
+        return firstPhotoWithDate?.date
+    }
+
+    fun getEndTime(): ZonedDateTime? {
+        val reversedList = photos.reversed()
+        val lastPhotoWithDate = reversedList.find { it.date != null }
+        return lastPhotoWithDate?.date
+    }
+
+    /**
+     * in Minutes
+     */
+    fun getDuartion(): Int? {
+        val start = getStartTime()
+        val end = getEndTime()
+        return if(start == null || end == null) {
+            null
+        } else {
+            val unit = ChronoUnit.MINUTES
+            unit.between(start, end).toInt()
+        }
     }
 }

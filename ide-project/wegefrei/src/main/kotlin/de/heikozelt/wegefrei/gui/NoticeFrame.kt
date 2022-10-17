@@ -74,6 +74,7 @@ class NoticeFrame(private val app: App) : JFrame() {
         log.debug("loadData(notice id: ${notice.id})")
         selectedPhotos.registerObserver(selectedPhotosPanel)
         selectedPhotos.registerObserver(allPhotosPanel)
+        selectedPhotos.registerObserver(noticeForm.getNoticeFormFields())
         selectedPhotos.registerObserver(noticeForm.getNoticeFormFields().getMiniMap())
         selectedPhotos.setPhotos(TreeSet(notice.photos))
 

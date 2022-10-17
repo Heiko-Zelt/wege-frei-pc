@@ -27,6 +27,8 @@ import kotlin.math.sqrt
  * Die Karte ist Anfangs beim Konstruktor-Aufruf komplett leer.
  * Erst mit load()-Data wird ggf. ein Adress-Marker gesetzt und ggf. Foto-Markers hinzugefügt.
  * Die Foto-Markers werden indirekt über das Observer-Pattern hinzugefügt oder entfernt.
+ *
+ * todo: Bug: nicht jedes Photo hat eine GeoPosition
  */
 class MiniMap(
     private val noticeFrame: NoticeFrame

@@ -3,13 +3,11 @@ package de.heikozelt.wegefrei.gui
 import de.heikozelt.wegefrei.docfilters.DateDocFilter
 import de.heikozelt.wegefrei.docfilters.OnlyDigitsDocFilter
 import de.heikozelt.wegefrei.docfilters.TimeDocFilter
+import de.heikozelt.wegefrei.entities.Photo
 import de.heikozelt.wegefrei.gui.Styles.Companion.FORM_BACKGROUND
 import de.heikozelt.wegefrei.gui.Styles.Companion.NO_BORDER
 import de.heikozelt.wegefrei.gui.Styles.Companion.TEXTFIELD_FONT
-import de.heikozelt.wegefrei.model.CountrySymbol
-import de.heikozelt.wegefrei.model.ListVehicleMakes
-import de.heikozelt.wegefrei.model.Offense
-import de.heikozelt.wegefrei.model.VehicleColor
+import de.heikozelt.wegefrei.model.*
 import org.slf4j.LoggerFactory
 import java.awt.BorderLayout
 import java.awt.GridBagConstraints
@@ -21,13 +19,14 @@ import java.time.LocalTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
+import java.util.*
 import javax.swing.*
 import javax.swing.text.AbstractDocument
 
 /**
  * Panel mit den Formular-Feldern
  */
-class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel() {
+class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel(), SelectedPhotosObserver {
 
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
     private val countrySymbolComboBox = JComboBox(CountrySymbol.COUNTRY_SYMBOLS)
@@ -468,6 +467,32 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel() {
         noteTextArea.isEnabled = false
     }
 
+    override fun selectedPhoto(index: Int, photo: Photo) {
+        if(photo.date != null) {
+            updateDateTimeAndDuration()
+        }
+    }
+
+    override fun unselectedPhoto(index: Int, photo: Photo) {
+        if(photo.date != null) {
+            updateDateTimeAndDuration()
+        }
+    }
+
+    override fun replacedPhotoSelection(photos: TreeSet<Photo>) {
+        if(photos.size != 0) {
+            updateDateTimeAndDuration()
+        }
+    }
+
+    private fun updateDateTimeAndDuration() {
+        val selectedPhotos = noticeFrame.getSelectedPhotos()
+        val newStartTime = selectedPhotos.getStartTime()
+        observationDateTextField.text = blankOrDateString(newStartTime)
+        observationTimeTextField.text = blankOrTimeString(newStartTime)
+        durationTextField.text = blankOrIntString(selectedPhotos.getDuartion())
+    }
+
     companion object {
         /**
          * trimms String and returns null if blank
@@ -561,4 +586,6 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel() {
             }
         }
     }
+
+
 }
