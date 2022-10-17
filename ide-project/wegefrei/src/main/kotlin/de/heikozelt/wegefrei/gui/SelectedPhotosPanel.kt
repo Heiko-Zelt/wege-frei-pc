@@ -24,11 +24,13 @@ class SelectedPhotosPanel(private val noticeFrame: NoticeFrame) : JPanel(),
 
         // nicht notwendig, wenn selectedPhotos anfänglich leer ist und Observer vorher schon registriert ist
         // aber man weiß ja nie
+        var i = 1
         for (photo in noticeFrame.getSelectedPhotos().getPhotos()) {
             log.warn("observer zu spät registriert?")
-            val panel = MiniSelectedPhotoPanel(noticeFrame, photo)
+            val panel = MiniSelectedPhotoPanel(noticeFrame, photo, i)
             miniSelectedPhotoPanels.add(panel)
             add(panel)
+            i++
         }
         autoscrolls = true
     }
@@ -65,13 +67,15 @@ class SelectedPhotosPanel(private val noticeFrame: NoticeFrame) : JPanel(),
 
     override fun selectedPhoto(index: Int, photo: Photo) {
         log.debug("added photo")
-        val panel = MiniSelectedPhotoPanel(noticeFrame, photo)
+        val panel = MiniSelectedPhotoPanel(noticeFrame, photo, index)
         miniSelectedPhotoPanels.add(index, panel)
         log.debug("add selected photo panel to container. component count: $componentCount")
         add(panel, index)
         log.debug("after add: component count: $componentCount")
-        revalidate()
-        repaint()
+        // bei allen nachfolgenden Fotos den Index-Text ändern
+        for(i in index + 1 until miniSelectedPhotoPanels.size) {
+            miniSelectedPhotoPanels[i].updateText(i)
+        }
         revalidate()
         repaint()
     }
@@ -80,6 +84,13 @@ class SelectedPhotosPanel(private val noticeFrame: NoticeFrame) : JPanel(),
         log.debug("removed photo")
         val panel = panelWithPhoto(photo)
         miniSelectedPhotoPanels.remove(panel)
+        log.debug("miniSelectedPhotoPanels.size: ${miniSelectedPhotoPanels.size}")
+        // bei allen nachfolgenden Fotos den Index-Text ändern
+        for(i in index until miniSelectedPhotoPanels.size) {
+            log.debug("i: $i")
+            miniSelectedPhotoPanels[i].updateText(i)
+        }
+
         log.debug("remove selected photo panel to container. component count: $componentCount")
         remove(panel)
         log.debug("after remove: component count: $componentCount")
@@ -90,8 +101,8 @@ class SelectedPhotosPanel(private val noticeFrame: NoticeFrame) : JPanel(),
     override fun replacedPhotoSelection(photos: TreeSet<Photo>) {
         removeAll()
         miniSelectedPhotoPanels.clear()
-        for (photo in photos) {
-            val panel = MiniSelectedPhotoPanel(noticeFrame, photo)
+        for ((i, photo) in photos.withIndex()) {
+            val panel = MiniSelectedPhotoPanel(noticeFrame, photo, i)
             miniSelectedPhotoPanels.add(panel)
             add(panel)
         }

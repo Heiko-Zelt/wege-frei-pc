@@ -20,7 +20,7 @@ class MiniPhotoPanel(private val noticeFrame: NoticeFrame, private val photo: Ph
 
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
     private val thumbnailLabel = JLabel("not loaded", SwingConstants.CENTER)
-    private val mouseListener: MiniPhotoPanelMouseListener
+    private val mouseListener: MiniPhotoPanelMouseAdapter
     private val button = JButton("+")
     private var borderVisible = false
 
@@ -40,7 +40,7 @@ class MiniPhotoPanel(private val noticeFrame: NoticeFrame, private val photo: Ph
         thumbnailLabel.setBounds(0, 0, THUMBNAIL_SIZE, THUMBNAIL_SIZE)
         thumbnailLabel.border = NORMAL_BORDER
 
-        mouseListener = MiniPhotoPanelMouseListener(noticeFrame, this)
+        mouseListener = MiniPhotoPanelMouseAdapter(noticeFrame, this)
         if (active) {
             thumbnailLabel.addMouseListener(mouseListener)
         }

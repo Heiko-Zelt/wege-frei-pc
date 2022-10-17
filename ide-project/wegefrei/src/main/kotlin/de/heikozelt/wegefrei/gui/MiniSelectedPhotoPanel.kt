@@ -12,11 +12,12 @@ import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.SwingConstants
 
-class MiniSelectedPhotoPanel(private val noticeFrame: NoticeFrame, private val photo: Photo): JPanel() {
+class MiniSelectedPhotoPanel(private val noticeFrame: NoticeFrame, private val photo: Photo, private var index: Int): JPanel() {
 
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
     private val thumbnailLabel = JLabel("not loaded", SwingConstants.CENTER)
     private val button = JButton("-")
+    private val label = JLabel()
     private var borderVisible = false
 
     init {
@@ -26,10 +27,12 @@ class MiniSelectedPhotoPanel(private val noticeFrame: NoticeFrame, private val p
         minimumSize = preferredSize
         maximumSize = preferredSize
 
+        //background = Color.green
+
         thumbnailLabel.toolTipText = photo.getToolTipText()
         thumbnailLabel.setBounds(0, 0, Styles.THUMBNAIL_SIZE, Styles.THUMBNAIL_SIZE)
         thumbnailLabel.border = NORMAL_BORDER
-        thumbnailLabel.addMouseListener(MiniSelectedPhotoPanelMouseListener(noticeFrame, this))
+        thumbnailLabel.addMouseListener(MiniSelectedPhotoPanelMouseAdapter(noticeFrame, this))
 
         // + 1 wegen Border
         button.addActionListener { unselectPhoto() }
@@ -37,6 +40,15 @@ class MiniSelectedPhotoPanel(private val noticeFrame: NoticeFrame, private val p
         button.setBounds(buttonXY, buttonXY, Styles.SELECT_BUTTON_SIZE, Styles.SELECT_BUTTON_SIZE)
         button.margin = Insets(0, 0, 0, 0)
 
+
+        updateText(index)
+        label.border = NORMAL_BORDER
+        label.background = Styles.PHOTO_MARKER_BACKGROUND
+        label.isOpaque = true
+        val labelSize = label.preferredSize
+        label.setBounds(0, 0, labelSize.width, labelSize.height)
+
+        add(label)
         add(button)
         add(thumbnailLabel)
 
@@ -63,5 +75,9 @@ class MiniSelectedPhotoPanel(private val noticeFrame: NoticeFrame, private val p
 
     fun getPhoto(): Photo {
         return photo
+    }
+
+    fun updateText(index: Int) {
+        label.text = " ${index + 1} "
     }
 }

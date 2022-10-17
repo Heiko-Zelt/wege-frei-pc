@@ -44,7 +44,7 @@ class MiniMap(
         border = NORMAL_BORDER
         val info = OSMTileFactoryInfo()
         tileFactory = DefaultTileFactory(info)
-        addMouseListener(MiniMapMouseListener(noticeFrame))
+        addMouseListener(MiniMapMouseAdapter(noticeFrame))
         overlayPainter = painter
         size = Dimension(150, 150)
         preferredSize = Dimension(150, 150)
