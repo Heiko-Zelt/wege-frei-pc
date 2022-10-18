@@ -300,9 +300,8 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel(), Selecte
             disableFormFields()
         }
 
-        val addrLocation = notice.getGeoPosition()
-        if(addrLocation != null) {
-            miniMap.setAddrLocation(addrLocation)
+        notice.getGeoPosition()?.let {
+            miniMap.setAddressPosition(it)
         }
 
         val countrySymbol = CountrySymbol.fromAbbreviation(notice.countrySymbol)

@@ -33,8 +33,10 @@ class Notice(
     var color: String? = null,
 
     /**
-     * Breitengrad des Adress-Markers
-     * Y-Achse, Richtung Norden, , z.B. 50.08 für Wiesbaden
+     * Breitengrad des Adress-Markers.
+     * Y-Achse, Richtung Norden, , z.B. 50.08 für Wiesbaden.
+     * Die Geo-Koordinaten müssen nicht zwingend ans Ordnungsamt übermittelt werden.
+     * Sie sind aber zur eigenen Nutzung sinnvoll.
      */
     @Column
     var latitude: Float? = null,
@@ -168,6 +170,11 @@ class Notice(
         } else {
             null
         }
+    }
+
+    fun setGeoPosition(position: GeoPosition?) {
+        latitude = position?.latitude?.toFloat()
+        longitude = position?.longitude?.toFloat()
     }
 
     /**

@@ -4,22 +4,13 @@ import de.heikozelt.wegefrei.gui.Styles.Companion.HIGHLIGHT_BORDER
 import de.heikozelt.wegefrei.gui.Styles.Companion.NORMAL_BORDER
 import de.heikozelt.wegefrei.model.SelectedPhotosObserver
 import org.slf4j.LoggerFactory
+import java.awt.Dimension
 
 /**
- * Beispiele für components:
- * { } leer
- * { photoMarker(0) } merkwürdiger Fall
- * { addressMarker } keine Geo-Location in Foto? manuell gesetzt?
- * { photoMarker(2), photoMarker(1), photoMarker(0) } merkwürdiger Fall
- * { addressMarker, photoMarker(2), photoMarker(1), photoMarker(0) } Perfekter Use Case
- * Sie werden in umgekehrter Reihenfolge gezeichnet.
- * Letzter Marker unten, erster Marker ganz obendrauf.
- *
- * Die Karte ist Anfangs beim Konstruktor-Aufruf komplett leer.
- * Erst mit load()-Data wird ggf. ein Adress-Marker gesetzt und ggf. Foto-Markers hinzugefügt.
- * Die Foto-Markers werden indirekt über das Observer-Pattern hinzugefügt oder entfernt.
- *
- * todo: Prio 1: Gemeinsamkeiten von MiniMap und MaxiMap in BaseMap-Klasse extrahieren
+ * Die kleine Miniatur-Karte wird direkt im Formular angezeigt.
+ * Sie kann nicht direkt benutzt werden.
+ * Ein Klick auf die Mini-Karte öffnet die große Karte.
+ * Dann erhält die Mini-Karte eine hervorgehobenen Rahmen.
  */
 class MiniMap(
     private val noticeFrame: NoticeFrame
@@ -31,6 +22,9 @@ class MiniMap(
     init {
         log.debug("init")
         border = NORMAL_BORDER
+        size = Dimension(150, 150)
+        preferredSize = Dimension(150, 150)
+        addMouseListener(MiniMapMouseListener(noticeFrame))
     }
 
     fun displayBorder(visible: Boolean) {

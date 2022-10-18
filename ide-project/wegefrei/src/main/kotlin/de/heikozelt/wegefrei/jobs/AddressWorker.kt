@@ -42,7 +42,7 @@ class AddressWorker(
         val text = connection.inputStream.use { it.reader().use { reader -> reader.readText() } }
         log.debug(text)
 
-        val nominatimResponse = Klaxon().parse<NominatimResponse>(text)
+        nominatimResponse = Klaxon().parse<NominatimResponse>(text)
         log.debug("displayName: ${nominatimResponse?.displayName}")
         log.debug("road: ${nominatimResponse?.address?.road}")
         log.debug("houseNumber: ${nominatimResponse?.address?.houseNumber}")
@@ -53,15 +53,21 @@ class AddressWorker(
      * this is done in the Swing Event Dispatcher Thread (EDT)
      */
     override fun done() {
+        log.debug("done()")
         nominatimResponse?.address?.let {
+            log.debug("adr")
             if (it.road != null) {
+                log.debug("road")
                 var street = it.road
                 if (it.houseNumber != null) {
+                    log.debug("house number")
                     street += " " + it.houseNumber
                 }
+                log.debug("street")
                 noticeForm.getNoticeFormFields().setStreet(street)
             }
             if (it.postcode != null) {
+                log.debug("postcode")
                 noticeForm.getNoticeFormFields().setZipCode(it.postcode)
             }
             if (it.city != null) {

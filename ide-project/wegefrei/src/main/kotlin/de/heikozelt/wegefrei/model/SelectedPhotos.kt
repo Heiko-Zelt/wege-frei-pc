@@ -1,6 +1,7 @@
 package de.heikozelt.wegefrei.model
 
 import de.heikozelt.wegefrei.entities.Photo
+import org.jxmapviewer.viewer.GeoPosition
 import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
 import java.util.*
@@ -117,5 +118,25 @@ class SelectedPhotos(private var photos: TreeSet<Photo> = TreeSet<Photo>()) {
             }
         }
         return markerIndex
+    }
+
+    fun getAveragePosition(): GeoPosition? {
+        val latitudes = mutableListOf<Float>()
+        val longitudes = mutableListOf<Float>()
+        photos.forEach { photo ->
+            photo.latitude?.let { lat ->
+                photo.longitude?.let { lon ->
+                    latitudes.add(lat)
+                    longitudes.add(lon)
+                }
+            }
+        }
+        return if(latitudes.size == 0) {
+            null
+        } else {
+            val newLatitude = latitudes.average()
+            val newLongitude = longitudes.average()
+            GeoPosition(newLatitude, newLongitude)
+        }
     }
 }

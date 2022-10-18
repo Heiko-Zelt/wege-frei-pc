@@ -17,10 +17,12 @@ import javax.swing.JFrame
 import javax.swing.JPanel
 import javax.swing.JScrollPane
 import javax.swing.JSplitPane
+import kotlin.math.abs
+import kotlin.math.sqrt
 
 /**
  * Haupt-Fenster zum Bearbeiten einer Meldung
- * (mit Dispatcher-Funktionen)
+ * (mit "Dispatcher-Funktionen" / "Business-Logik")
  * Instanziierung
  * <ol>
  *   <li>ohne Parameter zum Bearbeiten einer neuen Meldung. notice.id ist null.</li>
@@ -28,15 +30,20 @@ import javax.swing.JSplitPane
  * </ol>
  */
 class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver {
-
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
+
+    // Daten-Modell:
     private var notice: Notice? = null
     private var selectedPhotos: SelectedPhotos = SelectedPhotos()
+    private var addressPosition: GeoPosition? = null
+
+    // GUI-Komponenten:
     private var allPhotosPanel = AllPhotosPanel(this)
     private var selectedPhotosPanel = SelectedPhotosPanel(this)
     private var selectedPhotosScrollPane = JScrollPane(selectedPhotosPanel)
     private var noticeForm = NoticeForm(this)
 
+    // Split-Panes:
     private var topSplitPane = JSplitPane(JSplitPane.VERTICAL_SPLIT, allPhotosPanel, selectedPhotosScrollPane)
     private var bottomSplitPane = JSplitPane(JSplitPane.HORIZONTAL_SPLIT, noticeForm, JPanel())
     private var mainSplitPane = JSplitPane(JSplitPane.VERTICAL_SPLIT, topSplitPane, bottomSplitPane)
@@ -90,6 +97,15 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
         this.notice = notice
         allPhotosPanel.loadData("20220301_184952.jpg")
         noticeForm.loadData(notice)
+
+        addressPosition = notice.getGeoPosition()
+
+        /*
+        Initial wird keine große Karte angezeigt
+        notice.getGeoPosition()?.let {
+           maxiMap.setAddressPosition(it)
+        }
+        */
     }
 
     fun getDatabaseService(): DatabaseService {
@@ -162,7 +178,7 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
     /**
      * zeigt im Zoom-Bereich ein großes Foto an
      */
-    fun showPhoto(photo: Photo) {
+    private fun showPhoto(photo: Photo) {
         log.debug("show photo")
         val photoPanel = MaxiPhotoPanel(this, photo)
         val scrollPane = JScrollPane(photoPanel)
@@ -182,7 +198,7 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
         //todo scollpane und photo zoomPanel.showSelectedPhoto(miniSelectedPhotoPanel.getPhoto())
         val photoPanel = MaxiSelectedPhotoPanel(this, miniSelectedPhotoPanel.getPhoto())
         val scrollPane = JScrollPane(photoPanel)
-        bottomSplitPane.rightComponent = scrollPane
+        setZoomComponent(scrollPane)
 
         noticeForm.getNoticeFormFields().getMiniMap().displayBorder(false)
         allPhotosPanel.hideBorder()
@@ -198,7 +214,7 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
         //todo scollpane und photo zoomPanel.showSelectedPhoto(miniSelectedPhotoPanel.getPhoto())
         val photoPanel = MaxiSelectedPhotoPanel(this, photo)
         val scrollPane = JScrollPane(photoPanel)
-        bottomSplitPane.rightComponent = scrollPane
+        setZoomComponent(scrollPane)
 
         noticeForm.getNoticeFormFields().getMiniMap().displayBorder(false)
         allPhotosPanel.hideBorder()
@@ -206,15 +222,23 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
     }
 
 
-    fun findAddress(position: GeoPosition) {
-        val worker = AddressWorker(position, noticeForm)
-        worker.execute()
+    private fun findAddress() {
+        log.info("findAddress()")
+        addressPosition?.let {
+            val worker = AddressWorker(it, noticeForm)
+            worker.execute()
+        }
     }
 
+    /**
+     * Die Methode wird vom OK-Button aufgerufen.
+     */
     fun saveNotice() {
+        // todo addressPosition speichern
         noticeForm.getNoticeFormFields().saveNotice()
         val dbService = app.getDatabaseService()
         notice?.let {
+            it.setGeoPosition(addressPosition)
             if (it.id == null) {
                 dbService.insertNotice(it)
                 app.noticeAdded(it)
@@ -225,6 +249,9 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
         }
     }
 
+    /**
+     * Die Methode wird vom Löschen-Button aufgerufen.
+     */
     fun deleteNotice() {
         val dbService = app.getDatabaseService()
         notice?.let {
@@ -233,7 +260,11 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
         }
     }
 
+    /**
+     * Die Methode wird vom E-Mail-absenden-Button aufgerufen.
+     */
     fun sendNotice() {
+        saveNotice()
         notice?.let {
             sendEmail()
             disableFormFields()
@@ -258,13 +289,13 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
      * nur falls es sich um das gleiche Foto handelt.
      */
     override fun selectedPhoto(index: Int, photo: Photo) {
-        log.debug("zick 1")
         getMaxiPhotoPanel()?.let {
-            log.debug("zick 2")
             if (photo == it.getPhoto()) {
-                log.debug("zick 3")
                 showSelectedPhoto(photo)
             }
+        }
+        photo.getGeoPosition()?.run {
+            updateAddressPosition()
         }
     }
 
@@ -273,13 +304,13 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
      * nur falls es sich um das gleiche Foto handelt.
      */
     override fun unselectedPhoto(index: Int, photo: Photo) {
-        log.debug("zuck 1")
         getMaxiSelectedPhotoPanel()?.let {
-            log.debug("zuck 2")
             if (photo == it.getPhoto()) {
-                log.debug("zuck 3")
                 showPhoto(photo)
             }
+        }
+        photo.getGeoPosition()?.run {
+            updateAddressPosition()
         }
     }
 
@@ -291,11 +322,20 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
         return bottomSplitPane.rightComponent
     }
 
+    private fun setZoomComponent(comp: Component) {
+        // ggf. Observer entfernen, wichtig zur Vermeidung eines Memory-Leaks
+        val oldComp = getZoomComponent()
+        if(oldComp is MaxiMapForm) {
+            selectedPhotos.unregisterObserver(oldComp.getMaxiMap())
+        }
+        bottomSplitPane.rightComponent = comp
+    }
+
     /**
      * liefert eine Referenz auf das MaxiMapForm,
      * falls dieses gerade angezeigt wird, sonst null
      */
-    fun getMaxiMapPanel(): MaxiMapForm? {
+    fun getMaxiMapForm(): MaxiMapForm? {
         val zoomComp = getZoomComponent()
         return if(zoomComp is MaxiMapForm) {
             zoomComp
@@ -310,12 +350,9 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
      */
     private fun getMaxiPhotoPanel(): MaxiPhotoPanel? {
         val zoomComp = getZoomComponent()
-        log.debug("zack 1")
         if(zoomComp is JScrollPane) {
-            log.debug("zack 2")
             val v = zoomComp.viewport.view
             if(v is MaxiPhotoPanel) {
-                log.debug("zack 3")
                 return v
             }
         }
@@ -328,15 +365,58 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
      */
     private fun getMaxiSelectedPhotoPanel(): MaxiSelectedPhotoPanel? {
         val zoomComp = getZoomComponent()
-        log.debug("zock 1")
         if(zoomComp is JScrollPane) {
-            log.debug("zock 2")
             val v = zoomComp.viewport.view
             if(v is MaxiSelectedPhotoPanel) {
-                log.debug("zock 3")
                 return v
             }
         }
         return null
+    }
+
+    /**
+     * wird z.B. aufgerufen, wenn ein Foto mit
+     * Geo-Koordinaten ausgewählt oder entfernt wird.
+     * Berechnet automatisch die neue Marker-Position
+     * und benachrichtigt die MiniMap und ggf. die MaxiMap.
+     */
+    private fun updateAddressPosition() {
+        val oldPosition = addressPosition
+        addressPosition = selectedPhotos.getAveragePosition()
+        noticeForm.getNoticeFormFields().getMiniMap().setAddressPosition(addressPosition)
+        getMaxiMapForm()?.setAddressMarker(addressPosition)
+
+        // aus Performance-Gründen:
+        // bei nur minimalen Abweichungen keine neu Addresse suchen
+        addressPosition?.let {
+            if (oldPosition == null || distance(oldPosition, it) > NEARBY_DEGREES) {
+                findAddress()
+            }
+        }
+    }
+
+    companion object {
+        /**
+         * Berechnet die Distanz zwischen 2 Punkten nach dem Satz vom Pythagoras
+         * Die Erdkrümmung wird nicht berücksichtigt
+         * todo: die Erdkrümmung berücksichtigen
+         */
+        private fun distance(positionA: GeoPosition, positionB: GeoPosition): Double {
+            // a = betrag von ( A.longitudeA - B.longitude )
+            // b = betrag von ( A.latitude - B.latitude )
+            // c = wurzel aus ( a im quadrat + b im quadrat)
+            val a = abs(positionA.longitude - positionB.longitude)
+            val b = abs(positionA.latitude - positionA.latitude)
+            val c = sqrt(a * a + b * b)
+            val num1 = " %.7f".format(NEARBY_DEGREES)
+            val num2 = " %.7f".format(c)
+            //log.debug("Schwellwert: $num1, distance = $num2")
+            return c
+        }
+
+        private const val EARTH_CIRCUMFERENCE = 40_075_000.0 // meters
+        private const val WHOLE_CIRCLE = 360.0 // degrees
+        private const val NEARBY_METERS = 6.0 // meters
+        const val NEARBY_DEGREES = NEARBY_METERS * WHOLE_CIRCLE / EARTH_CIRCUMFERENCE
     }
 }

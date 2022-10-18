@@ -7,7 +7,6 @@ import org.jxmapviewer.OSMTileFactoryInfo
 import org.jxmapviewer.viewer.DefaultTileFactory
 import org.jxmapviewer.viewer.GeoPosition
 import org.slf4j.LoggerFactory
-import java.awt.Dimension
 import java.util.*
 
 /**
@@ -40,36 +39,7 @@ open class BaseMap(
         log.debug("init")
         val info = OSMTileFactoryInfo()
         tileFactory = DefaultTileFactory(info)
-        addMouseListener(MiniMapMouseListener(noticeFrame))
         overlayPainter = painter
-        size = Dimension(150, 150)
-        preferredSize = Dimension(150, 150)
-    }
-
-    /**
-     * Der Adress-Marker wird gesetzt, falls vorhanden.
-     * Die Foto-Markers werden indirekt über Observer-Pattern aktualisiert.
-     */
-    fun setAddrLocation(addressLocation: GeoPosition?) {
-        log.debug("setAddrLocation")
-
-        if (addressLocation == null) {
-            addressMarker?.let {
-                remove(it.getLabel())
-                addressMarker = null
-            }
-        } else {
-            addressMarker?.let {
-                it.position = addressLocation
-            } ?: run {
-                val newAddressMarker = AddressMarker(addressLocation)
-                add(newAddressMarker.getLabel(), 0)
-                addressMarker = newAddressMarker
-            }
-        }
-
-        updatePainterWaypoints()
-        fitToMarkers()
     }
 
     private fun updatePainterWaypoints() {
@@ -110,7 +80,7 @@ open class BaseMap(
             add(marker.getLabel(), compIndex)
         }
 
-        //updateAddressLocation()
+        // todo nicht immer alles notwendig
         updatePainterWaypoints()
         fitToMarkers()
         revalidate()
@@ -123,7 +93,6 @@ open class BaseMap(
             log.debug("photoMarker: ${m.getLabel().text}")
         }
     }
-
 
 
     /**
@@ -146,7 +115,8 @@ open class BaseMap(
         for (i in markerIndex until photoMarkers.size) {
             photoMarkers[i].decrementPhotoIndex()
         }
-        //updateAddressLocation()
+
+        // todo nicht immer alles notwendig
         updatePainterWaypoints()
         fitToMarkers()
         revalidate()
@@ -186,9 +156,6 @@ open class BaseMap(
             add(iterator.next().getLabel())
         }
 
-        // ggf. Adress-Location anpassen und Karten-Bereich neu justieren
-        // todo adress-location nur updaten, wenn Foto hinzugefügt oder entfernt wird, nicht hier
-        //updateAddressLocation()
         updatePainterWaypoints()
         fitToMarkers()
     }
@@ -201,13 +168,12 @@ open class BaseMap(
         for (marker in photoMarkers) {
             fitPoints.add(marker.position)
         }
-        val aM = addressMarker
-        if (aM != null) {
-            fitPoints.add(aM.position)
+        addressMarker?.let {
+            fitPoints.add(it.position)
         }
 
         fitPoints.forEach {
-            log.debug("fitPoint: $")
+            log.debug("fitPoint: $it")
         }
 
         when (fitPoints.size) {
@@ -223,10 +189,38 @@ open class BaseMap(
 
             else -> {
                 log.debug("zoom: $zoom")
-                zoomToBestFit(fitPoints, 0.4)
+                // todo Prio 2: Bug in JXMapViewer2 beheben, 2 mal gleiche Latitude/Longitude
+                zoomToBestFit(fitPoints, 0.5)
                 log.debug("zoom: $zoom")
             }
         }
     }
 
+    /**
+     * Die Methode setzt den AddressMarker neu, oder entfernt ihn.
+     * Sie wird für die MaxiMap von NoticeFrame aufgerufen.
+     * Für MiniMap indirekt von NoticeFormFields.
+     */
+    fun setAddressPosition(addressPosition: GeoPosition?) {
+        if(addressPosition == null) {
+            addressMarker?.let {
+                remove(it.getLabel())
+                addressMarker = null
+            }
+        } else {
+            val aM = addressMarker
+            if (aM == null) {
+                addressMarker = AddressMarker(addressPosition)
+                addressMarker?.let {
+                    add(it.getLabel(), 0)
+                }
+            } else {
+                aM.position = addressPosition
+            }
+        }
+        updatePainterWaypoints()
+        fitToMarkers()
+        revalidate()
+        repaint()
+    }
 }
