@@ -24,6 +24,8 @@ class FirstSwingTest {
     @BeforeEach
     fun setUp() {
         log.debug("setUp()")
+        application(WegeFrei::class.java).start()
+
         rob = BasicRobot.robotWithCurrentAwtHierarchy()
         assertNotNull(rob)
         //rob?.waitForIdle()
@@ -32,26 +34,24 @@ class FirstSwingTest {
     }
 
     @Test
-    fun clickOnNewNotice() {
+    fun click_on_new_notice_window_opens() {
         assertNotNull(noticesWindow)
         noticesWindow?.button(withText("neue Meldung erfassen"))?.click()
 
         val noticeWindow = findFrame(NewNoticeFrameMatcher()).using(rob)
         noticeWindow?.button(withText("Abbrechen"))?.click()
-
-        Thread.sleep(5000)
     }
 
     @Test
-    fun clickOnScanButton_nothingHappens() {
+    fun click_on_scan_button_nothing_happens_in_gui() {
         assertNotNull(noticesWindow)
         noticesWindow?.button(withText("Scan"))?.click()
     }
 
     @AfterEach
     fun tearDown() {
-        noticesWindow?.cleanUp()
         // Cleans up any used resources (keyboard, mouse, open windows and ScreenLock) used by this robot.
+        noticesWindow?.cleanUp()
     }
 
     companion object {
@@ -61,8 +61,7 @@ class FirstSwingTest {
         @JvmStatic
         fun setUpOnce() {
             LOG.debug("setUpOnce()")
-            FailOnThreadViolationRepaintManager.install();
-            application(WegeFrei::class.java).start()
+            FailOnThreadViolationRepaintManager.install()
         }
 
         @AfterAll

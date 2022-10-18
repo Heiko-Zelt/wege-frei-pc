@@ -54,6 +54,8 @@ class WegeFrei {
         noticesFrame.noticeDeleted(notice)
     }
 
+    // todo Prio 3: Hintergrundjob und Status-Balken anzeigen
+    // todo Prio 3: erst Anzahl der Dateien ermitteln, dann einlesen
     fun scanForNewPhotos() {
         log.info("scanning for new images...")
 
