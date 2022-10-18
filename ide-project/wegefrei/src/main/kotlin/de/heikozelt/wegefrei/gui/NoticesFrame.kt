@@ -1,6 +1,6 @@
 package de.heikozelt.wegefrei.gui
 
-import de.heikozelt.wegefrei.App
+import de.heikozelt.wegefrei.WegeFrei
 import de.heikozelt.wegefrei.entities.Notice
 import de.heikozelt.wegefrei.jobs.LoadNoticesWorker
 import de.heikozelt.wegefrei.model.NoticesTableModel
@@ -20,7 +20,7 @@ import javax.swing.JTable
  *       Das kann etwas länger dauern und läuft in einem Hintergrund-Thread.</li>
  * </ol>
  */
-class NoticesFrame(private val app: App) : JFrame("Meldungen - Wege frei!") {
+class NoticesFrame(private val app: WegeFrei) : JFrame("Meldungen - Wege frei!") {
 
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
     private val scrollPanel = JPanel(BorderLayout())

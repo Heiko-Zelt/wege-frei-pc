@@ -1,6 +1,6 @@
 package de.heikozelt.wegefrei.gui
 
-import de.heikozelt.wegefrei.App
+import de.heikozelt.wegefrei.WegeFrei
 import de.heikozelt.wegefrei.model.NoticesTableModel
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
@@ -9,7 +9,7 @@ import javax.swing.JTable
 /**
  * Ein Doppelklick auf eine Meldung in der Tabelle öffnet ein Fenster zum Bearbeiten der Meldung.
  */
-class NoticesTableMouseListener(private val app: App): MouseAdapter() {
+class NoticesTableMouseListener(private val app: WegeFrei): MouseAdapter() {
     override fun mouseClicked(me: MouseEvent) {
         if (me.clickCount == 2) { // double click
             val table = me.source as JTable

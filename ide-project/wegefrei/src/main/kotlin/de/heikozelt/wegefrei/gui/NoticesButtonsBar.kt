@@ -1,6 +1,6 @@
 package de.heikozelt.wegefrei.gui
 
-import de.heikozelt.wegefrei.App
+import de.heikozelt.wegefrei.WegeFrei
 import de.heikozelt.wegefrei.entities.Notice
 import de.heikozelt.wegefrei.gui.Styles.Companion.BUTTONS_DISTANCE
 import de.heikozelt.wegefrei.gui.Styles.Companion.BUTTON_MARGIN
@@ -11,7 +11,7 @@ import javax.swing.ImageIcon
 import javax.swing.JButton
 import javax.swing.JPanel
 
-class NoticesButtonsBar(private val app: App): JPanel() {
+class NoticesButtonsBar(private val app: WegeFrei): JPanel() {
 
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
     init {

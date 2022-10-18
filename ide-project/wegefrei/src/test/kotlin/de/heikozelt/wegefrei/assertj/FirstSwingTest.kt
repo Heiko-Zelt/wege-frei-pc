@@ -1,6 +1,6 @@
 package de.heikozelt.wegefrei.assertj
 
-import de.heikozelt.wegefrei.Main
+import de.heikozelt.wegefrei.WegeFrei
 import org.assertj.swing.core.BasicRobot
 import org.assertj.swing.core.Robot
 import org.assertj.swing.core.matcher.JButtonMatcher.withText
@@ -62,7 +62,7 @@ class FirstSwingTest {
         fun setUpOnce() {
             LOG.debug("setUpOnce()")
             FailOnThreadViolationRepaintManager.install();
-            application(Main::class.java).start()
+            application(WegeFrei::class.java).start()
         }
 
         @AfterAll

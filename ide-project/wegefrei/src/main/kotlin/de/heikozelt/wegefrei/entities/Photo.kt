@@ -1,6 +1,6 @@
 package de.heikozelt.wegefrei.entities
 
-import de.heikozelt.wegefrei.App
+import de.heikozelt.wegefrei.WegeFrei
 import jakarta.persistence.*
 import org.jxmapviewer.viewer.GeoPosition
 import org.slf4j.LoggerFactory
@@ -64,7 +64,7 @@ class Photo (
     }
 
     fun loadImage() {
-        val file = File(App.PHOTO_DIR, filename)
+        val file = File(WegeFrei.PHOTO_DIR, filename)
         //val photo = readPhotoMetadata(file)
         img = ImageIO.read(file)
     }

@@ -41,8 +41,7 @@ compileTestKotlin {
 }
 
 application {
-    //mainClassName = 'MainKt'
-    mainClass.set('de.heikozelt.wegefrei.Main')
+    mainClass.set('de.heikozelt.wegefrei.WegeFrei')
 }
 
 task copyRuntimeLibs(type: Copy) {

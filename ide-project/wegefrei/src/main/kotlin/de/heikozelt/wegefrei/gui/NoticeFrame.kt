@@ -1,6 +1,6 @@
 package de.heikozelt.wegefrei.gui
 
-import de.heikozelt.wegefrei.App
+import de.heikozelt.wegefrei.WegeFrei
 import de.heikozelt.wegefrei.DatabaseService
 import de.heikozelt.wegefrei.entities.Notice
 import de.heikozelt.wegefrei.entities.Photo
@@ -25,7 +25,7 @@ import javax.swing.JSplitPane
  *   <li>Instanziierung mit Notice als Parameter zum Bearbeiten einer bestehenden Meldung. notice.id enthält eine Zahl.</li>
  * </ol>
  */
-class NoticeFrame(private val app: App) : JFrame() {
+class NoticeFrame(private val app: WegeFrei) : JFrame() {
 
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
     private var notice: Notice? = null

@@ -8,12 +8,13 @@ import de.heikozelt.wegefrei.entities.Notice
 import de.heikozelt.wegefrei.entities.Photo
 import de.heikozelt.wegefrei.gui.NoticesFrame
 import org.slf4j.LoggerFactory
+import java.awt.EventQueue
 import java.io.File
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.*
 
-class App {
+class WegeFrei {
 
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
     //kotlin-logging: private val log = KotlinLogging.logger {}
@@ -113,5 +114,29 @@ class App {
     companion object {
         // todo: Einstellungen in DB speichern und Ort der Datenbank via Kommando-Zeilen-Parameter übergeben
         const val PHOTO_DIR = "/media/veracrypt1/_Fotos/2022/03"
+
+        private val LOG = LoggerFactory.getLogger(this::class.java.canonicalName)
+
+        @JvmStatic
+        fun main(args: Array<String>) {
+            LOG.info("Wege frei!")
+            LOG.debug("Program arguments: ${args.joinToString()}")
+
+            /*
+            try {
+                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            } catch (e: Exception) {
+                LOG.error("exception while setting look and feel", e)
+            }
+            */
+
+            val shutdownHook = Thread { LOG.info("exit") }
+            Runtime.getRuntime().addShutdownHook(shutdownHook)
+
+            EventQueue.invokeLater { WegeFrei() }
+
+            LOG.debug("de.heikozelt.wegefrei.main function finished")
+        }
+
     }
 }
