@@ -1,14 +1,16 @@
 package de.heikozelt.wegefrei.gui
 
-import de.heikozelt.wegefrei.WegeFrei
 import de.heikozelt.wegefrei.DatabaseService
+import de.heikozelt.wegefrei.WegeFrei
 import de.heikozelt.wegefrei.entities.Notice
 import de.heikozelt.wegefrei.entities.Photo
 import de.heikozelt.wegefrei.gui.Styles.Companion.FRAME_BACKGROUND
 import de.heikozelt.wegefrei.jobs.AddressWorker
 import de.heikozelt.wegefrei.model.SelectedPhotos
+import de.heikozelt.wegefrei.model.SelectedPhotosObserver
 import org.jxmapviewer.viewer.GeoPosition
 import org.slf4j.LoggerFactory
+import java.awt.Component
 import java.time.ZonedDateTime
 import java.util.*
 import javax.swing.JFrame
@@ -25,7 +27,7 @@ import javax.swing.JSplitPane
  *   <li>Instanziierung mit Notice als Parameter zum Bearbeiten einer bestehenden Meldung. notice.id enthält eine Zahl.</li>
  * </ol>
  */
-class NoticeFrame(private val app: WegeFrei) : JFrame() {
+class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver {
 
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
     private var notice: Notice? = null
@@ -72,10 +74,12 @@ class NoticeFrame(private val app: WegeFrei) : JFrame() {
      */
     fun loadData(notice: Notice) {
         log.debug("loadData(notice id: ${notice.id})")
+        selectedPhotos.registerObserver(this)
         selectedPhotos.registerObserver(selectedPhotosPanel)
         selectedPhotos.registerObserver(allPhotosPanel)
         selectedPhotos.registerObserver(noticeForm.getNoticeFormFields())
         selectedPhotos.registerObserver(noticeForm.getNoticeFormFields().getMiniMap())
+
         selectedPhotos.setPhotos(TreeSet(notice.photos))
 
         title = if(notice.id == null) {
@@ -108,40 +112,18 @@ class NoticeFrame(private val app: WegeFrei) : JFrame() {
      * wählt ein Foto aus
      */
     fun selectPhoto(photo: Photo) {
-        log.debug("select photo")
+        log.debug("selectPhoto(photo=${photo.filename}")
         selectedPhotos.add(photo)
-        //allPhotosPanel.deactivatePhoto(photo)
-        log.debug("selected photo: $photo")
-        selectedPhotosPanel.showBorder(photo)
-        bottomSplitPane.rightComponent = MaxiSelectedPhotoPanel(this, photo)
+        // alle weiteren Aktionen via Observers
     }
-
-    /**
-     * entfernt ein Foto aus der Auswahl für die Meldung
-    fun unselectPhoto(photoPanel: MiniSelectedPhotoPanel) {
-    log.debug("unselect photo")
-    selectedPhotosPanel.removePhoto(photoPanel)
-    allPhotosPanel.activatePhoto(photoPanel.getPhoto())
-    val photo = photoPanel.getPhoto()
-    zoomPanel.showPhoto(photo)
-    allPhotosPanel.showBorder(photo)
-    selectedPhotosPanel.hideBorder()
-    }
-     */
 
     /**
      * entfernt ein Foto aus der Auswahl für die Meldung
      */
     fun unselectPhoto(photo: Photo) {
-        log.debug("unselect photo")
-        //val index = selectedPhotosPanel.indexOfPhoto(photo)
-        //val index = selectedPhotos.getPhotos().indexOf(photo)
-        //noticeForm.getMiniMap().removeMarker(index)
-        //selectedPhotosPanel.removePhoto(photo)
+        log.debug("unselectPhoto(photo=${photo.filename}")
         selectedPhotos.remove(photo)
-        //todo scrollpane und photo zoomPanel.showPhoto(photo)
-        selectedPhotosPanel.hideBorder()
-        bottomSplitPane.rightComponent = MaxiPhotoPanel(this, photo)
+        // alle weiteren Aktionen via Observers
     }
 
     /**
@@ -150,11 +132,13 @@ class NoticeFrame(private val app: WegeFrei) : JFrame() {
     fun showMaxiMap() {
         log.debug("show maxi map")
         val maxiMapForm = MaxiMapForm(this)
+        val maxiMap = maxiMapForm.getMaxiMap()
         bottomSplitPane.rightComponent = maxiMapForm
         notice?.let {
             maxiMapForm.setAddressMarker(it.getGeoPosition())
             maxiMapForm.setPhotoMarkers(selectedPhotos)
         }
+        maxiMap.replacedPhotoSelection(selectedPhotos.getPhotos())
 
         noticeForm.getNoticeFormFields().getMiniMap().displayBorder(true)
         allPhotosPanel.hideBorder()
@@ -176,6 +160,20 @@ class NoticeFrame(private val app: WegeFrei) : JFrame() {
     }
 
     /**
+     * zeigt im Zoom-Bereich ein großes Foto an
+     */
+    fun showPhoto(photo: Photo) {
+        log.debug("show photo")
+        val photoPanel = MaxiPhotoPanel(this, photo)
+        val scrollPane = JScrollPane(photoPanel)
+        bottomSplitPane.rightComponent = scrollPane
+
+        noticeForm.getNoticeFormFields().getMiniMap().displayBorder(false)
+        allPhotosPanel.showBorder(photo)
+        selectedPhotosPanel.hideBorder()
+    }
+
+    /**
      * zeigt im Zoom-Bereich ein großes bereits ausgewähltes Foto an
      */
     fun showSelectedPhoto(miniSelectedPhotoPanel: MiniSelectedPhotoPanel) {
@@ -189,6 +187,22 @@ class NoticeFrame(private val app: WegeFrei) : JFrame() {
         noticeForm.getNoticeFormFields().getMiniMap().displayBorder(false)
         allPhotosPanel.hideBorder()
         selectedPhotosPanel.showBorder(miniSelectedPhotoPanel)
+    }
+
+    /**
+     * zeigt im Zoom-Bereich ein großes bereits ausgewähltes Foto an
+     */
+    private fun showSelectedPhoto(photo: Photo) {
+        log.debug("show selected photo")
+
+        //todo scollpane und photo zoomPanel.showSelectedPhoto(miniSelectedPhotoPanel.getPhoto())
+        val photoPanel = MaxiSelectedPhotoPanel(this, photo)
+        val scrollPane = JScrollPane(photoPanel)
+        bottomSplitPane.rightComponent = scrollPane
+
+        noticeForm.getNoticeFormFields().getMiniMap().displayBorder(false)
+        allPhotosPanel.hideBorder()
+        selectedPhotosPanel.showBorder(photo)
     }
 
 
@@ -237,5 +251,92 @@ class NoticeFrame(private val app: WegeFrei) : JFrame() {
     private fun sendEmail() {
         log.debug("sending email is not yet implemented")
         // todo Prio 2 E-Mail versenden
+    }
+
+    /**
+     * tausche nicht ausgewähltes durch ausgewähltes Foto,
+     * nur falls es sich um das gleiche Foto handelt.
+     */
+    override fun selectedPhoto(index: Int, photo: Photo) {
+        log.debug("zick 1")
+        getMaxiPhotoPanel()?.let {
+            log.debug("zick 2")
+            if (photo == it.getPhoto()) {
+                log.debug("zick 3")
+                showSelectedPhoto(photo)
+            }
+        }
+    }
+
+    /**
+     * tausche ausgewähltes durch nicht ausgewähltes Foto,
+     * nur falls es sich um das gleiche Foto handelt.
+     */
+    override fun unselectedPhoto(index: Int, photo: Photo) {
+        log.debug("zuck 1")
+        getMaxiSelectedPhotoPanel()?.let {
+            log.debug("zuck 2")
+            if (photo == it.getPhoto()) {
+                log.debug("zuck 3")
+                showPhoto(photo)
+            }
+        }
+    }
+
+    override fun replacedPhotoSelection(photos: TreeSet<Photo>) {
+        // todo was ist denn hier zu tun?
+    }
+
+    fun getZoomComponent(): Component {
+        return bottomSplitPane.rightComponent
+    }
+
+    /**
+     * liefert eine Referenz auf das MaxiMapForm,
+     * falls dieses gerade angezeigt wird, sonst null
+     */
+    fun getMaxiMapPanel(): MaxiMapForm? {
+        val zoomComp = getZoomComponent()
+        return if(zoomComp is MaxiMapForm) {
+            zoomComp
+        } else {
+            null
+        }
+    }
+
+    /**
+     * liefert eine Referenz auf das MaxiPhotoPanel,
+     * falls dieses gerade angezeigt wird, sonst null
+     */
+    private fun getMaxiPhotoPanel(): MaxiPhotoPanel? {
+        val zoomComp = getZoomComponent()
+        log.debug("zack 1")
+        if(zoomComp is JScrollPane) {
+            log.debug("zack 2")
+            val v = zoomComp.viewport.view
+            if(v is MaxiPhotoPanel) {
+                log.debug("zack 3")
+                return v
+            }
+        }
+        return null
+    }
+
+    /**
+     * liefert eine Referenz auf das MaxiSelectedPhotoPanel,
+     * falls dieses gerade angezeigt wird, sonst null
+     */
+    private fun getMaxiSelectedPhotoPanel(): MaxiSelectedPhotoPanel? {
+        val zoomComp = getZoomComponent()
+        log.debug("zock 1")
+        if(zoomComp is JScrollPane) {
+            log.debug("zock 2")
+            val v = zoomComp.viewport.view
+            if(v is MaxiSelectedPhotoPanel) {
+                log.debug("zock 3")
+                return v
+            }
+        }
+        return null
     }
 }

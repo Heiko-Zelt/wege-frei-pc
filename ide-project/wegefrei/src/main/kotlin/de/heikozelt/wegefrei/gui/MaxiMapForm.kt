@@ -15,7 +15,7 @@ import javax.swing.JPanel
 class MaxiMapForm(private val noticeFrame: NoticeFrame) : JPanel() {
 
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
-    private val maxiMap = MaxiMap()
+    private val maxiMap = MaxiMap(noticeFrame)
     private val maxiMapButtonsBar = MaxiMapButtonsBar(noticeFrame)
 
     init {
@@ -41,5 +41,9 @@ class MaxiMapForm(private val noticeFrame: NoticeFrame) : JPanel() {
 
     fun disableMap() {
         // todo: implementieren Karte deaktivieren
+    }
+
+    fun getMaxiMap(): MaxiMap {
+        return maxiMap
     }
 }

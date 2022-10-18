@@ -47,18 +47,29 @@ class SelectedPhotosPanel(private val noticeFrame: NoticeFrame) : JPanel(),
         return null
     }
 
+    /**
+     * zeigt bei einem Panel den Rahmen hervorgehoben an,
+     * bei allen anderen normal
+     */
     fun showBorder(miniSelectedPhotoPanel: MiniSelectedPhotoPanel) {
         for (panel in miniSelectedPhotoPanels) {
             panel.displayBorder(panel == miniSelectedPhotoPanel)
         }
     }
 
+    /**
+     * zeigt bei einem Panel den Rahmen hervorgehoben an,
+     * bei allen anderen normal
+     */
     fun showBorder(photo: Photo) {
         for (panel in miniSelectedPhotoPanels) {
             panel.displayBorder(photo == panel.getPhoto())
         }
     }
 
+    /**
+     * zeigt bei allen Panel den Rahmen normal an
+     */
     fun hideBorder() {
         for (panel in miniSelectedPhotoPanels) {
             panel.displayBorder(false)
@@ -76,6 +87,20 @@ class SelectedPhotosPanel(private val noticeFrame: NoticeFrame) : JPanel(),
         for(i in index + 1 until miniSelectedPhotoPanels.size) {
             miniSelectedPhotoPanels[i].updateText(i)
         }
+
+        // todo gemeinsame Basis-Klasse für MaxiPhotoPanel und MaxiSelectedPhotoPanel
+        val zoomComponent = noticeFrame.getZoomComponent()
+        if(zoomComponent is MaxiPhotoPanel) {
+            if(photo == zoomComponent.getPhoto()) {
+                panel.displayBorder(true)
+            }
+        }
+        if(zoomComponent is MaxiSelectedPhotoPanel ) {
+            if(photo == zoomComponent.getPhoto()) {
+                panel.displayBorder(true)
+            }
+        }
+
         revalidate()
         repaint()
     }

@@ -67,6 +67,7 @@ class AllPhotosPanel(private val noticeFrame: NoticeFrame) : JPanel(), SelectedP
     }
 
     private fun deactivatePhoto(photo: Photo) {
+        log.debug("deactivate")
         panelWithPhoto(photo)?.deactivate()
     }
 
@@ -76,7 +77,7 @@ class AllPhotosPanel(private val noticeFrame: NoticeFrame) : JPanel(), SelectedP
         }
     }
 
-    private fun showBorder(photo: Photo) {
+    fun showBorder(photo: Photo) {
         for (panel in miniPhotoPanels) {
             panel.displayBorder(photo == panel.getPhoto())
         }
@@ -103,7 +104,7 @@ class AllPhotosPanel(private val noticeFrame: NoticeFrame) : JPanel(), SelectedP
      */
     override fun unselectedPhoto(index: Int, photo: Photo) {
         log.debug("unselectedPhoto(index = $index)")
-        showBorder(photo)
+        //showBorder(photo) nicht in jedem Fall
         activatePhoto(photo)
     }
 

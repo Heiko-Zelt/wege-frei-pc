@@ -41,7 +41,9 @@ class MiniPhotoPanel(private val noticeFrame: NoticeFrame, private val photo: Ph
         thumbnailLabel.border = NORMAL_BORDER
 
         mouseListener = MiniPhotoPanelMouseListener(noticeFrame, this)
-        if (active) {
+        //thumbnailLabel.isEnabled = active
+        //thumbnailLabel.addMouseListener(mouseListener)
+        if(active) {
             thumbnailLabel.addMouseListener(mouseListener)
         }
 
@@ -73,24 +75,27 @@ class MiniPhotoPanel(private val noticeFrame: NoticeFrame, private val photo: Ph
     }
 
     fun activate() {
+        log.debug("activate()")
         active = true
 
         val worker = ThumbnailWorker(photo, active, thumbnailLabel)
         worker.execute()
 
         button.isEnabled = true
+        //thumbnailLabel.isEnabled = true
         thumbnailLabel.addMouseListener(mouseListener)
-        log.debug("activate")
     }
 
     fun deactivate() {
+        log.debug("deactivate()")
         active = false
 
         val worker = ThumbnailWorker(photo, active, thumbnailLabel)
         worker.execute()
 
         button.isEnabled = false
-        log.debug("deactivate")
+        //thumbnailLabel.isEnabled = false
+        thumbnailLabel.removeMouseListener(mouseListener)
     }
 
     fun displayBorder(visible: Boolean) {
