@@ -17,7 +17,7 @@ class MarkerPainter: WaypointPainter<Marker>() {
             val y = (point.y - rectangle.getY()).toInt()
             val label = waypoint.getLabel()
             val labelX = x - label.width / 2 // zentriert
-            val labelY = if(waypoint is AddressMarker) {
+            val labelY = if(waypoint is OffenseMarker) {
                 y - label.height // Unterkante
             } else { // is PhotoMarker
                 y - label.height / 2 // mittig

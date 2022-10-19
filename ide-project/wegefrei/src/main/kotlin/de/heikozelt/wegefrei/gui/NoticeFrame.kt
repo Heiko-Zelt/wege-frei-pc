@@ -35,7 +35,7 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
     // Daten-Modell:
     private var notice: Notice? = null
     private var selectedPhotos: SelectedPhotos = SelectedPhotos()
-    private var addressPosition: GeoPosition? = null
+    private var offensePosition: GeoPosition? = null
 
     // GUI-Komponenten:
     private var allPhotosPanel = AllPhotosPanel(this)
@@ -98,7 +98,7 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
         allPhotosPanel.loadData("20220301_184952.jpg")
         noticeForm.loadData(notice)
 
-        addressPosition = notice.getGeoPosition()
+        offensePosition = notice.getGeoPosition()
 
         /*
         Initial wird keine große Karte angezeigt
@@ -147,16 +147,12 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
      */
     fun showMaxiMap() {
         log.debug("show maxi map")
+        // todo: do nothing if it is already shown
         val maxiMapForm = MaxiMapForm(this)
-        //val maxiMap = maxiMapForm.getMaxiMap()
+        selectedPhotos.registerObserver(maxiMapForm.getMaxiMap())
         setZoomComponent(maxiMapForm)
-        //bottomSplitPane.rightComponent = maxiMapForm
-        notice?.let {
-            maxiMapForm.setAddressMarker(it.getGeoPosition())
-            maxiMapForm.setPhotoMarkers(selectedPhotos)
-        }
-        // irgendwie doppelt
-        //maxiMap.replacedPhotoSelection(selectedPhotos.getPhotos())
+        maxiMapForm.setOffenseMarker(offensePosition)
+        maxiMapForm.setPhotoMarkers(selectedPhotos)
 
         noticeForm.getNoticeFormFields().getMiniMap().displayBorder(true)
         allPhotosPanel.hideBorder()
@@ -226,7 +222,7 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
 
     private fun findAddress() {
         log.info("findAddress()")
-        addressPosition?.let {
+        offensePosition?.let {
             val worker = AddressWorker(it, noticeForm)
             worker.execute()
         }
@@ -240,7 +236,7 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
         noticeForm.getNoticeFormFields().saveNotice()
         val dbService = app.getDatabaseService()
         notice?.let {
-            it.setGeoPosition(addressPosition)
+            it.setGeoPosition(offensePosition)
             if (it.id == null) {
                 dbService.insertNotice(it)
                 app.noticeAdded(it)
@@ -297,7 +293,7 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
             }
         }
         photo.getGeoPosition()?.run {
-            updateAddressPosition()
+            updateOffensePosition()
         }
     }
 
@@ -312,7 +308,7 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
             }
         }
         photo.getGeoPosition()?.run {
-            updateAddressPosition()
+            updateOffensePosition()
         }
     }
 
@@ -382,19 +378,29 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
      * Berechnet automatisch die neue Marker-Position
      * und benachrichtigt die MiniMap und ggf. die MaxiMap.
      */
-    private fun updateAddressPosition() {
-        val oldPosition = addressPosition
-        addressPosition = selectedPhotos.getAveragePosition()
-        noticeForm.getNoticeFormFields().getMiniMap().setAddressPosition(addressPosition)
-        getMaxiMapForm()?.setAddressMarker(addressPosition)
+    fun updateOffensePosition() {
+        val oldPosition = offensePosition
+        offensePosition = selectedPhotos.getAveragePosition()
+        noticeForm.getNoticeFormFields().getMiniMap().setOffensePosition(offensePosition)
+        getMaxiMapForm()?.setOffenseMarker(offensePosition)
 
         // aus Performance-Gründen:
         // bei nur minimalen Abweichungen keine neu Addresse suchen
-        addressPosition?.let {
+        offensePosition?.let {
             if (oldPosition == null || distance(oldPosition, it) > NEARBY_DEGREES) {
                 findAddress()
             }
         }
+    }
+
+    /**
+     * Entfernt die Adress-Position und die beiden Adress-Marker.
+     * Die Adressdaten (Straße, PLZ und Ort) bleiben im Formular erhalten, falls vorhanden.
+     */
+    fun deleteOffensePosition() {
+        offensePosition = null
+        noticeForm.getNoticeFormFields().getMiniMap().setOffensePosition(null)
+        getMaxiMapForm()?.setOffenseMarker(null)
     }
 
     companion object {

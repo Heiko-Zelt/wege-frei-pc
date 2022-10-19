@@ -29,9 +29,9 @@ class MaxiMapForm(private val noticeFrame: NoticeFrame) : JPanel() {
         isVisible = true
     }
 
-    fun setAddressMarker(addressPosition: GeoPosition?) {
-        maxiMap.setAddressPosition(addressPosition)
-        maxiMapButtonsBar.setAddressPosition(addressPosition)
+    fun setOffenseMarker(offensePosition: GeoPosition?) {
+        maxiMap.setOffensePosition(offensePosition)
+        maxiMapButtonsBar.setAddressPosition(offensePosition)
     }
 
     fun setPhotoMarkers(selectedPhotos: SelectedPhotos) {

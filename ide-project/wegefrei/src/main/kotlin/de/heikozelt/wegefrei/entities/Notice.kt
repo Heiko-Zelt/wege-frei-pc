@@ -71,6 +71,10 @@ class Notice(
     @Column
     var duration: Int? = null,
 
+    /**
+     * Ordnungswidrigkeit/Verstoß
+     * American English: offense, British: offence
+     */
     @Column
     var offense: Int? = null,
 

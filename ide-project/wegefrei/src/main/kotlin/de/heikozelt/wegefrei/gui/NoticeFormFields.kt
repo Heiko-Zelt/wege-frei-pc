@@ -301,7 +301,7 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel(), Selecte
         }
 
         notice.getGeoPosition()?.let {
-            miniMap.setAddressPosition(it)
+            miniMap.setOffensePosition(it)
         }
 
         val countrySymbol = CountrySymbol.fromAbbreviation(notice.countrySymbol)

@@ -27,6 +27,9 @@ class MiniMap(
         addMouseListener(MiniMapMouseListener(noticeFrame))
     }
 
+    /**
+     * Rahmen hervorheben oder nicht
+     */
     fun displayBorder(visible: Boolean) {
         if (visible && !borderVisible) {
             border = HIGHLIGHT_BORDER
@@ -38,6 +41,4 @@ class MiniMap(
             borderVisible = false
         }
     }
-
-
 }

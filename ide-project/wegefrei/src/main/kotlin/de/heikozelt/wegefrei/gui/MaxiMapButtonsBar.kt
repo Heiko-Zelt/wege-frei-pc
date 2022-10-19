@@ -11,8 +11,8 @@ import javax.swing.JPanel
  */
 class MaxiMapButtonsBar(private val noticeFrame: NoticeFrame, private val maxiMapForm: MaxiMapForm): JPanel() {
     private val fitButton = JButton("Anpassen")
-    private val addButton = JButton("Adress-Marker setzen")
-    private val removeButton = JButton("Adress-Marker entfernen")
+    private val addButton = JButton("Tatort-Marker setzen")
+    private val removeButton = JButton("Tatort-Marker entfernen")
 
     init {
         layout = FlowLayout(FlowLayout.RIGHT, 5,0)
@@ -26,12 +26,20 @@ class MaxiMapButtonsBar(private val noticeFrame: NoticeFrame, private val maxiMa
         add(fitStruts);
 
         addButton.margin = Styles.BUTTON_MARGIN
-        addButton.addActionListener {/* todo: implemntieren */ }
+        addButton.addActionListener {
+            noticeFrame.updateOffensePosition()
+            addButton.isVisible = false
+            removeButton.isVisible = true
+        }
         addButton.isVisible = false
         add(addButton)
 
         removeButton.margin = Styles.BUTTON_MARGIN
-        removeButton.addActionListener { /* todo: implementieren */ }
+        removeButton.addActionListener {
+            noticeFrame.deleteOffensePosition()
+            removeButton.isVisible = false
+            addButton.isVisible = true
+        }
         removeButton.isVisible = false
         add(removeButton)
 

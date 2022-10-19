@@ -31,9 +31,9 @@ open class BaseMap(
 
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
     private val painter = MarkerPainter()
-    protected val photoMarkers = LinkedList<PhotoMarker>()
-    protected var addressMarker: AddressMarker? = null
-    protected var selectedPhotos = noticeFrame.getSelectedPhotos()
+    private val photoMarkers = LinkedList<PhotoMarker>()
+    private var offenseMarker: OffenseMarker? = null
+    private var selectedPhotos = noticeFrame.getSelectedPhotos()
 
     init {
         log.debug("init")
@@ -45,7 +45,7 @@ open class BaseMap(
     private fun updatePainterWaypoints() {
         val markers = mutableSetOf<Marker>()
         markers.addAll(photoMarkers)
-        val aM = addressMarker
+        val aM = offenseMarker
         if (aM != null) {
             markers.add(aM)
         }
@@ -133,6 +133,7 @@ open class BaseMap(
      * alle Foto-Markers müssen ersetzt werden
      */
     override fun replacedPhotoSelection(photos: TreeSet<Photo>) {
+        log.debug("replacedPhotoSelection(photos.size=${photos.size}")
         // alle bestehenden Foto-Marker entfernen
         // (aber den ggf. existieren Adress-Marker behalten)
         for (photoMarker in photoMarkers) {
@@ -160,6 +161,9 @@ open class BaseMap(
         fitToMarkers()
     }
 
+    /**
+     * todo: Wann werden width und height initialisiert? Vorher revalidate() aufrufen?
+     */
     fun fitToMarkers() {
         log.debug("fitToMarkers()")
         // 2 identische Geo-Positionen können keine Bounding Box mit Ausdehnung bilden
@@ -168,7 +172,7 @@ open class BaseMap(
         for (marker in photoMarkers) {
             fitPoints.add(marker.position)
         }
-        addressMarker?.let {
+        offenseMarker?.let {
             fitPoints.add(it.position)
         }
 
@@ -202,21 +206,21 @@ open class BaseMap(
      * Sie wird für die MaxiMap von NoticeFrame aufgerufen.
      * Für MiniMap indirekt von NoticeFormFields.
      */
-    fun setAddressPosition(addressPosition: GeoPosition?) {
-        if(addressPosition == null) {
-            addressMarker?.let {
+    fun setOffensePosition(offensePosition: GeoPosition?) {
+        if(offensePosition == null) {
+            offenseMarker?.let {
                 remove(it.getLabel())
-                addressMarker = null
+                offenseMarker = null
             }
         } else {
-            val aM = addressMarker
-            if (aM == null) {
-                addressMarker = AddressMarker(addressPosition)
-                addressMarker?.let {
+            val oM = offenseMarker
+            if (oM == null) {
+                offenseMarker = OffenseMarker(offensePosition)
+                offenseMarker?.let {
                     add(it.getLabel(), 0)
                 }
             } else {
-                aM.position = addressPosition
+                oM.position = offensePosition
             }
         }
         updatePainterWaypoints()

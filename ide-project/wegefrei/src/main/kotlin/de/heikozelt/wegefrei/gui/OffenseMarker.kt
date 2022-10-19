@@ -10,7 +10,7 @@ import javax.imageio.ImageIO
 import javax.swing.ImageIcon
 
 
-class AddressMarker(coord: GeoPosition?) : Marker(coord) {
+class OffenseMarker(coord: GeoPosition?) : Marker(coord) {
 
     init {
         lbl.icon = icn

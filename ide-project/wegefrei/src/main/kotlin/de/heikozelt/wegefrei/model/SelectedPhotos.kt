@@ -120,6 +120,12 @@ class SelectedPhotos(private var photos: TreeSet<Photo> = TreeSet<Photo>()) {
         return markerIndex
     }
 
+    /**
+     * Die Methode ist ähnlich GeoBounds(positions).getCenter().
+     * Es wird allerdings nicht die Mitte der Bounding-Box zurückgeliefert,
+     * sondern jeweils der Durchschnittswert der Breiten- und Längengrade.
+     * Ein einzelner Ausreißer hat also weniger Gewicht.
+     */
     fun getAveragePosition(): GeoPosition? {
         val latitudes = mutableListOf<Float>()
         val longitudes = mutableListOf<Float>()
