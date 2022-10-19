@@ -160,7 +160,7 @@ open class BaseMap(
         fitToMarkers()
     }
 
-    private fun fitToMarkers() {
+    fun fitToMarkers() {
         log.debug("fitToMarkers()")
         // 2 identische Geo-Positionen können keine Bounding Box mit Ausdehnung bilden
         // daher Set statt List
@@ -188,10 +188,11 @@ open class BaseMap(
             }
 
             else -> {
-                log.debug("zoom: $zoom")
+                log.debug("zoom vor zoomToBestFit(): $zoom")
                 // todo Prio 2: Bug in JXMapViewer2 beheben, 2 mal gleiche Latitude/Longitude
+                log.debug("width: $width, height: $height" )
                 zoomToBestFit(fitPoints, 0.5)
-                log.debug("zoom: $zoom")
+                log.debug("zoom nach zoomToBestFit(): $zoom")
             }
         }
     }

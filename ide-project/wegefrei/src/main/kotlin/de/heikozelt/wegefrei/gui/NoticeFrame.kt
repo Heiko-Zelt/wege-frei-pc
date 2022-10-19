@@ -148,13 +148,15 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
     fun showMaxiMap() {
         log.debug("show maxi map")
         val maxiMapForm = MaxiMapForm(this)
-        val maxiMap = maxiMapForm.getMaxiMap()
-        bottomSplitPane.rightComponent = maxiMapForm
+        //val maxiMap = maxiMapForm.getMaxiMap()
+        setZoomComponent(maxiMapForm)
+        //bottomSplitPane.rightComponent = maxiMapForm
         notice?.let {
             maxiMapForm.setAddressMarker(it.getGeoPosition())
             maxiMapForm.setPhotoMarkers(selectedPhotos)
         }
-        maxiMap.replacedPhotoSelection(selectedPhotos.getPhotos())
+        // irgendwie doppelt
+        //maxiMap.replacedPhotoSelection(selectedPhotos.getPhotos())
 
         noticeForm.getNoticeFormFields().getMiniMap().displayBorder(true)
         allPhotosPanel.hideBorder()

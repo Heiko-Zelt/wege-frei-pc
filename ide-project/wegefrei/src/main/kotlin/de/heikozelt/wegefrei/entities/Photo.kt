@@ -118,7 +118,7 @@ class Photo (
             lines.add("$latitude, $longitude")
         }
         val text = "<html>${lines.joinToString("<br>")}</html>"
-        log.debug(text)
+        //log.debug(text)
         return text
     }
 

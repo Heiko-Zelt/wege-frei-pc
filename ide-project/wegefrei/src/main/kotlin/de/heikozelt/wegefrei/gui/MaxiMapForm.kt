@@ -16,7 +16,7 @@ class MaxiMapForm(private val noticeFrame: NoticeFrame) : JPanel() {
 
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
     private val maxiMap = MaxiMap(noticeFrame)
-    private val maxiMapButtonsBar = MaxiMapButtonsBar(noticeFrame)
+    private val maxiMapButtonsBar = MaxiMapButtonsBar(noticeFrame, this)
 
     init {
         layout = BorderLayout()
@@ -35,12 +35,11 @@ class MaxiMapForm(private val noticeFrame: NoticeFrame) : JPanel() {
     }
 
     fun setPhotoMarkers(selectedPhotos: SelectedPhotos) {
-        // todo implement loading photos
+        maxiMap.replacedPhotoSelection(selectedPhotos.getPhotos())
     }
 
-
-    fun disableMap() {
-        // todo: implementieren Karte deaktivieren
+    fun fit() {
+        maxiMap.fitToMarkers()
     }
 
     fun getMaxiMap(): MaxiMap {

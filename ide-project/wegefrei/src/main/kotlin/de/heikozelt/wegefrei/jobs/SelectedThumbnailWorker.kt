@@ -70,7 +70,7 @@ class SelectedThumbnailWorker(
         if(thumbnailImage != null) {
             label.text = null
             label.icon = ImageIcon(thumbnailImage)
-            log.debug("setBounds($thumbnailX, $thumbnailY, $thumbnailWidth, $thumbnailHeight)")
+            //log.debug("setBounds($thumbnailX, $thumbnailY, $thumbnailWidth, $thumbnailHeight)")
             label.setBounds(thumbnailX, thumbnailY, thumbnailWidth, thumbnailHeight)
         }
     }

@@ -9,12 +9,21 @@ import javax.swing.JPanel
 /**
  * Button-Leiste unterhalb der großen Karte
  */
-class MaxiMapButtonsBar(private val noticeFrame: NoticeFrame): JPanel() {
+class MaxiMapButtonsBar(private val noticeFrame: NoticeFrame, private val maxiMapForm: MaxiMapForm): JPanel() {
+    private val fitButton = JButton("Anpassen")
     private val addButton = JButton("Adress-Marker setzen")
     private val removeButton = JButton("Adress-Marker entfernen")
 
     init {
         layout = FlowLayout(FlowLayout.RIGHT, 5,0)
+
+        fitButton.margin = Styles.BUTTON_MARGIN
+        fitButton.addActionListener { maxiMapForm.fit() }
+        fitButton.toolTipText = "Kartenausschnitt anpassen"
+        add(fitButton)
+
+        val fitStruts = Box.createHorizontalStrut(Styles.BUTTONS_DISTANCE)
+        add(fitStruts);
 
         addButton.margin = Styles.BUTTON_MARGIN
         addButton.addActionListener {/* todo: implemntieren */ }
