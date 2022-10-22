@@ -6,6 +6,7 @@ import de.heikozelt.wegefrei.entities.Notice
 import de.heikozelt.wegefrei.entities.Photo
 import de.heikozelt.wegefrei.gui.Styles.Companion.FRAME_BACKGROUND
 import de.heikozelt.wegefrei.jobs.AddressWorker
+import de.heikozelt.wegefrei.maps.MaxiMapForm
 import de.heikozelt.wegefrei.model.SelectedPhotos
 import de.heikozelt.wegefrei.model.SelectedPhotosObserver
 import org.jxmapviewer.viewer.GeoPosition
@@ -416,8 +417,8 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
             val a = abs(positionA.longitude - positionB.longitude)
             val b = abs(positionA.latitude - positionA.latitude)
             val c = sqrt(a * a + b * b)
-            val num1 = " %.7f".format(NEARBY_DEGREES)
-            val num2 = " %.7f".format(c)
+            //val num1 = " %.7f".format(NEARBY_DEGREES)
+            //val num2 = " %.7f".format(c)
             //log.debug("Schwellwert: $num1, distance = $num2")
             return c
         }

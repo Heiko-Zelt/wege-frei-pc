@@ -7,6 +7,7 @@ import de.heikozelt.wegefrei.entities.Photo
 import de.heikozelt.wegefrei.gui.Styles.Companion.FORM_BACKGROUND
 import de.heikozelt.wegefrei.gui.Styles.Companion.NO_BORDER
 import de.heikozelt.wegefrei.gui.Styles.Companion.TEXTFIELD_FONT
+import de.heikozelt.wegefrei.maps.MiniMap
 import de.heikozelt.wegefrei.model.*
 import org.slf4j.LoggerFactory
 import java.awt.BorderLayout

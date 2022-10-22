@@ -1,7 +1,10 @@
-package de.heikozelt.wegefrei.gui
+package de.heikozelt.wegefrei.maps
 
+import de.heikozelt.wegefrei.gui.NoticeFrame
+import de.heikozelt.wegefrei.gui.Styles
 import org.jxmapviewer.input.PanMouseInputListener
 import org.jxmapviewer.input.ZoomMouseWheelListenerCenter
+import org.jxmapviewer.viewer.GeoPosition
 import org.slf4j.LoggerFactory
 
 /**
@@ -22,5 +25,15 @@ class MaxiMap(private val noticeFrame: NoticeFrame): BaseMap(noticeFrame) {
         addMouseListener(mm)
         addMouseMotionListener(mm)
         addMouseWheelListener(mw)
+    }
+
+    override fun setOffensePosition(offensePosition: GeoPosition?) {
+        log.debug("maxi.setOffensePosition(${offensePosition.toString()}")
+        super.setOffensePosition(offensePosition)
+        offenseMarker?.getLabel()?.let {
+            val mickey = OffenseMarkerMouseListener()
+            it.addMouseListener(mickey)
+            it.addMouseMotionListener(mickey)
+        } // todo: add / remove mouse listeners to label
     }
 }

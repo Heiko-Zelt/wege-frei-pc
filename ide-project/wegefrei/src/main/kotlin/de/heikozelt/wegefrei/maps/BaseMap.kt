@@ -1,6 +1,7 @@
-package de.heikozelt.wegefrei.gui
+package de.heikozelt.wegefrei.maps
 
 import de.heikozelt.wegefrei.entities.Photo
+import de.heikozelt.wegefrei.gui.NoticeFrame
 import de.heikozelt.wegefrei.model.SelectedPhotosObserver
 import org.jxmapviewer.JXMapViewer
 import org.jxmapviewer.OSMTileFactoryInfo
@@ -23,7 +24,6 @@ import java.util.*
  * Erst mit load()-Data wird ggf. ein Adress-Marker gesetzt und ggf. Foto-Markers hinzugefügt.
  * Die Foto-Markers werden indirekt über das Observer-Pattern hinzugefügt oder entfernt.
  *
- * todo: Prio 1: Gemeinsamkeiten von MiniMap und MaxiMap in BaseMap-Klasse extrahieren
  */
 open class BaseMap(
     private val noticeFrame: NoticeFrame
@@ -32,7 +32,7 @@ open class BaseMap(
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
     private val painter = MarkerPainter()
     private val photoMarkers = LinkedList<PhotoMarker>()
-    private var offenseMarker: OffenseMarker? = null
+    protected var offenseMarker: OffenseMarker? = null
     private var selectedPhotos = noticeFrame.getSelectedPhotos()
 
     init {
@@ -45,10 +45,7 @@ open class BaseMap(
     private fun updatePainterWaypoints() {
         val markers = mutableSetOf<Marker>()
         markers.addAll(photoMarkers)
-        val aM = offenseMarker
-        if (aM != null) {
-            markers.add(aM)
-        }
+        offenseMarker?.let { markers.add(it) }
         painter.waypoints = markers
     }
 
@@ -133,7 +130,7 @@ open class BaseMap(
      * alle Foto-Markers müssen ersetzt werden
      */
     override fun replacedPhotoSelection(photos: TreeSet<Photo>) {
-        log.debug("replacedPhotoSelection(photos.size=${photos.size}")
+        log.debug("replacedPhotoSelection(photos.size=${photos.size})")
         // alle bestehenden Foto-Marker entfernen
         // (aber den ggf. existieren Adress-Marker behalten)
         for (photoMarker in photoMarkers) {
@@ -206,7 +203,8 @@ open class BaseMap(
      * Sie wird für die MaxiMap von NoticeFrame aufgerufen.
      * Für MiniMap indirekt von NoticeFormFields.
      */
-    fun setOffensePosition(offensePosition: GeoPosition?) {
+    open fun setOffensePosition(offensePosition: GeoPosition?) {
+        log.debug("base.setOffensePosition(${offensePosition.toString()}")
         if(offensePosition == null) {
             offenseMarker?.let {
                 remove(it.getLabel())

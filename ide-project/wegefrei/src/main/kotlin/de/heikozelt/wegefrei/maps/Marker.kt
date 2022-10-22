@@ -1,4 +1,4 @@
-package de.heikozelt.wegefrei.gui
+package de.heikozelt.wegefrei.maps
 
 import org.jxmapviewer.viewer.DefaultWaypoint
 import org.jxmapviewer.viewer.GeoPosition

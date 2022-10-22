@@ -1,5 +1,6 @@
-package de.heikozelt.wegefrei.gui
+package de.heikozelt.wegefrei.maps
 
+import de.heikozelt.wegefrei.gui.NoticeFrame
 import de.heikozelt.wegefrei.gui.Styles.Companion.FORM_BACKGROUND
 import de.heikozelt.wegefrei.gui.Styles.Companion.NO_BORDER
 import de.heikozelt.wegefrei.model.SelectedPhotos

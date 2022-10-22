@@ -1,5 +1,7 @@
-package de.heikozelt.wegefrei.gui
+package de.heikozelt.wegefrei.maps
 
+import de.heikozelt.wegefrei.gui.NoticeFrame
+import de.heikozelt.wegefrei.gui.Styles
 import org.jxmapviewer.viewer.GeoPosition
 import java.awt.FlowLayout
 import javax.swing.Box
