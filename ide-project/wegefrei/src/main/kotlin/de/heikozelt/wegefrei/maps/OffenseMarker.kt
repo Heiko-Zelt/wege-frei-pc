@@ -1,6 +1,5 @@
 package de.heikozelt.wegefrei.maps
 
-import de.heikozelt.wegefrei.gui.RedBlueSwapFilter
 import org.jxmapviewer.viewer.DefaultWaypoint
 import org.jxmapviewer.viewer.GeoPosition
 import org.slf4j.LoggerFactory

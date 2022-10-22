@@ -1,4 +1,4 @@
-package de.heikozelt.wegefrei.gui
+package de.heikozelt.wegefrei.maps
 
 import java.awt.image.RGBImageFilter
 

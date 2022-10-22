@@ -8,6 +8,8 @@ import org.jxmapviewer.OSMTileFactoryInfo
 import org.jxmapviewer.viewer.DefaultTileFactory
 import org.jxmapviewer.viewer.GeoPosition
 import org.slf4j.LoggerFactory
+import java.awt.Graphics
+import java.awt.Point
 import java.util.*
 
 /**
@@ -30,7 +32,6 @@ open class BaseMap(
 ) : JXMapViewer(), SelectedPhotosObserver {
 
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
-    private val painter = MarkerPainter()
     private val photoMarkers = LinkedList<PhotoMarker>()
     protected var offenseMarker: OffenseMarker? = null
     private var selectedPhotos = noticeFrame.getSelectedPhotos()
@@ -39,15 +40,50 @@ open class BaseMap(
         log.debug("init")
         val info = OSMTileFactoryInfo()
         tileFactory = DefaultTileFactory(info)
-        overlayPainter = painter
     }
 
+    fun pixelToGeo(point: Point): GeoPosition {
+        val x = (point.x + viewportBounds.getX()).toInt()
+        val y = (point.y + viewportBounds.getY()).toInt()
+        val position = tileFactory.pixelToGeo(Point(x, y), zoom)
+        return position
+    }
+
+    fun geoToPixel(position: GeoPosition): Point {
+        val point = tileFactory.geoToPixel(position, zoom)
+        val x = (point.x - viewportBounds.getX()).toInt()
+        val y = (point.y - viewportBounds.getY()).toInt()
+        return Point(x, y)
+    }
+
+    // instead of overlayPainter
+    override fun paint(g: Graphics) {
+        log.debug("paint()")
+        for (photoMarker in photoMarkers) {
+            val point = geoToPixel(photoMarker.position)
+            val label = photoMarker.getLabel()
+            val labelX = point.x - label.width / 2 // zentriert
+            val labelY = point.y - label.height / 2 // mittig
+            label.setLocation(labelX, labelY)
+        }
+        offenseMarker?.let {
+            val point = geoToPixel(it.position)
+            val label = it.getLabel()
+            val labelX = point.x - label.width / 2 // zentriert
+            val labelY = point.y - label.height // Unterkante
+            label.setLocation(labelX, labelY)
+        }
+        super.paint(g)
+    }
+
+    /*
+     kein Rückgabewert und kein Seiten-Effekt!
     private fun updatePainterWaypoints() {
         val markers = mutableSetOf<Marker>()
         markers.addAll(photoMarkers)
         offenseMarker?.let { markers.add(it) }
-        painter.waypoints = markers
     }
+     */
 
     /**
      * Observer-Methode
@@ -78,7 +114,7 @@ open class BaseMap(
         }
 
         // todo nicht immer alles notwendig
-        updatePainterWaypoints()
+        //updatePainterWaypoints()
         fitToMarkers()
         revalidate()
         repaint()
@@ -114,7 +150,7 @@ open class BaseMap(
         }
 
         // todo nicht immer alles notwendig
-        updatePainterWaypoints()
+        //updatePainterWaypoints()
         fitToMarkers()
         revalidate()
         repaint()
@@ -139,7 +175,7 @@ open class BaseMap(
         photoMarkers.clear()
 
         for ((i, photo) in photos.withIndex()) {
-            var position = photo.getGeoPosition()
+            val position = photo.getGeoPosition()
             if (position != null) {
                 log.debug("add photo marker #$i")
                 photoMarkers.add(PhotoMarker(i, position))
@@ -154,8 +190,10 @@ open class BaseMap(
             add(iterator.next().getLabel())
         }
 
-        updatePainterWaypoints()
+        //updatePainterWaypoints()
         fitToMarkers()
+        revalidate()
+        repaint()
     }
 
     /**
@@ -221,7 +259,7 @@ open class BaseMap(
                 oM.position = offensePosition
             }
         }
-        updatePainterWaypoints()
+        //updatePainterWaypoints()
         fitToMarkers()
         revalidate()
         repaint()

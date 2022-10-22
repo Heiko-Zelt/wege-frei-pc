@@ -30,10 +30,17 @@ class MaxiMap(private val noticeFrame: NoticeFrame): BaseMap(noticeFrame) {
     override fun setOffensePosition(offensePosition: GeoPosition?) {
         log.debug("maxi.setOffensePosition(${offensePosition.toString()}")
         super.setOffensePosition(offensePosition)
+
+        // only in MaxiMap, not in MiniMap
+        // could as well be solved with a factory method and polymorphism
         offenseMarker?.getLabel()?.let {
-            val mickey = OffenseMarkerMouseListener()
+            val mickey = OffenseMarkerMouseListener(this)
             it.addMouseListener(mickey)
             it.addMouseMotionListener(mickey)
-        } // todo: add / remove mouse listeners to label
+        }
+    }
+
+    fun getOffnsMarker(): OffenseMarker? {
+        return offenseMarker
     }
 }
