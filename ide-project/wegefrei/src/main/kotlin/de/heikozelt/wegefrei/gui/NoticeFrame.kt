@@ -18,7 +18,9 @@ import javax.swing.JFrame
 import javax.swing.JPanel
 import javax.swing.JScrollPane
 import javax.swing.JSplitPane
+import kotlin.math.PI
 import kotlin.math.abs
+import kotlin.math.cos
 import kotlin.math.sqrt
 
 /**
@@ -230,7 +232,7 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
      * Bei nur minimalen Abweichungen keine neu Addresse suchen.
      */
     private fun maybeFindAddress() {
-        if (distance(searchedAddressForPosition, offensePosition) > NEARBY_DEGREES) {
+        if (distanceStraight(searchedAddressForPosition, offensePosition) > NEARBY_METERS) {
             findAddress()
         }
     }
@@ -421,18 +423,17 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
     }
 
     companion object {
+
+        private val LOG = LoggerFactory.getLogger(this::class.java.canonicalName)
         /**
          * Berechnet die Distanz zwischen 2 Punkten nach dem Satz vom Pythagoras
-         * Die Erdkrümmung wird nicht berücksichtigt
-         * todo: die Erdkrümmung berücksichtigen
+         * Die Distanz der Längengrade nimmt vom Equator zu den Poln ab.
+         * Das wird bei der Berechnung leder nicht berücksichtigt.
          */
-        private fun distance(positionA: GeoPosition?, positionB: GeoPosition?): Double {
+        private fun distancePythagoras(positionA: GeoPosition?, positionB: GeoPosition?): Double {
             if (positionA == null || positionB == null) {
                 return Double.POSITIVE_INFINITY
             }
-            // a = betrag von ( A.longitudeA - B.longitude )
-            // b = betrag von ( A.latitude - B.latitude )
-            // c = wurzel aus ( a im quadrat + b im quadrat)
             val a = abs(positionA.longitude - positionB.longitude)
             val b = abs(positionA.latitude - positionA.latitude)
             val c = sqrt(a * a + b * b)
@@ -442,9 +443,37 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
             return c
         }
 
-        private const val EARTH_CIRCUMFERENCE = 40_075_000.0 // meters
+        /**
+         * Distance of a straight line in meters (not moving on the curved surface of the earth).
+         * The calculation is very accurate for small distances.
+         * https://www.mkompf.com/gps/distcalc.html
+         */
+        fun distanceStraight(positionA: GeoPosition?, positionB: GeoPosition?): Double {
+            if (positionA == null || positionB == null) {
+                return Double.POSITIVE_INFINITY
+            }
+            val lat1 = positionA.latitude
+            val lat2 = positionB.latitude
+            val lon1 = positionA.longitude
+            val lon2 = positionB.longitude
+            val latDegrees = (lat1 + lat2) / 2 // Gradmaß
+            val latRadian = latDegrees * (PI / 180) // Bogenmaß
+            val dx = METERS_PER_DEGREE * cos(latRadian) * abs(lon1 - lon2)
+            val dy = METERS_PER_DEGREE * abs(lat1 - lat2)
+            val distance = sqrt(dx * dx + dy * dy)
+            val num = " %.7f".format(distance)
+            LOG.debug("distance: $num")
+            return distance
+        }
+
+        private const val EARTH_CIRCUMFERENCE = 40_075_000.0 // at the equator in meters (not at the poles)
         private const val WHOLE_CIRCLE = 360.0 // degrees
-        private const val NEARBY_METERS = 6.0 // meters
-        const val NEARBY_DEGREES = NEARBY_METERS * WHOLE_CIRCLE / EARTH_CIRCUMFERENCE
+        private const val METERS_PER_DEGREE = EARTH_CIRCUMFERENCE / WHOLE_CIRCLE
+
+        /**
+         * If the offense position marker is moved less than NEARBY_METERS
+         * no new address (street, house number, zip code, town) is searched for.
+         */
+        private const val NEARBY_METERS = 5.0
     }
 }

@@ -1,6 +1,5 @@
 package de.heikozelt.wegefrei.maps
 
-import org.slf4j.LoggerFactory
 import java.awt.Point
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
@@ -13,7 +12,7 @@ import java.awt.event.MouseEvent
  * </ul>
  */
 class OffenseMarkerMouseListener(private val maxiMap: MaxiMap) : MouseAdapter() {
-    private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
+    //private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
 
     /**
      * in Pixel ab der ViewPort-Ecke
@@ -24,7 +23,7 @@ class OffenseMarkerMouseListener(private val maxiMap: MaxiMap) : MouseAdapter() 
     override fun mousePressed(e: MouseEvent?) {
         if (e == null) return
         dragged = false
-        log.debug("mousePressed(point=${e.point})")
+        //log.debug("mousePressed(point=${e.point})")
         startPoint = e.point
         /*
         // relative Position innerhalb des Labels
@@ -51,16 +50,16 @@ class OffenseMarkerMouseListener(private val maxiMap: MaxiMap) : MouseAdapter() 
     override fun mouseDragged(e: MouseEvent?) {
         if (e == null) return
         dragged = true
-        log.debug("mouseDragged(point=${e.point}")
+        //log.debug("mouseDragged(point=${e.point}")
 
         startPoint?.let { sPoint ->
             val deltaX = e.x - sPoint.x
             val deltaY = e.y - sPoint.y
-            log.debug("delta x=$deltaX, y=$deltaY")
+            //log.debug("delta x=$deltaX, y=$deltaY")
             maxiMap.getOffenseMarker()?.let { marker ->
                 val label = marker.getLabel()
                 val newPoint = Point(label.x + deltaX + label.width / 2, label.y + deltaY + label.height)
-                log.debug("label x=${label.x}, y=${label.y} ---> $newPoint")
+                //log.debug("label x=${label.x}, y=${label.y} ---> $newPoint")
                 //label.setLocation(label.x + deltaX, label.y + deltaY)
 
                 marker.position = maxiMap.pixelToGeo(newPoint)
