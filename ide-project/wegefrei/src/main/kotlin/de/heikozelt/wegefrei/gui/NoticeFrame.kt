@@ -38,6 +38,11 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
     private var selectedPhotos: SelectedPhotos = SelectedPhotos()
     private var offensePosition: GeoPosition? = null
 
+    /**
+     * last offense position, for which an address was searched for
+     */
+    private var searchedAddressForPosition: GeoPosition? = null
+
     // GUI-Komponenten:
     private var allPhotosPanel = AllPhotosPanel(this)
     private var selectedPhotosPanel = SelectedPhotosPanel(this)
@@ -90,7 +95,7 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
 
         selectedPhotos.setPhotos(TreeSet(notice.photos))
 
-        title = if(notice.id == null) {
+        title = if (notice.id == null) {
             "Neue Meldung - Wege frei!"
         } else {
             "Meldung #${notice.id} - Wege frei!"
@@ -220,10 +225,20 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
         selectedPhotosPanel.showBorder(photo)
     }
 
+    /**
+     * aus Performance-Gründen:
+     * Bei nur minimalen Abweichungen keine neu Addresse suchen.
+     */
+    private fun maybeFindAddress() {
+        if (distance(searchedAddressForPosition, offensePosition) > NEARBY_DEGREES) {
+            findAddress()
+        }
+    }
 
     private fun findAddress() {
         log.info("findAddress()")
         offensePosition?.let {
+            searchedAddressForPosition = offensePosition
             val worker = AddressWorker(it, noticeForm)
             worker.execute()
         }
@@ -294,7 +309,7 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
             }
         }
         photo.getGeoPosition()?.run {
-            updateOffensePosition()
+            updateOffensePositionFromSelectedPhotos()
         }
     }
 
@@ -309,7 +324,7 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
             }
         }
         photo.getGeoPosition()?.run {
-            updateOffensePosition()
+            updateOffensePositionFromSelectedPhotos()
         }
     }
 
@@ -324,7 +339,7 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
     private fun setZoomComponent(comp: Component) {
         // ggf. Observer entfernen, wichtig zur Vermeidung eines Memory-Leaks
         val oldComp = getZoomComponent()
-        if(oldComp is MaxiMapForm) {
+        if (oldComp is MaxiMapForm) {
             selectedPhotos.unregisterObserver(oldComp.getMaxiMap())
         }
         bottomSplitPane.rightComponent = comp
@@ -336,7 +351,7 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
      */
     fun getMaxiMapForm(): MaxiMapForm? {
         val zoomComp = getZoomComponent()
-        return if(zoomComp is MaxiMapForm) {
+        return if (zoomComp is MaxiMapForm) {
             zoomComp
         } else {
             null
@@ -349,9 +364,9 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
      */
     private fun getMaxiPhotoPanel(): MaxiPhotoPanel? {
         val zoomComp = getZoomComponent()
-        if(zoomComp is JScrollPane) {
+        if (zoomComp is JScrollPane) {
             val v = zoomComp.viewport.view
-            if(v is MaxiPhotoPanel) {
+            if (v is MaxiPhotoPanel) {
                 return v
             }
         }
@@ -364,9 +379,9 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
      */
     private fun getMaxiSelectedPhotoPanel(): MaxiSelectedPhotoPanel? {
         val zoomComp = getZoomComponent()
-        if(zoomComp is JScrollPane) {
+        if (zoomComp is JScrollPane) {
             val v = zoomComp.viewport.view
-            if(v is MaxiSelectedPhotoPanel) {
+            if (v is MaxiSelectedPhotoPanel) {
                 return v
             }
         }
@@ -379,19 +394,11 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
      * Berechnet automatisch die neue Marker-Position
      * und benachrichtigt die MiniMap und ggf. die MaxiMap.
      */
-    fun updateOffensePosition() {
-        val oldPosition = offensePosition
+    fun updateOffensePositionFromSelectedPhotos() {
         offensePosition = selectedPhotos.getAveragePosition()
         noticeForm.getNoticeFormFields().getMiniMap().setOffensePosition(offensePosition)
         getMaxiMapForm()?.setOffenseMarker(offensePosition)
-
-        // aus Performance-Gründen:
-        // bei nur minimalen Abweichungen keine neu Addresse suchen
-        offensePosition?.let {
-            if (oldPosition == null || distance(oldPosition, it) > NEARBY_DEGREES) {
-                findAddress()
-            }
-        }
+        maybeFindAddress()
     }
 
     /**
@@ -404,13 +411,25 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
         getMaxiMapForm()?.setOffenseMarker(null)
     }
 
+    /**
+     * because user moved the offense marker
+     */
+    fun setOffensePosition(newPosition: GeoPosition) {
+        offensePosition = newPosition
+        noticeForm.getNoticeFormFields().getMiniMap().setOffensePosition(offensePosition)
+        maybeFindAddress()
+    }
+
     companion object {
         /**
          * Berechnet die Distanz zwischen 2 Punkten nach dem Satz vom Pythagoras
          * Die Erdkrümmung wird nicht berücksichtigt
          * todo: die Erdkrümmung berücksichtigen
          */
-        private fun distance(positionA: GeoPosition, positionB: GeoPosition): Double {
+        private fun distance(positionA: GeoPosition?, positionB: GeoPosition?): Double {
+            if (positionA == null || positionB == null) {
+                return Double.POSITIVE_INFINITY
+            }
             // a = betrag von ( A.longitudeA - B.longitude )
             // b = betrag von ( A.latitude - B.latitude )
             // c = wurzel aus ( a im quadrat + b im quadrat)

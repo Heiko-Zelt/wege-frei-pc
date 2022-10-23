@@ -19,9 +19,11 @@ class OffenseMarkerMouseListener(private val maxiMap: MaxiMap) : MouseAdapter() 
      * in Pixel ab der ViewPort-Ecke
      */
     private var startPoint: Point? = null
+    private var dragged = false
 
     override fun mousePressed(e: MouseEvent?) {
         if (e == null) return
+        dragged = false
         log.debug("mousePressed(point=${e.point})")
         startPoint = e.point
         /*
@@ -48,13 +50,14 @@ class OffenseMarkerMouseListener(private val maxiMap: MaxiMap) : MouseAdapter() 
      */
     override fun mouseDragged(e: MouseEvent?) {
         if (e == null) return
+        dragged = true
         log.debug("mouseDragged(point=${e.point}")
 
         startPoint?.let { sPoint ->
             val deltaX = e.x - sPoint.x
             val deltaY = e.y - sPoint.y
             log.debug("delta x=$deltaX, y=$deltaY")
-            maxiMap.getOffnsMarker()?.let { marker ->
+            maxiMap.getOffenseMarker()?.let { marker ->
                 val label = marker.getLabel()
                 val newPoint = Point(label.x + deltaX + label.width / 2, label.y + deltaY + label.height)
                 log.debug("label x=${label.x}, y=${label.y} ---> $newPoint")
@@ -63,6 +66,13 @@ class OffenseMarkerMouseListener(private val maxiMap: MaxiMap) : MouseAdapter() 
                 marker.position = maxiMap.pixelToGeo(newPoint)
                 maxiMap.repaint()
             }
+        }
+    }
+
+    override fun mouseReleased(e: MouseEvent?) {
+        if (e == null) return
+        if(dragged) {
+            maxiMap.changedOffenseMarker()
         }
     }
 }

@@ -33,14 +33,17 @@ class MaxiMap(private val noticeFrame: NoticeFrame): BaseMap(noticeFrame) {
 
         // only in MaxiMap, not in MiniMap
         // could as well be solved with a factory method and polymorphism
-        offenseMarker?.getLabel()?.let {
+        getOffenseMarker()?.getLabel()?.let {
             val mickey = OffenseMarkerMouseListener(this)
             it.addMouseListener(mickey)
             it.addMouseMotionListener(mickey)
         }
     }
 
-    fun getOffnsMarker(): OffenseMarker? {
-        return offenseMarker
+    fun changedOffenseMarker() {
+        getOffenseMarker()?.let {
+            noticeFrame.setOffensePosition(it.position)
+        }
     }
+
 }

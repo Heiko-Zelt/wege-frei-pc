@@ -29,7 +29,7 @@ class MaxiMapButtonsBar(private val noticeFrame: NoticeFrame, private val maxiMa
 
         addButton.margin = Styles.BUTTON_MARGIN
         addButton.addActionListener {
-            noticeFrame.updateOffensePosition()
+            noticeFrame.updateOffensePositionFromSelectedPhotos()
             addButton.isVisible = false
             removeButton.isVisible = true
         }

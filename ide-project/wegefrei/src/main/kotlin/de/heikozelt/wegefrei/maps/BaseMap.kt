@@ -33,7 +33,7 @@ open class BaseMap(
 
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
     private val photoMarkers = LinkedList<PhotoMarker>()
-    protected var offenseMarker: OffenseMarker? = null
+    private var offenseMarker: OffenseMarker? = null
     private var selectedPhotos = noticeFrame.getSelectedPhotos()
 
     init {
@@ -263,5 +263,9 @@ open class BaseMap(
         fitToMarkers()
         revalidate()
         repaint()
+    }
+
+    fun getOffenseMarker(): OffenseMarker? {
+        return offenseMarker
     }
 }
