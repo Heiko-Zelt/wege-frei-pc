@@ -79,5 +79,9 @@ class MiniSelectedPhotoPanel(private val noticeFrame: NoticeFrame, private val p
 
     fun updateText(index: Int) {
         label.text = " ${index + 1} "
+        // The label can change its width if the number of digits changes.
+        // Maybe a layout manager could take care of the label bounds?
+        val labelSize = label.preferredSize
+        label.setBounds(0, 0, labelSize.width, labelSize.height)
     }
 }
