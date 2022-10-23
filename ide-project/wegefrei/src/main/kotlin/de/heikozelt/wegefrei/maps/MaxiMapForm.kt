@@ -39,6 +39,11 @@ class MaxiMapForm(private val noticeFrame: NoticeFrame) : JPanel() {
         maxiMap.replacedPhotoSelection(selectedPhotos.getPhotos())
     }
 
+    fun disableFormFields() {
+        maxiMap.disableDragAndDrop()
+        maxiMapButtonsBar.disableOffenseMarkerButton()
+    }
+
     fun fit() {
         maxiMap.fitToMarkers()
     }

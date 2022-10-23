@@ -51,6 +51,11 @@ class MaxiMapButtonsBar(private val noticeFrame: NoticeFrame, private val maxiMa
         add(Box.createHorizontalStrut(Styles.BUTTONS_DISTANCE));
     }
 
+    fun disableOffenseMarkerButton() {
+        addButton.isEnabled = false
+        removeButton.isEnabled = false
+    }
+
     fun setAddressPosition(addressLocation: GeoPosition?) {
         val addressMarkerVisible = addressLocation != null
         removeButton.isVisible = addressMarkerVisible

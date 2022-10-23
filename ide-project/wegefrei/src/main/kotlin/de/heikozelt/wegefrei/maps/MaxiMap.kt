@@ -17,6 +17,8 @@ class MaxiMap(private val noticeFrame: NoticeFrame): BaseMap(noticeFrame) {
 
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
 
+    private val mickey = OffenseMarkerMouseListener(this)
+
     init {
         log.debug("init")
         border = Styles.NO_BORDER
@@ -34,9 +36,20 @@ class MaxiMap(private val noticeFrame: NoticeFrame): BaseMap(noticeFrame) {
         // only in MaxiMap, not in MiniMap
         // could as well be solved with a factory method and polymorphism
         getOffenseMarker()?.getLabel()?.let {
-            val mickey = OffenseMarkerMouseListener(this)
+            log.debug("add mouse listeners")
             it.addMouseListener(mickey)
             it.addMouseMotionListener(mickey)
+        }
+    }
+
+    /**
+     * todo Prio 3: Editing should be disabled by default, and there should be a method to enable it.
+     */
+    fun disableDragAndDrop() {
+        getOffenseMarker()?.getLabel()?.let {
+            log.debug("remove mouse listeners")
+            it.removeMouseListener(mickey)
+            it.removeMouseMotionListener(mickey)
         }
     }
 

@@ -161,6 +161,11 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
         setZoomComponent(maxiMapForm)
         maxiMapForm.setOffenseMarker(offensePosition)
         maxiMapForm.setPhotoMarkers(selectedPhotos)
+        notice?.let {
+            if (it.isSent()) {
+                maxiMapForm?.disableFormFields()
+            }
+        }
 
         noticeForm.getNoticeFormFields().getMiniMap().displayBorder(true)
         allPhotosPanel.hideBorder()
@@ -293,6 +298,7 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
         log.debug("disabling form fields is not yet implemented")
         // todo Prio 2 implementieren Eingabefelder deaktivieren
         noticeForm.disableFormFields()
+        getMaxiMapForm()?.disableFormFields()
     }
 
     private fun sendEmail() {
