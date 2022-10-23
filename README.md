@@ -11,7 +11,7 @@ Alle Daten (Beweisfotos und Meldungen) werden auf dem eigenen PC gespeichert. De
  1. Falsch parkende Fahrzeuge fotografiern. Es können mehrere Fotos mit Kfz-Kennzeichen, Verkehrszeichen, HU-Plaktte, Anfang und Ende der Beoabachtung, etc... gemacht werden.
  1. Fotos (z.B. via USB-Kabel) vom Smartphone in ein spezielles Verzeichnis auf dem PC kopieren.
  1. Fotos nach Metadaten (GPS-Geo-Lokation, Datum und Uhrzeit) scannen.
- 1. Meldungen erfassen. Einige Daten wie Tat-Datum, -Uhrzeit, -Dauer, -Ort und Adresse werden automatisch im Formular eingetragen. Kontrolle der Fotos und des Tatorts durch Kartenanzeige.
+ 1. Meldungen erfassen. Einige Daten wie Tat-Datum, -Uhrzeit, -Dauer, -Ort und Adresse werden automatisch im Formular eingetragen. Kontrolle der Fotos durch integrierten Bildbetrachter und des Tatorts durch Kartenanzeige.
  1. Meldungen über das eigene E-Mail-Postfach an das Ordnungsamt senden.
 
 ## Empfehlungen
