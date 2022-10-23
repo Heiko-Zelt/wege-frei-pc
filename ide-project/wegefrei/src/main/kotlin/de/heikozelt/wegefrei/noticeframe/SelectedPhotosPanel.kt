@@ -1,4 +1,4 @@
-package de.heikozelt.wegefrei.gui
+package de.heikozelt.wegefrei.noticeframe
 
 import de.heikozelt.wegefrei.entities.Photo
 import de.heikozelt.wegefrei.gui.Styles.Companion.NO_BORDER
@@ -95,7 +95,7 @@ class SelectedPhotosPanel(private val noticeFrame: NoticeFrame) : JPanel(),
                 panel.displayBorder(true)
             }
         }
-        if(zoomComponent is MaxiSelectedPhotoPanel ) {
+        if(zoomComponent is MaxiSelectedPhotoPanel) {
             if(photo == zoomComponent.getPhoto()) {
                 panel.displayBorder(true)
             }

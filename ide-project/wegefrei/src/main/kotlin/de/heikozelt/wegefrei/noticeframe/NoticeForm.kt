@@ -1,4 +1,4 @@
-package de.heikozelt.wegefrei.gui
+package de.heikozelt.wegefrei.noticeframe
 
 import de.heikozelt.wegefrei.entities.Notice
 import de.heikozelt.wegefrei.gui.Styles.Companion.FORM_BACKGROUND
@@ -38,7 +38,7 @@ class NoticeForm(private val noticeFrame: NoticeFrame) : JPanel() {
         return noticeFormFields
     }
 
-    fun disableFormFields() {
-        noticeFormFields.disableFormFields()
+    fun enableOrDisableEditing() {
+        noticeFormFields.enableOrDisableEditing()
     }
 }

@@ -1,6 +1,7 @@
-package de.heikozelt.wegefrei.gui
+package de.heikozelt.wegefrei.noticeframe
 
 import de.heikozelt.wegefrei.entities.Notice
+import de.heikozelt.wegefrei.gui.Styles
 import java.awt.FlowLayout
 import javax.swing.Box
 import javax.swing.JButton

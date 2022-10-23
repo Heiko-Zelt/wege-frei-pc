@@ -1,4 +1,4 @@
-package de.heikozelt.wegefrei.gui
+package de.heikozelt.wegefrei.noticeframe
 
 import de.heikozelt.wegefrei.model.Offense
 import java.awt.Component

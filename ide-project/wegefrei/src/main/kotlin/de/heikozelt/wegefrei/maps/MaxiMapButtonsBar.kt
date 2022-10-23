@@ -1,7 +1,7 @@
 package de.heikozelt.wegefrei.maps
 
-import de.heikozelt.wegefrei.gui.NoticeFrame
 import de.heikozelt.wegefrei.gui.Styles
+import de.heikozelt.wegefrei.noticeframe.NoticeFrame
 import org.jxmapviewer.viewer.GeoPosition
 import java.awt.FlowLayout
 import javax.swing.Box
@@ -49,11 +49,14 @@ class MaxiMapButtonsBar(private val noticeFrame: NoticeFrame, private val maxiMa
         add(buttonStruts);
 
         add(Box.createHorizontalStrut(Styles.BUTTONS_DISTANCE));
+        enableOrDisableOffenseMarkerButton() // is disabled
     }
 
-    fun disableOffenseMarkerButton() {
-        addButton.isEnabled = false
-        removeButton.isEnabled = false
+    fun enableOrDisableOffenseMarkerButton() {
+        val notice = noticeFrame.getNotice()
+        val enab = (notice != null) && !notice.isSent()
+        addButton.isEnabled = enab
+        removeButton.isEnabled = enab
     }
 
     fun setAddressPosition(addressLocation: GeoPosition?) {

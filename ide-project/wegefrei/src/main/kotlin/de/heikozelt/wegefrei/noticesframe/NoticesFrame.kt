@@ -1,7 +1,8 @@
-package de.heikozelt.wegefrei.gui
+package de.heikozelt.wegefrei.noticesframe
 
 import de.heikozelt.wegefrei.WegeFrei
 import de.heikozelt.wegefrei.entities.Notice
+import de.heikozelt.wegefrei.gui.Styles
 import de.heikozelt.wegefrei.jobs.LoadNoticesWorker
 import de.heikozelt.wegefrei.model.NoticesTableModel
 import org.slf4j.LoggerFactory

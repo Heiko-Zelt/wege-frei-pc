@@ -2,7 +2,7 @@ package de.heikozelt.wegefrei.jobs
 
 import de.heikozelt.wegefrei.DatabaseService
 import de.heikozelt.wegefrei.entities.Photo
-import de.heikozelt.wegefrei.gui.AllPhotosPanel
+import de.heikozelt.wegefrei.noticeframe.AllPhotosPanel
 import org.slf4j.LoggerFactory
 import javax.swing.SwingWorker
 

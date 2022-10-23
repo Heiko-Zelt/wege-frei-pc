@@ -1,6 +1,6 @@
 package de.heikozelt.wegefrei.maps
 
-import de.heikozelt.wegefrei.gui.NoticeFrame
+import de.heikozelt.wegefrei.noticeframe.NoticeFrame
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 

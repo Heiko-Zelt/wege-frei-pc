@@ -1,7 +1,9 @@
-package de.heikozelt.wegefrei.gui
+package de.heikozelt.wegefrei.noticesframe
 
 import de.heikozelt.wegefrei.WegeFrei
 import de.heikozelt.wegefrei.model.NoticesTableModel
+import de.heikozelt.wegefrei.noticeframe.NoticeFrame
+import java.awt.EventQueue
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import javax.swing.JTable
@@ -21,7 +23,10 @@ class NoticesTableMouseListener(private val app: WegeFrei): MouseAdapter() {
             // open new Window to edit existing notice
             val notice = model.getNoticeAt(rowIndex)
             val editNoticeFrame = NoticeFrame(app)
-            editNoticeFrame.loadData(notice)
+            EventQueue.invokeLater {
+                //Thread.sleep(5000) // simulate slowness
+                editNoticeFrame.loadData(notice)
+            }
         }
     }
 }

@@ -1,4 +1,4 @@
-package de.heikozelt.wegefrei.gui
+package de.heikozelt.wegefrei.noticeframe
 
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent

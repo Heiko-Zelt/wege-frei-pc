@@ -1,6 +1,7 @@
-package de.heikozelt.wegefrei.gui
+package de.heikozelt.wegefrei.noticesframe
 
-import de.heikozelt.wegefrei.model.VehicleColor
+import de.heikozelt.wegefrei.gui.Styles
+import de.heikozelt.wegefrei.model.NoticeState
 import org.slf4j.LoggerFactory
 import java.awt.Component
 import javax.swing.JLabel
@@ -11,7 +12,7 @@ import javax.swing.border.EmptyBorder
 import javax.swing.table.TableCellRenderer
 
 
-class NoticesTableColorCellRenderer : JLabel(), TableCellRenderer {
+class NoticesTableStateCellRenderer : JLabel(), TableCellRenderer {
 
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
 
@@ -26,7 +27,7 @@ class NoticesTableColorCellRenderer : JLabel(), TableCellRenderer {
      */
     override fun getTableCellRendererComponent(
         table: JTable?,
-        value: Any,
+        value: Any?,
         isSelected: Boolean,
         hasFocus: Boolean,
         row: Int,
@@ -69,9 +70,15 @@ class NoticesTableColorCellRenderer : JLabel(), TableCellRenderer {
         //isOpaque = background != null && !(background.equals(table.background));
         super.setOpaque(true)
 
-        if (value is VehicleColor) {
-            icon = ColorIcon(value.color)
-            text = value.colorName
+        // todo icon & Farbe
+        text = if (value is NoticeState) {
+            when(value) {
+                NoticeState.INCOMPLETE -> "unvollständig"
+                NoticeState.COMPLETE -> "offen"
+                NoticeState.SENT -> "gemeldet"
+            }
+        } else {
+            "?"
         }
         return this
     }

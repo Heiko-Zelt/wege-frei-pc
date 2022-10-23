@@ -1,6 +1,7 @@
-package de.heikozelt.wegefrei.gui
+package de.heikozelt.wegefrei.noticeframe
 
 import de.heikozelt.wegefrei.entities.Photo
+import de.heikozelt.wegefrei.gui.Styles
 import de.heikozelt.wegefrei.gui.Styles.Companion.HIGHLIGHT_BORDER
 import de.heikozelt.wegefrei.gui.Styles.Companion.NORMAL_BORDER
 import de.heikozelt.wegefrei.jobs.SelectedThumbnailWorker

@@ -6,7 +6,7 @@ import com.drew.metadata.exif.ExifSubIFDDirectory
 import com.drew.metadata.exif.GpsDirectory
 import de.heikozelt.wegefrei.entities.Notice
 import de.heikozelt.wegefrei.entities.Photo
-import de.heikozelt.wegefrei.gui.NoticesFrame
+import de.heikozelt.wegefrei.noticesframe.NoticesFrame
 import org.slf4j.LoggerFactory
 import java.awt.EventQueue
 import java.io.File

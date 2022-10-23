@@ -1,4 +1,4 @@
-package de.heikozelt.wegefrei.gui
+package de.heikozelt.wegefrei.noticeframe
 
 import de.heikozelt.wegefrei.DatabaseService
 import de.heikozelt.wegefrei.WegeFrei
@@ -26,10 +26,24 @@ import kotlin.math.sqrt
 /**
  * Haupt-Fenster zum Bearbeiten einer Meldung
  * (mit "Dispatcher-Funktionen" / "Business-Logik")
- * Instanziierung
+ *
+ * Ablauf:
  * <ol>
- *   <li>ohne Parameter zum Bearbeiten einer neuen Meldung. notice.id ist null.</li>
- *   <li>Instanziierung mit Notice als Parameter zum Bearbeiten einer bestehenden Meldung. notice.id enthält eine Zahl.</li>
+ *   <li>Konstruktor + init()-Methode
+ *     <ol>
+ *       <li>Anlegen der GUI-Elemente/Widgets</li>
+ *       <li>alle deaktivieren</li>
+ *       <li>zum Container, hier JFrame hinzufügen</li>
+ *       <li>JFrame anzeigen</li>
+ *     </ol>
+ *   </li>
+ *   <li>Daten laden
+ *     <ol>
+ *       <li>hier eine neue/leere Meldung oder</li>
+ *       <li>bestehende/teils oder vollständig ausgefüllte Meldung</li>
+ *     </ol>
+ *   </li>
+ *   <li>Aktivierung der Formularfelder (abhängig von den konkreten Daten)</li>
  * </ol>
  */
 class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver {
@@ -83,11 +97,16 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
     }
 
     /**
+     * @param notice
+     * <ol>
+     *   <li>ohne Parameter bzw. mit Default-Parameter zum Bearbeiten einer neuen Meldung. notice.id ist null.</li>
+     *   <li>Instanziierung mit Notice als Parameter zum Bearbeiten einer bestehenden Meldung. notice.id enthält eine Zahl.</li>
+     * </ol>
      * SelectedPhotosObservers werden frühzeitig registriert.
      * Fotos werden direkt danach ersetzt.
      * Zuletzt werden sonstige Daten geladen.
      */
-    fun loadData(notice: Notice) {
+    fun loadData(notice: Notice = Notice()) {
         log.debug("loadData(notice id: ${notice.id})")
         selectedPhotos.registerObserver(this)
         selectedPhotos.registerObserver(selectedPhotosPanel)
@@ -163,7 +182,7 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
         maxiMapForm.setPhotoMarkers(selectedPhotos)
         notice?.let {
             if (it.isSent()) {
-                maxiMapForm?.disableFormFields()
+                maxiMapForm?.enableOrDisableEditing()
             }
         }
 
@@ -283,13 +302,14 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
 
     /**
      * Die Methode wird vom E-Mail-absenden-Button aufgerufen.
+     * todo 4. Status einführen, Meldung ist im Postausgang, aber noch nicht gesendet
      */
     fun sendNotice() {
         saveNotice()
         notice?.let {
             sendEmail()
-            disableFormFields()
             it.sentTime = ZonedDateTime.now()
+            disableFormFields()
             saveNotice()
         }
     }
@@ -297,8 +317,8 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
     private fun disableFormFields() {
         log.debug("disabling form fields is not yet implemented")
         // todo Prio 2 implementieren Eingabefelder deaktivieren
-        noticeForm.disableFormFields()
-        getMaxiMapForm()?.disableFormFields()
+        noticeForm.enableOrDisableEditing()
+        getMaxiMapForm()?.enableOrDisableEditing()
     }
 
     private fun sendEmail() {

@@ -1,5 +1,6 @@
 package de.heikozelt.wegefrei.gui
 
+import de.heikozelt.wegefrei.noticeframe.NoticeFrame
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.jxmapviewer.viewer.GeoPosition

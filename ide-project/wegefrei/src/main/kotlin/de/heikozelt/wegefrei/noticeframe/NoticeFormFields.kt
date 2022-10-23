@@ -1,9 +1,10 @@
-package de.heikozelt.wegefrei.gui
+package de.heikozelt.wegefrei.noticeframe
 
 import de.heikozelt.wegefrei.docfilters.DateDocFilter
 import de.heikozelt.wegefrei.docfilters.OnlyDigitsDocFilter
 import de.heikozelt.wegefrei.docfilters.TimeDocFilter
 import de.heikozelt.wegefrei.entities.Photo
+import de.heikozelt.wegefrei.gui.*
 import de.heikozelt.wegefrei.gui.Styles.Companion.FORM_BACKGROUND
 import de.heikozelt.wegefrei.gui.Styles.Companion.NO_BORDER
 import de.heikozelt.wegefrei.gui.Styles.Companion.TEXTFIELD_FONT
@@ -287,6 +288,8 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel(), Selecte
         add(noteTextArea, constraints)
 
         setSize(700, 700)
+
+        enableOrDisableEditing()
         isVisible = true
     }
 
@@ -296,10 +299,6 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel(), Selecte
      */
     fun loadData() {
         val notice = noticeFrame.getNotice() ?: return
-
-        if (notice.isSent()) {
-            disableFormFields()
-        }
 
         notice.getGeoPosition()?.let {
             miniMap.setOffensePosition(it)
@@ -336,6 +335,8 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel(), Selecte
         abandonedCheckBox.isSelected = notice.vehicleAbandoned
         recipientTextField.text = notice.recipient
         noteTextArea.text = notice.note
+
+        enableOrDisableEditing()
     }
 
     /**
@@ -443,28 +444,30 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel(), Selecte
      * keine weitere Bearbeitung mehr zulassen,
      * wenn die Meldung bereits versendet wurde.
      */
-    fun disableFormFields() {
-        countrySymbolComboBox.isEnabled = false
-        licensePlateTextField.isEnabled = false
-        vehicleMakeComboBox.isEnabled = false
-        colorComboBox.isEnabled = false
-        streetTextField.isEnabled = false
-        zipCodeTextField.isEnabled = false
-        townTextField.isEnabled = false
-        locationDescriptionTextField.isEnabled = false
-        offenseComboBox.isEnabled = false
-        observationDateTextField.isEnabled = false
-        observationTimeTextField.isEnabled = false
-        durationTextField.isEnabled = false
-        obstructionCheckBox.isEnabled = false
-        endangeringCheckBox.isEnabled = false
-        environmentalStickerCheckBox.isEnabled = false
-        vehicleInspectionStickerCheckBox.isEnabled = false
-        inspectionYearTextField.isEnabled = false
-        inspectionMonthTextField.isEnabled = false
-        abandonedCheckBox.isEnabled = false
-        recipientTextField.isEnabled = false
-        noteTextArea.isEnabled = false
+    fun enableOrDisableEditing() {
+        val notice = noticeFrame.getNotice()
+        val enab = (notice != null) && !notice.isSent()
+        countrySymbolComboBox.isEnabled = enab
+        licensePlateTextField.isEnabled = enab
+        vehicleMakeComboBox.isEnabled = enab
+        colorComboBox.isEnabled = enab
+        streetTextField.isEnabled = enab
+        zipCodeTextField.isEnabled = enab
+        townTextField.isEnabled = enab
+        locationDescriptionTextField.isEnabled = enab
+        offenseComboBox.isEnabled = enab
+        observationDateTextField.isEnabled = enab
+        observationTimeTextField.isEnabled = enab
+        durationTextField.isEnabled = enab
+        obstructionCheckBox.isEnabled = enab
+        endangeringCheckBox.isEnabled = enab
+        environmentalStickerCheckBox.isEnabled = enab
+        vehicleInspectionStickerCheckBox.isEnabled = enab
+        inspectionYearTextField.isEnabled = enab
+        inspectionMonthTextField.isEnabled = enab
+        abandonedCheckBox.isEnabled = enab
+        recipientTextField.isEnabled = enab
+        noteTextArea.isEnabled = enab
     }
 
     override fun selectedPhoto(index: Int, photo: Photo) {

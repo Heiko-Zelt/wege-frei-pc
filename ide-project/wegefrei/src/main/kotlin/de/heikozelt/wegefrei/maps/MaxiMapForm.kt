@@ -1,9 +1,9 @@
 package de.heikozelt.wegefrei.maps
 
-import de.heikozelt.wegefrei.gui.NoticeFrame
 import de.heikozelt.wegefrei.gui.Styles.Companion.FORM_BACKGROUND
 import de.heikozelt.wegefrei.gui.Styles.Companion.NO_BORDER
 import de.heikozelt.wegefrei.model.SelectedPhotos
+import de.heikozelt.wegefrei.noticeframe.NoticeFrame
 import org.jxmapviewer.viewer.GeoPosition
 import org.slf4j.LoggerFactory
 import java.awt.BorderLayout
@@ -39,9 +39,9 @@ class MaxiMapForm(private val noticeFrame: NoticeFrame) : JPanel() {
         maxiMap.replacedPhotoSelection(selectedPhotos.getPhotos())
     }
 
-    fun disableFormFields() {
-        maxiMap.disableDragAndDrop()
-        maxiMapButtonsBar.disableOffenseMarkerButton()
+    fun enableOrDisableEditing() {
+        maxiMap.enableOrDisableDragAndDrop()
+        maxiMapButtonsBar.enableOrDisableOffenseMarkerButton()
     }
 
     fun fit() {

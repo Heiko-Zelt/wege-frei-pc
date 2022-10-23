@@ -1,7 +1,7 @@
 package de.heikozelt.wegefrei.jobs
 
 import com.beust.klaxon.Klaxon
-import de.heikozelt.wegefrei.gui.NoticeForm
+import de.heikozelt.wegefrei.noticeframe.NoticeForm
 import de.heikozelt.wegefrei.json.NominatimResponse
 import org.jxmapviewer.viewer.GeoPosition
 import org.slf4j.LoggerFactory

@@ -1,7 +1,7 @@
 package de.heikozelt.wegefrei.maps
 
 import de.heikozelt.wegefrei.entities.Photo
-import de.heikozelt.wegefrei.gui.NoticeFrame
+import de.heikozelt.wegefrei.noticeframe.NoticeFrame
 import de.heikozelt.wegefrei.model.SelectedPhotosObserver
 import org.jxmapviewer.JXMapViewer
 import org.jxmapviewer.OSMTileFactoryInfo

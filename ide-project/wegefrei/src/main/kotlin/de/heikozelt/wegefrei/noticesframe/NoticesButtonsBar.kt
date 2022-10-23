@@ -1,10 +1,11 @@
-package de.heikozelt.wegefrei.gui
+package de.heikozelt.wegefrei.noticesframe
 
 import de.heikozelt.wegefrei.WegeFrei
-import de.heikozelt.wegefrei.entities.Notice
 import de.heikozelt.wegefrei.gui.Styles.Companion.BUTTONS_DISTANCE
 import de.heikozelt.wegefrei.gui.Styles.Companion.BUTTON_MARGIN
+import de.heikozelt.wegefrei.noticeframe.NoticeFrame
 import org.slf4j.LoggerFactory
+import java.awt.EventQueue
 import java.awt.FlowLayout
 import javax.swing.Box
 import javax.swing.ImageIcon
@@ -15,31 +16,23 @@ class NoticesButtonsBar(private val app: WegeFrei): JPanel() {
 
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
     init {
-        //background = TOOLBAR_BACKGROUND
-        //isFloatable = false
-        //border = TOOLBAR_BORDER
-
         layout = FlowLayout(FlowLayout.RIGHT, 5,0)
 
         log.debug("layout " + layout)
-        //JToolBar: javax.swing.plaf.synth.SynthToolBarUI$SynthToolBarLayoutManager
-        //JPanel: java.awt.FlowLayout[hgap=5,vgap=5,align=center]
-
-        //add(Box.createHorizontalGlue())
 
         val newButton = JButton("neue Meldung erfassen")
         newButton.margin = BUTTON_MARGIN
 
         newButton.addActionListener {
-            val newNotice = Notice()
             val newNoticeFrame = NoticeFrame(app)
-            newNoticeFrame.loadData(newNotice)
+            EventQueue.invokeLater {
+                // Thread.sleep(5000) // simulate slowness
+                newNoticeFrame.loadData()
+            }
         }
         add(newButton)
 
-        //addSeparator(BUTTONS_SEPARATOR_DIMENSION)
         add(Box.createHorizontalStrut(BUTTONS_DISTANCE));
-        //add(BUTTONS_SEPARATOR)
 
         val scanButton = JButton()
         scanButton.margin = BUTTON_MARGIN
@@ -53,9 +46,7 @@ class NoticesButtonsBar(private val app: WegeFrei): JPanel() {
         }
         add(scanButton)
 
-        //add(Box.createHorizontalStrut(25));
         add(Box.createHorizontalStrut(BUTTONS_DISTANCE));
-        //add(BUTTONS_SEPARATOR)
 
         val settingsButton = JButton()
         settingsButton.margin = BUTTON_MARGIN
@@ -70,14 +61,11 @@ class NoticesButtonsBar(private val app: WegeFrei): JPanel() {
         }
         add(settingsButton)
 
-        //add(Box.createHorizontalStrut(25));
         add(Box.createHorizontalStrut(BUTTONS_DISTANCE));
-        //add(BUTTONS_SEPARATOR)
 
         val helpButton = JButton()
         helpButton.margin = BUTTON_MARGIN
         val helpImageURL = this::class.java.getResource("help_icon.gif")
-        //button.setActionCommand(UP)
         helpButton.toolTipText = "Hilfe"
         helpButton.addActionListener { log.debug("unhandled event") }
         if(helpImageURL != null) {
@@ -87,9 +75,7 @@ class NoticesButtonsBar(private val app: WegeFrei): JPanel() {
         }
         add(helpButton)
 
-        //add(Box.createHorizontalStrut(25));
         add(Box.createHorizontalStrut(BUTTONS_DISTANCE));
-        //add(BUTTONS_SEPARATOR)
     }
 
 }

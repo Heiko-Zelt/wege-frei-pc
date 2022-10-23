@@ -1,6 +1,6 @@
 package de.heikozelt.wegefrei.gui
 
-import de.heikozelt.wegefrei.gui.NoticeFormFields.Companion.trimmedOrNull
+import de.heikozelt.wegefrei.noticeframe.NoticeFormFields.Companion.trimmedOrNull
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
