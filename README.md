@@ -2,6 +2,8 @@
 
 Wege-frei PC ist ein Programm für den PC/Mac/Raspberry Pi/Desktop/Laptop, um Falschparker_innen zu melden. Die Idee zu diesem Projekt basiert auf der Wegeheld-App und der Weg.li-Website.
 
+![Screenshot](doc/screenshot1.png)
+
 ## Besonderheit
 
 Alle Daten (Beweisfotos und Meldungen) werden auf dem eigenen PC gespeichert. Der Versand erfolgt über das persönliche E-Mail-Postfach direkt an das zuständige Ordnungsamt. Hierdurch ergibt sich ein Geschwindigkeitsvorteil und im Sinne der Datensparsamkeit werden die Daten nicht durch zusätzliche Dienstleister verarbeitet.
