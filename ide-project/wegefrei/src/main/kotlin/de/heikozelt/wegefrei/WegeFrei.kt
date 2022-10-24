@@ -6,14 +6,20 @@ import com.drew.metadata.exif.ExifSubIFDDirectory
 import com.drew.metadata.exif.GpsDirectory
 import de.heikozelt.wegefrei.entities.Notice
 import de.heikozelt.wegefrei.entities.Photo
+import de.heikozelt.wegefrei.json.Settings
 import de.heikozelt.wegefrei.noticesframe.NoticesFrame
+import de.heikozelt.wegefrei.settingsframe.SettingsFrame
 import org.slf4j.LoggerFactory
 import java.awt.EventQueue
 import java.io.File
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.*
+import javax.swing.UIManager
 
+/**
+ * Wege Frei! PC
+ */
 class WegeFrei {
 
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
@@ -24,9 +30,32 @@ class WegeFrei {
 
     private val noticesFrame = NoticesFrame(this)
 
+    private var settings: Settings? = null
+
+    /**
+     * reference to SettingsFrame, if window is shown on screen otherwise null
+     */
+    private var settingsFrame: SettingsFrame? = null
+
     init{
         log.debug("initializing")
         noticesFrame.loadData()
+    }
+
+    fun setSettings(settings: Settings?) {
+        this.settings = settings
+    }
+
+    fun openSettingsFrame() {
+        if (settingsFrame == null) {
+            settingsFrame = SettingsFrame(this)
+        } else {
+            settingsFrame?.toFront()
+        }
+    }
+
+    fun settingsFrameClosed() {
+        this.settingsFrame = null
     }
 
     fun getDatabaseService(): DatabaseService {
@@ -114,7 +143,7 @@ class WegeFrei {
     }
 
     companion object {
-        // todo: Einstellungen in DB speichern und Ort der Datenbank via Kommando-Zeilen-Parameter übergeben
+        // todo Prio 1: Einstellungen in Settings-Datei speichern
         const val PHOTO_DIR = "/media/veracrypt1/_Fotos/2022/03"
 
         private val LOG = LoggerFactory.getLogger(this::class.java.canonicalName)
@@ -122,22 +151,30 @@ class WegeFrei {
         @JvmStatic
         fun main(args: Array<String>) {
             LOG.info("Wege frei!")
-            LOG.debug("Program arguments: ${args.joinToString()}")
+            //LOG.debug("Program arguments: ${args.joinToString()}")
 
-            /*
+            val settings = Settings.load()
+
             try {
-                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+                // todo Prio 1: set look and feel according to settings
+                //val className = UIManager.getSystemLookAndFeelClassName()
+                val className = UIManager.getCrossPlatformLookAndFeelClassName()
+                LOG.info("look & feel: $className")
+                UIManager.setLookAndFeel(className);
             } catch (e: Exception) {
                 LOG.error("exception while setting look and feel", e)
             }
-            */
 
             val shutdownHook = Thread { LOG.info("exit") }
             Runtime.getRuntime().addShutdownHook(shutdownHook)
 
-            EventQueue.invokeLater { WegeFrei() }
+            EventQueue.invokeLater {
+                val app = WegeFrei()
+                app.setSettings(settings)
 
-            LOG.debug("de.heikozelt.wegefrei.main function finished")
+            }
+
+            LOG.debug("de.heikozelt.wegefrei.Main.main()-method finished")
         }
 
     }

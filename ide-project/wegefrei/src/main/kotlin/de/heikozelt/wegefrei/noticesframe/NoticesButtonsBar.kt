@@ -4,6 +4,7 @@ import de.heikozelt.wegefrei.WegeFrei
 import de.heikozelt.wegefrei.gui.Styles.Companion.BUTTONS_DISTANCE
 import de.heikozelt.wegefrei.gui.Styles.Companion.BUTTON_MARGIN
 import de.heikozelt.wegefrei.noticeframe.NoticeFrame
+import de.heikozelt.wegefrei.settingsframe.SettingsFrame
 import org.slf4j.LoggerFactory
 import java.awt.EventQueue
 import java.awt.FlowLayout
@@ -15,6 +16,9 @@ import javax.swing.JPanel
 class NoticesButtonsBar(private val app: WegeFrei): JPanel() {
 
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
+
+    // todo: set null again, when closed, but how?
+    private var settingsFrame: SettingsFrame? = null
     init {
         layout = FlowLayout(FlowLayout.RIGHT, 5,0)
 
@@ -53,7 +57,7 @@ class NoticesButtonsBar(private val app: WegeFrei): JPanel() {
         val settingsImageURL = this::class.java.getResource("settings_icon.gif")
         //button.setActionCommand(UP)
         settingsButton.toolTipText = "Einstellungen"
-        settingsButton.addActionListener{ log.debug("unhandled event")}
+        settingsButton.addActionListener{ app.openSettingsFrame() }
         if(settingsImageURL != null) {
             settingsButton.icon = ImageIcon(settingsImageURL, "Einstellungen")
         } else {

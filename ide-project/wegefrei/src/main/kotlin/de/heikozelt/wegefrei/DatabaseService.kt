@@ -85,6 +85,11 @@ class DatabaseService {
     }
 
     companion object {
+        /**
+         * The filename includes a major software version number.
+         * This makes it easy to have multiple major software versions installed in parallel.
+         * If the file format changes significantly, the major software version should change too.
+         */
         private const val PERSISTENCE_UNIT_NAME = "wegefrei"
     }
 }
