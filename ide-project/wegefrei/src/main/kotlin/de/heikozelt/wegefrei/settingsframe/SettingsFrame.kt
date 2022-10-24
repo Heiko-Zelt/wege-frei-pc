@@ -23,16 +23,22 @@ class SettingsFrame(private val app: WegeFrei): JFrame() {
         isVisible = true
     }
 
-    fun setSettings(settings: Settings) {
-        this.settings = settings
+    fun setSettings(settings: Settings?) {
+        settings?.let {
+            this.settings = it
+            settingsFormFields.load(it)
+        }
     }
 
     fun saveAndClose() {
-        isVisible = false
-        dispose()
-        settings?.save()
-        app.setSettings(settings)
-        app.settingsFrameClosed()
+        settings?.let {
+            isVisible = false
+            dispose()
+            settingsFormFields.save(it)
+            settings?.saveToFile()
+            app.settingsChanged()
+            app.settingsFrameClosed()
+        }
     }
 
     fun cancelAndClose() {

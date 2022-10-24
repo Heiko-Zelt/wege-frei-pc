@@ -27,11 +27,7 @@ class NoticeFormButtonsBar(private val noticeFrame: NoticeFrame): JPanel() {
         val okButton = JButton("Ok")
         okButton.margin = Styles.BUTTON_MARGIN
         //okButton.border = NORMAL_BORDER
-        okButton.addActionListener {
-            noticeFrame.saveNotice()
-            noticeFrame.isVisible = false
-            noticeFrame.dispose()
-        }
+        okButton.addActionListener { noticeFrame.saveAndClose() }
         add(okButton)
 
         //addSeparator(BUTTONS_SEPARATOR_DIMENSION)
@@ -39,10 +35,7 @@ class NoticeFormButtonsBar(private val noticeFrame: NoticeFrame): JPanel() {
 
         val cancelButton = JButton("Abbrechen")
         cancelButton.margin = Styles.BUTTON_MARGIN
-        cancelButton.addActionListener {
-            noticeFrame.isVisible = false
-            noticeFrame.dispose()
-        }
+        cancelButton.addActionListener { noticeFrame.cancelAndClose() }
         add(cancelButton)
 
         deleteButtonStruts.isVisible = false
@@ -50,11 +43,7 @@ class NoticeFormButtonsBar(private val noticeFrame: NoticeFrame): JPanel() {
 
         deleteButton.isVisible = false
         deleteButton.margin = Styles.BUTTON_MARGIN
-        deleteButton.addActionListener {
-                noticeFrame.deleteNotice()
-                noticeFrame.isVisible = false
-                noticeFrame.dispose()
-            }
+        deleteButton.addActionListener { noticeFrame.deleteAndClose() }
         add(deleteButton)
 
         add(Box.createHorizontalStrut(Styles.BUTTONS_DISTANCE));

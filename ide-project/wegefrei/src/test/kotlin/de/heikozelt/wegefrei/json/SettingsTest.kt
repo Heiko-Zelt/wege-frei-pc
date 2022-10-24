@@ -13,8 +13,8 @@ class SettingsTest {
         val originalSettings = Settings()
         assertEquals("", originalSettings.lookAndFeel)
 
-        originalSettings.save(testSettingsPath)
-        val readSettings = Settings.load(testSettingsPath)
+        originalSettings.saveToFile(testSettingsPath)
+        val readSettings = Settings.loadFromFile(testSettingsPath)
 
         assertEquals("", readSettings?.lookAndFeel)
     }

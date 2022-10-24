@@ -74,7 +74,10 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
         log.debug("init")
         title = "Meldung - Wege frei!"
         background = FRAME_BACKGROUND
-        defaultCloseOperation = DISPOSE_ON_CLOSE
+
+        //defaultCloseOperation = DISPOSE_ON_CLOSE ist egal
+        addWindowListener(NoticeFrameWindowListener(this))
+
         setSize(1000, 700)
 
         topSplitPane.apply {
@@ -446,6 +449,26 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
         offensePosition = newPosition
         noticeForm.getNoticeFormFields().getMiniMap().setOffensePosition(offensePosition)
         maybeFindAddress()
+    }
+
+    fun cancelAndClose() {
+        isVisible = false
+        dispose()
+        app.noticeFrameClosed(this)
+    }
+
+    fun saveAndClose() {
+        saveNotice()
+        isVisible = false
+        dispose()
+        app.noticeFrameClosed(this)
+    }
+
+    fun deleteAndClose() {
+        deleteNotice()
+        isVisible = false
+        dispose()
+        app.noticeFrameClosed(this)
     }
 
     companion object {

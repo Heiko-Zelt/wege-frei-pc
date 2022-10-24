@@ -12,6 +12,8 @@ import javax.swing.JPanel
 import javax.swing.JTable
 
 /**
+ * Der NoticesFrame zeigt eine Übersichts-Tabelle mit allen Meldungen an.
+ *
  * Die Initialisierung erfolgt in 2 Schritten:
  * <ol>
  *   <li>Die GUI wird aufgebaut.

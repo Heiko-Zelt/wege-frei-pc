@@ -7,6 +7,7 @@ import com.drew.metadata.exif.GpsDirectory
 import de.heikozelt.wegefrei.entities.Notice
 import de.heikozelt.wegefrei.entities.Photo
 import de.heikozelt.wegefrei.json.Settings
+import de.heikozelt.wegefrei.noticeframe.NoticeFrame
 import de.heikozelt.wegefrei.noticesframe.NoticesFrame
 import de.heikozelt.wegefrei.settingsframe.SettingsFrame
 import org.slf4j.LoggerFactory
@@ -15,10 +16,16 @@ import java.io.File
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.*
+import javax.swing.SwingUtilities
 import javax.swing.UIManager
 
 /**
  * Wege Frei! PC
+ *
+ * Diese Klasse ist der Ober-Manager.
+ * Sie verwaltet die einzelnen Fenster vom Typ NoticesFrame (Übersichts-Seite),
+ * NoticeFrame (neue oder bestehende Meldung bearbeiten) & SettingsFrame,
+ * sowie die Einstellungen (Settings) und die Datenbank-Verbindung (DatabaseService).
  */
 class WegeFrei {
 
@@ -28,7 +35,7 @@ class WegeFrei {
 
     private val databaseService = DatabaseService()
 
-    private val noticesFrame = NoticesFrame(this)
+    private var noticesFrame: NoticesFrame? = null
 
     private var settings: Settings? = null
 
@@ -37,23 +44,71 @@ class WegeFrei {
      */
     private var settingsFrame: SettingsFrame? = null
 
+    /**
+     * einzelne Meldungs-Fenster (neue oder bestehende Meldung bearbeiten)
+     */
+    private val noticeFrames = mutableListOf<NoticeFrame>()
+
     init{
         log.debug("initializing")
-        noticesFrame.loadData()
     }
 
-    fun setSettings(settings: Settings?) {
+    fun setSettings(settings: Settings) {
         this.settings = settings
+        changeLookAndFeel()
     }
 
+    fun openNoticesFrame() {
+        noticesFrame = NoticesFrame(this)
+        noticesFrame?.loadData()
+    }
+
+    /**
+     * Opens Window to create new or edit existing notice
+     * @param notice The notice to edit or new notice if omitted.
+     */
+    fun openNoticeFrame(notice: Notice = Notice()) {
+        log.debug("Anzahl NoticeFrames: " + noticeFrames.size)
+        val noticeFrame = NoticeFrame(this)
+        noticeFrames.add(noticeFrame)
+        EventQueue.invokeLater {
+            // Thread.sleep(5000) // simulate slowness
+            noticeFrame.loadData(notice)
+        }
+    }
+
+    /**
+     * must be called to prevent memory leaks
+     */
+    fun noticeFrameClosed(noticeFrame: NoticeFrame) {
+        noticeFrames.remove(noticeFrame)
+    }
+
+    /**
+     * Is called when Settings (may) have changed.
+     */
+    fun settingsChanged() {
+        settings?.let {
+            changeLookAndFeel()
+        }
+    }
+
+    /**
+     * Öffnet das Einstellungen-Fenster.
+     * (Wenn es schon geöffnet ist, dann wird es nur in den Vordergrund gebracht.)
+     */
     fun openSettingsFrame() {
         if (settingsFrame == null) {
             settingsFrame = SettingsFrame(this)
+            settingsFrame?.setSettings(settings)
         } else {
             settingsFrame?.toFront()
         }
     }
 
+    /**
+     * must be called, when settings frame is closed
+     */
     fun settingsFrameClosed() {
         this.settingsFrame = null
     }
@@ -66,21 +121,21 @@ class WegeFrei {
      * called, when new notice is saved, added to database
      */
     fun noticeAdded(notice: Notice) {
-        noticesFrame.noticeAdded(notice)
+        noticesFrame?.noticeAdded(notice)
     }
 
     /**
      * called, when existing notice is saved, updated in database
      */
     fun noticeUpdated(notice: Notice) {
-        noticesFrame.noticeUpdated(notice)
+        noticesFrame?.noticeUpdated(notice)
     }
 
     /**
      * called, when existing notice is deleted
      */
     fun noticeDeleted(notice: Notice) {
-        noticesFrame.noticeDeleted(notice)
+        noticesFrame?.noticeDeleted(notice)
     }
 
     // todo Prio 3: Hintergrundjob und Status-Balken anzeigen
@@ -142,6 +197,24 @@ class WegeFrei {
         return Photo(file.name, latitude, longitude, datTim, null)
     }
 
+    private fun changeLookAndFeel() {
+        settings?.let { setti ->
+            try {
+                // todo Prio 1: set look and feel according to settings
+                LOG.info("look & feel name: ${setti.lookAndFeel}")
+                val className = setti.getLookAndFeelInfo()?.className
+                LOG.debug("look & feel class name: $className")
+                className?.let {
+                    UIManager.setLookAndFeel(className);
+                }
+                noticesFrame?.let { frame -> SwingUtilities.updateComponentTreeUI(frame) }
+                noticeFrames.forEach { frame -> SwingUtilities.updateComponentTreeUI(frame) }
+            } catch (e: Exception) {
+                LOG.error("exception while setting look and feel", e)
+            }
+        }
+    }
+
     companion object {
         // todo Prio 1: Einstellungen in Settings-Datei speichern
         const val PHOTO_DIR = "/media/veracrypt1/_Fotos/2022/03"
@@ -153,17 +226,7 @@ class WegeFrei {
             LOG.info("Wege frei!")
             //LOG.debug("Program arguments: ${args.joinToString()}")
 
-            val settings = Settings.load()
-
-            try {
-                // todo Prio 1: set look and feel according to settings
-                //val className = UIManager.getSystemLookAndFeelClassName()
-                val className = UIManager.getCrossPlatformLookAndFeelClassName()
-                LOG.info("look & feel: $className")
-                UIManager.setLookAndFeel(className);
-            } catch (e: Exception) {
-                LOG.error("exception while setting look and feel", e)
-            }
+            val settings = Settings.loadFromFile()
 
             val shutdownHook = Thread { LOG.info("exit") }
             Runtime.getRuntime().addShutdownHook(shutdownHook)
@@ -171,7 +234,7 @@ class WegeFrei {
             EventQueue.invokeLater {
                 val app = WegeFrei()
                 app.setSettings(settings)
-
+                app.openNoticesFrame()
             }
 
             LOG.debug("de.heikozelt.wegefrei.Main.main()-method finished")

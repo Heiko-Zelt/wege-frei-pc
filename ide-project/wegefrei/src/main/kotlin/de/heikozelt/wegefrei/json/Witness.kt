@@ -6,11 +6,15 @@ import com.beust.klaxon.Json
  * Part of Settings
  */
 class Witness (
-    val email: String = "",
-    val street: String = "",
+    var email: String = "",
+
+    var street: String = "",
+
     @Json(name= "zip_code")
-    val zipCode: String = "",
-    val town: String = "",
+    var zipCode: String = "",
+
+    var town: String = "",
+
     @Json(name= "telephone_number")
-    val telephoneNumber: String = ""
+    var telephoneNumber: String = ""
 )

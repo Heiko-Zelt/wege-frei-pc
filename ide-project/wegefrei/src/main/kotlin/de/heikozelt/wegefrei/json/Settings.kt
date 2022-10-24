@@ -14,27 +14,36 @@ import kotlin.io.path.Path
  * @param lookAndFeel: java class name example: "com.sun.java.swing.plaf.gtk.GTKLookAndFeel" or "javax.swing.plaf.metal.MetalLookAndFeel"
  */
 class Settings (
-    val witness: Witness = Witness(),
+    var witness: Witness = Witness(),
 
     @Json(name = "look_and_feel")
-    val lookAndFeel: String = "",
+    var lookAndFeel: String = "",
 
     @Json(name = "photos_directory")
-    val photosDirectory: String = "~",
+    var photosDirectory: String = "~",
 
     @Json(name = "database_directory")
-    val databaseDirectory: String = "~"
+    var databaseDirectory: String = "~"
 ) {
+    private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
 
     /**
      * @param path Usually no path should be specified. But for unit tests a path should be given.
      */
-    fun save(path: Path = SETTINGS_PATH) {
+    fun saveToFile(path: Path = SETTINGS_PATH) {
         //todo: Prio 3 it would be nice to have pretty print with line breaks and indents like in Gson
+        log.debug("save settings to file ${path.toString()}")
         val text = Klaxon().toJsonString(this)
         val file = File(path.toString())
         file.createNewFile() // if file already exists will do nothing
         file.writeText(text)
+    }
+
+    /**
+     * To set the look'n'feel the className-Field is needed
+     */
+    fun getLookAndFeelInfo(): UIManager.LookAndFeelInfo? {
+        return UIManager.getInstalledLookAndFeels().firstOrNull { it.name == lookAndFeel }
     }
 
     companion object {
@@ -54,7 +63,7 @@ class Settings (
          * And there is already a constructor without parameters.
          * @param path Usually no path should be specified. But for unit tests a path should be given.
          */
-        fun load(path: Path = SETTINGS_PATH): Settings {
+        fun loadFromFile(path: Path = SETTINGS_PATH): Settings {
             return try {
                 val file = File(path.toString())
                 val text = file.inputStream().readBytes().toString(Charsets.UTF_8)
