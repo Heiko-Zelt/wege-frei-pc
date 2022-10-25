@@ -33,7 +33,6 @@ class SettingsFrameTest {
         assertNotNull(settingsRepo)
         //doNothing().`when`(settingsRepo.saveToFile(any()))
 
-        settingsRepo.setPath(path)
         settings = settingsRepo.load()
         assertNotNull(settings)
         app = WegeFrei(settingsRepo)
@@ -71,7 +70,7 @@ class SettingsFrameTest {
     }
 
     @Test
-    fun open_settings_change_look_and_feel_save_and_close() {
+    fun open_settings_change_tls_encryption_save_and_close() {
         window?.comboBox("tlsComboBox")?.selectItem("StartTLS-verschlüsselt")
         val closeButtonFix = window?.button(withText("Ok"))
         assertNotNull(closeButtonFix)

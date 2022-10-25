@@ -9,8 +9,8 @@ import java.nio.file.Path
 import kotlin.io.path.Path
 
 /**
- * load and save Settings from file system.
- * (or Windows registry?)
+ * Load and save Settings from/to file system.
+ * Usually the file is located in the users home directory.
  */
 class SettingsFileRepo: SettingsRepo {
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
@@ -23,17 +23,15 @@ class SettingsFileRepo: SettingsRepo {
     private var settingsPath = Path(System.getProperty("user.home"), ".wege_frei_v1.settings.json")
 
     /**
-     * simple setter method to change the default path
+     * Simple setter method to change the default path.
      */
-    override fun setPath(settingsPath: Path) {
+    fun setPath(settingsPath: Path) {
         this.settingsPath = settingsPath
     }
 
     /**
-     * This factory method could be a constructor, but it's better to have a name for it,
-     * which clearly tells what it does.
-     * And there is already a constructor without parameters.
-     * @param path Usually no path should be specified. But for unit tests a path should be given.
+     * Load settings from filesystem.
+     * If the file is not found return default values.
      */
     override fun load(): Settings {
         return try {
@@ -53,7 +51,7 @@ class SettingsFileRepo: SettingsRepo {
     }
 
     /**
-     * @param path Usually no path should be specified. But for unit tests a path should be given.
+     * Save settings to a file.
      */
     override fun save(settings: Settings) {
         //todo: Prio 3 it would be nice to have pretty print with line breaks and indents like in Gson

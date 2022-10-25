@@ -20,7 +20,6 @@ dependencies {
     implementation 'commons-logging:commons-logging:1.2'
     implementation files('libs/jxmapviewer2-2.7-SNAPSHOT.jar')
 
-
     //implementation 'io.github.microutils:kotlin-logging:3.0.0' no module defined?
     implementation 'org.slf4j:slf4j-api:2.0.3' // needed by kotlin-logging
     implementation 'org.slf4j:slf4j-simple:2.0.3' // simple implementation of api
@@ -30,6 +29,7 @@ dependencies {
     implementation 'com.beust:klaxon:5.6'
     testImplementation 'org.jetbrains.kotlin:kotlin-test'
     testImplementation 'org.assertj:assertj-swing-junit:3.17.1'
+    // Problems with Mockito and Kotlin and NullPointers
     //testImplementation 'org.mockito:mockito-junit-jupiter:4.8.0'
     //testImplementation "org.mockito.kotlin:mockito-kotlin:4.0.0"
 }
