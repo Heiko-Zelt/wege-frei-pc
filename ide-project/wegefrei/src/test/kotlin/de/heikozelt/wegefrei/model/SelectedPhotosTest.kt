@@ -2,7 +2,6 @@ package de.heikozelt.wegefrei.model
 
 import de.heikozelt.wegefrei.entities.Photo
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.time.ZonedDateTime
 
@@ -47,6 +46,7 @@ class SelectedPhotosTest {
         assertEquals(2, selectedPhotos.calculateMarkerIndex(3)) // letztes Foto wurde entfernt
     }
 
+    /*
     @Test
     @Disabled("fails and method is not needed")
     fun getPhotosWithGeoPosition() {
@@ -59,5 +59,5 @@ class SelectedPhotosTest {
         //assertEquals(photo0, withPosition[0])
         //assertEquals(photo1, withPosition[1])
     }
-
+    */
 }

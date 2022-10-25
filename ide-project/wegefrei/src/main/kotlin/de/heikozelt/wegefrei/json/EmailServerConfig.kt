@@ -15,7 +15,7 @@ class EmailServerConfig(
     var smtpPort: Int = 25,
 
     @Json(name = "smtp_user_name")
-    var smtpUsername: String = "",
+    var smtpUserName: String = "",
 
     var tls: Tls = Tls.START_TLS
 )

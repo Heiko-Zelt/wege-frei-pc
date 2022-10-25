@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory
 import java.util.*
 
 
-class DatabaseService {
+class DatabaseRepo {
     private val em: EntityManager
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
 

@@ -8,7 +8,7 @@ import javax.swing.JFrame
 import javax.swing.JScrollPane
 
 /**
- * todo Prio 1: weitere Formularfelder, Gridbag-Layout
+ * Einstellungen-Fenster
  */
 class SettingsFrame(private val app: WegeFrei): JFrame() {
 
@@ -27,25 +27,37 @@ class SettingsFrame(private val app: WegeFrei): JFrame() {
         isVisible = true
     }
 
+    /**
+     * Settings-Objekt auf Formular-Felder abbilden
+     */
     fun setSettings(settings: Settings?) {
+        log.debug("setSettings()")
         settings?.let {
             this.settings = it
             settingsFormFields.load(it)
         }
     }
 
+    /**
+     * Formular-Eingabe speichern und Fenster schließen
+     * todo Wie JUnit-testen, wenn Settings-Dateiname hardcoded ist?
+     */
     fun saveAndClose() {
+        log.debug("saveAndClose()")
         settings?.let {
             isVisible = false
             dispose()
             settingsFormFields.save(it)
-            settings?.saveToFile()
-            app.settingsChanged()
+            app.settingsChanged(it)
             app.settingsFrameClosed()
         }
     }
 
+    /**
+     * Fenster schließen ohne zu speichern
+     */
     fun cancelAndClose() {
+        log.debug("cancelAndClose()")
         isVisible = false
         dispose()
         app.settingsFrameClosed()

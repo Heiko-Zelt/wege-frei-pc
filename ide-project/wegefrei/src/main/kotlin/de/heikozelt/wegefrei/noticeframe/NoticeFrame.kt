@@ -1,6 +1,6 @@
 package de.heikozelt.wegefrei.noticeframe
 
-import de.heikozelt.wegefrei.DatabaseService
+import de.heikozelt.wegefrei.DatabaseRepo
 import de.heikozelt.wegefrei.WegeFrei
 import de.heikozelt.wegefrei.entities.Notice
 import de.heikozelt.wegefrei.entities.Photo
@@ -139,8 +139,8 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
         */
     }
 
-    fun getDatabaseService(): DatabaseService {
-        return app.getDatabaseService()
+    fun getDatabaseService(): DatabaseRepo {
+        return app.getDatabaseRepo()
     }
 
     fun getSelectedPhotos(): SelectedPhotos {
@@ -280,7 +280,7 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
     fun saveNotice() {
         // todo addressPosition speichern
         noticeForm.getNoticeFormFields().saveNotice()
-        val dbService = app.getDatabaseService()
+        val dbService = app.getDatabaseRepo()
         notice?.let {
             it.setGeoPosition(offensePosition)
             if (it.id == null) {
@@ -297,7 +297,7 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
      * Die Methode wird vom Löschen-Button aufgerufen.
      */
     fun deleteNotice() {
-        val dbService = app.getDatabaseService()
+        val dbService = app.getDatabaseRepo()
         notice?.let {
             dbService.deleteNotice(it)
             app.noticeDeleted(it)

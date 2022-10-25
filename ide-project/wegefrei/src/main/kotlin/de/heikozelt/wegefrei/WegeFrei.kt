@@ -26,21 +26,25 @@ import javax.swing.UIManager
  * Sie verwaltet die einzelnen Fenster vom Typ NoticesFrame (Übersichts-Seite),
  * NoticeFrame (neue oder bestehende Meldung bearbeiten) & SettingsFrame,
  * sowie die Einstellungen (Settings) und die Datenbank-Verbindung (DatabaseService).
+ * @param settingsRepo constructor injection (enables unit tests with test settings)
  */
-class WegeFrei {
+open class WegeFrei(private val settingsRepo: SettingsRepo = SettingsFileRepo()) {
 
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
     //kotlin-logging: private val log = KotlinLogging.logger {}
     //JUL: private val logger = Logger.getLogger(this::class.java.name)
 
-    private val databaseService = DatabaseService()
-
-    private var noticesFrame: NoticesFrame? = null
+    private val databaseRepo = DatabaseRepo()
 
     private var settings: Settings? = null
 
     /**
-     * reference to SettingsFrame, if window is shown on screen otherwise null
+     * Übersichts-Fenster (falls geöffnet sonst null)
+     */
+    private var noticesFrame: NoticesFrame? = null
+
+    /**
+     * reference to the Settings-Window, if the window is shown on screen otherwise null
      */
     private var settingsFrame: SettingsFrame? = null
 
@@ -51,11 +55,36 @@ class WegeFrei {
 
     init{
         log.debug("initializing")
+        val settings = settingsRepo.load()
+
+        //val app = WegeFrei()
+        setSettings(settings)
     }
 
-    fun setSettings(settings: Settings) {
+    /**
+     * simple getter method
+     */
+    fun getSettings(): Settings? {
+        return settings
+    }
+
+    /**
+     * set settings (without saving to file)
+     */
+    private fun setSettings(settings: Settings) {
         this.settings = settings
         changeLookAndFeel()
+    }
+
+    /**
+     * This method is called when Settings (may) have changed.
+     * Settings are saved to file.
+     */
+    fun settingsChanged(settings: Settings?) {
+        settings?.let {
+            setSettings(it)
+            settingsRepo.save(it)
+        }
     }
 
     fun openNoticesFrame() {
@@ -85,15 +114,6 @@ class WegeFrei {
     }
 
     /**
-     * Is called when Settings (may) have changed.
-     */
-    fun settingsChanged() {
-        settings?.let {
-            changeLookAndFeel()
-        }
-    }
-
-    /**
      * Öffnet das Einstellungen-Fenster.
      * (Wenn es schon geöffnet ist, dann wird es nur in den Vordergrund gebracht.)
      */
@@ -113,8 +133,18 @@ class WegeFrei {
         this.settingsFrame = null
     }
 
-    fun getDatabaseService(): DatabaseService {
-        return databaseService
+    /**
+     * simple getter method
+     */
+    fun getDatabaseRepo(): DatabaseRepo {
+        return databaseRepo
+    }
+
+    /**
+     * simple getter method
+     */
+    fun getSettingsRepo(): SettingsRepo {
+        return settingsRepo
     }
 
     /**
@@ -152,12 +182,12 @@ class WegeFrei {
         for (filename in filenames) {
             log.debug(filename)
             //JUL logger.log(Level.FINE, filename)
-            if (databaseService.getPhotoByFilename(filename) == null) {
+            if (databaseRepo.getPhotoByFilename(filename) == null) {
                 log.debug("image in filesystem is new")
 
                 val photo = readPhotoMetadata(File(PHOTO_DIR, filename))
                 //    ProofPhoto(filename, null, null, null)
-                databaseService.insertPhoto(photo)
+                databaseRepo.insertPhoto(photo)
             } else {
                 log.debug("image in filesystem is already in database")
             }
@@ -197,7 +227,7 @@ class WegeFrei {
         return Photo(file.name, latitude, longitude, datTim, null)
     }
 
-    private fun changeLookAndFeel() {
+    fun changeLookAndFeel() {
         settings?.let { setti ->
             try {
                 // todo Prio 1: set look and feel according to settings
@@ -226,14 +256,11 @@ class WegeFrei {
             LOG.info("Wege frei!")
             //LOG.debug("Program arguments: ${args.joinToString()}")
 
-            val settings = Settings.loadFromFile()
-
             val shutdownHook = Thread { LOG.info("exit") }
             Runtime.getRuntime().addShutdownHook(shutdownHook)
 
             EventQueue.invokeLater {
                 val app = WegeFrei()
-                app.setSettings(settings)
                 app.openNoticesFrame()
             }
 

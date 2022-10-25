@@ -1,6 +1,6 @@
 package de.heikozelt.wegefrei.jobs
 
-import de.heikozelt.wegefrei.DatabaseService
+import de.heikozelt.wegefrei.DatabaseRepo
 import de.heikozelt.wegefrei.entities.Notice
 import de.heikozelt.wegefrei.model.NoticesTableModel
 import org.slf4j.LoggerFactory
@@ -13,7 +13,7 @@ import javax.swing.SwingWorker
  * der Tabelle im Übersichts-Fenster.
  */
 class LoadNoticesWorker(
-    private val databaseService: DatabaseService,
+    private val databaseRepo: DatabaseRepo,
     private val noticesTableModel: NoticesTableModel
 )
 : SwingWorker<MutableList<Notice>, MutableList<Notice>>() {
@@ -26,7 +26,7 @@ class LoadNoticesWorker(
      */
     override fun doInBackground(): MutableList<Notice>? {
         log.info("doInBackground()")
-        notices = LinkedList(databaseService.getAllNoticesDesc())
+        notices = LinkedList(databaseRepo.getAllNoticesDesc())
         return notices
     }
 

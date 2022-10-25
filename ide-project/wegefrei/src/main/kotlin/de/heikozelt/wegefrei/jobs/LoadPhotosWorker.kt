@@ -1,6 +1,6 @@
 package de.heikozelt.wegefrei.jobs
 
-import de.heikozelt.wegefrei.DatabaseService
+import de.heikozelt.wegefrei.DatabaseRepo
 import de.heikozelt.wegefrei.entities.Photo
 import de.heikozelt.wegefrei.noticeframe.AllPhotosPanel
 import org.slf4j.LoggerFactory
@@ -11,7 +11,7 @@ import javax.swing.SwingWorker
  * und übermittelt sie an das AllPhotosPanel.
  */
 class LoadPhotosWorker(
-    private val databaseService: DatabaseService,
+    private val databaseRepo: DatabaseRepo,
     private val firstPhotoFilename: String,
     private val allPhotosPanel: AllPhotosPanel
 )
@@ -25,7 +25,7 @@ class LoadPhotosWorker(
      */
     override fun doInBackground(): Set<Photo>? {
         log.info("doInBackground()")
-        photos = databaseService.getPhotos(firstPhotoFilename, 20)
+        photos = databaseRepo.getPhotos(firstPhotoFilename, 20)
         return photos
     }
 

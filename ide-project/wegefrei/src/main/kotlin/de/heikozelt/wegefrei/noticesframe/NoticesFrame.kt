@@ -53,7 +53,7 @@ class NoticesFrame(private val app: WegeFrei) : JFrame("Meldungen - Wege frei!")
     }
 
     fun loadData() {
-        val worker = LoadNoticesWorker(app.getDatabaseService(), noticesTableModel)
+        val worker = LoadNoticesWorker(app.getDatabaseRepo(), noticesTableModel)
         worker.execute()
     }
 

@@ -1,6 +1,9 @@
 package de.heikozelt.wegefrei.settingsframe
 
+import de.heikozelt.wegefrei.docfilters.OnlyDigitsDocFilter
+import de.heikozelt.wegefrei.gui.TrimmingTextField
 import de.heikozelt.wegefrei.json.Settings
+import de.heikozelt.wegefrei.json.Tls
 import org.slf4j.LoggerFactory
 import java.awt.GridBagConstraints
 import java.awt.GridBagLayout
@@ -9,28 +12,29 @@ import javax.swing.JComboBox
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.JTextField
+import javax.swing.text.AbstractDocument
 
 class SettingsFormFields(private val settingsFrame: SettingsFrame): JPanel() {
 
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
 
-    private val emailTextField = JTextField(30)
-    private val streetTextField = JTextField(30)
-    private val zipCodeTextField = JTextField(5)
-    private val townTextField = JTextField(30)
-    private val phoneNumberTextField = JTextField(20)
+    private val emailTextField = TrimmingTextField(30)
+    private val streetTextField = TrimmingTextField(30)
+    private val zipCodeTextField = TrimmingTextField(5)
+    private val townTextField = TrimmingTextField(30)
+    private val phoneNumberTextField = TrimmingTextField(20)
 
-    private val smtpHostTextField = JTextField(30)
+    private val smtpHostTextField = TrimmingTextField(30)
     private val smtpPortTextField = JTextField(6)
-    private val smtpUserNameTextField = JTextField(30)
+    private val smtpUserNameTextField = TrimmingTextField(30)
     private val tlsValues = arrayOf("Klartext (nicht empfohlen)", "TLS-verschlüsselt", "StartTLS-verschlüsselt")
     private val tlsComboBox = JComboBox(tlsValues)
 
     private val lookAndFeelNames = Settings.lookAndFeelNames().toTypedArray()
     private val lookAndFeelComboBox = JComboBox(lookAndFeelNames)
     // todo Prio 3: File chooser dialog
-    private val photosDirTextField = JTextField(30)
-    private val databaseDirTextField = JTextField(30)
+    private val photosDirTextField = TrimmingTextField(30)
+    private val databaseDirTextField = TrimmingTextField(30)
 
     init {
         log.debug("init")
@@ -52,6 +56,7 @@ class SettingsFormFields(private val settingsFrame: SettingsFrame): JPanel() {
         val emailLabel = JLabel("E-Mail-Adresse:")
         add(emailLabel, constraints)
         constraints.gridx = 1
+        emailTextField.name = "emailTextField"
         add(emailTextField, constraints)
 
         constraints.gridy++
@@ -99,6 +104,10 @@ class SettingsFormFields(private val settingsFrame: SettingsFrame): JPanel() {
         val smtpPortLabel = JLabel("SMTP-Port:")
         add(smtpPortLabel, constraints)
         constraints.gridx = 1
+        val portDoc = smtpPortTextField.document
+        if (portDoc is AbstractDocument) {
+            portDoc.documentFilter = OnlyDigitsDocFilter()
+        }
         add(smtpPortTextField, constraints)
 
         constraints.gridy++
@@ -113,6 +122,7 @@ class SettingsFormFields(private val settingsFrame: SettingsFrame): JPanel() {
         val tlsLabel = JLabel("Verschlüsselung:")
         add(tlsLabel, constraints)
         constraints.gridx = 1
+        tlsComboBox.name = "tlsComboBox"
         add(tlsComboBox, constraints)
 
         constraints.gridy++
@@ -141,16 +151,50 @@ class SettingsFormFields(private val settingsFrame: SettingsFrame): JPanel() {
         add(databaseDirTextField, constraints)
     }
 
+    /**
+     * Mapping von Settings-Objekt auf Werte der Formular-Felder
+     */
     fun load(settings: Settings) {
+        emailTextField.text = settings.witness.emailAddress
+        streetTextField.text = settings.witness.street
+        zipCodeTextField.text = settings.witness.zipCode
+        townTextField.text = settings.witness.town
+        phoneNumberTextField.text = settings.witness.telephoneNumber
+
+        smtpHostTextField.text = settings.emailServerConfig.smtpHost
+        smtpPortTextField.text = settings.emailServerConfig.smtpPort.toString()
+        smtpUserNameTextField.text = settings.emailServerConfig.smtpUserName
+        val tlsIndex = Tls.values().indexOf(settings.emailServerConfig.tls)
+        tlsComboBox.selectedItem = tlsValues[tlsIndex]
+
         lookAndFeelComboBox.selectedItem = lookAndFeelNames.find { it == settings.lookAndFeel }
+        photosDirTextField.text = settings.photosDirectory
+        databaseDirTextField.text = settings.databaseDirectory
     }
 
+    /**
+     * Mapping von Werten der Formular-Felder auf Settings-Objekt
+     */
     fun save(settings: Settings) {
-        val selected = lookAndFeelComboBox.selectedItem
-        if(selected == null) {
-            log.warn("No String selected as look and feel.")
+        settings.witness.emailAddress = emailTextField.text.trim()
+        settings.witness.street = streetTextField.text.trim()
+        settings.witness.zipCode = zipCodeTextField.text.trim()
+        settings.witness.town = townTextField.text.trim()
+        settings.witness.telephoneNumber = phoneNumberTextField.text.trim()
+
+        settings.emailServerConfig.smtpHost = smtpHostTextField.text.trim()
+        settings.emailServerConfig.smtpPort = smtpPortTextField.text.toInt()
+        settings.emailServerConfig.smtpUserName = smtpUserNameTextField.text.trim()
+        settings.emailServerConfig.tls = Tls.values()[tlsComboBox.selectedIndex]
+
+        val selectedLook = lookAndFeelComboBox.selectedItem
+        settings.lookAndFeel = if(selectedLook is String) {
+            selectedLook
         } else {
-            settings.lookAndFeel = lookAndFeelComboBox.selectedItem as String
+            log.warn("No String selected as look and feel.")
+            ""
         }
+        settings.photosDirectory = photosDirTextField.text.trim()
+        settings.databaseDirectory = databaseDirTextField.text.trim()
     }
 }
