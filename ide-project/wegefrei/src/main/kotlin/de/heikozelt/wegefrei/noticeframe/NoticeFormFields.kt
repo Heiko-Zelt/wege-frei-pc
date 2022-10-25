@@ -11,7 +11,6 @@ import de.heikozelt.wegefrei.gui.Styles.Companion.TEXTFIELD_FONT
 import de.heikozelt.wegefrei.maps.MiniMap
 import de.heikozelt.wegefrei.model.*
 import org.slf4j.LoggerFactory
-import java.awt.BorderLayout
 import java.awt.GridBagConstraints
 import java.awt.GridBagConstraints.WEST
 import java.awt.GridBagLayout
@@ -58,7 +57,6 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel(), Selecte
 
     init {
         log.debug("init")
-        layout = BorderLayout()
 
         background = FORM_BACKGROUND
         border = NO_BORDER
@@ -126,7 +124,7 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel(), Selecte
         add(miniMap, constraints)
 
         constraints.gridy++
-        val streetLabel = JLabel("<html>Straße & Hausnummer.:<sup>*</sup></html>")
+        val streetLabel = JLabel("<html>Straße & Hausnummer:<sup>*</sup></html>")
         //streetLabel.foreground = TEXT_COLOR
         constraints.gridx = 0
         constraints.weighty = 0.1

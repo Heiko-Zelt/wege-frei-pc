@@ -16,6 +16,9 @@ import kotlin.io.path.Path
 class Settings (
     var witness: Witness = Witness(),
 
+    @Json(name = "email_server")
+    var emailServerConfig: EmailServerConfig = EmailServerConfig(),
+
     @Json(name = "look_and_feel")
     var lookAndFeel: String = "",
 

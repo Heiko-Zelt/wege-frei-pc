@@ -45,6 +45,7 @@ import kotlin.math.sqrt
  *   </li>
  *   <li>Aktivierung der Formularfelder (abhängig von den konkreten Daten)</li>
  * </ol>
+ * todo Prio 2: Wenn Fenster geschlossen wird via Close-Button oder bei Änderung der Datenbank, fragen ob Daten gespeichert werden sollen (falls sie geändert wurden)
  */
 class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver {
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
@@ -185,7 +186,7 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
         maxiMapForm.setPhotoMarkers(selectedPhotos)
         notice?.let {
             if (it.isSent()) {
-                maxiMapForm?.enableOrDisableEditing()
+                maxiMapForm.enableOrDisableEditing()
             }
         }
 

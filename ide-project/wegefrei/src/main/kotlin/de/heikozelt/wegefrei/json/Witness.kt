@@ -6,7 +6,8 @@ import com.beust.klaxon.Json
  * Part of Settings
  */
 class Witness (
-    var email: String = "",
+    @Json(name= "email_address")
+    var emailAddress: String = "",
 
     var street: String = "",
 

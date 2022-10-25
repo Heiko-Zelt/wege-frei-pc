@@ -7,6 +7,9 @@ import java.awt.BorderLayout
 import javax.swing.JFrame
 import javax.swing.JScrollPane
 
+/**
+ * todo Prio 1: weitere Formularfelder, Gridbag-Layout
+ */
 class SettingsFrame(private val app: WegeFrei): JFrame() {
 
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
@@ -16,6 +19,7 @@ class SettingsFrame(private val app: WegeFrei): JFrame() {
     private var settingsFormFieldsScrollPane = JScrollPane(settingsFormFields)
 
     init {
+        title = "Einstellungen - Wege frei!"
         layout = BorderLayout()
         add(settingsFormFieldsScrollPane, BorderLayout.CENTER)
         add(settingsFormButtonBar, BorderLayout.SOUTH)
