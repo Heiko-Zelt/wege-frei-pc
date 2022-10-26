@@ -5,7 +5,13 @@ import com.beust.klaxon.Json
 /**
  * Part of Settings
  */
-class Witness (
+data class Witness (
+    @Json(name= "given_name")
+    var givenName: String = "",
+
+    @Json(name= "surname")
+    var surname: String = "",
+
     @Json(name= "email_address")
     var emailAddress: String = "",
 
@@ -18,4 +24,22 @@ class Witness (
 
     @Json(name= "telephone_number")
     var telephoneNumber: String = ""
-)
+): Cloneable {
+
+    /**
+     * Deep copy.
+     * There is no difference to copy().
+     * String values are not copied because they are immutable.
+     */
+    public override fun clone(): Witness {
+        return Witness(
+            givenName,
+            surname,
+            emailAddress,
+            street,
+            zipCode,
+            town,
+            telephoneNumber
+        )
+    }
+}

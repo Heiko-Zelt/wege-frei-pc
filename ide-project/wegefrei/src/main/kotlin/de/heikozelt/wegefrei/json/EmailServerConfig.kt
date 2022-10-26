@@ -7,7 +7,7 @@ import com.beust.klaxon.Json
  * The mail server password is not saved.
  * User is asked when sending emails.
  */
-class EmailServerConfig(
+data class EmailServerConfig(
     @Json(name = "smtp_host")
     var smtpHost: String = "",
 
@@ -18,4 +18,17 @@ class EmailServerConfig(
     var smtpUserName: String = "",
 
     var tls: Tls = Tls.START_TLS
-)
+): Cloneable {
+
+    /**
+     * There is no difference to copy(), isn't it?
+     */
+    public override fun clone(): EmailServerConfig {
+        return EmailServerConfig(
+            smtpHost,
+            smtpPort,
+            smtpUserName,
+            tls
+        )
+    }
+}

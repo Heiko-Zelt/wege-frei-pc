@@ -34,7 +34,7 @@ open class WegeFrei(private val settingsRepo: SettingsRepo = SettingsFileRepo())
     //kotlin-logging: private val log = KotlinLogging.logger {}
     //JUL: private val logger = Logger.getLogger(this::class.java.name)
 
-    private val databaseRepo = DatabaseRepo()
+    private var databaseRepo:DatabaseRepo? = null
 
     private var settings: Settings? = null
 
@@ -72,15 +72,44 @@ open class WegeFrei(private val settingsRepo: SettingsRepo = SettingsFileRepo())
      * set settings (without saving to file)
      */
     private fun setSettings(settings: Settings) {
+        log.debug("setSettings()")
+        val dbDirChanged = settings.databaseDirectory != this.settings?.databaseDirectory
+        log.debug("dbDirChanged: $dbDirChanged")
+        val photosDirChanged = settings.photosDirectory != this.settings?.photosDirectory
+        log.debug("photosDirChanged: $photosDirChanged")
+        val lookAndFeelChanged = settings.lookAndFeel != this.settings?.lookAndFeel
+        log.debug("lookAndFeel: before: ${this.settings?.lookAndFeel}, after: ${settings.lookAndFeel}, changed: $lookAndFeelChanged")
+
+        val isNoticesFrameOpen = noticesFrame != null
+        log.debug("isNoticesFrameOpen: $isNoticesFrameOpen")
+
         this.settings = settings
-        changeLookAndFeel()
+
+        // todo close all NoticeFrames if repo changed
+        // but how to react to unsaved changes??? just save them or ask user???
+
+        if(lookAndFeelChanged) {
+            changeLookAndFeel()
+        }
+
+        if(dbDirChanged) {
+            closeNoticesFrame()
+
+            //databaseRepo?.close()
+            databaseRepo = DatabaseRepo(settings.databaseDirectory)
+
+            if(isNoticesFrameOpen) {
+                openNoticesFrame()
+            }
+        }
     }
 
     /**
      * This method is called when Settings (may) have changed.
-     * Settings are saved to file.
+     * Settings are also saved to file.
      */
     fun settingsChanged(settings: Settings?) {
+        log.debug("settingsChanged()")
         settings?.let {
             setSettings(it)
             settingsRepo.save(it)
@@ -90,6 +119,14 @@ open class WegeFrei(private val settingsRepo: SettingsRepo = SettingsFileRepo())
     fun openNoticesFrame() {
         noticesFrame = NoticesFrame(this)
         noticesFrame?.loadData()
+    }
+
+    fun closeNoticesFrame() {
+        noticesFrame?.let {
+            it.isVisible = false
+            it.dispose()
+        }
+        noticesFrame = null
     }
 
     /**
@@ -120,7 +157,10 @@ open class WegeFrei(private val settingsRepo: SettingsRepo = SettingsFileRepo())
     fun openSettingsFrame() {
         if (settingsFrame == null) {
             settingsFrame = SettingsFrame(this)
-            settingsFrame?.setSettings(settings)
+            // The Application needs to remember its original settings.
+            // settingsFrame is not allowed to change them directly.
+            // so the object must be cloned.
+            settingsFrame?.setSettings(settings?.clone())
         } else {
             settingsFrame?.toFront()
         }
@@ -136,7 +176,7 @@ open class WegeFrei(private val settingsRepo: SettingsRepo = SettingsFileRepo())
     /**
      * simple getter method
      */
-    fun getDatabaseRepo(): DatabaseRepo {
+    fun getDatabaseRepo(): DatabaseRepo? {
         return databaseRepo
     }
 
@@ -172,6 +212,8 @@ open class WegeFrei(private val settingsRepo: SettingsRepo = SettingsFileRepo())
     // todo Prio 3: erst Anzahl der Dateien ermitteln, dann einlesen
     fun scanForNewPhotos() {
         log.info("scanning for new images...")
+        // todo Fehlermeldung ausgeben
+        val dbRepo = databaseRepo?:return
 
         val dir = File(PHOTO_DIR)
         if (!dir.isDirectory) {
@@ -182,12 +224,12 @@ open class WegeFrei(private val settingsRepo: SettingsRepo = SettingsFileRepo())
         for (filename in filenames) {
             log.debug(filename)
             //JUL logger.log(Level.FINE, filename)
-            if (databaseRepo.getPhotoByFilename(filename) == null) {
+            if (dbRepo.getPhotoByFilename(filename) == null) {
                 log.debug("image in filesystem is new")
 
                 val photo = readPhotoMetadata(File(PHOTO_DIR, filename))
                 //    ProofPhoto(filename, null, null, null)
-                databaseRepo.insertPhoto(photo)
+                dbRepo.insertPhoto(photo)
             } else {
                 log.debug("image in filesystem is already in database")
             }
@@ -227,20 +269,23 @@ open class WegeFrei(private val settingsRepo: SettingsRepo = SettingsFileRepo())
         return Photo(file.name, latitude, longitude, datTim, null)
     }
 
-    fun changeLookAndFeel() {
+    private fun changeLookAndFeel() {
+        log.debug("changeLookAndFeel()")
         settings?.let { setti ->
             try {
                 // todo Prio 1: set look and feel according to settings
-                LOG.info("look & feel name: ${setti.lookAndFeel}")
+                log.info("look & feel name: ${setti.lookAndFeel}")
                 val className = setti.getLookAndFeelInfo()?.className
-                LOG.debug("look & feel class name: $className")
+                log.debug("look & feel class name: $className")
                 className?.let {
-                    UIManager.setLookAndFeel(className);
+                    log.debug("UIManager.setLookAndFeel()")
+                    UIManager.setLookAndFeel(className)
                 }
                 noticesFrame?.let { frame -> SwingUtilities.updateComponentTreeUI(frame) }
                 noticeFrames.forEach { frame -> SwingUtilities.updateComponentTreeUI(frame) }
+                // settingsFrame should not be open
             } catch (e: Exception) {
-                LOG.error("exception while setting look and feel", e)
+                log.error("exception while setting look and feel", e)
             }
         }
     }

@@ -37,8 +37,8 @@ class AllPhotosPanel(private val noticeFrame: NoticeFrame) : JPanel(), SelectedP
         appendPhoto
         }
         */
-
-        val worker = LoadPhotosWorker(noticeFrame.getDatabaseService(), firstPhotoFilename, this)
+        val dbRepo = noticeFrame.getDatabaseRepo()?:return
+        val worker = LoadPhotosWorker(dbRepo, firstPhotoFilename, this)
         worker.execute()
     }
 

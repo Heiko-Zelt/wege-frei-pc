@@ -9,7 +9,7 @@ internal class DatabaseRepoTest {
 
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
 
-    private val databaseRepo = DatabaseRepo()
+    private val databaseRepo = DatabaseRepo("~")
 
     @Test
     fun getPhotoByFilename() {

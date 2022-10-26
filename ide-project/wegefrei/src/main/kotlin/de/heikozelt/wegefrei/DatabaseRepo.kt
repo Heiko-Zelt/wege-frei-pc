@@ -8,12 +8,15 @@ import org.slf4j.LoggerFactory
 import java.util.*
 
 
-class DatabaseRepo {
+class DatabaseRepo(directory: String) {
     private val em: EntityManager
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
 
     init {
-        val factory = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME)
+        log.info("use database in directory: $directory")
+        val persistenceMap = hashMapOf<String, String>()
+        persistenceMap["javax.persistence.jdbc.url"] = "jdbc:h2:file:$directory/wege_frei_v1"
+        val factory = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME, persistenceMap)
         em = factory.createEntityManager()
     }
 
@@ -82,6 +85,12 @@ class DatabaseRepo {
         em.transaction.begin()
         em.remove(notice)
         em.transaction.commit()
+    }
+
+    fun close() {
+        if(em.isOpen) {
+            em.close()
+        }
     }
 
     companion object {

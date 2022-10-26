@@ -25,6 +25,7 @@ class FirstSwingTest {
     fun setUp() {
         log.debug("setUp()")
         application(WegeFrei::class.java).start()
+        // todo open Notices-Window!!!
 
         rob = BasicRobot.robotWithCurrentAwtHierarchy()
         assertNotNull(rob)

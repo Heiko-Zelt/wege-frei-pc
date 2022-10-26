@@ -53,7 +53,9 @@ class NoticesFrame(private val app: WegeFrei) : JFrame("Meldungen - Wege frei!")
     }
 
     fun loadData() {
-        val worker = LoadNoticesWorker(app.getDatabaseRepo(), noticesTableModel)
+        // todo Fehlermeldung ausgeben
+        val dbRepo = app.getDatabaseRepo()?:return
+        val worker = LoadNoticesWorker(dbRepo, noticesTableModel)
         worker.execute()
     }
 

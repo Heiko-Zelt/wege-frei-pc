@@ -15,6 +15,15 @@ Alle Daten (Beweisfotos und Meldungen) werden auf dem eigenen PC gespeichert. De
  1. Fotos nach Metadaten (GPS-Geo-Position, Datum und Uhrzeit) scannen.
  1. Meldungen erfassen. Einige Daten wie Tat-Datum, -Uhrzeit, -Dauer, -Ort und Adresse werden automatisch im Formular eingetragen. Kontrolle der Fotos durch integrierten Bildbetrachter und des Tatorts durch Kartenanzeige.
  1. Meldungen über das eigene E-Mail-Postfach an das Ordnungsamt senden.
+ 
+## Installation
+
+Installationsdateien werden in Kürze zur Verfügung gestellt. Für technisch begabte Anwender_innen, bitte das GIT-Repo clonen und mit Gradle eine .jar-Datei bauen.
+
+Nach der Installation kannst du direkt Meldungen erfassen. Wenn du die Beweiss-Fotos von deinen Urlaubsfotos, etc... trennen möchtest, kannst du unter Einstellungen einen anderen Ordner angeben. Bevor Du Meldungen an das Ordnungsamt übertragen kannst musst du deine Zeugen-Daten angeben. Annonyme Anzeigen werden nicht akzeptiert. Außerdem musst du Konfigurations-Daten eines Postausgangs-Servers (SMTP) angeben.
+
+![Screenshot Einstellungen](doc/screenshot_settings.png)
+
 
 ## Empfehlungen
 

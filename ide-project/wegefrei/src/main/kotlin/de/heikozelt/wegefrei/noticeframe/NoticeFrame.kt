@@ -139,7 +139,7 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
         */
     }
 
-    fun getDatabaseService(): DatabaseRepo {
+    fun getDatabaseRepo(): DatabaseRepo? {
         return app.getDatabaseRepo()
     }
 
@@ -280,14 +280,14 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
     fun saveNotice() {
         // todo addressPosition speichern
         noticeForm.getNoticeFormFields().saveNotice()
-        val dbService = app.getDatabaseRepo()
+        val dbRepo = app.getDatabaseRepo()?:return
         notice?.let {
             it.setGeoPosition(offensePosition)
             if (it.id == null) {
-                dbService.insertNotice(it)
+                dbRepo.insertNotice(it)
                 app.noticeAdded(it)
             } else {
-                dbService.updateNotice(it)
+                dbRepo.updateNotice(it)
                 app.noticeUpdated(it)
             }
         }
@@ -297,9 +297,9 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
      * Die Methode wird vom Löschen-Button aufgerufen.
      */
     fun deleteNotice() {
-        val dbService = app.getDatabaseRepo()
+        val dbRepo = app.getDatabaseRepo()?:return
         notice?.let {
-            dbService.deleteNotice(it)
+            dbRepo.deleteNotice(it)
             app.noticeDeleted(it)
         }
     }

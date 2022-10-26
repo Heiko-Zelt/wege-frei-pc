@@ -24,7 +24,7 @@ class SettingsFormButtonsBar(settingsFrame: SettingsFrame): JPanel() {
 
         val cancelButton = JButton("Abbrechen")
         cancelButton.margin = Styles.BUTTON_MARGIN
-        cancelButton.addActionListener { settingsFrame.cancelAndClose() }
+        cancelButton.addActionListener { settingsFrame.discardChangesAndClose() }
         add(cancelButton)
 
         add(Box.createHorizontalStrut(Styles.BUTTONS_DISTANCE));
