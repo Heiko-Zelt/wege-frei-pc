@@ -8,10 +8,7 @@ import org.slf4j.LoggerFactory
 import java.awt.GridBagConstraints
 import java.awt.GridBagLayout
 import java.awt.Insets
-import javax.swing.JComboBox
-import javax.swing.JLabel
-import javax.swing.JPanel
-import javax.swing.JTextField
+import javax.swing.*
 import javax.swing.text.AbstractDocument
 
 class SettingsFormFields(private val settingsFrame: SettingsFrame): JPanel() {
@@ -32,9 +29,10 @@ class SettingsFormFields(private val settingsFrame: SettingsFrame): JPanel() {
 
     private val lookAndFeelNames = Settings.lookAndFeelNames().toTypedArray()
     private val lookAndFeelComboBox = JComboBox(lookAndFeelNames)
-    // todo Prio 3: File chooser dialog
-    private val photosDirTextField = TrimmingTextField(30)
-    private val databaseDirTextField = TrimmingTextField(30)
+    private val photosDirLabel = JLabel()
+    private val photosDirButton = JButton("Verzeichnis auswählen")
+    private val databaseDirLabel = JLabel()
+    private val databaseDirButton = JButton("Verzeichnis auswählen")
 
     init {
         log.debug("init")
@@ -138,17 +136,24 @@ class SettingsFormFields(private val settingsFrame: SettingsFrame): JPanel() {
 
         constraints.gridy++
         constraints.gridx = 0
-        val photosDirLabel = JLabel("Fotos-Verzeichnis:")
-        add(photosDirLabel, constraints)
+        val photosDirDecoLabel = JLabel("Fotos-Verzeichnis:")
+        add(photosDirDecoLabel, constraints)
         constraints.gridx = 1
-        add(photosDirTextField, constraints)
+        add(photosDirLabel, constraints)
+        photosDirButton.addActionListener { DirectoryChooser(photosDirLabel, "Fotos-Verzeichnis") }
+        constraints.gridy++
+        add(photosDirButton, constraints)
 
         constraints.gridy++
         constraints.gridx = 0
-        val databaseDirLabel = JLabel("Datenbank-Verzeichnis:")
-        add(databaseDirLabel, constraints)
+        val databaseDirDecoLabel = JLabel("Datenbank-Verzeichnis:")
+        add(databaseDirDecoLabel, constraints)
         constraints.gridx = 1
-        add(databaseDirTextField, constraints)
+        add(databaseDirLabel, constraints)
+        databaseDirButton.addActionListener { DirectoryChooser(databaseDirLabel, "Datenbank-Verzeichnis") }
+        constraints.gridy++
+        constraints.gridx = 1
+        add(databaseDirButton, constraints)
     }
 
     /**
@@ -168,8 +173,8 @@ class SettingsFormFields(private val settingsFrame: SettingsFrame): JPanel() {
         tlsComboBox.selectedItem = tlsValues[tlsIndex]
 
         lookAndFeelComboBox.selectedItem = lookAndFeelNames.find { it == settings.lookAndFeel }
-        photosDirTextField.text = settings.photosDirectory
-        databaseDirTextField.text = settings.databaseDirectory
+        photosDirLabel.text = settings.photosDirectory
+        databaseDirLabel.text = settings.databaseDirectory
     }
 
     /**
@@ -194,7 +199,7 @@ class SettingsFormFields(private val settingsFrame: SettingsFrame): JPanel() {
             log.warn("No String selected as look and feel.")
             ""
         }
-        settings.photosDirectory = photosDirTextField.text.trim()
-        settings.databaseDirectory = databaseDirTextField.text.trim()
+        settings.photosDirectory = photosDirLabel.text
+        settings.databaseDirectory = databaseDirLabel.text
     }
 }
