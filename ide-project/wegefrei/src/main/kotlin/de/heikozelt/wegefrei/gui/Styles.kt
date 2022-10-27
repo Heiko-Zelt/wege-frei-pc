@@ -5,6 +5,7 @@ import java.awt.Font
 import java.awt.Insets
 import javax.swing.*
 import javax.swing.border.Border
+import javax.swing.border.EmptyBorder
 
 
 /**
@@ -14,6 +15,8 @@ class Styles {
     companion object {
         val LABEL_FONT = JLabel().font ?: Font("Dialog", Font.BOLD, 12)
         val TEXTFIELD_FONT = JTextField().font ?: Font("Dialog", Font.PLAIN, 12)
+
+        val BUTTONS_BAR_BORDER = EmptyBorder(5, 10, 5, 10)
 
         const val BUTTONS_DISTANCE = 15
         const val THUMBNAIL_SIZE = 140
