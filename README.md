@@ -36,3 +36,4 @@ Die Software verwendet Web-Services/APIs. Bei der Benutzung wird deine IP-Adress
  * https://tile.openstreetmap.org/ für die Kartendartstellung (Download von Kachel-Bildern)
  * https://nominatim.openstreetmap.org/ für die Suche nach Post-Anschrifts-Adressen von Tatort-Geo-Koordinaten
 
+Bei Nutzung des Internets wird deine IP-Adresse natürlich auch an den Internet-Zugangs-Provider übermittelt und beim Versand von E-Mails an den E-Mail-Provider.
