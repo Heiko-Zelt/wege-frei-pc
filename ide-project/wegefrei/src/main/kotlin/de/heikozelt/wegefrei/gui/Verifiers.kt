@@ -28,5 +28,10 @@ class Verifiers {
          * 1-12 oder 01-12 oder Leerstring
          */
         val inspectionMonthVerifier = PatternVerifier("^(0?[1-9]|1[012])?$")
+
+        /**
+         * someone@somewhere or blank
+         */
+        val emailAddressVerifier = PatternVerifier("^(.+@.+)|[ //t//n]*$")
     }
 }

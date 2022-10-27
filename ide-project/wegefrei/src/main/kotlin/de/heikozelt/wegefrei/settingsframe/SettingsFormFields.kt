@@ -2,6 +2,7 @@ package de.heikozelt.wegefrei.settingsframe
 
 import de.heikozelt.wegefrei.docfilters.OnlyDigitsDocFilter
 import de.heikozelt.wegefrei.gui.TrimmingTextField
+import de.heikozelt.wegefrei.gui.Verifiers
 import de.heikozelt.wegefrei.json.Settings
 import de.heikozelt.wegefrei.json.Tls
 import org.slf4j.LoggerFactory
@@ -122,6 +123,7 @@ class SettingsFormFields(private val settingsFrame: SettingsFrame): JPanel() {
         constraints.weightx = RIGHT_WEIGHT
         constraints.gridx = 1
         emailTextField.name = "emailTextField"
+        emailTextField.inputVerifier = Verifiers.emailAddressVerifier
         add(emailTextField, constraints)
 
         constraints.insets = Insets(16, 5, 0, 0)
