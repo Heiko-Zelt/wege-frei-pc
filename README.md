@@ -27,5 +27,13 @@ Nach der Installation kannst du direkt Meldungen erfassen. Wenn du die Beweiss-F
 
 ## Empfehlungen
 
- 1. Fotos verschlüsselt speichern (z.B. mit VeraCrypt)
- 1. Beim E-Mail-Versand TLS-Verschlüsselung verwenden
+ * Fotos verschlüsselt speichern (z.B. mit VeraCrypt)
+ * Beim E-Mail-Versand TLS-Verschlüsselung verwenden
+ 
+## Datenschutz
+
+Die Software verwendet Web-Services/APIs. Bei der Benutzung wird deine IP-Adresse daher an folgende Websites übermittelt:
+ * https://tile.openstreetmap.org/ für die Kartendartstellung (Download von Kachel-Bildern)
+ * https://nominatim.openstreetmap.org/ für die Suche nach Post-Anschrifts-Adressen von Tatort-Geo-Koordinaten
+
+Bei Nutzung des Internets wird deine IP-Adresse natürlich auch an den Internet-Zugangs-Provider übermittelt und beim Versand von E-Mails an den E-Mail-Provider.
