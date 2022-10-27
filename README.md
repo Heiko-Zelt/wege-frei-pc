@@ -33,6 +33,6 @@ Nach der Installation kannst du direkt Meldungen erfassen. Wenn du die Beweiss-F
 ## Datenschutz
 
 Die Software verwendet Web-Services/APIs. Bei der Benutzung wird deine IP-Adresse daher an folgende Websites übermittelt:
- * https://tile.openstreetmap.org/ für Kartendaten (Kacheln)
+ * https://tile.openstreetmap.org/ für die Kartendartstellung (Download von Kachel-Bildern)
  * https://nominatim.openstreetmap.org/ für die Suche nach Post-Anschrifts-Adressen von Tatort-Geo-Koordinaten
 
