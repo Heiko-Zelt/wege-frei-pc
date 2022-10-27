@@ -1,6 +1,7 @@
 package de.heikozelt.wegefrei.settingsframe
 
 import de.heikozelt.wegefrei.docfilters.OnlyDigitsDocFilter
+import de.heikozelt.wegefrei.gui.SmtpAuthenticator
 import de.heikozelt.wegefrei.gui.TrimmingTextField
 import de.heikozelt.wegefrei.gui.Verifiers
 import de.heikozelt.wegefrei.json.Settings
@@ -9,8 +10,16 @@ import org.slf4j.LoggerFactory
 import java.awt.GridBagConstraints
 import java.awt.GridBagLayout
 import java.awt.Insets
+import java.util.*
+import javax.mail.Message
+import javax.mail.MessagingException
+import javax.mail.Session
+import javax.mail.Transport
+import javax.mail.internet.InternetAddress
+import javax.mail.internet.MimeMessage
 import javax.swing.*
 import javax.swing.text.AbstractDocument
+
 
 class SettingsFormFields(private val settingsFrame: SettingsFrame): JPanel() {
 
@@ -29,6 +38,7 @@ class SettingsFormFields(private val settingsFrame: SettingsFrame): JPanel() {
     private val smtpUserNameTextField = TrimmingTextField(MAX_COLUMNS)
     private val tlsValues = arrayOf("Klartext (nicht empfohlen)", "TLS-verschlüsselt", "StartTLS-verschlüsselt")
     private val tlsComboBox = JComboBox(tlsValues)
+    private val smtpConnectButton = JButton("Test-E-Mail senden")
 
     private val lookAndFeelNames = Settings.lookAndFeelNames().toTypedArray()
     private val lookAndFeelComboBox = JComboBox(lookAndFeelNames)
@@ -181,6 +191,12 @@ class SettingsFormFields(private val settingsFrame: SettingsFrame): JPanel() {
         tlsComboBox.name = "tlsComboBox"
         add(tlsComboBox, constraints)
 
+        constraints.gridy++
+        constraints.fill = GridBagConstraints.NONE;
+        smtpConnectButton.addActionListener { testSmtpConnection() }
+        constraints.gridx = 1
+        add(smtpConnectButton, constraints)
+
         constraints.insets = Insets(16, 5, 0, 0)
         constraints.fill = GridBagConstraints.HORIZONTAL;
         constraints.gridy++
@@ -280,9 +296,77 @@ class SettingsFormFields(private val settingsFrame: SettingsFrame): JPanel() {
         settings.databaseDirectory = databaseDirLabel.text
     }
 
+    private fun testSmtpConnection() {
+        log.debug("testSmtpConnection()")
+
+        val authenticator = SmtpAuthenticator()
+        authenticator.setUserName(smtpUserNameTextField.text.trim())
+        val passwordEntered = authenticator.askForPassword()
+        if(!passwordEntered) {
+            return
+        }
+        log.debug("auth: ${authenticator.passwordAuthentication}")
+        log.debug("userName: ${authenticator.passwordAuthentication.userName}")
+        //log.debug("password: ${authenticator.passwordAuthentication.password}") don't log passwords
+
+        val props = Properties()
+        props["mail.smtp.auth"] = true
+        props["mail.smtp.host"] = smtpHostTextField.text.trim()
+        props["mail.smtp.port"] = smtpPortTextField.text.trim()
+        val tls = Tls.values()[tlsComboBox.selectedIndex]
+        log.debug("TLS: $tls")
+        when(tls) {
+            Tls.PLAIN -> props["mail.smtp.ssl.enable"] = false
+            Tls.START_TLS -> props["mail.smtp.starttls.required"] = true
+            Tls.TLS -> {
+                props["mail.smtp.ssl.enable"] = true
+                props["mail.smtp.ssl.protocols"] = "TLSv1 TLSv1.1 TLSv1.2"
+            }
+        }
+
+        val session = Session.getInstance(props, authenticator)
+        log.debug("session: $session")
+        //log.debug("transport: ${session.transport}")
+
+        val msg = MimeMessage(session)
+        msg.addHeader("Content-type", "text/HTML; charset=UTF-8");
+        //msg.addHeader("Content-Transfer-Encoding", "8bit"); quoted-printable is java default
+        msg.addHeader("User-Agent", MAIL_USER_AGENT);
+        val fullName = "${givenNameTextField.text.trim()} ${surnameTextField.text.trim()}"
+        val senderName = fullName.ifBlank { TEST_MAIL_FROM_NAME }
+        val senderEmailAddress = emailTextField.text.trim()
+        msg.setFrom(InternetAddress(senderEmailAddress, senderName))
+        msg.setSubject(TEST_MAIL_SUBJECT, "UTF-8");
+        msg.setContent(TEST_MAIL_TEXT, "text/html; charset=utf-8")
+        msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(emailTextField.text.trim(), false));
+        try {
+            Transport.send(msg)
+            JOptionPane.showMessageDialog(null, "Die E-Mail-Nachricht wurde erfolgreich versendet.\n\nBitte prüfe deinen Post-Eingang!", "E-Mail abgeschickt", JOptionPane.INFORMATION_MESSAGE)
+        } catch(ex: MessagingException) {
+            log.debug("exception while sending test message", ex)
+            log.debug("exception: ${ex.message}")
+            ex.cause?.let {
+                log.debug("cause: ${it.message}")
+            }
+            var errorMessage = "Es ist ein Fehler aufgetreten:\n\n${ex.message}"
+            ex.cause?.let {
+                errorMessage += "\n\n{$ex.cause.message}"
+            }
+            val result = JOptionPane.showMessageDialog(
+                this,
+                errorMessage,
+                "Test-E-Mail senden",
+                JOptionPane.ERROR_MESSAGE)
+        }
+    }
+
     companion object {
         const val MAX_COLUMNS = 15
         const val LEFT_WEIGHT = 0.05
         const val RIGHT_WEIGHT = 0.95
+        const val MAIL_USER_AGENT = "Wege frei! https://github.com/Heiko-Zelt/wege-frei-pc"
+        const val TEST_MAIL_SUBJECT = "Wege frei! Test-E-Mail"
+        const val TEST_MAIL_FROM_NAME = "Wege frei!"
+        const val TEST_MAIL_TEXT = "<h1>Dies ist ein Test</h1>\n<p>Diese E-Mail-Nachricht wurde automatisch von der Wege frei!-Anwendung generiert.</p>"
     }
 }
