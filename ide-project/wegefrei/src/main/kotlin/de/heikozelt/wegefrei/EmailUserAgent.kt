@@ -53,13 +53,14 @@ class EmailUserAgent {
     /**
      * Jetzt aber wirklich absenden (und eventuell nach Passwort fragen).
      */
-    fun sendMailDirectly(emailMessage: EmailMessage) {
+    fun sendMailDirectly(emailMessage: EmailMessage, doneCallback: (Boolean) -> Unit) {
         emailServerConfig?.let { serverConfig ->
             emailMessage?.let { eMessage ->
                 val authenticator = SmtpAuthenticator()
                 authenticator.setUserName(serverConfig.smtpUserName)
                 val passwordEntered = authenticator.askForPassword()
                 if (!passwordEntered) {
+                    doneCallback(false)
                     return
                 }
                 log.debug("auth: ${authenticator.passwordAuthentication}")
@@ -77,7 +78,7 @@ class EmailUserAgent {
                     Tls.START_TLS -> props["mail.smtp.starttls.required"] = true
                     Tls.TLS -> {
                         props["mail.smtp.ssl.enable"] = true
-                        props["mail.smtp.ssl.protocols"] = "TLSv1 TLSv1.1 TLSv1.2"
+                        props["mail.smtp.ssl.protocols"] = "TLSv1 TLSv1.1 TLSv1.2 TLSv1.3"
                     }
                 }
 
@@ -93,6 +94,7 @@ class EmailUserAgent {
 
                 try {
                     Transport.send(msg)
+                    doneCallback(true)
                     JOptionPane.showMessageDialog(
                         null,
                         "Die E-Mail-Nachricht wurde erfolgreich versendet.\n\nBitte prüfe deinen Post-Eingang!",
@@ -105,11 +107,13 @@ class EmailUserAgent {
                     ex.cause?.let {
                         log.debug("cause: ${it.message}")
                     }
+
+                    doneCallback(false)
+
                     var errorMessage = "Es ist ein Fehler aufgetreten:\n\n${ex.message}"
                     ex.cause?.let {
                         errorMessage += "\n\n{$ex.cause.message}"
                     }
-
                     val result = JOptionPane.showMessageDialog(
                         null,
                         errorMessage,
