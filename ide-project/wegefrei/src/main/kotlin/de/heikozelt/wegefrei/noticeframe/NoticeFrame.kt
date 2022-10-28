@@ -112,6 +112,11 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
      */
     fun loadData(notice: Notice = Notice()) {
         log.debug("loadData(notice id: ${notice.id})")
+
+        app.getSettings()?.let {
+            selectedPhotosPanel.setPhotosDirectory(it.photosDirectory)
+        }
+
         selectedPhotos.registerObserver(this)
         selectedPhotos.registerObserver(selectedPhotosPanel)
         selectedPhotos.registerObserver(allPhotosPanel)
@@ -126,8 +131,10 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
             "Meldung #${notice.id} - Wege frei!"
         }
         this.notice = notice
-        allPhotosPanel.loadData("20220301_184952.jpg")
-        noticeForm.loadData(notice)
+        app.getSettings()?. let {
+            allPhotosPanel.loadData(it.photosDirectory, "20220301_184952.jpg")
+            noticeForm.loadData(notice)
+        }
 
         offensePosition = notice.getGeoPosition()
 
@@ -189,7 +196,6 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
                 maxiMapForm.enableOrDisableEditing()
             }
         }
-
         noticeForm.getNoticeFormFields().getMiniMap().displayBorder(true)
         allPhotosPanel.hideBorder()
         selectedPhotosPanel.hideBorder()
@@ -200,10 +206,11 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
      */
     fun showPhoto(miniPhotoPanel: MiniPhotoPanel) {
         log.debug("show photo")
-        val photoPanel = MaxiPhotoPanel(this, miniPhotoPanel.getPhoto())
-        val scrollPane = JScrollPane(photoPanel)
-        bottomSplitPane.rightComponent = scrollPane
-
+        app.getSettings()?.photosDirectory?.let {
+            val photoPanel = MaxiPhotoPanel(it,this, miniPhotoPanel.getPhoto())
+            val scrollPane = JScrollPane(photoPanel)
+            setZoomComponent(scrollPane)
+        }
         noticeForm.getNoticeFormFields().getMiniMap().displayBorder(false)
         allPhotosPanel.showBorder(miniPhotoPanel)
         selectedPhotosPanel.hideBorder()
@@ -214,10 +221,11 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
      */
     private fun showPhoto(photo: Photo) {
         log.debug("show photo")
-        val photoPanel = MaxiPhotoPanel(this, photo)
-        val scrollPane = JScrollPane(photoPanel)
-        bottomSplitPane.rightComponent = scrollPane
-
+        app.getSettings()?.photosDirectory?.let {
+            val photoPanel = MaxiPhotoPanel(it,this, photo)
+            val scrollPane = JScrollPane(photoPanel)
+            setZoomComponent(scrollPane)
+        }
         noticeForm.getNoticeFormFields().getMiniMap().displayBorder(false)
         allPhotosPanel.showBorder(photo)
         selectedPhotosPanel.hideBorder()
@@ -230,9 +238,11 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
         log.debug("show selected photo")
 
         //todo scollpane und photo zoomPanel.showSelectedPhoto(miniSelectedPhotoPanel.getPhoto())
-        val photoPanel = MaxiSelectedPhotoPanel(this, miniSelectedPhotoPanel.getPhoto())
-        val scrollPane = JScrollPane(photoPanel)
-        setZoomComponent(scrollPane)
+        app.getSettings()?.photosDirectory?.let {
+            val photoPanel = MaxiSelectedPhotoPanel(it,this, miniSelectedPhotoPanel.getPhoto())
+            val scrollPane = JScrollPane(photoPanel)
+            setZoomComponent(scrollPane)
+        }
 
         noticeForm.getNoticeFormFields().getMiniMap().displayBorder(false)
         allPhotosPanel.hideBorder()
@@ -246,9 +256,11 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
         log.debug("show selected photo")
 
         //todo scollpane und photo zoomPanel.showSelectedPhoto(miniSelectedPhotoPanel.getPhoto())
-        val photoPanel = MaxiSelectedPhotoPanel(this, photo)
-        val scrollPane = JScrollPane(photoPanel)
-        setZoomComponent(scrollPane)
+        app.getSettings()?.photosDirectory?.let {
+            val photoPanel = MaxiSelectedPhotoPanel(it, this, photo)
+            val scrollPane = JScrollPane(photoPanel)
+            setZoomComponent(scrollPane)
+        }
 
         noticeForm.getNoticeFormFields().getMiniMap().displayBorder(false)
         allPhotosPanel.hideBorder()

@@ -13,6 +13,7 @@ import javax.swing.SwingWorker
  * generiert ein Thumbnail-Image und passt das Label an.
  */
 class SelectedThumbnailWorker(
+    private val photosDir: String,
     private val photo: Photo,
     private val label: JLabel)
 : SwingWorker<ImageIcon?, ImageIcon?>() {
@@ -27,7 +28,7 @@ class SelectedThumbnailWorker(
 
     private fun calculateThumbnail() {
         //Thread.sleep(5000)
-        photo.getImage()?.let { image ->
+        photo.getImage(photosDir)?.let { image ->
             // Thumbnail-Größe auf die Längere der beiden Bild-Seiten anpassen
             if (image.height > image.width) {
                 val scaleFactor = Styles.THUMBNAIL_SIZE.toFloat() / image.height
@@ -44,7 +45,7 @@ class SelectedThumbnailWorker(
     }
 
     private fun makeThumbnailImage() {
-        photo.getImage()?.let { image ->
+        photo.getImage(photosDir)?.let { image ->
             thumbnailImage = image.getScaledInstance(thumbnailWidth, thumbnailHeight, Image.SCALE_SMOOTH)
         }
     }

@@ -16,6 +16,7 @@ import javax.swing.SwingWorker
  * generiert ein Thumbnail-Image und passt das Label an.
  */
 class ThumbnailWorker(
+    private val photosDir: String,
     private val photo: Photo,
     private val active: Boolean,
     private val label: JLabel)
@@ -29,9 +30,15 @@ class ThumbnailWorker(
     private var thumbnailImage: Image? = null
     private var icon: ImageIcon? = null
 
+    init{
+        log.debug("photosDir: $photosDir")
+    }
+
     private fun calculateThumbnail() {
+        log.debug("calculateThumbnail()")
         //Thread.sleep(5000)
-        photo.getImage()?.let { image ->
+        photo.getImage(photosDir)?.let { image ->
+            log.debug("got image of photo")
             // Thumbnail-Größe auf die Längere der beiden Bild-Seiten anpassen
             if (image.height > image.width) {
                 val scaleFactor = Styles.THUMBNAIL_SIZE.toFloat() / image.height
@@ -45,10 +52,11 @@ class ThumbnailWorker(
                 thumbnailY = (Styles.THUMBNAIL_SIZE - thumbnailHeight) / 2 + 1
             }
         }
+        log.debug("thumbnail: with: $thumbnailWidth, height: $thumbnailHeight")
     }
 
     private fun makeThumbnailImage() {
-        photo.getImage()?.let { image ->
+        photo.getImage(photosDir)?.let { image ->
             thumbnailImage = image.getScaledInstance(thumbnailWidth, thumbnailHeight, Image.SCALE_SMOOTH)
             if (!active) {
                 val filter = GrayFilter(true, 50)
@@ -60,27 +68,32 @@ class ThumbnailWorker(
     }
 
     /**
-     * This is done in own Thread
+     * This is done in own Thread.
+     * Intense computing of icon.
      */
     override fun doInBackground(): ImageIcon? {
+        log.debug("doInBackground()")
         calculateThumbnail()
         makeThumbnailImage()
         icon = if(thumbnailImage == null) {
             null
         } else {
-            ImageIcon(thumbnailImage)
+            ImageIcon(thumbnailImage) // doppelt!!!
         }
         return icon
     }
 
     /**
-     * this is done in the Swing Event Dispatcher Thread
+     * This is done in the Swing Event Dispatcher Thread.
+     * Just update the user interface.
      */
     override fun done() {
-        if(thumbnailImage != null) {
+        log.debug("done()")
+        icon?.let {
+            log.debug("setting icon...")
             label.text = null
-            label.icon = ImageIcon(thumbnailImage)
-            //log.debug("setBounds($thumbnailX, $thumbnailY, $thumbnailWidth, $thumbnailHeight)")
+            label.icon = it
+            log.debug("setBounds($thumbnailX, $thumbnailY, $thumbnailWidth, $thumbnailHeight)")
             label.setBounds(thumbnailX, thumbnailY, thumbnailWidth, thumbnailHeight)
         }
     }

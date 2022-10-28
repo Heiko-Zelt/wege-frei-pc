@@ -14,9 +14,11 @@ import javax.swing.JPanel
 class AllPhotosPanel(private val noticeFrame: NoticeFrame) : JPanel(), SelectedPhotosObserver {
 
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
-    private var firstPhotoFilename: String? = null
     private val selectedPhotos = noticeFrame.getSelectedPhotos()
     private val miniPhotoPanels = arrayListOf<MiniPhotoPanel>()
+
+    //private var firstPhotoFilename: String? = null
+    private var photosDir: String? = null
 
     init {
         background = ALL_PHOTOS_BACKGROUND
@@ -30,13 +32,9 @@ class AllPhotosPanel(private val noticeFrame: NoticeFrame) : JPanel(), SelectedP
     }
 
     // todo Prio 2: load from database as background job
-    fun loadData(firstPhotoFilename: String) {
-        /*
-        val photos = noticeFrame.getDatabaseService().getPhotos(firstPhotoFilename, 20)
-        for (photo in photos) {
-        appendPhoto
-        }
-        */
+    fun loadData(photosDir: String, firstPhotoFilename: String) {
+        this.photosDir = photosDir
+        log.debug("photosDir: $photosDir")
         val dbRepo = noticeFrame.getDatabaseRepo()?:return
         val worker = LoadPhotosWorker(dbRepo, firstPhotoFilename, this)
         worker.execute()
@@ -46,10 +44,14 @@ class AllPhotosPanel(private val noticeFrame: NoticeFrame) : JPanel(), SelectedP
      * called from LoadPhotosWorker
      */
     fun appendPhoto(photo: Photo) {
+        log.debug("appendPhoto(${photo.filename})")
         val active = !selectedPhotos.getPhotos().contains(photo)
-        val miniPhotoPanel = MiniPhotoPanel(noticeFrame, photo, active)
-        miniPhotoPanels.add(miniPhotoPanel)
-        add(miniPhotoPanel, componentCount - 1) // am Ende, aber vor forwardButton
+        log.debug("photosDir: $photosDir")
+        photosDir?.let {
+            val miniPhotoPanel = MiniPhotoPanel(it, noticeFrame, photo, active)
+            miniPhotoPanels.add(miniPhotoPanel)
+            add(miniPhotoPanel, componentCount - 1) // am Ende, aber vor forwardButton
+        }
     }
 
     private fun panelWithPhoto(photo: Photo): MiniPhotoPanel? {

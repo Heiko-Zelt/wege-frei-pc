@@ -1,6 +1,5 @@
 package de.heikozelt.wegefrei.entities
 
-import de.heikozelt.wegefrei.WegeFrei
 import jakarta.persistence.*
 import org.jxmapviewer.viewer.GeoPosition
 import org.slf4j.LoggerFactory
@@ -63,18 +62,18 @@ class Photo (
         }
     }
 
-    fun loadImage() {
-        val file = File(WegeFrei.PHOTO_DIR, filename)
-        //val photo = readPhotoMetadata(file)
+    private fun loadImage(photosDir: String) {
+        log.debug("filename=$filename, loadImage(photosDir=$photosDir)")
+        val file = File(photosDir, filename)
         img = ImageIO.read(file)
     }
 
     @Transient
     private var img: BufferedImage? = null
 
-    fun getImage(): BufferedImage? {
+    fun getImage(photosDir: String): BufferedImage? {
         if(img == null) {
-            loadImage()
+            loadImage(photosDir)
         }
         return img
     }

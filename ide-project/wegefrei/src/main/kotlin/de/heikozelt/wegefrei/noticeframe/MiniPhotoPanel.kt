@@ -15,7 +15,7 @@ import javax.swing.JPanel
 import javax.swing.SwingConstants
 
 
-class MiniPhotoPanel(private val noticeFrame: NoticeFrame, private val photo: Photo, private var active: Boolean) :
+class MiniPhotoPanel(private val photosDir: String, private val noticeFrame: NoticeFrame, private val photo: Photo, private var active: Boolean) :
     JPanel() {
 
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
@@ -58,7 +58,7 @@ class MiniPhotoPanel(private val noticeFrame: NoticeFrame, private val photo: Ph
         add(thumbnailLabel)
 
         // Loading the image from the filesystem and resizing it is time-consuming. So, do it later...
-        val worker = ThumbnailWorker(photo, active, thumbnailLabel)
+        val worker = ThumbnailWorker(photosDir, photo, active, thumbnailLabel)
         worker.execute()
     }
 
@@ -78,7 +78,7 @@ class MiniPhotoPanel(private val noticeFrame: NoticeFrame, private val photo: Ph
         log.debug("activate()")
         active = true
 
-        val worker = ThumbnailWorker(photo, active, thumbnailLabel)
+        val worker = ThumbnailWorker(photosDir, photo, active, thumbnailLabel)
         worker.execute()
 
         button.isEnabled = true
@@ -90,7 +90,7 @@ class MiniPhotoPanel(private val noticeFrame: NoticeFrame, private val photo: Ph
         log.debug("deactivate()")
         active = false
 
-        val worker = ThumbnailWorker(photo, active, thumbnailLabel)
+        val worker = ThumbnailWorker(photosDir, photo, active, thumbnailLabel)
         worker.execute()
 
         button.isEnabled = false

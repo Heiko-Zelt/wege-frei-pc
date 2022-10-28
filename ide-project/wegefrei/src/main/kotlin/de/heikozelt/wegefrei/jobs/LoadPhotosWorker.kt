@@ -7,8 +7,10 @@ import org.slf4j.LoggerFactory
 import javax.swing.SwingWorker
 
 /**
- * Läd die Fotos aus der Datenbank
+ * Läd die Fotos (nur Metadaten) aus der Datenbank
  * und übermittelt sie an das AllPhotosPanel.
+ * Werden die Daten in einem Rutsch aus der Datenbank geladen?
+ * oder wäre auch ein Cursor / Stream-Verarbeitung möglich?
  */
 class LoadPhotosWorker(
     private val databaseRepo: DatabaseRepo,
@@ -26,6 +28,7 @@ class LoadPhotosWorker(
     override fun doInBackground(): Set<Photo>? {
         log.info("doInBackground()")
         photos = databaseRepo.getPhotos(firstPhotoFilename, 20)
+        log.debug("number of photos in database: ${photos?.size}")
         return photos
     }
 

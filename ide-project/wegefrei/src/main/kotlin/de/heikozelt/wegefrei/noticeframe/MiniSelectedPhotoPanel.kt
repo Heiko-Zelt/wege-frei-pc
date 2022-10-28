@@ -13,8 +13,12 @@ import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.SwingConstants
 
-class MiniSelectedPhotoPanel(private val noticeFrame: NoticeFrame, private val photo: Photo, private var index: Int): JPanel() {
-
+class MiniSelectedPhotoPanel(
+    private val photosDir: String,
+    private val noticeFrame: NoticeFrame,
+    private val photo: Photo,
+    private var index: Int): JPanel()
+{
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
     private val thumbnailLabel = JLabel("not loaded", SwingConstants.CENTER)
     private val button = JButton("-")
@@ -54,7 +58,7 @@ class MiniSelectedPhotoPanel(private val noticeFrame: NoticeFrame, private val p
         add(thumbnailLabel)
 
         // Loading the image from the filesystem and resizing it is time-consuming. So, do it later...
-        val worker = SelectedThumbnailWorker(photo, thumbnailLabel)
+        val worker = SelectedThumbnailWorker(photosDir, photo, thumbnailLabel)
         worker.execute()
     }
 

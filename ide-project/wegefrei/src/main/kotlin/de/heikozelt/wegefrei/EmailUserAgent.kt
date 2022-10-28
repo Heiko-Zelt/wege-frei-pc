@@ -52,72 +52,70 @@ class EmailUserAgent {
      */
     fun sendMailDirectly(emailMessage: EmailMessage, doneCallback: (Boolean) -> Unit) {
         emailServerConfig?.let { serverConfig ->
-            emailMessage?.let { eMessage ->
-                val authenticator = SmtpAuthenticator()
-                authenticator.setUserName(serverConfig.smtpUserName)
-                val passwordEntered = authenticator.askForPassword()
-                if (!passwordEntered) {
-                    doneCallback(false)
-                    return
+            val authenticator = SmtpAuthenticator()
+            authenticator.setUserName(serverConfig.smtpUserName)
+            val passwordEntered = authenticator.askForPassword()
+            if (!passwordEntered) {
+                doneCallback(false)
+                return
+            }
+            log.debug("auth: ${authenticator.passwordAuthentication}")
+            log.debug("userName: ${authenticator.passwordAuthentication.userName}")
+            //log.debug("password: ${authenticator.passwordAuthentication.password}") don't log passwords
+
+            val props = Properties()
+            props["mail.smtp.auth"] = true
+            props["mail.smtp.host"] = serverConfig.smtpHost
+            props["mail.smtp.port"] = serverConfig.smtpPort
+            val tls = serverConfig.tls
+            log.debug("TLS: $tls")
+            when (tls) {
+                Tls.PLAIN -> props["mail.smtp.ssl.enable"] = false
+                Tls.START_TLS -> props["mail.smtp.starttls.required"] = true
+                Tls.TLS -> {
+                    props["mail.smtp.ssl.enable"] = true
+                    props["mail.smtp.ssl.protocols"] = "TLSv1 TLSv1.1 TLSv1.2 TLSv1.3"
                 }
-                log.debug("auth: ${authenticator.passwordAuthentication}")
-                log.debug("userName: ${authenticator.passwordAuthentication.userName}")
-                //log.debug("password: ${authenticator.passwordAuthentication.password}") don't log passwords
+            }
 
-                val props = Properties()
-                props["mail.smtp.auth"] = true
-                props["mail.smtp.host"] = serverConfig.smtpHost
-                props["mail.smtp.port"] = serverConfig.smtpPort
-                val tls = serverConfig.tls
-                log.debug("TLS: $tls")
-                when (tls) {
-                    Tls.PLAIN -> props["mail.smtp.ssl.enable"] = false
-                    Tls.START_TLS -> props["mail.smtp.starttls.required"] = true
-                    Tls.TLS -> {
-                        props["mail.smtp.ssl.enable"] = true
-                        props["mail.smtp.ssl.protocols"] = "TLSv1 TLSv1.1 TLSv1.2 TLSv1.3"
-                    }
+            val session = Session.getInstance(props, authenticator)
+            log.debug("session: $session")
+
+            val msg = MimeMessage(session)
+            msg.addHeader("User-Agent", SettingsFormFields.MAIL_USER_AGENT);
+            msg.setFrom(InternetAddress(emailMessage.fromAddress, emailMessage.fromName))
+            msg.setRecipient(Message.RecipientType.TO, InternetAddress(emailMessage.toAddress, emailMessage.toName))
+            msg.setSubject(emailMessage.subject, "UTF-8");
+            msg.setContent(emailMessage.content, "text/html; charset=utf-8")
+
+            try {
+                Transport.send(msg)
+                doneCallback(true)
+                JOptionPane.showMessageDialog(
+                    null,
+                    "Die E-Mail-Nachricht wurde erfolgreich versendet.\n\nBitte prüfe deinen Post-Eingang!",
+                    "E-Mail abgeschickt",
+                    JOptionPane.INFORMATION_MESSAGE
+                )
+            } catch (ex: MessagingException) {
+                log.debug("exception while sending test message", ex)
+                log.debug("exception: ${ex.message}")
+                ex.cause?.let {
+                    log.debug("cause: ${it.message}")
                 }
 
-                val session = Session.getInstance(props, authenticator)
-                log.debug("session: $session")
+                doneCallback(false)
 
-                val msg = MimeMessage(session)
-                msg.addHeader("User-Agent", SettingsFormFields.MAIL_USER_AGENT);
-                msg.setFrom(InternetAddress(eMessage.fromAddress, eMessage.fromName))
-                msg.setRecipient(Message.RecipientType.TO, InternetAddress(eMessage.toAddress, eMessage.toName))
-                msg.setSubject(eMessage.subject, "UTF-8");
-                msg.setContent(eMessage.content, "text/html; charset=utf-8")
-
-                try {
-                    Transport.send(msg)
-                    doneCallback(true)
-                    JOptionPane.showMessageDialog(
-                        null,
-                        "Die E-Mail-Nachricht wurde erfolgreich versendet.\n\nBitte prüfe deinen Post-Eingang!",
-                        "E-Mail abgeschickt",
-                        JOptionPane.INFORMATION_MESSAGE
-                    )
-                } catch (ex: MessagingException) {
-                    log.debug("exception while sending test message", ex)
-                    log.debug("exception: ${ex.message}")
-                    ex.cause?.let {
-                        log.debug("cause: ${it.message}")
-                    }
-
-                    doneCallback(false)
-
-                    var errorMessage = "Es ist ein Fehler aufgetreten:\n\n${ex.message}"
-                    ex.cause?.let {
-                        errorMessage += "\n\n{$ex.cause.message}"
-                    }
-                    val result = JOptionPane.showMessageDialog(
-                        null,
-                        errorMessage,
-                        "Test-E-Mail senden",
-                        JOptionPane.ERROR_MESSAGE
-                    )
+                var errorMessage = "Es ist ein Fehler aufgetreten:\n\n${ex.message}"
+                ex.cause?.let {
+                    errorMessage += "\n\n{$ex.cause.message}"
                 }
+                JOptionPane.showMessageDialog(
+                    null,
+                    errorMessage,
+                    "Test-E-Mail senden",
+                    JOptionPane.ERROR_MESSAGE
+                )
             }
         }
     }

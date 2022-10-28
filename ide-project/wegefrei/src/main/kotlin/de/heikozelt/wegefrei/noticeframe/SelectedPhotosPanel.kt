@@ -14,7 +14,7 @@ class SelectedPhotosPanel(private val noticeFrame: NoticeFrame) : JPanel(),
     SelectedPhotosObserver {
 
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
-
+    private var photosDir: String? = null
     private val miniSelectedPhotoPanels = arrayListOf<MiniSelectedPhotoPanel>()
 
     init {
@@ -24,15 +24,26 @@ class SelectedPhotosPanel(private val noticeFrame: NoticeFrame) : JPanel(),
 
         // nicht notwendig, wenn selectedPhotos anfänglich leer ist und Observer vorher schon registriert ist
         // aber man weiß ja nie
+        // photosDir ist im Konstruktor noch null. Es kann also so gar nicht funktionieren.
+        /*
         var i = 1
         for (photo in noticeFrame.getSelectedPhotos().getPhotos()) {
             log.warn("observer zu spät registriert?")
-            val panel = MiniSelectedPhotoPanel(noticeFrame, photo, i)
-            miniSelectedPhotoPanels.add(panel)
-            add(panel)
+            photosDir?.let {
+                val panel = MiniSelectedPhotoPanel(it, noticeFrame, photo, i)
+                miniSelectedPhotoPanels.add(panel)
+                add(panel)
+            }
+
             i++
         }
+        */
         autoscrolls = true
+    }
+
+
+    fun setPhotosDirectory(photosDir: String) {
+        this.photosDir = photosDir
     }
 
     /**
@@ -78,31 +89,34 @@ class SelectedPhotosPanel(private val noticeFrame: NoticeFrame) : JPanel(),
 
     override fun selectedPhoto(index: Int, photo: Photo) {
         log.debug("added photo")
-        val panel = MiniSelectedPhotoPanel(noticeFrame, photo, index)
-        miniSelectedPhotoPanels.add(index, panel)
-        log.debug("add selected photo panel to container. component count: $componentCount")
-        add(panel, index)
-        log.debug("after add: component count: $componentCount")
-        // bei allen nachfolgenden Fotos den Index-Text ändern
-        for(i in index + 1 until miniSelectedPhotoPanels.size) {
-            miniSelectedPhotoPanels[i].updateText(i)
-        }
+        photosDir?.let { dir ->
+            val panel = MiniSelectedPhotoPanel(dir, noticeFrame, photo, index)
+            miniSelectedPhotoPanels.add(index, panel)
+            log.debug("add selected photo panel to container. component count: $componentCount")
+            add(panel, index)
 
-        // todo gemeinsame Basis-Klasse für MaxiPhotoPanel und MaxiSelectedPhotoPanel
-        val zoomComponent = noticeFrame.getZoomComponent()
-        if(zoomComponent is MaxiPhotoPanel) {
-            if(photo == zoomComponent.getPhoto()) {
-                panel.displayBorder(true)
+            log.debug("after add: component count: $componentCount")
+            // bei allen nachfolgenden Fotos den Index-Text ändern
+            for (i in index + 1 until miniSelectedPhotoPanels.size) {
+                miniSelectedPhotoPanels[i].updateText(i)
             }
-        }
-        if(zoomComponent is MaxiSelectedPhotoPanel) {
-            if(photo == zoomComponent.getPhoto()) {
-                panel.displayBorder(true)
-            }
-        }
 
-        revalidate()
-        repaint()
+            // todo gemeinsame Basis-Klasse für MaxiPhotoPanel und MaxiSelectedPhotoPanel
+            val zoomComponent = noticeFrame.getZoomComponent()
+            if (zoomComponent is MaxiPhotoPanel) {
+                if (photo == zoomComponent.getPhoto()) {
+                    panel.displayBorder(true)
+                }
+            }
+            if (zoomComponent is MaxiSelectedPhotoPanel) {
+                if (photo == zoomComponent.getPhoto()) {
+                    panel.displayBorder(true)
+                }
+            }
+
+            revalidate()
+            repaint()
+        }
     }
 
     override fun unselectedPhoto(index: Int, photo: Photo) {
@@ -124,12 +138,14 @@ class SelectedPhotosPanel(private val noticeFrame: NoticeFrame) : JPanel(),
     }
 
     override fun replacedPhotoSelection(photos: TreeSet<Photo>) {
-        removeAll()
-        miniSelectedPhotoPanels.clear()
-        for ((i, photo) in photos.withIndex()) {
-            val panel = MiniSelectedPhotoPanel(noticeFrame, photo, i)
-            miniSelectedPhotoPanels.add(panel)
-            add(panel)
+        photosDir?.let { dir ->
+            removeAll()
+            miniSelectedPhotoPanels.clear()
+            for ((i, photo) in photos.withIndex()) {
+                val panel = MiniSelectedPhotoPanel(dir, noticeFrame, photo, i)
+                miniSelectedPhotoPanels.add(panel)
+                add(panel)
+            }
         }
     }
 }

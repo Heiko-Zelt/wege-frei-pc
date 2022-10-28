@@ -232,9 +232,6 @@ open class WegeFrei(private val settingsRepo: SettingsRepo = SettingsFileRepo())
     }
 
     companion object {
-        // todo Prio 1: Einstellungen in Settings-Datei speichern
-        const val PHOTO_DIR = "/media/veracrypt1/_Fotos/2022/03"
-
         private val LOG = LoggerFactory.getLogger(this::class.java.canonicalName)
 
         @JvmStatic

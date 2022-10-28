@@ -8,8 +8,11 @@ import java.awt.Image
 import java.awt.Insets
 import javax.swing.*
 
-class MaxiSelectedPhotoPanel(private val noticeFrame: NoticeFrame, private val photo: Photo): JPanel() {
-
+class MaxiSelectedPhotoPanel(
+    private val photosDir: String,
+    private val noticeFrame: NoticeFrame,
+    private val photo: Photo): JPanel()
+{
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
 
     init {
@@ -20,7 +23,7 @@ class MaxiSelectedPhotoPanel(private val noticeFrame: NoticeFrame, private val p
         //val file = File(PHOTO_DIR, filename)
         //val photo = readPhotoMetadata(file)
         //val img = ImageIO.read(file)
-        val scaledImg = photo.getImage()?.getScaledInstance(600,400, Image.SCALE_SMOOTH)
+        val scaledImg = photo.getImage(photosDir)?.getScaledInstance(600,400, Image.SCALE_SMOOTH)
         val label = if(scaledImg == null) {
             JLabel("not loaded")
         } else {

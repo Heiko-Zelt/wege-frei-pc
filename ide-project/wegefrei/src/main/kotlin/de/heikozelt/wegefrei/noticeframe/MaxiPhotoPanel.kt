@@ -8,7 +8,7 @@ import java.awt.Image
 import java.awt.Insets
 import javax.swing.*
 
-class MaxiPhotoPanel(private val noticeFrame: NoticeFrame, private val photo: Photo): JPanel() {
+class MaxiPhotoPanel(private val photosDir: String, private val noticeFrame: NoticeFrame, private val photo: Photo): JPanel() {
 
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
 
@@ -17,7 +17,7 @@ class MaxiPhotoPanel(private val noticeFrame: NoticeFrame, private val photo: Ph
     private val button: JButton
 
     private fun makeThumbnailImage(): Image? {
-        return photo.getImage()?.getScaledInstance(600, 400, Image.SCALE_SMOOTH)
+        return photo.getImage(photosDir)?.getScaledInstance(600, 400, Image.SCALE_SMOOTH)
     }
 
     init {
