@@ -3,10 +3,9 @@ package de.heikozelt.wegefrei.emailmessageframe
 import de.heikozelt.wegefrei.gui.Styles.Companion.BUTTONS_BAR_BORDER
 import org.slf4j.LoggerFactory
 import java.awt.Window
-import java.awt.event.ActionEvent
 import javax.swing.*
 
-class EmailMessageButtonsBar : JPanel() {
+class EmailMessageButtonsBar(private val emailMessageDialog: EmailMessageDialog) : JPanel() {
 
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
     private val sendButton = JButton("Senden")
@@ -17,6 +16,10 @@ class EmailMessageButtonsBar : JPanel() {
             val win: Window? = SwingUtilities.getWindowAncestor(this)
             win?.dispose()
         }
+        sendButton.addActionListener {
+            emailMessageDialog.send()
+        }
+
         val lay = GroupLayout(this)
         lay.autoCreateGaps = true;
         //lay.autoCreateContainerGaps = true;
@@ -39,14 +42,6 @@ class EmailMessageButtonsBar : JPanel() {
         )
         lay.linkSize(SwingConstants.HORIZONTAL, sendButton, cancelButton);
         layout = lay
-    }
 
-    /**
-     * Was soll als Nächstes passieren,
-     * wenn die Anwender_in auf ok klickt.
-     * @param action die Funktion, die aufgerufen werden soll
-     */
-    fun setSendAction(action: (ActionEvent) -> Unit) {
-        sendButton.addActionListener(action)
     }
 }

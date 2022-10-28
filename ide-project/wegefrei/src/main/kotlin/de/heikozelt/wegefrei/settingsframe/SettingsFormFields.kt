@@ -1,10 +1,10 @@
 package de.heikozelt.wegefrei.settingsframe
 
+import de.heikozelt.wegefrei.EmailUserAgent
 import de.heikozelt.wegefrei.docfilters.OnlyDigitsDocFilter
-import de.heikozelt.wegefrei.emailmessageframe.EmailMessageDialog
-import de.heikozelt.wegefrei.gui.SmtpAuthenticator
 import de.heikozelt.wegefrei.gui.TrimmingTextField
 import de.heikozelt.wegefrei.gui.Verifiers
+import de.heikozelt.wegefrei.json.EmailServerConfig
 import de.heikozelt.wegefrei.json.Settings
 import de.heikozelt.wegefrei.json.Tls
 import de.heikozelt.wegefrei.model.EmailMessage
@@ -12,13 +12,6 @@ import org.slf4j.LoggerFactory
 import java.awt.GridBagConstraints
 import java.awt.GridBagLayout
 import java.awt.Insets
-import java.util.*
-import javax.mail.Message
-import javax.mail.MessagingException
-import javax.mail.Session
-import javax.mail.Transport
-import javax.mail.internet.InternetAddress
-import javax.mail.internet.MimeMessage
 import javax.swing.*
 import javax.swing.text.AbstractDocument
 
@@ -48,8 +41,6 @@ class SettingsFormFields(private val settingsFrame: SettingsFrame): JPanel() {
     private val photosDirButton = JButton("Ordner auswählen")
     private val databaseDirLabel = JLabel()
     private val databaseDirButton = JButton("Ordner auswählen")
-
-    private var emailMessage: EmailMessage? = null
 
     init {
         log.debug("init")
@@ -197,7 +188,7 @@ class SettingsFormFields(private val settingsFrame: SettingsFrame): JPanel() {
 
         constraints.gridy++
         constraints.fill = GridBagConstraints.NONE;
-        smtpConnectButton.addActionListener { testEmailStep1() }
+        smtpConnectButton.addActionListener { sendTestEmail() }
         constraints.gridx = 1
         add(smtpConnectButton, constraints)
 
@@ -304,14 +295,20 @@ class SettingsFormFields(private val settingsFrame: SettingsFrame): JPanel() {
      * Erst mal die Test-E-Mail anzeigen.
      * Nur wenn die Anwender_in auf Ok klickt, wirklich absenden.
      */
-    private fun testEmailStep1() {
-        log.debug("testSmtpConnection()")
+    private fun sendTestEmail() {
+        log.debug("sendTestEmail()")
 
         val fullName = "${givenNameTextField.text.trim()} ${surnameTextField.text.trim()}"
         val senderName = fullName.ifBlank { TEST_MAIL_FROM_NAME }
         val senderEmailAddress = emailTextField.text.trim()
 
-        val emailMessageDialog = EmailMessageDialog()
+        val emailServerConfig = EmailServerConfig(
+            smtpHostTextField.text.trim(),
+            smtpPortTextField.text.trim().toInt(),
+            smtpUserNameTextField.text.trim(),
+            Tls.values()[tlsComboBox.selectedIndex]
+        )
+
         val eMessage = EmailMessage(
             senderName,
             senderEmailAddress,
@@ -320,78 +317,12 @@ class SettingsFormFields(private val settingsFrame: SettingsFrame): JPanel() {
             TEST_MAIL_SUBJECT,
             TEST_MAIL_CONTENT
         )
-        emailMessageDialog.loadData(eMessage)
-        emailMessage = eMessage
-        emailMessageDialog.setNextAction { testEmailStep2() }
+        val emailUserAgent = EmailUserAgent()
+        emailUserAgent.setEmailServerConfig(emailServerConfig)
+        emailUserAgent.sendMailAfterConfirmation(eMessage)
     }
 
-    /**
-     * Jetzt aber wirklich absenden.
-     */
-    private fun testEmailStep2() {
-        emailMessage?. let { eMessage ->
-            val authenticator = SmtpAuthenticator()
-            authenticator.setUserName(smtpUserNameTextField.text.trim())
-            val passwordEntered = authenticator.askForPassword()
-            if (!passwordEntered) {
-                return
-            }
-            log.debug("auth: ${authenticator.passwordAuthentication}")
-            log.debug("userName: ${authenticator.passwordAuthentication.userName}")
-            //log.debug("password: ${authenticator.passwordAuthentication.password}") don't log passwords
 
-            val props = Properties()
-            props["mail.smtp.auth"] = true
-            props["mail.smtp.host"] = smtpHostTextField.text.trim()
-            props["mail.smtp.port"] = smtpPortTextField.text.trim()
-            val tls = Tls.values()[tlsComboBox.selectedIndex]
-            log.debug("TLS: $tls")
-            when (tls) {
-                Tls.PLAIN -> props["mail.smtp.ssl.enable"] = false
-                Tls.START_TLS -> props["mail.smtp.starttls.required"] = true
-                Tls.TLS -> {
-                    props["mail.smtp.ssl.enable"] = true
-                    props["mail.smtp.ssl.protocols"] = "TLSv1 TLSv1.1 TLSv1.2"
-                }
-            }
-
-            val session = Session.getInstance(props, authenticator)
-            log.debug("session: $session")
-
-            val msg = MimeMessage(session)
-            msg.addHeader("User-Agent", MAIL_USER_AGENT);
-            msg.setFrom(InternetAddress(eMessage.fromAddress, eMessage.fromName))
-            msg.setRecipient(Message.RecipientType.TO, InternetAddress(eMessage.toAddress, eMessage.toName))
-            msg.setSubject(eMessage.subject, "UTF-8");
-            msg.setContent(eMessage.content, "text/html; charset=utf-8")
-
-            try {
-                Transport.send(msg)
-                JOptionPane.showMessageDialog(
-                    null,
-                    "Die E-Mail-Nachricht wurde erfolgreich versendet.\n\nBitte prüfe deinen Post-Eingang!",
-                    "E-Mail abgeschickt",
-                    JOptionPane.INFORMATION_MESSAGE
-                )
-            } catch (ex: MessagingException) {
-                log.debug("exception while sending test message", ex)
-                log.debug("exception: ${ex.message}")
-                ex.cause?.let {
-                    log.debug("cause: ${it.message}")
-                }
-                var errorMessage = "Es ist ein Fehler aufgetreten:\n\n${ex.message}"
-                ex.cause?.let {
-                    errorMessage += "\n\n{$ex.cause.message}"
-                }
-                val result = JOptionPane.showMessageDialog(
-                    this,
-                    errorMessage,
-                    "Test-E-Mail senden",
-                    JOptionPane.ERROR_MESSAGE
-                )
-            }
-        }
-    }
 
     companion object {
         const val MAX_COLUMNS = 15
