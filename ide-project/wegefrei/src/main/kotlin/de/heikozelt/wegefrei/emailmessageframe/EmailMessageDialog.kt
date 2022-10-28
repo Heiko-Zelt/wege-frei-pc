@@ -24,7 +24,6 @@ class EmailMessageDialog(private val emailUserAgent: EmailUserAgent) : JFrame() 
 
     private val emailMessagePanel = EmailMessagePanel()
     private val statusLabel = JLabel()
-    //private val emailMessageButtonsBar = EmailMessageButtonsBar(this)
     private var emailMessage: EmailMessage? = null
     private val sendButton = JButton("Senden")
     private val cancelButton = JButton("Abbrechen")
@@ -41,8 +40,8 @@ class EmailMessageDialog(private val emailUserAgent: EmailUserAgent) : JFrame() 
         defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
         size = Dimension(400, 300)
         val lay = GroupLayout(contentPane)
-        lay.autoCreateGaps = true;
-        lay.autoCreateContainerGaps = true;
+        lay.autoCreateGaps = true
+        lay.autoCreateContainerGaps = true
         // left to right
         lay.setHorizontalGroup(
             lay.createParallelGroup(GroupLayout.Alignment.LEADING)
@@ -68,7 +67,7 @@ class EmailMessageDialog(private val emailUserAgent: EmailUserAgent) : JFrame() 
                         .addComponent(okButton)
                 )
         )
-        lay.linkSize(SwingConstants.HORIZONTAL, sendButton, cancelButton);
+        lay.linkSize(SwingConstants.HORIZONTAL, sendButton, cancelButton)
         layout = lay
         isVisible = true
     }

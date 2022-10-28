@@ -1,10 +1,10 @@
 package de.heikozelt.wegefrei
 
 import de.heikozelt.wegefrei.entities.Notice
-import de.heikozelt.wegefrei.jobs.ScanWorker
 import de.heikozelt.wegefrei.json.Settings
 import de.heikozelt.wegefrei.noticeframe.NoticeFrame
 import de.heikozelt.wegefrei.noticesframe.NoticesFrame
+import de.heikozelt.wegefrei.scanframe.ScanFrame
 import de.heikozelt.wegefrei.settingsframe.SettingsFrame
 import org.slf4j.LoggerFactory
 import java.awt.EventQueue
@@ -221,12 +221,15 @@ open class WegeFrei(private val settingsRepo: SettingsRepo = SettingsFileRepo())
         }
     }
 
-    // todo Statusbalken
+    /**
+     * Scannt die Fotos im Dateisystem und trägt die Metadaten in die Datenbank ein.
+     * todo: SHA1-Hashwert über Dateiinhalt als Primärschlüssel für Fotos.
+     */
     fun scanForNewPhotos() {
+        val scanFrame = ScanFrame()
         settings?.photosDirectory?.let {photosDir ->
             databaseRepo?.let { dbRepo ->
-                val worker = ScanWorker(photosDir, dbRepo)
-                worker.execute()
+                scanFrame.scan(photosDir, dbRepo)
             }
         }
     }
