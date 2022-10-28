@@ -22,15 +22,12 @@ import javax.swing.JOptionPane
  *   <li>Displays the email message</li>
  *   <li>Asks user for confirmation</li>
  *   <li>Asks for password (and remembers it)</li>
- *   <li>Displays status bar</li>
+ *   <li>Displays status bar/label</li>
  *   <li>Sends email to SMTP server</li>
  *   <li>Calls back if successful or not</li>
  * </ol>
  * The E-Mail-Body must be HTML code.
- * todo Prio 1: Statusbalken
  * todo Prio 3: Einstellungen speichern nach erfolgreichem Test?
- * todo Prio 2: Bei Passwort-Eingabe-Fenster: Klick auf Abbrechen soll auch EMailDialog schließen
- * todo Prio 2: Bei E-Mail erfolgreich versendet Popup: Klick auf ok soll auch EMailDialog schließen
  * todo Prio 2: Passwort merken, aber wie jederzeit änderbar?
  * Sobald der E-Mail-Versand einmal gescheitert ist, Passwort wieder vergessen.
  */
