@@ -13,22 +13,30 @@ import kotlin.jvm.Transient
 @Entity
 @Table(name="PHOTOS")
 class Photo (
-
     @Id
     val filename: String? = null,
+
+    /**
+     * Ein SHA1-Hashwert hat im Binär-Format 20 Bytes = 160 Bit.
+     * Hex-encoded: 40 characters
+     * Java data type: byte[]
+     * todo: make this the primary key/id
+     */
+    @Column(columnDefinition = "BINARY(20)")
+    val hash: ByteArray? = null,
 
     /**
      * Breitengrad der Foto-Metadaten
      * y-Achse, Richtung Norden, z.B. 50.08 für Wiesbaden
      */
-    @Column
+    @Column // REAL = A single precision floating point number.
     val latitude: Float? = null,
 
     /**
      * Längengrad der Foto-Metadaten
      * x-Achse, Richtung Osten, z.B. 8.24 für Wiesbaden
      */
-    @Column
+    @Column // REAL = A single precision floating point number.
     val longitude: Float? = null,
 
     /**

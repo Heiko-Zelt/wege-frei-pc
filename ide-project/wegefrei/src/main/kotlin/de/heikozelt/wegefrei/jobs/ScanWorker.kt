@@ -20,6 +20,7 @@ import javax.swing.SwingWorker
  * Das Ergebnis wird in die Datenbank geschrieben.
  * Die Pixel-Daten verbleiben im Dateisystem (Lazy loading).
  * todo Indexieren, Fotos in der Datenbank fortlaufend nummerieren für AllPhotosPanel-List-Modell.
+ * todo Unterverzeichnisse rekursiv scannen und SHA1-Hashwert als Primärschlüssel statt Dateiname.
  */
 class ScanWorker(
     private val scanFrame: ScanFrame,
@@ -124,7 +125,8 @@ class ScanWorker(
             ZonedDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault())
             //Instant.ofEpochMilli(date.time).atZone(ZoneId.systemDefault()).toLocalDateTime()
         }
-        return Photo(file.name, latitude, longitude, datTim, null)
+        val sha1Hash = "0123456789abcdefghij".toByteArray()
+        return Photo(file.name, sha1Hash, latitude, longitude, datTim, null)
     }
 
     companion object {
