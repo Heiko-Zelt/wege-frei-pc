@@ -7,11 +7,16 @@ import java.time.ZonedDateTime
 
 class SelectedPhotosTest {
 
+    // 20 Bytes = 160 bit
+    private val hash1 = "0123456789abcdefghij".toByteArray()
+    private val hash2 = "abcdefghij0123456789".toByteArray()
+    private val hash3 = "ABCDEFGHIJ0123456789".toByteArray()
+
     @Test
     fun calculateMarkerIndex_3_photos_3_markers() {
-       val photo1 = Photo("1.jpeg", 50.08f, 8.24f, ZonedDateTime.now())
-       val photo2 = Photo("2.jpeg", 50.08f, 8.24f, ZonedDateTime.now())
-       val photo3 = Photo("3.jpeg", 50.08f, 8.24f, ZonedDateTime.now())
+       val photo1 = Photo("1.jpeg", hash1,50.08f, 8.24f, ZonedDateTime.now())
+       val photo2 = Photo("2.jpeg", hash2,50.08f, 8.24f, ZonedDateTime.now())
+       val photo3 = Photo("3.jpeg", hash3,50.08f, 8.24f, ZonedDateTime.now())
        val selectedPhotos = SelectedPhotos()
        selectedPhotos.add(photo1)
        selectedPhotos.add(photo2)
@@ -22,9 +27,9 @@ class SelectedPhotosTest {
 
     @Test
     fun calculateMarkerIndex_3_photos_2_markers_a() {
-        val photo1 = Photo("1.jpeg", null, null, ZonedDateTime.now())
-        val photo2 = Photo("2.jpeg", 50.08f, 8.24f, ZonedDateTime.now())
-        val photo3 = Photo("3.jpeg", 50.08f, 8.24f, ZonedDateTime.now())
+        val photo1 = Photo("1.jpeg", hash1,null, null, ZonedDateTime.now())
+        val photo2 = Photo("2.jpeg", hash2,50.08f, 8.24f, ZonedDateTime.now())
+        val photo3 = Photo("3.jpeg", hash3,50.08f, 8.24f, ZonedDateTime.now())
         val selectedPhotos = SelectedPhotos()
         selectedPhotos.add(photo1)
         selectedPhotos.add(photo2)
@@ -35,9 +40,9 @@ class SelectedPhotosTest {
 
     @Test
     fun calculateMarkerIndex_3_photos_2_markers_b() {
-        val photo1 = Photo("1.jpeg", 50.08f, 8.24f, ZonedDateTime.now())
-        val photo2 = Photo("2.jpeg", 50.08f, 8.24f, ZonedDateTime.now())
-        val photo3 = Photo("3.jpeg", null, null, ZonedDateTime.now())
+        val photo1 = Photo("1.jpeg", hash1,50.08f, 8.24f, ZonedDateTime.now())
+        val photo2 = Photo("2.jpeg", hash2,50.08f, 8.24f, ZonedDateTime.now())
+        val photo3 = Photo("3.jpeg", hash3,null, null, ZonedDateTime.now())
         val selectedPhotos = SelectedPhotos()
         selectedPhotos.add(photo1)
         selectedPhotos.add(photo2)
@@ -46,18 +51,4 @@ class SelectedPhotosTest {
         assertEquals(2, selectedPhotos.calculateMarkerIndex(3)) // letztes Foto wurde entfernt
     }
 
-    /*
-    @Test
-    @Disabled("fails and method is not needed")
-    fun getPhotosWithGeoPosition() {
-        val photo0 = Photo("0.jpeg", 50.08f, 8.24f, ZonedDateTime.now())
-        val photo1 = Photo("1.jpeg", 50.08f, 8.24f, ZonedDateTime.now())
-        val photo2 = Photo("2.jpeg", null, null, ZonedDateTime.now())
-        val selectedPhotos = SelectedPhotos()
-        //val withPosition = selectedPhotos.getPhotosWithGeoPosition()
-        //assertEquals(2, withPosition.size)
-        //assertEquals(photo0, withPosition[0])
-        //assertEquals(photo1, withPosition[1])
-    }
-    */
 }

@@ -11,6 +11,7 @@ internal class DatabaseRepoTest {
 
     private val databaseRepo = DatabaseRepo("~")
 
+    // todo Prio 1: use in memory test database
     @Test
     fun getPhotoByFilename() {
         val photo1 = databaseRepo.getPhotoByFilename("20220301_184943.jpg")

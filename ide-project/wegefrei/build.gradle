@@ -7,8 +7,8 @@ group = 'de.heikozelt'
 version = '1.0-SNAPSHOT'
 
 java {
-    sourceCompatibility = '14'
-    targetCompatibility = '14'
+    sourceCompatibility = '17'
+    targetCompatibility = '17'
 }
 
 repositories {
@@ -40,11 +40,11 @@ test {
 }
 
 compileKotlin {
-    kotlinOptions.jvmTarget = '14'
+    kotlinOptions.jvmTarget = '17'
 }
 
 compileTestKotlin {
-    kotlinOptions.jvmTarget = '14'
+    kotlinOptions.jvmTarget = '17'
 }
 
 application {

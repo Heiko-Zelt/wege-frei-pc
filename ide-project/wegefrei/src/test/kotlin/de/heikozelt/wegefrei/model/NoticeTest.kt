@@ -45,9 +45,11 @@ class NoticeTest {
         val photoTime2 = ZonedDateTime.of(2021, 12, 30, 19, 49, 59, 0, ZoneId.of("CET"))
         val expectedSentTime = ZonedDateTime.of(2021, 12, 31, 19, 49, 59, 0, ZoneId.of("CET"))
 
+        val hash1 = "0123456789abcdefghij".toByteArray()
+        val hash2 = "abcdefghij0123456789".toByteArray()
         val photos = hashSetOf(
-            Photo("img1.jpeg", 50.111f, 8.111f, photoTime1),
-            Photo("img2.jpeg", 50.222f, 8.222f, photoTime2)
+            Photo("img1.jpeg", hash1,50.111f, 8.111f, photoTime1),
+            Photo("img2.jpeg", hash2,50.222f, 8.222f, photoTime2)
         )
 
         val n = Notice(

@@ -9,7 +9,9 @@ class SettingsTest {
     fun clone_deep_copy() {
         val original = Settings(
             Witness(
-                "joe@ori.ginal",
+                "Peter",
+                "Müller",
+                "pete@ori.ginal",
                 "Mainstreet 1",
                 "12345",
                 "Frankfurt",
@@ -18,7 +20,7 @@ class SettingsTest {
             EmailServerConfig(
                 "smtp.ori.ginal",
                 25,
-                "joe",
+                "pete",
                 Tls.START_TLS
             ),
             "Metal",
@@ -31,11 +33,11 @@ class SettingsTest {
         assertFalse(original.witness === klone.witness)
         assertFalse(original.emailServerConfig === klone.emailServerConfig)
         assertEquals(original.witness.emailAddress, klone.witness.emailAddress)
-        assertEquals("joe@ori.ginal", original.witness.emailAddress)
+        assertEquals("pete@ori.ginal", original.witness.emailAddress)
 
         klone.witness.emailAddress = "changed"
 
-        assertEquals("joe@ori.ginal", original.witness.emailAddress)
+        assertEquals("pete@ori.ginal", original.witness.emailAddress)
 
         assertFalse(original.witness.emailAddress === klone.witness.emailAddress)
         assertNotEquals(original.witness.emailAddress, klone.witness.emailAddress)
@@ -45,6 +47,8 @@ class SettingsTest {
     fun data_class_equals() {
         val settings1 = Settings(
             Witness(
+                "Joe",
+                "Ünsever",
                 "joe@ori.ginal",
                 "Mainstreet 1",
                 "12345",
@@ -63,6 +67,8 @@ class SettingsTest {
         )
         val settings2 = Settings(
             Witness(
+                "Joe",
+                "Ünsever",
                 "joe@ori.ginal",
                 "Mainstreet 1",
                 "12345",
