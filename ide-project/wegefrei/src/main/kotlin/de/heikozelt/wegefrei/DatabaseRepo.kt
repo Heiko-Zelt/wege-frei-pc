@@ -8,14 +8,13 @@ import org.slf4j.LoggerFactory
 import java.util.*
 
 
-class DatabaseRepo(directory: String) {
+class DatabaseRepo(jdbcUrl: String) {
     private val em: EntityManager
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
 
     init {
-        log.info("use database in directory: $directory")
         val persistenceMap = hashMapOf<String, String>()
-        persistenceMap["javax.persistence.jdbc.url"] = "jdbc:h2:file:$directory/wege_frei_v1"
+        persistenceMap["javax.persistence.jdbc.url"] = jdbcUrl
         val factory = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME, persistenceMap)
         em = factory.createEntityManager()
     }
@@ -94,11 +93,23 @@ class DatabaseRepo(directory: String) {
     }
 
     companion object {
+        private val LOG = LoggerFactory.getLogger(this::class.java.canonicalName)
+
         /**
          * The filename includes a major software version number.
          * This makes it easy to have multiple major software versions installed in parallel.
          * If the file format changes significantly, the major software version should change too.
          */
         private const val PERSISTENCE_UNIT_NAME = "wegefrei"
+
+        fun fromDirectory(directory: String): DatabaseRepo {
+            LOG.info("use database in directory: $directory")
+            return DatabaseRepo("jdbc:h2:file:$directory/wege_frei_v1")
+        }
+
+        fun fromMemory(): DatabaseRepo {
+            LOG.info("use in memory database")
+            return DatabaseRepo("jdbc:h2:mem:wege_frei_v1")
+        }
     }
 }

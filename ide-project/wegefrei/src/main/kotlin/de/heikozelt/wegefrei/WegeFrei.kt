@@ -87,8 +87,8 @@ open class WegeFrei(private val settingsRepo: SettingsRepo = SettingsFileRepo())
         if(dbDirChanged) {
             closeNoticesFrame()
 
-            //databaseRepo?.close()
-            databaseRepo = DatabaseRepo(settings.databaseDirectory)
+            databaseRepo?.close()
+            databaseRepo = DatabaseRepo.fromDirectory(settings.databaseDirectory)
 
             if(isNoticesFrameOpen) {
                 openNoticesFrame()
