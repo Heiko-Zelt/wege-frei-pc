@@ -28,8 +28,8 @@ class EmailMessagePanel : JPanel() {
         val toLabel = JLabel("an:")
         val subjectLabel = JLabel("Betreff:")
         val lay = GroupLayout(this)
-        lay.autoCreateGaps = true;
-        lay.autoCreateContainerGaps = true;
+        lay.autoCreateGaps = true
+        lay.autoCreateContainerGaps = true
         // left to right
         lay.setHorizontalGroup(
             lay.createParallelGroup(GroupLayout.Alignment.LEADING)

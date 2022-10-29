@@ -3,11 +3,7 @@ package de.heikozelt.wegefrei.settingsframe
 import de.heikozelt.wegefrei.WegeFrei
 import de.heikozelt.wegefrei.json.Settings
 import org.slf4j.LoggerFactory
-import java.awt.BorderLayout
-import javax.swing.JFrame
-import javax.swing.JOptionPane
-import javax.swing.JScrollPane
-import javax.swing.WindowConstants
+import javax.swing.*
 
 /**
  * Einstellungen-Fenster
@@ -18,19 +14,47 @@ class SettingsFrame(private val app: WegeFrei) : JFrame() {
     private var originalSettings: Settings? = null
     private var settings: Settings? = null
     private val settingsFormFields = SettingsFormFields(this)
-    private val settingsFormButtonBar = SettingsFormButtonsBar(this)
     private var settingsFormFieldsScrollPane = JScrollPane(settingsFormFields)
-
 
     init {
         log.debug("init")
+        val okButton = JButton("Ok")
+        okButton.addActionListener { saveAndClose() }
+        val cancelButton = JButton("Abbrechen")
+        cancelButton.addActionListener { discardChangesAndClose() }
+
         title = "Einstellungen - Wege frei!"
-        layout = BorderLayout()
-        add(settingsFormFieldsScrollPane, BorderLayout.CENTER)
-        add(settingsFormButtonBar, BorderLayout.SOUTH)
+
+        val lay = GroupLayout(contentPane)
+        lay.autoCreateGaps = true
+        lay.autoCreateContainerGaps = true
+        // left to right
+        lay.setHorizontalGroup(
+            lay.createParallelGroup(GroupLayout.Alignment.LEADING)
+                .addComponent(settingsFormFieldsScrollPane)
+                .addGroup(lay.createSequentialGroup()
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.PREFERRED_SIZE, Int.MAX_VALUE)
+                    .addComponent(okButton)
+                    .addComponent(cancelButton)
+                )
+        )
+        // top to bottom
+        lay.setVerticalGroup(
+            lay.createSequentialGroup()
+                .addComponent(settingsFormFieldsScrollPane)
+                .addGroup(
+                    lay.createParallelGroup()
+                        .addComponent(okButton)
+                        .addComponent(cancelButton)
+                )
+        )
+        lay.linkSize(SwingConstants.HORIZONTAL, okButton, cancelButton)
+        layout = lay
+
+
         setSize(600, 600)
         isVisible = true
-        defaultCloseOperation = WindowConstants.DO_NOTHING_ON_CLOSE;
+        defaultCloseOperation = WindowConstants.DO_NOTHING_ON_CLOSE
         addWindowListener(SettingsWindowListener(this))
     }
 
