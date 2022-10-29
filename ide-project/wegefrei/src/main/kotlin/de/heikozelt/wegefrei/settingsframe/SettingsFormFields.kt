@@ -9,9 +9,7 @@ import de.heikozelt.wegefrei.json.Settings
 import de.heikozelt.wegefrei.json.Tls
 import de.heikozelt.wegefrei.model.EmailMessage
 import org.slf4j.LoggerFactory
-import java.awt.GridBagConstraints
-import java.awt.GridBagLayout
-import java.awt.Insets
+import java.awt.Dimension
 import javax.swing.*
 import javax.swing.text.AbstractDocument
 
@@ -19,13 +17,12 @@ import javax.swing.text.AbstractDocument
  * Teil von SettingsFrame.
  * Die vielen Formularfelder passen eventuell nicht alle in den JFrame,
  * deswegen Darstellung in einer ScrollPane.
- * todo GroupLayout statt GridBagLayout
  */
-class SettingsFormFields: JPanel() {
-
+class SettingsFormFields : JPanel() {
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
 
-    private val emailTextField = TrimmingTextField(MAX_COLUMNS)
+    // GUI components
+    private val emailAddressTextField = TrimmingTextField(MAX_COLUMNS)
     private val givenNameTextField = TrimmingTextField(MAX_COLUMNS)
     private val surnameTextField = TrimmingTextField(MAX_COLUMNS)
     private val streetTextField = TrimmingTextField(MAX_COLUMNS)
@@ -37,19 +34,189 @@ class SettingsFormFields: JPanel() {
     private val smtpPortTextField = JTextField(6)
     private val smtpUserNameTextField = TrimmingTextField(MAX_COLUMNS)
     private val tlsValues = arrayOf("Klartext (nicht empfohlen)", "TLS-verschlüsselt", "StartTLS-verschlüsselt")
-    private val tlsComboBox = JComboBox(tlsValues)
-    private val smtpConnectButton = JButton("Test-E-Mail senden")
+    private val encryptionComboBox = JComboBox(tlsValues)
+    private val sendTestMailButton = JButton("Test-E-Mail senden")
 
     private val lookAndFeelNames = Settings.lookAndFeelNames().toTypedArray()
     private val lookAndFeelComboBox = JComboBox(lookAndFeelNames)
-    private val photosDirLabel = JLabel()
+    private val photosDirField = JLabel()
     private val photosDirButton = JButton("Ordner auswählen")
-    private val databaseDirLabel = JLabel()
+    private val databaseDirField = JLabel()
     private val databaseDirButton = JButton("Ordner auswählen")
 
     init {
         log.debug("init")
-        layout = GridBagLayout()
+
+        // GUI components
+        val witnessHeading = JLabel("<html><b>Zeugendaten</b></html>")
+        witnessHeading.horizontalAlignment = SwingConstants.CENTER
+        witnessHeading.verticalAlignment = SwingConstants.BOTTOM
+        increaseHeight(witnessHeading)
+        val givenNameLabel = JLabel("Vorname:")
+        givenNameTextField.name = "givenNameTextField"
+        val surnameLabel = JLabel("Nachname:")
+        surnameTextField.name = "surnameTextField"
+        val streetLabel = JLabel("Straße & Hausnummer:")
+        val zipCodeLabel = JLabel("PLZ:")
+        val townLabel = JLabel("Ort:")
+        val phoneNumberLabel = JLabel("Telefonnummer:")
+        val emailAddressLabel = JLabel("E-Mail-Adresse:")
+        emailAddressTextField.name = "emailTextField"
+        emailAddressTextField.inputVerifier = PatternVerifier.emailAddressVerifier
+
+        val emailServerHeading = JLabel("<html><b>E-Mail-Server</b></html>")
+        emailServerHeading.horizontalAlignment = SwingConstants.CENTER
+        emailServerHeading.verticalAlignment = SwingConstants.BOTTOM
+        increaseHeight(emailServerHeading)
+        val smtpHostLabel = JLabel("SMTP-Host:")
+        val smtpPortLabel = JLabel("SMTP-Port:")
+        val portDoc = smtpPortTextField.document
+        if (portDoc is AbstractDocument) {
+            portDoc.documentFilter = CharPredicateDocFilter.onlyDigitsDocFilter
+        }
+        val smtpUserNameLabel = JLabel("SMTP-Benutzername:")
+        val encryptionLabel = JLabel("Verschlüsselung:")
+        encryptionComboBox.name = "tlsComboBox"
+        sendTestMailButton.addActionListener { sendTestEmail() }
+
+        val technicalHeading = JLabel("<html><b>Sonstiges</p></html>")
+        technicalHeading.horizontalAlignment = SwingConstants.CENTER
+        technicalHeading.verticalAlignment = SwingConstants.BOTTOM
+        increaseHeight(technicalHeading)
+
+        val lookAndFeelLabel = JLabel("Look and Feel:")
+        val photosDirLabel = JLabel("Fotos-Ordner:")
+        photosDirButton.addActionListener { DirectoryChooser(photosDirField, "Fotos-Ordner") }
+        val databaseDirLabel = JLabel("Datenbank-Ordner:")
+        databaseDirButton.addActionListener { DirectoryChooser(databaseDirField, "Datenbank-Ordner") }
+
+        // layout:
+        val lay = GroupLayout(this)
+        restrictHeight(givenNameTextField)
+        lay.autoCreateGaps = true
+        lay.autoCreateContainerGaps = true
+        // left to right
+        lay.setHorizontalGroup(
+            lay.createParallelGroup(GroupLayout.Alignment.LEADING)
+                .addGroup( // labels & form fields
+                    lay.createSequentialGroup()
+                        .addGroup( // labels
+                            lay.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                .addComponent(givenNameLabel)
+                                .addComponent(surnameLabel)
+                                .addComponent(streetLabel)
+                                .addComponent(zipCodeLabel)
+                                .addComponent(townLabel)
+                                .addComponent(phoneNumberLabel)
+                                .addComponent(emailAddressLabel)
+                                .addComponent(smtpHostLabel)
+                                .addComponent(smtpPortLabel)
+                                .addComponent(smtpUserNameLabel)
+                                .addComponent(encryptionLabel)
+                                .addComponent(lookAndFeelLabel)
+                                .addComponent(photosDirLabel)
+                                .addComponent(databaseDirLabel)
+                        )
+                        .addGroup( // form fields
+                            lay.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                .addComponent(givenNameTextField)
+                                .addComponent(surnameTextField)
+                                .addComponent(streetTextField)
+                                .addComponent(zipCodeTextField)
+                                .addComponent(townTextField)
+                                .addComponent(phoneNumberTextField)
+                                .addComponent(emailAddressTextField)
+                                .addComponent(smtpHostTextField)
+                                .addComponent(smtpPortTextField)
+                                .addComponent(smtpUserNameTextField)
+                                .addComponent(encryptionComboBox)
+                                .addComponent(sendTestMailButton)
+                                .addComponent(lookAndFeelComboBox)
+                                .addComponent(photosDirField)
+                                .addComponent(photosDirButton)
+                                .addComponent(databaseDirField)
+                                .addComponent(databaseDirButton)
+                        )
+                )
+                .addComponent(witnessHeading)
+                .addComponent(emailServerHeading)
+                .addComponent(technicalHeading)
+        )
+        // top to bottom
+        lay.setVerticalGroup(
+            lay.createSequentialGroup()
+                .addComponent(witnessHeading)
+                .addGroup(
+                    lay.createParallelGroup(GroupLayout.Alignment.CENTER)
+                        .addComponent(givenNameLabel).addComponent(givenNameTextField)
+
+                )
+                .addGroup(
+                    lay.createParallelGroup(GroupLayout.Alignment.CENTER)
+                        .addComponent(surnameLabel).addComponent(surnameTextField)
+                )
+                .addGroup(
+                    lay.createParallelGroup(GroupLayout.Alignment.CENTER)
+                        .addComponent(streetLabel).addComponent(streetTextField)
+                )
+                .addGroup(
+                    lay.createParallelGroup(GroupLayout.Alignment.CENTER)
+                        .addComponent(zipCodeLabel).addComponent(zipCodeTextField)
+                )
+                .addGroup(
+                    lay.createParallelGroup(GroupLayout.Alignment.CENTER)
+                        .addComponent(townLabel).addComponent(townTextField)
+                )
+                .addGroup(
+                    lay.createParallelGroup(GroupLayout.Alignment.CENTER)
+                        .addComponent(phoneNumberLabel).addComponent(phoneNumberTextField)
+                )
+                .addGroup(
+                    lay.createParallelGroup(GroupLayout.Alignment.CENTER)
+                        .addComponent(emailAddressLabel).addComponent(emailAddressTextField)
+                )
+                .addComponent(emailServerHeading)
+                .addGroup(
+                    lay.createParallelGroup(GroupLayout.Alignment.CENTER)
+                        .addComponent(smtpHostLabel).addComponent(smtpHostTextField)
+                )
+                .addGroup(
+                    lay.createParallelGroup(GroupLayout.Alignment.CENTER)
+                        .addComponent(smtpPortLabel).addComponent(smtpPortTextField)
+                )
+                .addGroup(
+                    lay.createParallelGroup(GroupLayout.Alignment.CENTER)
+                        .addComponent(smtpUserNameLabel).addComponent(smtpUserNameTextField)
+                )
+                .addGroup(
+                    lay.createParallelGroup(GroupLayout.Alignment.CENTER)
+                        .addComponent(encryptionLabel).addComponent(encryptionComboBox)
+                )
+                .addComponent(sendTestMailButton)
+                .addComponent(technicalHeading)
+                .addGroup(
+                    lay.createParallelGroup(GroupLayout.Alignment.CENTER)
+                        .addComponent(lookAndFeelLabel).addComponent(lookAndFeelComboBox)
+                )
+                .addGroup(
+                    lay.createParallelGroup(GroupLayout.Alignment.CENTER)
+                        .addComponent(photosDirLabel).addComponent(photosDirField)
+                )
+                .addComponent(photosDirButton)
+                .addGroup(
+                    lay.createParallelGroup(GroupLayout.Alignment.CENTER)
+                        .addComponent(databaseDirLabel).addComponent(databaseDirField)
+                )
+                .addComponent(databaseDirButton)
+                // Höhe von TextFields passt sich an. das sieht hässlich aus, Gap hilft leider nicht.
+                //.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.PREFERRED_SIZE, Int.MAX_VALUE)
+        )
+        layout = lay
+        restrictAllComponents()
+
+        /*
+        GroupLayout  : 123 Code Zeilen <<< Sieger!
+        GridBaglayout: 163 Code Zeilen
 
         val constraints = GridBagConstraints()
         constraints.fill = GridBagConstraints.HORIZONTAL
@@ -60,7 +227,6 @@ class SettingsFormFields: JPanel() {
         constraints.gridy = 0
         constraints.gridx = 0
         constraints.gridwidth = 2
-        val witnessLabel = JLabel("<html><b>Zeugendaten</b></html>")
         witnessLabel.horizontalAlignment = SwingConstants.CENTER
         add(witnessLabel, constraints)
 
@@ -68,28 +234,23 @@ class SettingsFormFields: JPanel() {
         constraints.gridx=0
         constraints.gridwidth = 1
         constraints.weightx = LEFT_WEIGHT
-        val givenNameLabel = JLabel("Vorname:")
         add(givenNameLabel, constraints)
         constraints.weightx = RIGHT_WEIGHT
         constraints.gridx = 1
-        givenNameTextField.name = "givenNameTextField"
         add(givenNameTextField, constraints)
 
         constraints.gridy++
         constraints.gridx=0
         constraints.gridwidth = 1
         constraints.weightx = LEFT_WEIGHT
-        val surnameLabel = JLabel("Nachname:")
         add(surnameLabel, constraints)
         constraints.weightx = RIGHT_WEIGHT
         constraints.gridx = 1
-        surnameTextField.name = "surnameTextField"
         add(surnameTextField, constraints)
 
         constraints.gridy++
         constraints.gridx = 0
         constraints.weightx = LEFT_WEIGHT
-        val streetLabel = JLabel("Straße & Hausnummer:")
         add(streetLabel, constraints)
         constraints.weightx = RIGHT_WEIGHT
         constraints.gridx = 1
@@ -99,7 +260,6 @@ class SettingsFormFields: JPanel() {
         constraints.gridy++
         constraints.gridx = 0
         constraints.weightx = LEFT_WEIGHT
-        val zipCodeLabel = JLabel("PLZ:")
         add(zipCodeLabel, constraints)
         constraints.weightx = RIGHT_WEIGHT
         constraints.gridx = 1
@@ -109,7 +269,6 @@ class SettingsFormFields: JPanel() {
         constraints.gridy++
         constraints.gridx = 0
         constraints.weightx = LEFT_WEIGHT
-        val townLabel = JLabel("Ort:")
         add(townLabel, constraints)
         constraints.weightx = RIGHT_WEIGHT
         constraints.gridx = 1
@@ -118,7 +277,6 @@ class SettingsFormFields: JPanel() {
         constraints.gridy++
         constraints.gridx = 0
         constraints.weightx = LEFT_WEIGHT
-        val phoneNumberLabel = JLabel("Telefonnummer:")
         add(phoneNumberLabel, constraints)
         constraints.weightx = RIGHT_WEIGHT
         constraints.gridx = 1
@@ -128,12 +286,9 @@ class SettingsFormFields: JPanel() {
         constraints.gridx=0
         constraints.gridwidth = 1
         constraints.weightx = LEFT_WEIGHT
-        val emailLabel = JLabel("E-Mail-Adresse:")
         add(emailLabel, constraints)
         constraints.weightx = RIGHT_WEIGHT
         constraints.gridx = 1
-        emailTextField.name = "emailTextField"
-        emailTextField.inputVerifier = PatternVerifier.emailAddressVerifier
         add(emailTextField, constraints)
 
         constraints.insets = Insets(16, 5, 0, 0)
@@ -141,7 +296,7 @@ class SettingsFormFields: JPanel() {
         constraints.gridx = 0
         constraints.gridwidth = 2
         constraints.weightx = 1.0
-        val emailServerLabel = JLabel("<html><b>E-Mail-Server</b></html>")
+
         emailServerLabel.horizontalAlignment = SwingConstants.CENTER
         add(emailServerLabel, constraints)
 
@@ -150,7 +305,6 @@ class SettingsFormFields: JPanel() {
         constraints.gridy++
         constraints.gridx = 0
         constraints.weightx = LEFT_WEIGHT
-        val smtpHostLabel = JLabel("SMTP-Host:")
         add(smtpHostLabel, constraints)
         constraints.weightx = RIGHT_WEIGHT
         constraints.gridx = 1
@@ -160,21 +314,15 @@ class SettingsFormFields: JPanel() {
         constraints.gridy++
         constraints.gridx = 0
         constraints.weightx = LEFT_WEIGHT
-        val smtpPortLabel = JLabel("SMTP-Port:")
         add(smtpPortLabel, constraints)
         constraints.weightx = RIGHT_WEIGHT
         constraints.gridx = 1
-        val portDoc = smtpPortTextField.document
-        if (portDoc is AbstractDocument) {
-            portDoc.documentFilter = CharPredicateDocFilter.onlyDigitsDocFilter
-        }
         add(smtpPortTextField, constraints)
 
         constraints.fill = GridBagConstraints.HORIZONTAL
         constraints.gridy++
         constraints.gridx = 0
         constraints.weightx = LEFT_WEIGHT
-        val smtpUserNameLabel = JLabel("SMTP-Benutzername:")
         add(smtpUserNameLabel, constraints)
         constraints.weightx = RIGHT_WEIGHT
         constraints.gridx = 1
@@ -184,16 +332,13 @@ class SettingsFormFields: JPanel() {
         constraints.gridy++
         constraints.gridx = 0
         constraints.weightx = LEFT_WEIGHT
-        val tlsLabel = JLabel("Verschlüsselung:")
         add(tlsLabel, constraints)
         constraints.weightx = RIGHT_WEIGHT
         constraints.gridx = 1
-        tlsComboBox.name = "tlsComboBox"
         add(tlsComboBox, constraints)
 
         constraints.gridy++
         constraints.fill = GridBagConstraints.NONE
-        smtpConnectButton.addActionListener { sendTestEmail() }
         constraints.gridx = 1
         add(smtpConnectButton, constraints)
 
@@ -203,7 +348,6 @@ class SettingsFormFields: JPanel() {
         constraints.gridx = 0
         constraints.gridwidth = 2
         constraints.weightx = 1.0
-        val technicalLabel = JLabel("<html><b>Sonstiges</b></html>")
         technicalLabel.horizontalAlignment = SwingConstants.CENTER
         add(technicalLabel, constraints)
 
@@ -212,7 +356,6 @@ class SettingsFormFields: JPanel() {
         constraints.gridwidth = 1
         constraints.gridy++
         constraints.weightx = LEFT_WEIGHT
-        val lookAndFeelLabel = JLabel("Look and Feel:")
         add(lookAndFeelLabel, constraints)
         constraints.weightx = RIGHT_WEIGHT
         constraints.gridx = 1
@@ -221,34 +364,31 @@ class SettingsFormFields: JPanel() {
         constraints.gridy++
         constraints.gridx = 0
         constraints.weightx = LEFT_WEIGHT
-        val photosDirDecoLabel = JLabel("Fotos-Ordner:")
         add(photosDirDecoLabel, constraints)
         constraints.weightx = RIGHT_WEIGHT
         constraints.gridx = 1
         add(photosDirLabel, constraints)
-        photosDirButton.addActionListener { DirectoryChooser(photosDirLabel, "Fotos-Ordner") }
         constraints.gridy++
         add(photosDirButton, constraints)
 
         constraints.gridy++
         constraints.gridx = 0
         constraints.weightx = LEFT_WEIGHT
-        val databaseDirDecoLabel = JLabel("Datenbank-Ordner:")
         add(databaseDirDecoLabel, constraints)
         constraints.weightx = RIGHT_WEIGHT
         constraints.gridx = 1
         add(databaseDirLabel, constraints)
-        databaseDirButton.addActionListener { DirectoryChooser(databaseDirLabel, "Datenbank-Ordner") }
         constraints.gridy++
         constraints.gridx = 1
         add(databaseDirButton, constraints)
+         */
     }
 
     /**
      * Mapping von Settings-Objekt auf Werte der Formular-Felder
      */
     fun load(settings: Settings) {
-        emailTextField.text = settings.witness.emailAddress
+        emailAddressTextField.text = settings.witness.emailAddress
         givenNameTextField.text = settings.witness.givenName
         surnameTextField.text = settings.witness.surname
         streetTextField.text = settings.witness.street
@@ -260,11 +400,11 @@ class SettingsFormFields: JPanel() {
         smtpPortTextField.text = settings.emailServerConfig.smtpPort.toString()
         smtpUserNameTextField.text = settings.emailServerConfig.smtpUserName
         val tlsIndex = Tls.values().indexOf(settings.emailServerConfig.tls)
-        tlsComboBox.selectedItem = tlsValues[tlsIndex]
+        encryptionComboBox.selectedItem = tlsValues[tlsIndex]
 
         lookAndFeelComboBox.selectedItem = lookAndFeelNames.find { it == settings.lookAndFeel }
-        photosDirLabel.text = settings.photosDirectory
-        databaseDirLabel.text = settings.databaseDirectory
+        photosDirField.text = settings.photosDirectory
+        databaseDirField.text = settings.databaseDirectory
     }
 
     /**
@@ -272,7 +412,7 @@ class SettingsFormFields: JPanel() {
      */
     fun save(settings: Settings) {
 
-        settings.witness.emailAddress = emailTextField.text.trim()
+        settings.witness.emailAddress = emailAddressTextField.text.trim()
         settings.witness.givenName = givenNameTextField.text.trim()
         settings.witness.surname = surnameTextField.text.trim()
         settings.witness.street = streetTextField.text.trim()
@@ -283,17 +423,17 @@ class SettingsFormFields: JPanel() {
         settings.emailServerConfig.smtpHost = smtpHostTextField.text.trim()
         settings.emailServerConfig.smtpPort = smtpPortTextField.text.toInt()
         settings.emailServerConfig.smtpUserName = smtpUserNameTextField.text.trim()
-        settings.emailServerConfig.tls = Tls.values()[tlsComboBox.selectedIndex]
+        settings.emailServerConfig.tls = Tls.values()[encryptionComboBox.selectedIndex]
 
         val selectedLook = lookAndFeelComboBox.selectedItem
-        settings.lookAndFeel = if(selectedLook is String) {
+        settings.lookAndFeel = if (selectedLook is String) {
             selectedLook
         } else {
             log.warn("No String selected as look and feel.")
             ""
         }
-        settings.photosDirectory = photosDirLabel.text
-        settings.databaseDirectory = databaseDirLabel.text
+        settings.photosDirectory = photosDirField.text
+        settings.databaseDirectory = databaseDirField.text
     }
 
     /**
@@ -305,13 +445,13 @@ class SettingsFormFields: JPanel() {
 
         val fullName = "${givenNameTextField.text.trim()} ${surnameTextField.text.trim()}"
         val senderName = fullName.ifBlank { TEST_MAIL_FROM_NAME }
-        val senderEmailAddress = emailTextField.text.trim()
+        val senderEmailAddress = emailAddressTextField.text.trim()
 
         val emailServerConfig = EmailServerConfig(
             smtpHostTextField.text.trim(),
             smtpPortTextField.text.trim().toInt(),
             smtpUserNameTextField.text.trim(),
-            Tls.values()[tlsComboBox.selectedIndex]
+            Tls.values()[encryptionComboBox.selectedIndex]
         )
 
         val eMessage = EmailMessage(
@@ -327,13 +467,45 @@ class SettingsFormFields: JPanel() {
         emailUserAgent.sendMailAfterConfirmation(eMessage)
     }
 
+    private fun restrictAllComponents() {
+        // 4 Schleifen, aber gut verständlich
+        components.filterIsInstance<JTextField>().forEach { restrictHeight(it) }
+        components.filterIsInstance<JComboBox<*>>().forEach { restrictHeight(it) }
+
+        /*
+        Welche Lösung ist übersichtlicher und performanter?
+
+        Hässlicher Type Cast
+        components.filter {it is JTextField || it is JComboBox<*> }.forEach { restrictHeight(it as JComponent) }
+
+        Das Wort filter fehlt
+        for(it in components) {
+            if(it is JTextField) restrictHeight(it)
+            if(it is JComboBox<*>) restrictHeight(it)
+        }
+        */
+    }
+
     companion object {
         const val MAX_COLUMNS = 15
-        const val LEFT_WEIGHT = 0.05
-        const val RIGHT_WEIGHT = 0.95
         const val MAIL_USER_AGENT = "Wege frei! https://github.com/Heiko-Zelt/wege-frei-pc"
         const val TEST_MAIL_SUBJECT = "Wege frei! Test-E-Mail"
         const val TEST_MAIL_FROM_NAME = "Wege frei!"
-        const val TEST_MAIL_CONTENT = "<html><h1>Dies ist ein Test</h1>\n<p>Diese E-Mail-Nachricht wurde automatisch von der Wege frei!-Anwendung generiert.</p></html>"
+        const val TEST_MAIL_CONTENT =
+            "<html><h1>Dies ist ein Test</h1>\n<p>Diese E-Mail-Nachricht wurde automatisch von der Wege frei!-Anwendung generiert.</p></html>"
+
+        /**
+         * set maximum height to preferred height
+         */
+        fun restrictHeight(component: JComponent) {
+            component.maximumSize = Dimension(component.maximumSize.width, component.preferredSize.height)
+        }
+
+        /**
+         * increase minimum height by constant factor
+         */
+        fun increaseHeight(component: JComponent) {
+            component.minimumSize = Dimension(component.minimumSize.width, (component.minimumSize.height * 1.8).toInt())
+        }
     }
 }

@@ -1,6 +1,7 @@
 package de.heikozelt.wegefrei.emailmessageframe
 
 import de.heikozelt.wegefrei.model.EmailMessage
+import org.slf4j.LoggerFactory
 import java.awt.Dimension
 import javax.swing.GroupLayout
 import javax.swing.JLabel
@@ -17,16 +18,24 @@ import javax.swing.JPanel
  * </pre>
  */
 class EmailMessagePanel : JPanel() {
+    private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
+
+    // GUI components
     private val fromField = JLabel()
     private val toField = JLabel()
     private val subjectField = JLabel()
     private val contentField = JLabel()
 
     init {
-        contentField.preferredSize = Dimension(350, 300)
+        log.debug("init")
+
+        // GUI components
         val fromLabel = JLabel("von:")
         val toLabel = JLabel("an:")
         val subjectLabel = JLabel("Betreff:")
+
+        // layout:
+        contentField.preferredSize = Dimension(350, 300)
         val lay = GroupLayout(this)
         lay.autoCreateGaps = true
         lay.autoCreateContainerGaps = true

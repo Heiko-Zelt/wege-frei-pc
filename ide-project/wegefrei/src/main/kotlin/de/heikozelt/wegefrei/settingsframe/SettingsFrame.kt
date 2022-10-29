@@ -60,7 +60,8 @@ class SettingsFrame(private val app: WegeFrei) : JFrame() {
         layout = lay
 
 
-        setSize(600, 600)
+        //setSize(600, 600)
+        pack()
         isVisible = true
         defaultCloseOperation = WindowConstants.DO_NOTHING_ON_CLOSE
         //addWindowListener(SettingsWindowListener(this))
