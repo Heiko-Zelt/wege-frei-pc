@@ -15,8 +15,13 @@ import java.awt.Insets
 import javax.swing.*
 import javax.swing.text.AbstractDocument
 
-
-class SettingsFormFields(private val settingsFrame: SettingsFrame): JPanel() {
+/**
+ * Teil von SettingsFrame.
+ * Die vielen Formularfelder passen eventuell nicht alle in den JFrame,
+ * deswegen Darstellung in einer ScrollPane.
+ * todo GroupLayout statt GridBagLayout
+ */
+class SettingsFormFields: JPanel() {
 
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
 
@@ -321,8 +326,6 @@ class SettingsFormFields(private val settingsFrame: SettingsFrame): JPanel() {
         emailUserAgent.setEmailServerConfig(emailServerConfig)
         emailUserAgent.sendMailAfterConfirmation(eMessage)
     }
-
-
 
     companion object {
         const val MAX_COLUMNS = 15

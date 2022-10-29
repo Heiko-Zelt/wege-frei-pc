@@ -9,13 +9,14 @@ import javax.swing.*
 
 /**
  * Einstellungen-Fenster
+ * besteht grob aus vielen Formularfeldern in einer ScrollPane und 2 Buttons am unteren Rand
  */
 class SettingsFrame(private val app: WegeFrei) : JFrame() {
 
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
     private var originalSettings: Settings? = null
     private var settings: Settings? = null
-    private val settingsFormFields = SettingsFormFields(this)
+    private val settingsFormFields = SettingsFormFields()
     private var settingsFormFieldsScrollPane = JScrollPane(settingsFormFields)
 
     init {
@@ -106,7 +107,7 @@ class SettingsFrame(private val app: WegeFrei) : JFrame() {
     /**
      * Fenster schließen ohne zu speichern
      */
-    fun discardChangesAndClose() {
+    private fun discardChangesAndClose() {
         log.debug("discardChangesAndClose()")
         isVisible = false
         dispose()
