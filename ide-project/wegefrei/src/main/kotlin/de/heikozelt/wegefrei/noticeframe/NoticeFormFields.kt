@@ -182,7 +182,7 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel(), Selecte
             observationDateDoc.documentFilter = DateDocFilter()
         }
         observationDateTextField.toolTipText = "z.B. 31.12.2021"
-        observationDateTextField.inputVerifier = Verifiers.dateVerifier
+        observationDateTextField.inputVerifier = PatternVerifier.dateVerifier
         add(observationDateTextField, constraints)
 
         constraints.gridy++
@@ -196,7 +196,7 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel(), Selecte
             observationTimeDoc.documentFilter = TimeDocFilter()
         }
         observationTimeTextField.toolTipText = "z.B. 23:59"
-        observationTimeTextField.inputVerifier = Verifiers.timeVerifier
+        observationTimeTextField.inputVerifier = PatternVerifier.timeVerifier
         add(observationTimeTextField, constraints)
 
         constraints.gridy++
@@ -251,7 +251,7 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel(), Selecte
             inspectionYearDoc.documentFilter = OnlyDigitsDocFilter()
         }
         inspectionYearTextField.toolTipText = "Ganzzahl 4-stellig"
-        inspectionYearTextField.inputVerifier = Verifiers.inspectionYearVerifier
+        inspectionYearTextField.inputVerifier = PatternVerifier.inspectionYearVerifier
         inspectionYearTextField.isVisible = false
         add(inspectionYearTextField, constraints)
 
@@ -264,7 +264,7 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel(), Selecte
             inspectionMonthDoc.documentFilter = OnlyDigitsDocFilter()
         }
         inspectionMonthTextField.toolTipText = "Ganzzahl 1-12"
-        inspectionMonthTextField.inputVerifier = Verifiers.inspectionMonthVerifier
+        inspectionMonthTextField.inputVerifier = PatternVerifier.inspectionMonthVerifier
         inspectionMonthTextField.isVisible = false
         add(inspectionMonthTextField, constraints)
 
@@ -274,7 +274,7 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel(), Selecte
         add(recipientLabel, constraints)
         constraints.gridx = 1
         recipientTextField.toolTipText = "z.B. verwarngeldstelle@wiesbaden.de"
-        recipientTextField.inputVerifier = Verifiers.eMailVerifier
+        recipientTextField.inputVerifier = PatternVerifier.eMailVerifier
         add(recipientTextField, constraints)
 
         constraints.gridy++

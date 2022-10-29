@@ -6,11 +6,11 @@ import org.junit.jupiter.api.Test
 import javax.swing.JTextField
 
 
-class TimeVerifiersTest {
+class TimeVerifierTest {
 
     private val source = JTextField()
     private val target = JTextField()
-    private val verifier = Verifiers.timeVerifier
+    private val verifier = PatternVerifier.timeVerifier
 
     @Test
     fun verify_correct_time1() {

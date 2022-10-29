@@ -2,8 +2,8 @@ package de.heikozelt.wegefrei.settingsframe
 
 import de.heikozelt.wegefrei.EmailUserAgent
 import de.heikozelt.wegefrei.docfilters.OnlyDigitsDocFilter
+import de.heikozelt.wegefrei.gui.PatternVerifier
 import de.heikozelt.wegefrei.gui.TrimmingTextField
-import de.heikozelt.wegefrei.gui.Verifiers
 import de.heikozelt.wegefrei.json.EmailServerConfig
 import de.heikozelt.wegefrei.json.Settings
 import de.heikozelt.wegefrei.json.Tls
@@ -47,7 +47,7 @@ class SettingsFormFields(private val settingsFrame: SettingsFrame): JPanel() {
         layout = GridBagLayout()
 
         val constraints = GridBagConstraints()
-        constraints.fill = GridBagConstraints.HORIZONTAL;
+        constraints.fill = GridBagConstraints.HORIZONTAL
         constraints.insets = Insets(0, 5, 0, 0)
         constraints.anchor = GridBagConstraints.WEST
         constraints.weightx = 1.0
@@ -90,7 +90,7 @@ class SettingsFormFields(private val settingsFrame: SettingsFrame): JPanel() {
         constraints.gridx = 1
         add(streetTextField, constraints)
 
-        constraints.fill = GridBagConstraints.NONE;
+        constraints.fill = GridBagConstraints.NONE
         constraints.gridy++
         constraints.gridx = 0
         constraints.weightx = LEFT_WEIGHT
@@ -100,7 +100,7 @@ class SettingsFormFields(private val settingsFrame: SettingsFrame): JPanel() {
         constraints.gridx = 1
         add(zipCodeTextField, constraints)
 
-        constraints.fill = GridBagConstraints.HORIZONTAL;
+        constraints.fill = GridBagConstraints.HORIZONTAL
         constraints.gridy++
         constraints.gridx = 0
         constraints.weightx = LEFT_WEIGHT
@@ -128,7 +128,7 @@ class SettingsFormFields(private val settingsFrame: SettingsFrame): JPanel() {
         constraints.weightx = RIGHT_WEIGHT
         constraints.gridx = 1
         emailTextField.name = "emailTextField"
-        emailTextField.inputVerifier = Verifiers.emailAddressVerifier
+        emailTextField.inputVerifier = PatternVerifier.emailAddressVerifier
         add(emailTextField, constraints)
 
         constraints.insets = Insets(16, 5, 0, 0)
@@ -151,7 +151,7 @@ class SettingsFormFields(private val settingsFrame: SettingsFrame): JPanel() {
         constraints.gridx = 1
         add(smtpHostTextField, constraints)
 
-        constraints.fill = GridBagConstraints.NONE;
+        constraints.fill = GridBagConstraints.NONE
         constraints.gridy++
         constraints.gridx = 0
         constraints.weightx = LEFT_WEIGHT
@@ -165,7 +165,7 @@ class SettingsFormFields(private val settingsFrame: SettingsFrame): JPanel() {
         }
         add(smtpPortTextField, constraints)
 
-        constraints.fill = GridBagConstraints.HORIZONTAL;
+        constraints.fill = GridBagConstraints.HORIZONTAL
         constraints.gridy++
         constraints.gridx = 0
         constraints.weightx = LEFT_WEIGHT
@@ -175,7 +175,7 @@ class SettingsFormFields(private val settingsFrame: SettingsFrame): JPanel() {
         constraints.gridx = 1
         add(smtpUserNameTextField, constraints)
 
-        constraints.fill = GridBagConstraints.NONE;
+        constraints.fill = GridBagConstraints.NONE
         constraints.gridy++
         constraints.gridx = 0
         constraints.weightx = LEFT_WEIGHT
@@ -187,13 +187,13 @@ class SettingsFormFields(private val settingsFrame: SettingsFrame): JPanel() {
         add(tlsComboBox, constraints)
 
         constraints.gridy++
-        constraints.fill = GridBagConstraints.NONE;
+        constraints.fill = GridBagConstraints.NONE
         smtpConnectButton.addActionListener { sendTestEmail() }
         constraints.gridx = 1
         add(smtpConnectButton, constraints)
 
         constraints.insets = Insets(16, 5, 0, 0)
-        constraints.fill = GridBagConstraints.HORIZONTAL;
+        constraints.fill = GridBagConstraints.HORIZONTAL
         constraints.gridy++
         constraints.gridx = 0
         constraints.gridwidth = 2
@@ -203,7 +203,7 @@ class SettingsFormFields(private val settingsFrame: SettingsFrame): JPanel() {
         add(technicalLabel, constraints)
 
         constraints.insets = Insets(0, 5, 0, 0)
-        constraints.fill = GridBagConstraints.NONE;
+        constraints.fill = GridBagConstraints.NONE
         constraints.gridwidth = 1
         constraints.gridy++
         constraints.weightx = LEFT_WEIGHT
