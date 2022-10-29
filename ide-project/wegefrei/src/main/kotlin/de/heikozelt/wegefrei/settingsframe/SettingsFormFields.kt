@@ -45,13 +45,35 @@ class SettingsFormFields : JPanel() {
     private val databaseDirButton = JButton("Ordner auswählen")
 
     init {
+        /**
+         * set maximum height to preferred height
+         */
+        fun restrictHeight(component: JComponent) {
+            component.maximumSize = Dimension(component.maximumSize.width, component.preferredSize.height)
+        }
+
+        /**
+         * increase minimum height by constant factor
+         */
+        fun increaseHeight(component: JComponent) {
+            component.minimumSize = Dimension(component.minimumSize.width, (component.minimumSize.height * 1.8).toInt())
+        }
+
+        /**
+         * a specially formatted JLabel
+         */
+        class Heading(headingText: String): JLabel("<html><b>$headingText</b></html>") {
+            init {
+                horizontalAlignment = SwingConstants.CENTER
+                verticalAlignment = SwingConstants.BOTTOM
+                increaseHeight(this)
+            }
+        }
+
         log.debug("init")
 
         // GUI components
-        val witnessHeading = JLabel("<html><b>Zeuge</b></html>")
-        witnessHeading.horizontalAlignment = SwingConstants.CENTER
-        witnessHeading.verticalAlignment = SwingConstants.BOTTOM
-        increaseHeight(witnessHeading)
+        val witnessHeading = Heading("Zeuge")
         val givenNameLabel = JLabel("Vorname:")
         givenNameTextField.name = "givenNameTextField"
         val surnameLabel = JLabel("Nachname:")
@@ -64,10 +86,7 @@ class SettingsFormFields : JPanel() {
         emailAddressTextField.name = "emailTextField"
         emailAddressTextField.inputVerifier = PatternVerifier.emailAddressVerifier
 
-        val emailServerHeading = JLabel("<html><b>E-Mail-Server</b></html>")
-        emailServerHeading.horizontalAlignment = SwingConstants.CENTER
-        emailServerHeading.verticalAlignment = SwingConstants.BOTTOM
-        increaseHeight(emailServerHeading)
+        val emailServerHeading = Heading("E-Mail-Server")
         val smtpHostLabel = JLabel("SMTP-Host:")
         val smtpPortLabel = JLabel("SMTP-Port:")
         val portDoc = smtpPortTextField.document
@@ -79,11 +98,7 @@ class SettingsFormFields : JPanel() {
         encryptionComboBox.name = "tlsComboBox"
         sendTestMailButton.addActionListener { sendTestEmail() }
 
-        val technicalHeading = JLabel("<html><b>Sonstiges</p></html>")
-        technicalHeading.horizontalAlignment = SwingConstants.CENTER
-        technicalHeading.verticalAlignment = SwingConstants.BOTTOM
-        increaseHeight(technicalHeading)
-
+        val technicalHeading = Heading("Sonstiges")
         val lookAndFeelLabel = JLabel("Look and Feel:")
         val photosDirLabel = JLabel("Fotos-Ordner:")
         photosDirButton.addActionListener { DirectoryChooser(photosDirField, "Fotos-Ordner") }
@@ -92,7 +107,6 @@ class SettingsFormFields : JPanel() {
 
         // layout:
         val lay = GroupLayout(this)
-        restrictHeight(givenNameTextField)
         lay.autoCreateGaps = true
         lay.autoCreateContainerGaps = true
 
@@ -213,176 +227,9 @@ class SettingsFormFields : JPanel() {
                 //.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.PREFERRED_SIZE, Int.MAX_VALUE)
         )
         layout = lay
-        restrictAllComponents()
 
-        /*
-        GroupLayout  : 123 Code Zeilen <<< Sieger!
-        GridBaglayout: 163 Code Zeilen
-
-        val constraints = GridBagConstraints()
-        constraints.fill = GridBagConstraints.HORIZONTAL
-        constraints.insets = Insets(0, 5, 0, 0)
-        constraints.anchor = GridBagConstraints.WEST
-        constraints.weightx = 1.0
-        constraints.weighty = 0.1
-        constraints.gridy = 0
-        constraints.gridx = 0
-        constraints.gridwidth = 2
-        witnessLabel.horizontalAlignment = SwingConstants.CENTER
-        add(witnessLabel, constraints)
-
-        constraints.gridy++
-        constraints.gridx=0
-        constraints.gridwidth = 1
-        constraints.weightx = LEFT_WEIGHT
-        add(givenNameLabel, constraints)
-        constraints.weightx = RIGHT_WEIGHT
-        constraints.gridx = 1
-        add(givenNameTextField, constraints)
-
-        constraints.gridy++
-        constraints.gridx=0
-        constraints.gridwidth = 1
-        constraints.weightx = LEFT_WEIGHT
-        add(surnameLabel, constraints)
-        constraints.weightx = RIGHT_WEIGHT
-        constraints.gridx = 1
-        add(surnameTextField, constraints)
-
-        constraints.gridy++
-        constraints.gridx = 0
-        constraints.weightx = LEFT_WEIGHT
-        add(streetLabel, constraints)
-        constraints.weightx = RIGHT_WEIGHT
-        constraints.gridx = 1
-        add(streetTextField, constraints)
-
-        constraints.fill = GridBagConstraints.NONE
-        constraints.gridy++
-        constraints.gridx = 0
-        constraints.weightx = LEFT_WEIGHT
-        add(zipCodeLabel, constraints)
-        constraints.weightx = RIGHT_WEIGHT
-        constraints.gridx = 1
-        add(zipCodeTextField, constraints)
-
-        constraints.fill = GridBagConstraints.HORIZONTAL
-        constraints.gridy++
-        constraints.gridx = 0
-        constraints.weightx = LEFT_WEIGHT
-        add(townLabel, constraints)
-        constraints.weightx = RIGHT_WEIGHT
-        constraints.gridx = 1
-        add(townTextField, constraints)
-
-        constraints.gridy++
-        constraints.gridx = 0
-        constraints.weightx = LEFT_WEIGHT
-        add(phoneNumberLabel, constraints)
-        constraints.weightx = RIGHT_WEIGHT
-        constraints.gridx = 1
-        add(phoneNumberTextField, constraints)
-
-        constraints.gridy++
-        constraints.gridx=0
-        constraints.gridwidth = 1
-        constraints.weightx = LEFT_WEIGHT
-        add(emailLabel, constraints)
-        constraints.weightx = RIGHT_WEIGHT
-        constraints.gridx = 1
-        add(emailTextField, constraints)
-
-        constraints.insets = Insets(16, 5, 0, 0)
-        constraints.gridy++
-        constraints.gridx = 0
-        constraints.gridwidth = 2
-        constraints.weightx = 1.0
-
-        emailServerLabel.horizontalAlignment = SwingConstants.CENTER
-        add(emailServerLabel, constraints)
-
-        constraints.insets = Insets(0, 5, 0, 0)
-        constraints.gridwidth = 1
-        constraints.gridy++
-        constraints.gridx = 0
-        constraints.weightx = LEFT_WEIGHT
-        add(smtpHostLabel, constraints)
-        constraints.weightx = RIGHT_WEIGHT
-        constraints.gridx = 1
-        add(smtpHostTextField, constraints)
-
-        constraints.fill = GridBagConstraints.NONE
-        constraints.gridy++
-        constraints.gridx = 0
-        constraints.weightx = LEFT_WEIGHT
-        add(smtpPortLabel, constraints)
-        constraints.weightx = RIGHT_WEIGHT
-        constraints.gridx = 1
-        add(smtpPortTextField, constraints)
-
-        constraints.fill = GridBagConstraints.HORIZONTAL
-        constraints.gridy++
-        constraints.gridx = 0
-        constraints.weightx = LEFT_WEIGHT
-        add(smtpUserNameLabel, constraints)
-        constraints.weightx = RIGHT_WEIGHT
-        constraints.gridx = 1
-        add(smtpUserNameTextField, constraints)
-
-        constraints.fill = GridBagConstraints.NONE
-        constraints.gridy++
-        constraints.gridx = 0
-        constraints.weightx = LEFT_WEIGHT
-        add(tlsLabel, constraints)
-        constraints.weightx = RIGHT_WEIGHT
-        constraints.gridx = 1
-        add(tlsComboBox, constraints)
-
-        constraints.gridy++
-        constraints.fill = GridBagConstraints.NONE
-        constraints.gridx = 1
-        add(smtpConnectButton, constraints)
-
-        constraints.insets = Insets(16, 5, 0, 0)
-        constraints.fill = GridBagConstraints.HORIZONTAL
-        constraints.gridy++
-        constraints.gridx = 0
-        constraints.gridwidth = 2
-        constraints.weightx = 1.0
-        technicalLabel.horizontalAlignment = SwingConstants.CENTER
-        add(technicalLabel, constraints)
-
-        constraints.insets = Insets(0, 5, 0, 0)
-        constraints.fill = GridBagConstraints.NONE
-        constraints.gridwidth = 1
-        constraints.gridy++
-        constraints.weightx = LEFT_WEIGHT
-        add(lookAndFeelLabel, constraints)
-        constraints.weightx = RIGHT_WEIGHT
-        constraints.gridx = 1
-        add(lookAndFeelComboBox, constraints)
-
-        constraints.gridy++
-        constraints.gridx = 0
-        constraints.weightx = LEFT_WEIGHT
-        add(photosDirDecoLabel, constraints)
-        constraints.weightx = RIGHT_WEIGHT
-        constraints.gridx = 1
-        add(photosDirLabel, constraints)
-        constraints.gridy++
-        add(photosDirButton, constraints)
-
-        constraints.gridy++
-        constraints.gridx = 0
-        constraints.weightx = LEFT_WEIGHT
-        add(databaseDirDecoLabel, constraints)
-        constraints.weightx = RIGHT_WEIGHT
-        constraints.gridx = 1
-        add(databaseDirLabel, constraints)
-        constraints.gridy++
-        constraints.gridx = 1
-        add(databaseDirButton, constraints)
-         */
+        components.filterIsInstance<JTextField>().forEach(::restrictHeight)
+        components.filterIsInstance<JComboBox<*>>().forEach(::restrictHeight)
     }
 
     /**
@@ -468,25 +315,6 @@ class SettingsFormFields : JPanel() {
         emailUserAgent.sendMailAfterConfirmation(eMessage)
     }
 
-    private fun restrictAllComponents() {
-        // 4 Schleifen, aber gut verständlich
-        components.filterIsInstance<JTextField>().forEach { restrictHeight(it) }
-        components.filterIsInstance<JComboBox<*>>().forEach { restrictHeight(it) }
-
-        /*
-        Welche Lösung ist übersichtlicher und performanter?
-
-        Hässlicher Type Cast
-        components.filter {it is JTextField || it is JComboBox<*> }.forEach { restrictHeight(it as JComponent) }
-
-        Das Wort filter fehlt
-        for(it in components) {
-            if(it is JTextField) restrictHeight(it)
-            if(it is JComboBox<*>) restrictHeight(it)
-        }
-        */
-    }
-
     companion object {
         const val MAX_COLUMNS = 15
         const val MAIL_USER_AGENT = "Wege frei! https://github.com/Heiko-Zelt/wege-frei-pc"
@@ -494,19 +322,5 @@ class SettingsFormFields : JPanel() {
         const val TEST_MAIL_FROM_NAME = "Wege frei!"
         const val TEST_MAIL_CONTENT =
             "<html><h1>Dies ist ein Test</h1>\n<p>Diese E-Mail-Nachricht wurde automatisch von der Wege frei!-Anwendung generiert.</p></html>"
-
-        /**
-         * set maximum height to preferred height
-         */
-        fun restrictHeight(component: JComponent) {
-            component.maximumSize = Dimension(component.maximumSize.width, component.preferredSize.height)
-        }
-
-        /**
-         * increase minimum height by constant factor
-         */
-        fun increaseHeight(component: JComponent) {
-            component.minimumSize = Dimension(component.minimumSize.width, (component.minimumSize.height * 1.8).toInt())
-        }
     }
 }

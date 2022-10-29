@@ -8,6 +8,7 @@ import java.time.format.DateTimeFormatter
 
 @Entity
 @Table(name = "NOTICES")
+// todo Prio 3: two constructors instead of default values
 class Notice(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

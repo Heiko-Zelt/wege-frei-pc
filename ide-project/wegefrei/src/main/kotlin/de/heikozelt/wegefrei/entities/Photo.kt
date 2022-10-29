@@ -12,6 +12,7 @@ import kotlin.jvm.Transient
 
 @Entity
 @Table(name="PHOTOS")
+// todo Prio 3: two constructors instead of default values
 class Photo (
     @Id
     val filename: String? = null,
@@ -79,6 +80,7 @@ class Photo (
 
     @Transient
     private var img: BufferedImage? = null
+    // todo Prio3 val img: BufferedImage? by lazy { ... }
 
     fun getImage(photosDir: String): BufferedImage? {
         if(img == null) {
