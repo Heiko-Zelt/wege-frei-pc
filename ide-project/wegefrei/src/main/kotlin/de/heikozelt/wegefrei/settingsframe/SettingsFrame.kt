@@ -3,6 +3,8 @@ package de.heikozelt.wegefrei.settingsframe
 import de.heikozelt.wegefrei.WegeFrei
 import de.heikozelt.wegefrei.json.Settings
 import org.slf4j.LoggerFactory
+import java.awt.event.WindowAdapter
+import java.awt.event.WindowEvent
 import javax.swing.*
 
 /**
@@ -32,10 +34,15 @@ class SettingsFrame(private val app: WegeFrei) : JFrame() {
         lay.setHorizontalGroup(
             lay.createParallelGroup(GroupLayout.Alignment.LEADING)
                 .addComponent(settingsFormFieldsScrollPane)
-                .addGroup(lay.createSequentialGroup()
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.PREFERRED_SIZE, Int.MAX_VALUE)
-                    .addComponent(okButton)
-                    .addComponent(cancelButton)
+                .addGroup(
+                    lay.createSequentialGroup()
+                        .addPreferredGap(
+                            LayoutStyle.ComponentPlacement.RELATED,
+                            GroupLayout.PREFERRED_SIZE,
+                            Int.MAX_VALUE
+                        )
+                        .addComponent(okButton)
+                        .addComponent(cancelButton)
                 )
         )
         // top to bottom
@@ -55,7 +62,13 @@ class SettingsFrame(private val app: WegeFrei) : JFrame() {
         setSize(600, 600)
         isVisible = true
         defaultCloseOperation = WindowConstants.DO_NOTHING_ON_CLOSE
-        addWindowListener(SettingsWindowListener(this))
+        //addWindowListener(SettingsWindowListener(this))
+
+        addWindowListener(object : WindowAdapter() {
+            override fun windowClosing(e: WindowEvent?) {
+                mayAskMayClose()
+            }
+        })
     }
 
     /**
@@ -76,7 +89,7 @@ class SettingsFrame(private val app: WegeFrei) : JFrame() {
      */
     fun saveAndClose() {
         log.debug("saveAndClose()")
-        if(settings == null) {
+        if (settings == null) {
             settings = Settings()
         }
 
@@ -103,7 +116,7 @@ class SettingsFrame(private val app: WegeFrei) : JFrame() {
     fun mayAskMayClose() {
         log.debug("mayAskMayClose()")
 
-        if(settings == null) {
+        if (settings == null) {
             settings = Settings()
         }
         settings?.let {
