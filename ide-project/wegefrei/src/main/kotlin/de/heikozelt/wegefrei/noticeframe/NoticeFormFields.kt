@@ -1,8 +1,6 @@
 package de.heikozelt.wegefrei.noticeframe
 
-import de.heikozelt.wegefrei.docfilters.DateDocFilter
-import de.heikozelt.wegefrei.docfilters.OnlyDigitsDocFilter
-import de.heikozelt.wegefrei.docfilters.TimeDocFilter
+import de.heikozelt.wegefrei.gui.CharPredicateDocFilter
 import de.heikozelt.wegefrei.entities.Photo
 import de.heikozelt.wegefrei.gui.*
 import de.heikozelt.wegefrei.gui.Styles.Companion.FORM_BACKGROUND
@@ -179,7 +177,7 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel(), Selecte
         constraints.gridx = 1
         val observationDateDoc = observationDateTextField.document
         if (observationDateDoc is AbstractDocument) {
-            observationDateDoc.documentFilter = DateDocFilter()
+            observationDateDoc.documentFilter = CharPredicateDocFilter.dateDocFilter
         }
         observationDateTextField.toolTipText = "z.B. 31.12.2021"
         observationDateTextField.inputVerifier = PatternVerifier.dateVerifier
@@ -193,7 +191,7 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel(), Selecte
         constraints.gridx = 1
         val observationTimeDoc = observationTimeTextField.document
         if (observationTimeDoc is AbstractDocument) {
-            observationTimeDoc.documentFilter = TimeDocFilter()
+            observationTimeDoc.documentFilter = CharPredicateDocFilter.timeDocFilter
         }
         observationTimeTextField.toolTipText = "z.B. 23:59"
         observationTimeTextField.inputVerifier = PatternVerifier.timeVerifier
@@ -207,7 +205,7 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel(), Selecte
         constraints.gridx = 1
         val durationDoc = durationTextField.document
         if (durationDoc is AbstractDocument) {
-            durationDoc.documentFilter = OnlyDigitsDocFilter()
+            durationDoc.documentFilter = CharPredicateDocFilter.onlyDigitsDocFilter
         }
         durationTextField.toolTipText = "Ganzzahl"
         add(durationTextField, constraints)
@@ -248,7 +246,7 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel(), Selecte
         constraints.gridx = 1
         val inspectionYearDoc = inspectionYearTextField.document
         if (inspectionYearDoc is AbstractDocument) {
-            inspectionYearDoc.documentFilter = OnlyDigitsDocFilter()
+            inspectionYearDoc.documentFilter = CharPredicateDocFilter.onlyDigitsDocFilter
         }
         inspectionYearTextField.toolTipText = "Ganzzahl 4-stellig"
         inspectionYearTextField.inputVerifier = PatternVerifier.inspectionYearVerifier
@@ -261,7 +259,7 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel(), Selecte
         constraints.gridx = 1
         val inspectionMonthDoc = inspectionMonthTextField.document
         if (inspectionMonthDoc is AbstractDocument) {
-            inspectionMonthDoc.documentFilter = OnlyDigitsDocFilter()
+            inspectionMonthDoc.documentFilter = CharPredicateDocFilter.onlyDigitsDocFilter
         }
         inspectionMonthTextField.toolTipText = "Ganzzahl 1-12"
         inspectionMonthTextField.inputVerifier = PatternVerifier.inspectionMonthVerifier

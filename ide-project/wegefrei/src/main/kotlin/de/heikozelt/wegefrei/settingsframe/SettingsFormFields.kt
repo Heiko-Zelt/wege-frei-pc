@@ -1,7 +1,7 @@
 package de.heikozelt.wegefrei.settingsframe
 
 import de.heikozelt.wegefrei.EmailUserAgent
-import de.heikozelt.wegefrei.docfilters.OnlyDigitsDocFilter
+import de.heikozelt.wegefrei.gui.CharPredicateDocFilter
 import de.heikozelt.wegefrei.gui.PatternVerifier
 import de.heikozelt.wegefrei.gui.TrimmingTextField
 import de.heikozelt.wegefrei.json.EmailServerConfig
@@ -161,7 +161,7 @@ class SettingsFormFields(private val settingsFrame: SettingsFrame): JPanel() {
         constraints.gridx = 1
         val portDoc = smtpPortTextField.document
         if (portDoc is AbstractDocument) {
-            portDoc.documentFilter = OnlyDigitsDocFilter()
+            portDoc.documentFilter = CharPredicateDocFilter.onlyDigitsDocFilter
         }
         add(smtpPortTextField, constraints)
 

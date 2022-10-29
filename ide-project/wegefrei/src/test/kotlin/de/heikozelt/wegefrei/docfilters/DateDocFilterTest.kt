@@ -1,5 +1,6 @@
 package de.heikozelt.wegefrei.docfilters
 
+import de.heikozelt.wegefrei.gui.CharPredicateDocFilter
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import javax.swing.text.PlainDocument
@@ -10,7 +11,7 @@ class DateDocFilterTest {
     @Test
     fun test1() {
         val doc = PlainDocument()
-        doc.documentFilter = DateDocFilter()
+        doc.documentFilter = CharPredicateDocFilter.dateDocFilter
         doc.insertString(0, "a31.01.1999 ", SimpleAttributeSet())
         val line = doc.getParagraphElement(0)
         val start = line.startOffset
