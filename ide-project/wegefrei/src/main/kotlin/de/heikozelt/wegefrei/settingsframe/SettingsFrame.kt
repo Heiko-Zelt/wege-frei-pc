@@ -29,7 +29,6 @@ class SettingsFrame(private val app: WegeFrei) : JFrame() {
         title = "Einstellungen - Wege frei!"
 
         val lay = GroupLayout(contentPane)
-
         lay.autoCreateGaps = false
         lay.autoCreateContainerGaps = false
         // left to right
