@@ -9,6 +9,7 @@ import javax.swing.text.DocumentFilter
  * Die Zeichen werden als Character-Predicate angegeben.
  * Alle anderen Zeichen werden ignoriert.
  * z.B. val docFilter = CharPredicateDocFilter{ it.isDigit() }
+ * todo: Prio 2: alle DocFilters in einer Klasse vereinen, wie bei PatternVerifiers
  */
 open class CharPredicateDocFilter(private val predicate: (Char) -> Boolean): DocumentFilter() {
     @Throws(BadLocationException::class)

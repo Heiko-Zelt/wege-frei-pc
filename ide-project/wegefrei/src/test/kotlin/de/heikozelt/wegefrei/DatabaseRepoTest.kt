@@ -14,7 +14,6 @@ internal class DatabaseRepoTest {
 
     private val databaseRepo = DatabaseRepo.fromMemory()
 
-    // todo Prio 1: use in memory test database
     @Test
     fun getPhotoByFilename() {
         val zdt1 = ZonedDateTime.of(2021, 12, 30, 19, 49, 59, 0, ZoneId.of("CET"))

@@ -52,7 +52,6 @@ class SelectedPhotos(private var photos: TreeSet<Photo> = TreeSet<Photo>()) {
 
     /**
      * Wichtig, um Memory-Leaks zu vermeiden
-     * todo: wenn MaxiMap nicht mehr im Zoom-Bereich angezeigt wird
      */
     fun unregisterObserver(observer: SelectedPhotosObserver) {
         observers.remove(observer)

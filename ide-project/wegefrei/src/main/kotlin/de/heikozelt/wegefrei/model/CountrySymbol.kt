@@ -5,7 +5,7 @@ package de.heikozelt.wegefrei.model
  * entweder im alten Stil, Oval mit Länderkennzeichen
  * oder bei EU-Ländern als Teil des Kennzeichens mit EU-Flagge
  * todo Prio 2: Katalog vervollständigen, Gruppierung nach Erdteil
- * todo Prio 3: als Icon anzeigen
+ * todo Prio 3: Landeskennzeichen als Icon anzeigen
  */
 class CountrySymbol(val abbreviation: String, val countryName: String?) {
 

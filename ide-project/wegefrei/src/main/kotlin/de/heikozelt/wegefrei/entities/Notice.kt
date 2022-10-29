@@ -13,7 +13,7 @@ class Notice(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Int? = null,
 
-    // todo: entscheiden ob UTC oder CET/CEST?
+    // todo: Prio 3: entscheiden ob UTC oder CET/CEST? Wie ist es in den Photo-Meta-Daten gespeichert?
     // TIMESTAMP WITH TIME ZONE
     @Column
     var observationTime: ZonedDateTime? = null,
@@ -101,6 +101,7 @@ class Notice(
 
     /**
      * Warnblinkanlage eingeschaltet
+     * todo Prio 2: Warnblinkanlage-Check-Box in NoticeFormFields anzeigen
      */
     @Column
     var warningLights: Boolean = false,
@@ -205,6 +206,7 @@ class Notice(
      * todo Prio 2: mehrmals versenden ggf. an unterschiedliche Empfänger oder BCC, eigene Datenbank-Tabelle
      * todo Prio 3: Outbox. Nachricht erst in den Postausgang legen. Im Hintergrund-Thread wird versendet.
      * isSent() liefert dann true, wenn mindestend eine E-Mail erfolgreich versendet wurde
+     * todo Prio 1: E-Mail synchron versenden
      */
     fun isSent(): Boolean {
         return sentTime != null

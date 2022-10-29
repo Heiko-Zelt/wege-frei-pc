@@ -12,8 +12,6 @@ import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.slf4j.LoggerFactory
 
-// todo Prio 1: BeforeAll: Fenster öffnen und AfterEach: Fenster schließen passt nicht zusammen!
-
 class FirstSwingTest {
 
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
@@ -25,7 +23,6 @@ class FirstSwingTest {
     fun setUp() {
         log.debug("setUp()")
         application(WegeFrei::class.java).start()
-        // todo open Notices-Window!!!
 
         rob = BasicRobot.robotWithCurrentAwtHierarchy()
         assertNotNull(rob)

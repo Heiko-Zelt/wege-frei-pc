@@ -19,8 +19,8 @@ import javax.swing.SwingWorker
  * Scannt Verzeichnis mit Fotos nach Dateinamen und Metadaten.
  * Das Ergebnis wird in die Datenbank geschrieben.
  * Die Pixel-Daten verbleiben im Dateisystem (Lazy loading).
- * todo Indexieren, Fotos in der Datenbank fortlaufend nummerieren für AllPhotosPanel-List-Modell.
- * todo Unterverzeichnisse rekursiv scannen und SHA1-Hashwert als Primärschlüssel statt Dateiname.
+ * todo Prio 1: Indexieren, Fotos in der Datenbank fortlaufend nummerieren für AllPhotosPanel-List-Modell.
+ * todo Prio 1: Unterverzeichnisse rekursiv scannen und SHA1-Hashwert als Primärschlüssel statt Dateiname.
  */
 class ScanWorker(
     private val scanFrame: ScanFrame,

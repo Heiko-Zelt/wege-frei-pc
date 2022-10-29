@@ -54,7 +54,7 @@ class SettingsFileRepo: SettingsRepo {
      * Save settings to a file.
      */
     override fun save(settings: Settings) {
-        //todo: Prio 3 it would be nice to have pretty print with line breaks and indents like in Gson
+        //todo Prio 3: it would be nice to have pretty print with line breaks and indents like in Gson
         log.debug("save settings to file ${settingsPath.toString()}")
         val text = Klaxon().toJsonString(settings)
         val file = File(settingsPath.toString())

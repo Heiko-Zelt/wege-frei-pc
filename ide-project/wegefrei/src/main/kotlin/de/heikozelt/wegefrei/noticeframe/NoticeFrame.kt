@@ -185,7 +185,7 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
      */
     fun showMaxiMap() {
         log.debug("show maxi map")
-        // todo: do nothing if it is already shown
+        // todo Prio 4: do nothing if it is already shown
         val maxiMapForm = MaxiMapForm(this)
         selectedPhotos.registerObserver(maxiMapForm.getMaxiMap())
         setZoomComponent(maxiMapForm)
@@ -237,7 +237,8 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
     fun showSelectedPhoto(miniSelectedPhotoPanel: MiniSelectedPhotoPanel) {
         log.debug("show selected photo")
 
-        //todo scollpane und photo zoomPanel.showSelectedPhoto(miniSelectedPhotoPanel.getPhoto())
+        //todo Prio 3: Photos zoombar (scollpane)
+        //todo Prio 3: 2 Methoden für den gleichen Zweck, eine soll die andere Aufrufen
         app.getSettings()?.photosDirectory?.let {
             val photoPanel = MaxiSelectedPhotoPanel(it,this, miniSelectedPhotoPanel.getPhoto())
             val scrollPane = JScrollPane(photoPanel)
@@ -255,7 +256,6 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
     private fun showSelectedPhoto(photo: Photo) {
         log.debug("show selected photo")
 
-        //todo scollpane und photo zoomPanel.showSelectedPhoto(miniSelectedPhotoPanel.getPhoto())
         app.getSettings()?.photosDirectory?.let {
             val photoPanel = MaxiSelectedPhotoPanel(it, this, photo)
             val scrollPane = JScrollPane(photoPanel)
@@ -290,7 +290,6 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
      * Die Methode wird vom OK-Button aufgerufen.
      */
     fun saveNotice() {
-        // todo addressPosition speichern
         noticeForm.getNoticeFormFields().saveNotice()
         val dbRepo = app.getDatabaseRepo()?:return
         notice?.let {
@@ -318,7 +317,7 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
 
     /**
      * Die Methode wird vom E-Mail-absenden-Button aufgerufen.
-     * todo 4. Status einführen, Meldung ist im Postausgang, aber noch nicht gesendet
+     * todo Prio 3: asynchroner E-Mail-Versand. Vierten Status einführen, Meldung ist im Postausgang, aber noch nicht gesendet.
      */
     fun sendNotice() {
         saveNotice()
@@ -331,15 +330,14 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
     }
 
     private fun disableFormFields() {
-        log.debug("disabling form fields is not yet implemented")
-        // todo Prio 2 implementieren Eingabefelder deaktivieren
+        // todo Prio 2 ALLE Eingabefelder deaktivieren (auch Foto-Panels)
         noticeForm.enableOrDisableEditing()
         getMaxiMapForm()?.enableOrDisableEditing()
     }
 
     private fun sendEmail() {
         log.debug("sending email is not yet implemented")
-        // todo Prio 2 E-Mail versenden
+        // todo Prio 1: E-Mail versenden
     }
 
     /**

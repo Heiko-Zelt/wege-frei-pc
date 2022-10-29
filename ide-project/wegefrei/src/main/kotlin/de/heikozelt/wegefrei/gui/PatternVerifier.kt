@@ -6,10 +6,11 @@ import javax.swing.JComponent
 import javax.swing.JTextField
 
 /**
+ * todo: Prio 2: Verifiers und PatternVerifier in eine Klasse vereinen
  * todo: Prio 3: ermöglichen mehrere E-Mail-Adressen durch Komma getrennt anzugeben
  * Aufbau einer E-Mail-Adresse: "irgendwer@irgendeine_domain"
  */
-open class PatternVerifier(private val patternStr: String) : InputVerifier() {
+open class PatternVerifier(patternStr: String) : InputVerifier() {
 
     private var pattern: Pattern = Pattern.compile(patternStr)
 

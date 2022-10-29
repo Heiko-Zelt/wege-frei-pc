@@ -101,7 +101,7 @@ class SelectedPhotosPanel(private val noticeFrame: NoticeFrame) : JPanel(),
                 miniSelectedPhotoPanels[i].updateText(i)
             }
 
-            // todo gemeinsame Basis-Klasse für MaxiPhotoPanel und MaxiSelectedPhotoPanel
+            // todo Prio 3: gemeinsame Basis-Klasse für MaxiPhotoPanel und MaxiSelectedPhotoPanel
             val zoomComponent = noticeFrame.getZoomComponent()
             if (zoomComponent is MaxiPhotoPanel) {
                 if (photo == zoomComponent.getPhoto()) {

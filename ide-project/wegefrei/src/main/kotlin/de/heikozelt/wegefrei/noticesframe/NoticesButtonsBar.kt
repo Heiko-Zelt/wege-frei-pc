@@ -15,7 +15,7 @@ class NoticesButtonsBar(private val app: WegeFrei): JPanel() {
 
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
 
-    // todo: set null again, when closed, but how?
+    // todo Prio 2: set null again, when closed
     private var settingsFrame: SettingsFrame? = null
     init {
         layout = FlowLayout(FlowLayout.RIGHT, 5,0)
@@ -27,7 +27,7 @@ class NoticesButtonsBar(private val app: WegeFrei): JPanel() {
         newButton.addActionListener { app.openNoticeFrame() }
         add(newButton)
 
-        add(Box.createHorizontalStrut(BUTTONS_DISTANCE));
+        add(Box.createHorizontalStrut(BUTTONS_DISTANCE))
 
         val scanButton = JButton()
         scanButton.margin = BUTTON_MARGIN
@@ -41,7 +41,7 @@ class NoticesButtonsBar(private val app: WegeFrei): JPanel() {
         }
         add(scanButton)
 
-        add(Box.createHorizontalStrut(BUTTONS_DISTANCE));
+        add(Box.createHorizontalStrut(BUTTONS_DISTANCE))
 
         val settingsButton = JButton()
         settingsButton.margin = BUTTON_MARGIN
@@ -56,7 +56,7 @@ class NoticesButtonsBar(private val app: WegeFrei): JPanel() {
         }
         add(settingsButton)
 
-        add(Box.createHorizontalStrut(BUTTONS_DISTANCE));
+        add(Box.createHorizontalStrut(BUTTONS_DISTANCE))
 
         val helpButton = JButton()
         helpButton.margin = BUTTON_MARGIN
@@ -70,7 +70,7 @@ class NoticesButtonsBar(private val app: WegeFrei): JPanel() {
         }
         add(helpButton)
 
-        add(Box.createHorizontalStrut(BUTTONS_DISTANCE));
+        add(Box.createHorizontalStrut(BUTTONS_DISTANCE))
     }
 
 }

@@ -5,7 +5,6 @@ import java.awt.Font
 import java.awt.Insets
 import javax.swing.*
 import javax.swing.border.Border
-import javax.swing.border.EmptyBorder
 
 
 /**
@@ -13,10 +12,7 @@ import javax.swing.border.EmptyBorder
  */
 class Styles {
     companion object {
-        val LABEL_FONT = JLabel().font ?: Font("Dialog", Font.BOLD, 12)
         val TEXTFIELD_FONT = JTextField().font ?: Font("Dialog", Font.PLAIN, 12)
-
-        val BUTTONS_BAR_BORDER = EmptyBorder(5, 10, 5, 10)
 
         const val BUTTONS_DISTANCE = 15
         const val THUMBNAIL_SIZE = 140
@@ -26,23 +22,20 @@ class Styles {
         val NORMAL_BORDER: Border = BorderFactory.createLineBorder(Color.black)
         val HIGHLIGHT_BORDER: Border? = BorderFactory.createLineBorder(Color.yellow)
         val NO_BORDER: Border? = BorderFactory.createEmptyBorder()
-        val TOOLBAR_BORDER: Border? = BorderFactory.createEmptyBorder()
 
         val TEXT_COLOR: Color? = JLabel().foreground ?: Color.black
 
         val FRAME_BACKGROUND = JPanel().background ?: Color(238, 238, 238)
         val PHOTO_MARKER_BACKGROUND = Color(101, 162, 235)
-        val TOOLBAR_BACKGROUND = JToolBar().background ?: FRAME_BACKGROUND
         val ALL_PHOTOS_BACKGROUND = FRAME_BACKGROUND
         val SELECTED_PHOTOS_BACKGROUND = FRAME_BACKGROUND
         val FORM_BACKGROUND = FRAME_BACKGROUND
         val ZOOM_PANEL_BACKGROUND = FRAME_BACKGROUND
         val NOTICES_TABLE_BACKGROUND = JTable().background ?: Color(255, 255, 255)
-        val PHOTO_SQUARE_BACKGROUND = Color(128, 128, 128)
-
 
         /*
-        todo: dark mode
+        todo: Prio 3: programmatische Eingriffe ins Layout soweit es geht reduzieren
+        todo: Prio 4: weitere coole Open Source Look'n'Feels integrieren oder eigenes Look'n'Feel
 
         val NORMAL_BORDER: Border = BorderFactory.createLineBorder(Color.black)
         val HIGHLIGHT_BORDER: Border? = BorderFactory.createLineBorder(Color.yellow)

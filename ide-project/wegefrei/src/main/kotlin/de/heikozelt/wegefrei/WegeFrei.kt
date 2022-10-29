@@ -77,8 +77,7 @@ open class WegeFrei(private val settingsRepo: SettingsRepo = SettingsFileRepo())
 
         this.settings = settings
 
-        // todo close all NoticeFrames if repo changed
-        // but how to react to unsaved changes??? just save them or ask user???
+        // todo Prio 2: close all NoticeFrames if repo changed. ask user if unsaved changes exist.
 
         if(lookAndFeelChanged) {
             changeLookAndFeel()
@@ -223,7 +222,7 @@ open class WegeFrei(private val settingsRepo: SettingsRepo = SettingsFileRepo())
 
     /**
      * Scannt die Fotos im Dateisystem und trägt die Metadaten in die Datenbank ein.
-     * todo: SHA1-Hashwert über Dateiinhalt als Primärschlüssel für Fotos.
+     * todo Prio 1: SHA1-Hashwert über Dateiinhalt als Primärschlüssel für Fotos.
      */
     fun scanForNewPhotos() {
         val scanFrame = ScanFrame()

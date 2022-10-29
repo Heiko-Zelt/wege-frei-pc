@@ -1,8 +1,8 @@
 package de.heikozelt.wegefrei.maps
 
 import de.heikozelt.wegefrei.entities.Photo
-import de.heikozelt.wegefrei.noticeframe.NoticeFrame
 import de.heikozelt.wegefrei.model.SelectedPhotosObserver
+import de.heikozelt.wegefrei.noticeframe.NoticeFrame
 import org.jxmapviewer.JXMapViewer
 import org.jxmapviewer.OSMTileFactoryInfo
 import org.jxmapviewer.viewer.DefaultTileFactory
@@ -228,7 +228,7 @@ open class BaseMap(
 
             else -> {
                 log.debug("zoom vor zoomToBestFit(): $zoom")
-                // todo Prio 2: Bug in JXMapViewer2 beheben, 2 mal gleiche Latitude/Longitude
+                // todo Prio 3: Bug in JXMapViewer2 behoben, 2 mal gleiche Latitude/Longitude, Wann wird pull request commited?
                 log.debug("width: $width, height: $height" )
                 zoomToBestFit(fitPoints, 0.5)
                 log.debug("zoom nach zoomToBestFit(): $zoom")

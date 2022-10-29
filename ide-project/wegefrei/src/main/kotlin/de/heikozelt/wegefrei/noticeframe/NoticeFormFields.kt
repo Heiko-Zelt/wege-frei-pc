@@ -340,7 +340,7 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel(), Selecte
     /**
      * Mapping der Werte der GUI-Komponenten zu Notice
      */
-    // todo: form validation, Validierungsfehler bei Eingabefeldern anzeigen
+    // todo Prio 1: form validation, Validierungsfehler bei Eingabefeldern anzeigen
     fun saveNotice() {
         val notice = noticeFrame.getNotice() ?: return
 
@@ -369,7 +369,7 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel(), Selecte
             selectedColor.colorName
         }
 
-        // todo map addressLocation
+        // todo Prio 1: map addressLocation
 
         notice.street = trimmedOrNull(streetTextField.text)
         notice.zipCode = trimmedOrNull(zipCodeTextField.text)

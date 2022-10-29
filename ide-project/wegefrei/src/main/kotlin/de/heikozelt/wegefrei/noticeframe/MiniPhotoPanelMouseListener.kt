@@ -7,6 +7,9 @@ import java.awt.event.MouseEvent
 class MiniPhotoPanelMouseListener(private val noticeFrame: NoticeFrame, private val miniPhotoPanel: MiniPhotoPanel): MouseAdapter() {
 
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
+
+    // todo Prio 3: Drag and Drop statt Klick oder Doppelklick
+    // todo Prio 4: Animationen beim Fotos verschieben
     override fun mouseClicked(e: MouseEvent) {
         // todo: Bug: Doppelklick führt manchmal zu Fehlern
         if(e.clickCount == 1) {

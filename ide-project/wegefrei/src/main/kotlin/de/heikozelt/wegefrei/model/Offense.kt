@@ -17,7 +17,7 @@ class Offense(val id: Int, val text: String, val selectable: Boolean) {
          * Factory-Methode
          */
         fun fromId(id: Int?): Offense {
-            var offense = OFFENSES.find { it.id == id}
+            val offense = OFFENSES.find { it.id == id}
             return offense ?: OFFENSES[0]
         }
 
@@ -64,7 +64,7 @@ class Offense(val id: Int, val text: String, val selectable: Boolean) {
             Offense(24,"Halten/Parken auf schmaler Fahrbahn gegenüber Grundstückseinfahrt bzw. ausfahrt", true),
             Offense(25,"Halten/Parken vor Bordsteinabsenkung", true),
             Offense(26,"Halten/Parken auf linker Fahrbahnseite/linken Seitenstreifen", true)
-            //todo Katalog der Vergehen vervollständigen
+            //todo Prio 3: Katalog der Vergehen vervollständigen
         )
     }
 

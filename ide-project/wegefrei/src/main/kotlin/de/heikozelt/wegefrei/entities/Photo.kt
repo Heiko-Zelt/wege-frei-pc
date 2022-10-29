@@ -20,7 +20,7 @@ class Photo (
      * Ein SHA1-Hashwert hat im Binär-Format 20 Bytes = 160 Bit.
      * Hex-encoded: 40 characters
      * Java data type: byte[]
-     * todo: make this the primary key/id
+     * todo: Prio 1: make this the primary key/id
      */
     @Column(columnDefinition = "BINARY(20)")
     val hash: ByteArray? = null,
@@ -45,6 +45,7 @@ class Photo (
     @Column
     val date: ZonedDateTime? = null,
 
+    // todo Prio 2: show in AllPhotosPanel, which photos have been used for which notice
     @ManyToMany(mappedBy="photos")
     val notices: Set<Notice>? = null
 ): Comparable<Photo> {

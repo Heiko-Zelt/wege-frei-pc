@@ -12,7 +12,7 @@ class SettingsFormButtonsBar(settingsFrame: SettingsFrame): JPanel() {
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
 
     init {
-        // todo: hgap or horizontalStruts?
+        // todo: Prio 2: Testen, ob GroupLayout besser ist als GridBagLayout, wahrscheinlich schon
         layout = FlowLayout(FlowLayout.RIGHT, 5,0)
 
         val okButton = JButton("Ok")
@@ -20,13 +20,13 @@ class SettingsFormButtonsBar(settingsFrame: SettingsFrame): JPanel() {
         okButton.addActionListener { settingsFrame.saveAndClose() }
         add(okButton)
 
-        add(Box.createHorizontalStrut(Styles.BUTTONS_DISTANCE));
+        add(Box.createHorizontalStrut(Styles.BUTTONS_DISTANCE))
 
         val cancelButton = JButton("Abbrechen")
         cancelButton.margin = Styles.BUTTON_MARGIN
         cancelButton.addActionListener { settingsFrame.discardChangesAndClose() }
         add(cancelButton)
 
-        add(Box.createHorizontalStrut(Styles.BUTTONS_DISTANCE));
+        add(Box.createHorizontalStrut(Styles.BUTTONS_DISTANCE))
     }
 }
