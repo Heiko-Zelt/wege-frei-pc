@@ -48,7 +48,7 @@ class SettingsFormFields : JPanel() {
         log.debug("init")
 
         // GUI components
-        val witnessHeading = JLabel("<html><b>Zeugendaten</b></html>")
+        val witnessHeading = JLabel("<html><b>Zeuge</b></html>")
         witnessHeading.horizontalAlignment = SwingConstants.CENTER
         witnessHeading.verticalAlignment = SwingConstants.BOTTOM
         increaseHeight(witnessHeading)
@@ -95,6 +95,7 @@ class SettingsFormFields : JPanel() {
         restrictHeight(givenNameTextField)
         lay.autoCreateGaps = true
         lay.autoCreateContainerGaps = true
+
         // left to right
         lay.setHorizontalGroup(
             lay.createParallelGroup(GroupLayout.Alignment.LEADING)

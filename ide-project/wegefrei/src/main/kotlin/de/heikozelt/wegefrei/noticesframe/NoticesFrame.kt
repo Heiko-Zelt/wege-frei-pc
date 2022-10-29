@@ -45,8 +45,8 @@ class NoticesFrame(private val app: WegeFrei) : JFrame("Meldungen - Wege frei!")
 
         // layout:
         val lay = GroupLayout(contentPane)
-        lay.autoCreateGaps = true
-        lay.autoCreateContainerGaps = true
+        lay.autoCreateGaps = false
+        lay.autoCreateContainerGaps = false
         // left to right
         lay.setHorizontalGroup(
             lay.createParallelGroup(GroupLayout.Alignment.LEADING)

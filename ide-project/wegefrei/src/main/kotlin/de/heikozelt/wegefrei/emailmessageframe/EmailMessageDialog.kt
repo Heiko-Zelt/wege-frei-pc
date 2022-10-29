@@ -19,6 +19,9 @@ import javax.swing.*
  * Status: nichts oder "Wird gesendet..." oder "Wurde gesendet."
  * Buttons: (Senden) (Abbrechen) oder (Ok)
  * </pre>
+ * todo Prio 3: Ergebnis des Test-E-Mail-Versands durch einen Punkt anzeigen
+ * grün = erfolgreich, rot = Fehler, gelb = Benutzer hat abgebrochen/kein Passwort angegeben
+ * siehe: https://www.compart.com/en/unicode/U+2B24
  */
 class EmailMessageDialog(private val emailUserAgent: EmailUserAgent) : JFrame() {
 
@@ -40,13 +43,18 @@ class EmailMessageDialog(private val emailUserAgent: EmailUserAgent) : JFrame() 
         defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
         size = Dimension(400, 300)
         val lay = GroupLayout(contentPane)
-        lay.autoCreateGaps = true
-        lay.autoCreateContainerGaps = true
+        lay.autoCreateGaps = false
+        lay.autoCreateContainerGaps = false
         // left to right
         lay.setHorizontalGroup(
             lay.createParallelGroup(GroupLayout.Alignment.LEADING)
                 .addComponent(scrollPane)
-                .addComponent(statusLabel)
+                .addGroup(
+                    lay.createSequentialGroup()
+                        .addGap(4)
+                        .addComponent(statusLabel)
+                )
+
                 .addGroup(
                     lay.createSequentialGroup()
                         .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.PREFERRED_SIZE, Int.MAX_VALUE)

@@ -26,7 +26,7 @@ class ScanFrame: JFrame() {
         okButton.addActionListener { this.dispose() }
 
         title = "Fotos scannen - Wege frei!"
-        size = Dimension(400, 180)
+        size = Dimension(400, 150)
         val lay = GroupLayout(contentPane)
         lay.autoCreateGaps = true
         lay.autoCreateContainerGaps = true

@@ -27,7 +27,6 @@ class MaxiMapButtonsBar(private val noticeFrame: NoticeFrame, private val maxiMa
         val fitStruts = Box.createHorizontalStrut(Styles.BUTTONS_DISTANCE)
         add(fitStruts);
 
-        addButton.margin = Styles.BUTTON_MARGIN
         addButton.addActionListener {
             noticeFrame.updateOffensePositionFromSelectedPhotos()
             addButton.isVisible = false
@@ -36,7 +35,6 @@ class MaxiMapButtonsBar(private val noticeFrame: NoticeFrame, private val maxiMa
         addButton.isVisible = false
         add(addButton)
 
-        removeButton.margin = Styles.BUTTON_MARGIN
         removeButton.addActionListener {
             noticeFrame.deleteOffensePosition()
             removeButton.isVisible = false
