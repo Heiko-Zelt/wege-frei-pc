@@ -26,7 +26,7 @@ open class WegeFrei(private val settingsRepo: SettingsRepo = SettingsFileRepo())
     //kotlin-logging: private val log = KotlinLogging.logger {}
     //JUL: private val logger = Logger.getLogger(this::class.java.name)
 
-    private var databaseRepo:DatabaseRepo? = null
+    private var databaseRepo: DatabaseRepo? = null
 
     private var settings: Settings? = null
 
@@ -45,7 +45,7 @@ open class WegeFrei(private val settingsRepo: SettingsRepo = SettingsFileRepo())
      */
     private val noticeFrames = mutableListOf<NoticeFrame>()
 
-    init{
+    init {
         log.debug("initializing")
         val settings = settingsRepo.load()
 
@@ -79,17 +79,17 @@ open class WegeFrei(private val settingsRepo: SettingsRepo = SettingsFileRepo())
 
         // todo Prio 2: close all NoticeFrames if repo changed. ask user if unsaved changes exist.
 
-        if(lookAndFeelChanged) {
+        if (lookAndFeelChanged) {
             changeLookAndFeel()
         }
 
-        if(dbDirChanged) {
+        if (dbDirChanged) {
             closeNoticesFrame()
 
             databaseRepo?.close()
             databaseRepo = DatabaseRepo.fromDirectory(settings.databaseDirectory)
 
-            if(isNoticesFrameOpen) {
+            if (isNoticesFrameOpen) {
                 openNoticesFrame()
             }
         }
@@ -211,8 +211,8 @@ open class WegeFrei(private val settingsRepo: SettingsRepo = SettingsFileRepo())
                     log.debug("UIManager.setLookAndFeel()")
                     UIManager.setLookAndFeel(className)
                 }
-                noticesFrame?.let { frame -> SwingUtilities.updateComponentTreeUI(frame) }
-                noticeFrames.forEach { frame -> SwingUtilities.updateComponentTreeUI(frame) }
+                noticesFrame?.let(SwingUtilities::updateComponentTreeUI)
+                noticeFrames.forEach(SwingUtilities::updateComponentTreeUI)
                 // settingsFrame should not be open
             } catch (e: Exception) {
                 log.error("exception while setting look and feel", e)
@@ -226,7 +226,7 @@ open class WegeFrei(private val settingsRepo: SettingsRepo = SettingsFileRepo())
      */
     fun scanForNewPhotos() {
         val scanFrame = ScanFrame()
-        settings?.photosDirectory?.let {photosDir ->
+        settings?.photosDirectory?.let { photosDir ->
             databaseRepo?.let { dbRepo ->
                 scanFrame.scan(photosDir, dbRepo)
             }
