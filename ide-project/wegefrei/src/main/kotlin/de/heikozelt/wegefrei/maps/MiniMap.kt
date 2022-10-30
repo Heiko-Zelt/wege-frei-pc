@@ -23,7 +23,7 @@ class MiniMap(
     init {
         log.debug("init")
         border = NORMAL_BORDER
-        preferredSize = Dimension(150, 150)
+        preferredSize = Dimension(130, 130)
         minimumSize = preferredSize
         maximumSize = preferredSize
         addMouseListener(MiniMapMouseListener(noticeFrame))

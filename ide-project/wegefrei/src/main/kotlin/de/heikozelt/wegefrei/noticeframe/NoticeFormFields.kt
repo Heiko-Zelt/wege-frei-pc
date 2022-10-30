@@ -16,6 +16,12 @@ import javax.swing.text.AbstractDocument
 
 /**
  * Panel mit den Formular-Feldern
+ *
+ * Anordnung der Check Boxes:
+ * <pre>
+ * [] Fahrzeug war verlassen        [] mit Behinderung [] Umweltplakette fehlt/ungültig
+ * [] Warnblinkanlage eingeschaltet [] mit Gefährdung  [] HU-Plakette abgelaufen
+ * </pre>
  */
 class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel(), SelectedPhotosObserver {
 
@@ -37,11 +43,12 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel(), Selecte
     private val obstructionCheckBox = JCheckBox("mit Behinderung")
     private val endangeringCheckBox = JCheckBox("mit Gefährdung")
     private val environmentalStickerCheckBox = JCheckBox("Umweltplakette fehlt/ungültig")
-    private val vehicleInspectionStickerCheckBox = JCheckBox("HU Plakette abgelaufen")
-    private val inspectionYearLabel = JLabel("HU-Fälligkeit Jahr:")
-    private val inspectionYearTextField = JTextField(4)
-    private val inspectionMonthLabel = JLabel("HU-Fälligkeit Monat:")
+    private val vehicleInspectionStickerCheckBox = JCheckBox("HU-Plakette abgelaufen")
+    private val warningLightsCheckBox = JCheckBox("Warnblinkanlage eingeschaltet")
+    private val inspectionMonthYearLabel = JLabel("HU-Fälligkeit Jahr:")
     private val inspectionMonthTextField = JTextField(2)
+    private val monthYearSeparatorLabel = JLabel("/")
+    private val inspectionYearTextField = JTextField(4)
     private val recipientTextField = TrimmingTextField(30)
     private val noteTextArea = JTextArea(3, 40)
 
@@ -64,22 +71,20 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel(), Selecte
         val coordinatesLabel = JLabel("Koordinaten:")
         val streetLabel = JLabel("<html>Straße & Hausnummer:<sup>*</sup></html>")
         streetTextField.toolTipText = "z.B. Taunusstraße 7"
-        val zipCodeLabel = JLabel("<html>PLZ:<sup>*</sup></html>")
+        val zipCodeTownLabel = JLabel("<html>PLZ:<sup>*</sup>, Ort:<sup>*</sup></html>")
         zipCodeTextField.toolTipText = "z.B. 65183"
-        val townLabel = JLabel("<html>Ort:<sup>*</sup></html>")
         val locationDescriptionLabel = JLabel("Tatort:")
         townTextField.toolTipText = "z.B. Wiesbaden"
         locationDescriptionTextField.toolTipText = "z.B. Bushaltestelle Kochbrunnen"
         val offenseLabel = JLabel("<html>Verstoß:<sup>*</sup></html>")
         offenseComboBox.renderer = OffenseListCellRenderer()
-        val observationDateLabel = JLabel("<html>Beobachtungs-Datum:<sup>*</sup></html>")
+        val observationDateTimeLabel = JLabel("<html>Beobachtungsdatum<sup>*</sup>, Uhrzeit:<sup>*</sup></html>")
         val observationDateDoc = observationDateTextField.document
         if (observationDateDoc is AbstractDocument) {
             observationDateDoc.documentFilter = CharPredicateDocFilter.dateDocFilter
         }
         observationDateTextField.toolTipText = "z.B. 31.12.2021"
         observationDateTextField.inputVerifier = PatternVerifier.dateVerifier
-        val observationTimeLabel = JLabel("<html>Beobachtungs-Uhrzeit:<sup>*</sup></html>")
         val observationTimeDoc = observationTimeTextField.document
         if (observationTimeDoc is AbstractDocument) {
             observationTimeDoc.documentFilter = CharPredicateDocFilter.timeDocFilter
@@ -94,18 +99,12 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel(), Selecte
         durationTextField.toolTipText = "Ganzzahl"
         vehicleInspectionStickerCheckBox.addChangeListener {
             val src = it.source as JCheckBox
-            inspectionYearLabel.isVisible = src.isSelected
-            inspectionYearTextField.isVisible = src.isSelected
-            inspectionMonthLabel.isVisible = src.isSelected
+            inspectionMonthYearLabel.isVisible = src.isSelected
             inspectionMonthTextField.isVisible = src.isSelected
+            monthYearSeparatorLabel.isVisible = src.isSelected
+            inspectionYearTextField.isVisible = src.isSelected
         }
-        val inspectionYearDoc = inspectionYearTextField.document
-        if (inspectionYearDoc is AbstractDocument) {
-            inspectionYearDoc.documentFilter = CharPredicateDocFilter.onlyDigitsDocFilter
-        }
-        inspectionYearTextField.toolTipText = "Ganzzahl 4-stellig"
-        inspectionYearTextField.inputVerifier = PatternVerifier.inspectionYearVerifier
-        inspectionYearTextField.isVisible = false
+        vehicleInspectionStickerCheckBox.toolTipText = "Hauptuntersuchung/\"TÜV\""
         val inspectionMonthDoc = inspectionMonthTextField.document
         if (inspectionMonthDoc is AbstractDocument) {
             inspectionMonthDoc.documentFilter = CharPredicateDocFilter.onlyDigitsDocFilter
@@ -113,6 +112,14 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel(), Selecte
         inspectionMonthTextField.toolTipText = "Ganzzahl 1-12"
         inspectionMonthTextField.inputVerifier = PatternVerifier.inspectionMonthVerifier
         inspectionMonthTextField.isVisible = false
+        val inspectionYearDoc = inspectionYearTextField.document
+        if (inspectionYearDoc is AbstractDocument) {
+            inspectionYearDoc.documentFilter = CharPredicateDocFilter.onlyDigitsDocFilter
+        }
+        inspectionYearTextField.toolTipText = "Ganzzahl 4-stellig"
+        inspectionYearTextField.inputVerifier = PatternVerifier.inspectionYearVerifier
+        inspectionYearTextField.isVisible = false
+
         val recipientLabel = JLabel("<html>Empfänger:<sup>*</sup></html>")
         recipientTextField.toolTipText = "z.B. verwarngeldstelle@wiesbaden.de"
         recipientTextField.inputVerifier = PatternVerifier.eMailVerifier
@@ -138,16 +145,13 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel(), Selecte
                                 .addComponent(colorLabel)
                                 .addComponent(coordinatesLabel)
                                 .addComponent(streetLabel)
-                                .addComponent(zipCodeLabel)
-                                .addComponent(townLabel)
+                                .addComponent(zipCodeTownLabel)
                                 .addComponent(locationDescriptionLabel)
                                 .addComponent(offenseLabel)
-                                .addComponent(observationDateLabel)
-                                .addComponent(observationTimeLabel)
+                                .addComponent(observationDateTimeLabel)
                                 .addComponent(durationLabel)
                                 .addComponent(recipientLabel)
-                                .addComponent(inspectionYearLabel)
-                                .addComponent(inspectionMonthLabel)
+                                .addComponent(inspectionMonthYearLabel)
                                 .addComponent(noteLabel)
                         )
                         .addGroup( // form fields
@@ -158,32 +162,46 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel(), Selecte
                                 .addComponent(colorComboBox)
                                 .addComponent(miniMap)
                                 .addComponent(streetTextField)
-                                .addComponent(zipCodeTextField)
-                                .addComponent(townTextField)
+                                .addGroup(
+                                    lay.createSequentialGroup()
+                                        .addComponent(zipCodeTextField)
+                                        .addComponent(townTextField)
+                                )
                                 .addComponent(locationDescriptionTextField)
                                 .addComponent(offenseComboBox)
-                                .addComponent(observationDateTextField)
-                                .addComponent(observationTimeTextField)
+                                .addGroup(
+                                    lay.createSequentialGroup()
+                                        .addComponent(observationDateTextField)
+                                        .addComponent(observationTimeTextField)
+                                )
                                 .addComponent(durationTextField)
-                                .addComponent(inspectionYearTextField)
-                                .addComponent(inspectionMonthTextField)
+                                .addGroup(
+                                    lay.createSequentialGroup()
+                                        .addComponent(inspectionMonthTextField)
+                                        .addComponent(monthYearSeparatorLabel)
+                                        .addComponent(inspectionYearTextField)
+                                )
                                 .addComponent(recipientTextField)
                                 .addComponent(noteTextArea)
                         )
                 )
                 .addGroup( // check boxes
                     lay.createSequentialGroup()
-                        .addGroup( // first column of check boxes
+                        .addGroup( // 1st column of check boxes
                             lay.createParallelGroup(GroupLayout.Alignment.LEADING)
                                 .addComponent(abandonedCheckBox)
-                                .addComponent(environmentalStickerCheckBox)
-                                .addComponent(vehicleInspectionStickerCheckBox)
+                                .addComponent(warningLightsCheckBox)
+
                         )
-                        .addGroup( // second column of check boxes
+                        .addGroup( // 2nd column of check boxes
                             lay.createParallelGroup(GroupLayout.Alignment.LEADING)
                                 .addComponent(obstructionCheckBox)
                                 .addComponent(endangeringCheckBox)
-                                //todo Prio 1: Warnblinkanlage
+                        )
+                        .addGroup( // 3rd column of check boxes
+                            lay.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                .addComponent(environmentalStickerCheckBox)
+                                .addComponent(vehicleInspectionStickerCheckBox)
                         )
                 )
         )
@@ -191,253 +209,84 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel(), Selecte
         lay.setVerticalGroup(
             lay.createSequentialGroup()
                 .addGroup(
-                    lay.createParallelGroup(GroupLayout.Alignment.LEADING)
+                    lay.createParallelGroup(GroupLayout.Alignment.CENTER)
                         .addComponent(countrySymbolLabel).addComponent(countrySymbolComboBox)
                 )
                 .addGroup(
-                    lay.createParallelGroup(GroupLayout.Alignment.LEADING)
+                    lay.createParallelGroup(GroupLayout.Alignment.CENTER)
                         .addComponent(licensePlateLabel).addComponent(licensePlateTextField)
                 )
                 .addGroup(
-                    lay.createParallelGroup(GroupLayout.Alignment.LEADING)
+                    lay.createParallelGroup(GroupLayout.Alignment.CENTER)
                         .addComponent(vehicleMakeLabel).addComponent(vehicleMakeComboBox)
                 )
                 .addGroup(
-                    lay.createParallelGroup(GroupLayout.Alignment.LEADING)
+                    lay.createParallelGroup(GroupLayout.Alignment.CENTER)
                         .addComponent(colorLabel).addComponent(colorComboBox)
                 )
                 .addGroup(
-                    lay.createParallelGroup(GroupLayout.Alignment.LEADING)
+                    lay.createParallelGroup(GroupLayout.Alignment.CENTER)
                         .addComponent(coordinatesLabel).addComponent(miniMap)
                 )
                 .addGroup(
-                    lay.createParallelGroup(GroupLayout.Alignment.LEADING)
+                    lay.createParallelGroup(GroupLayout.Alignment.CENTER)
                         .addComponent(streetLabel).addComponent(streetTextField)
                 )
                 .addGroup(
-                    lay.createParallelGroup(GroupLayout.Alignment.LEADING)
-                        .addComponent(zipCodeLabel).addComponent(zipCodeTextField)
+                    lay.createParallelGroup(GroupLayout.Alignment.CENTER)
+                        .addComponent(zipCodeTownLabel).addComponent(zipCodeTextField).addComponent(townTextField)
                 )
                 .addGroup(
-                    lay.createParallelGroup(GroupLayout.Alignment.LEADING)
-                        .addComponent(townLabel).addComponent(townTextField)
-                )
-                .addGroup(
-                    lay.createParallelGroup(GroupLayout.Alignment.LEADING)
+                    lay.createParallelGroup(GroupLayout.Alignment.CENTER)
                         .addComponent(locationDescriptionLabel).addComponent(locationDescriptionTextField)
                 )
                 .addGroup(
-                    lay.createParallelGroup(GroupLayout.Alignment.LEADING)
+                    lay.createParallelGroup(GroupLayout.Alignment.CENTER)
                         .addComponent(offenseLabel).addComponent(offenseComboBox)
                 )
                 .addGroup(
-                    lay.createParallelGroup(GroupLayout.Alignment.LEADING)
-                        .addComponent(observationDateLabel).addComponent(observationDateTextField)
+                    lay.createParallelGroup(GroupLayout.Alignment.CENTER)
+                        .addComponent(observationDateTimeLabel).addComponent(observationDateTextField)
+                        .addComponent(observationTimeTextField)
                 )
                 .addGroup(
-                    lay.createParallelGroup(GroupLayout.Alignment.LEADING)
-                        .addComponent(observationTimeLabel).addComponent(observationTimeTextField)
-                )
-                .addGroup(
-                    lay.createParallelGroup(GroupLayout.Alignment.LEADING)
+                    lay.createParallelGroup(GroupLayout.Alignment.CENTER)
                         .addComponent(durationLabel).addComponent(durationTextField)
                 )
                 .addGroup(
-                    lay.createParallelGroup(GroupLayout.Alignment.LEADING)
+                    lay.createParallelGroup(GroupLayout.Alignment.CENTER)
                         .addComponent(abandonedCheckBox).addComponent(obstructionCheckBox)
+                        .addComponent(environmentalStickerCheckBox)
                 )
                 .addGroup(
-                    lay.createParallelGroup(GroupLayout.Alignment.LEADING)
-                        .addComponent(environmentalStickerCheckBox).addComponent(endangeringCheckBox)
-                )
-                .addGroup(
-                    lay.createParallelGroup(GroupLayout.Alignment.LEADING)
+                    lay.createParallelGroup(GroupLayout.Alignment.CENTER)
+                        .addComponent(warningLightsCheckBox).addComponent(endangeringCheckBox)
                         .addComponent(vehicleInspectionStickerCheckBox)
                 )
                 .addGroup(
-                    lay.createParallelGroup(GroupLayout.Alignment.LEADING)
-                        .addComponent(inspectionYearLabel).addComponent(inspectionYearTextField)
+                    lay.createParallelGroup(GroupLayout.Alignment.CENTER)
+                        .addComponent(inspectionMonthYearLabel).addComponent(inspectionMonthTextField)
+                        .addComponent(monthYearSeparatorLabel).addComponent(inspectionYearTextField)
                 )
                 .addGroup(
-                    lay.createParallelGroup(GroupLayout.Alignment.LEADING)
-                        .addComponent(inspectionMonthLabel).addComponent(inspectionMonthTextField)
-                )
-                .addGroup(
-                    lay.createParallelGroup(GroupLayout.Alignment.LEADING)
+                    lay.createParallelGroup(GroupLayout.Alignment.CENTER)
                         .addComponent(recipientLabel).addComponent(recipientTextField)
                 )
                 .addGroup(
-                    lay.createParallelGroup(GroupLayout.Alignment.LEADING)
+                    lay.createParallelGroup(GroupLayout.Alignment.CENTER)
                         .addComponent(noteLabel).addComponent(noteTextArea)
                 )
         )
         layout = lay
         components.filterIsInstance<JTextField>().forEach(Styles::restrictHeight)
         components.filterIsInstance<JComboBox<*>>().forEach(Styles::restrictSize)
+        components.filterIsInstance<JLabel>().forEach(Styles::restrictSize)
         Styles.restrictSize(zipCodeTextField)
         Styles.restrictSize(observationDateTextField)
         Styles.restrictSize(observationTimeTextField)
         Styles.restrictSize(durationTextField)
         Styles.restrictSize(inspectionYearTextField)
         Styles.restrictSize(inspectionMonthTextField)
-        /*
-                background = FORM_BACKGROUND
-                border = NO_BORDER
-                layout = GridBagLayout()
-                val constraints = GridBagConstraints()
-                constraints.insets = Insets(0, 5, 0, 0)
-                constraints.anchor = WEST
-                //constraints.fill = BOTH
-                constraints.weightx = 0.5
-                constraints.weighty = 0.1
-                constraints.gridy++
-
-                //countrySymbolLabel.foreground = TEXT_COLOR
-                constraints.gridx = 0
-                constraints.gridwidth = 1
-                add(countrySymbolLabel, constraints)
-                constraints.gridx = 1
-                countrySymbolComboBox.font = TEXTFIELD_FONT
-                add(countrySymbolComboBox, constraints)
-                constraints.gridy++
-
-                //licensePlateLabel.foreground = TEXT_COLOR
-                constraints.gridx = 0
-                add(licensePlateLabel, constraints)
-                constraints.gridx = 1
-                add(licensePlateTextField, constraints)
-                constraints.gridy++
-                //vehicleMakeLabel.foreground = TEXT_COLOR
-                constraints.gridx = 0
-                add(vehicleMakeLabel, constraints)
-                constraints.gridx = 1
-                vehicleMakeComboBox.font = TEXTFIELD_FONT
-                add(vehicleMakeComboBox, constraints)
-
-                constraints.gridy++
-                //colorLabel.foreground = TEXT_COLOR
-                constraints.gridx = 0
-                add(colorLabel, constraints)
-                //val modell = DefaultComboBoxModel(COLORS)
-                colorComboBox.font = TEXTFIELD_FONT
-                constraints.gridx = 1
-                add(colorComboBox, constraints)
-
-                constraints.gridy++
-                //coordinatesLabel.foreground = TEXT_COLOR
-                constraints.gridx = 0
-                add(coordinatesLabel, constraints)
-                constraints.gridx = 1
-                constraints.weighty = 1.0
-                add(miniMap, constraints)
-
-                constraints.gridy++
-                //streetLabel.foreground = TEXT_COLOR
-                constraints.gridx = 0
-                constraints.weighty = 0.1
-                add(streetLabel, constraints)
-                constraints.gridx = 1
-                add(streetTextField, constraints)
-
-                constraints.gridy++
-                //zipCodeLabel.foreground = TEXT_COLOR
-                constraints.gridx = 0
-                add(zipCodeLabel, constraints)
-                constraints.gridx = 1
-                add(zipCodeTextField, constraints)
-
-                constraints.gridy++
-                //townLabel.foreground = TEXT_COLOR
-                constraints.gridx = 0
-                add(townLabel, constraints)
-                constraints.gridx = 1
-                add(townTextField, constraints)
-
-                constraints.gridy++
-                //locationDescriptionLabel.foreground = TEXT_COLOR
-                constraints.gridx = 0
-                add(locationDescriptionLabel, constraints)
-                constraints.gridx = 1
-                add(locationDescriptionTextField, constraints)
-
-                constraints.gridy++
-                constraints.gridx = 0
-                add(offenseLabel, constraints)
-                constraints.gridx = 1
-                //offenseComboBox.prototypeDisplayValue = Offense.withLongestText();
-                offenseComboBox.font = TEXTFIELD_FONT
-                add(offenseComboBox, constraints)
-
-                constraints.gridy++
-                //offenseDateLabel.foreground = TEXT_COLOR
-                constraints.gridx = 0
-                add(observationDateLabel, constraints)
-                constraints.gridx = 1
-                add(observationDateTextField, constraints)
-
-                constraints.gridy++
-                //offenseTimeLabel.foreground = TEXT_COLOR
-                constraints.gridx = 0
-                add(observationTimeLabel, constraints)
-                constraints.gridx = 1
-                add(observationTimeTextField, constraints)
-
-                constraints.gridy++
-                //durationLabel.foreground = TEXT_COLOR
-                constraints.gridx = 0
-                add(durationLabel, constraints)
-                constraints.gridx = 1
-                add(durationTextField, constraints)
-
-                constraints.gridy++
-                abandonedCheckBox.background = FORM_BACKGROUND
-                constraints.gridx = 0
-                add(abandonedCheckBox, constraints)
-
-                obstructionCheckBox.background = FORM_BACKGROUND
-                constraints.gridx = 1
-                add(obstructionCheckBox, constraints)
-
-                constraints.gridy++
-                environmentalStickerCheckBox.background = FORM_BACKGROUND
-                constraints.gridx = 0
-                add(environmentalStickerCheckBox, constraints)
-
-                endangeringCheckBox.background = FORM_BACKGROUND
-                constraints.gridx = 1
-                add(endangeringCheckBox, constraints)
-
-                constraints.gridy++
-                vehicleInspectionStickerCheckBox.background = FORM_BACKGROUND
-                constraints.gridx = 0
-                add(vehicleInspectionStickerCheckBox, constraints)
-
-                constraints.gridy++
-                constraints.gridx = 0
-                add(inspectionYearLabel, constraints)
-                constraints.gridx = 1
-                add(inspectionYearTextField, constraints)
-
-                constraints.gridy++
-                constraints.gridx = 0
-                add(inspectionMonthLabel, constraints)
-                constraints.gridx = 1
-                add(inspectionMonthTextField, constraints)
-
-                constraints.gridy++
-                constraints.gridx = 0
-                add(recipientLabel, constraints)
-                constraints.gridx = 1
-                add(recipientTextField, constraints)
-
-                constraints.gridy++
-                constraints.gridx = 0
-                add(noteLabel, constraints)
-                constraints.gridx = 1
-                add(noteTextArea, constraints)
-                //setSize(700, 700)
-                //isVisible = true
-        */
 
         enableOrDisableEditing()
     }
@@ -475,13 +324,13 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel(), Selecte
         endangeringCheckBox.isSelected = notice.endangering
         environmentalStickerCheckBox.isSelected = notice.environmentalStickerMissing
         vehicleInspectionStickerCheckBox.isSelected = notice.vehicleInspectionExpired
-        inspectionYearLabel.isVisible = inspectionYearTextField.text.isNotBlank()
+        inspectionMonthYearLabel.isVisible = inspectionYearTextField.text.isNotBlank()
         inspectionYearTextField.isVisible = inspectionYearTextField.text.isNotBlank()
         inspectionYearTextField.text = blankOrShortString(notice.vehicleInspectionYear)
-        inspectionMonthLabel.isVisible = inspectionMonthTextField.text.isNotBlank()
         inspectionMonthTextField.isVisible = inspectionMonthTextField.text.isNotBlank()
         inspectionMonthTextField.text = blankOrByteString(notice.vehicleInspectionMonth)
         abandonedCheckBox.isSelected = notice.vehicleAbandoned
+        warningLightsCheckBox.isSelected = notice.warningLights
         recipientTextField.text = notice.recipient
         noteTextArea.text = notice.note
 
@@ -569,6 +418,7 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel(), Selecte
             null
         }
         notice.vehicleAbandoned = abandonedCheckBox.isSelected
+        notice.warningLights = warningLightsCheckBox.isSelected
         notice.recipient = trimmedOrNull(recipientTextField.text)
         notice.note = trimmedOrNull(noteTextArea.text)
     }
