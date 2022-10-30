@@ -1,12 +1,16 @@
 package de.heikozelt.wegefrei.noticeframe
 
 import de.heikozelt.wegefrei.DatabaseRepo
+import de.heikozelt.wegefrei.EmailUserAgent
 import de.heikozelt.wegefrei.WegeFrei
 import de.heikozelt.wegefrei.entities.Notice
 import de.heikozelt.wegefrei.entities.Photo
 import de.heikozelt.wegefrei.gui.Styles.Companion.FRAME_BACKGROUND
 import de.heikozelt.wegefrei.jobs.AddressWorker
+import de.heikozelt.wegefrei.json.Witness
 import de.heikozelt.wegefrei.maps.MaxiMapForm
+import de.heikozelt.wegefrei.model.EmailAddressWithName
+import de.heikozelt.wegefrei.model.EmailMessage
 import de.heikozelt.wegefrei.model.SelectedPhotos
 import de.heikozelt.wegefrei.model.SelectedPhotosObserver
 import org.jxmapviewer.viewer.GeoPosition
@@ -51,9 +55,9 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
 
     // Daten-Modell:
-    private var notice: Notice? = null
-    private var selectedPhotos: SelectedPhotos = SelectedPhotos()
-    private var offensePosition: GeoPosition? = null
+    private var notice: Notice? = null // wozu brauche ich dieses Feld, wenn getNotice() delegiert
+    private var selectedPhotos: SelectedPhotos = SelectedPhotos() // Achtung: Redundanz
+    private var offensePosition: GeoPosition? = null // Achtung: Redundanz
 
     /**
      * last offense position, for which an address was searched for
@@ -101,17 +105,20 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
     }
 
     /**
-     * @param notice
+     * Initialisiert alle GUI-Komponenten mit dem Inhalt der Meldung.
+     * Mapping von Daten-Modell/Notice auf Swing-Komponenten.
      * <ol>
      *   <li>ohne Parameter bzw. mit Default-Parameter zum Bearbeiten einer neuen Meldung. notice.id ist null.</li>
-     *   <li>Instanziierung mit Notice als Parameter zum Bearbeiten einer bestehenden Meldung. notice.id enthält eine Zahl.</li>
+     *   <li>Aufruf mit Notice als Parameter zum Bearbeiten einer bestehenden Meldung. notice.id enthält eine Zahl.</li>
      * </ol>
      * SelectedPhotosObservers werden frühzeitig registriert.
      * Fotos werden direkt danach ersetzt.
      * Zuletzt werden sonstige Daten geladen.
+     * @param notice
      */
-    fun loadData(notice: Notice = Notice()) {
-        log.debug("loadData(notice id: ${notice.id})")
+    fun setNotice(notice: Notice = Notice()) {
+        log.debug("setNotice(notice id: ${notice.id})")
+        this.notice = notice
 
         app.getSettings()?.let {
             selectedPhotosPanel.setPhotosDirectory(it.photosDirectory)
@@ -130,20 +137,20 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
         } else {
             "Meldung #${notice.id} - Wege frei!"
         }
-        this.notice = notice
-        app.getSettings()?. let {
+
+        app.getSettings()?.let {
             allPhotosPanel.loadData(it.photosDirectory, "20220301_184952.jpg")
-            noticeForm.loadData(notice)
+            noticeForm.setNotice(notice)
         }
 
         offensePosition = notice.getGeoPosition()
+    }
 
-        /*
-        Initial wird keine große Karte angezeigt
-        notice.getGeoPosition()?.let {
-           maxiMap.setAddressPosition(it)
-        }
-        */
+    /**
+     * delegiert nur
+     */
+    fun getNotice(): Notice {
+        return noticeForm.getNotice()
     }
 
     fun getDatabaseRepo(): DatabaseRepo? {
@@ -152,14 +159,6 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
 
     fun getSelectedPhotos(): SelectedPhotos {
         return selectedPhotos
-    }
-
-    fun setSelectedPhotos(selectedPhotos: SelectedPhotos) {
-        this.selectedPhotos = selectedPhotos
-    }
-
-    fun getNotice(): Notice? {
-        return notice
     }
 
     /**
@@ -207,7 +206,7 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
     fun showPhoto(miniPhotoPanel: MiniPhotoPanel) {
         log.debug("show photo")
         app.getSettings()?.photosDirectory?.let {
-            val photoPanel = MaxiPhotoPanel(it,this, miniPhotoPanel.getPhoto())
+            val photoPanel = MaxiPhotoPanel(it, this, miniPhotoPanel.getPhoto())
             val scrollPane = JScrollPane(photoPanel)
             setZoomComponent(scrollPane)
         }
@@ -222,7 +221,7 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
     private fun showPhoto(photo: Photo) {
         log.debug("show photo")
         app.getSettings()?.photosDirectory?.let {
-            val photoPanel = MaxiPhotoPanel(it,this, photo)
+            val photoPanel = MaxiPhotoPanel(it, this, photo)
             val scrollPane = JScrollPane(photoPanel)
             setZoomComponent(scrollPane)
         }
@@ -240,7 +239,7 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
         //todo Prio 3: Photos zoombar (scollpane)
         //todo Prio 3: 2 Methoden für den gleichen Zweck, eine soll die andere Aufrufen
         app.getSettings()?.photosDirectory?.let {
-            val photoPanel = MaxiSelectedPhotoPanel(it,this, miniSelectedPhotoPanel.getPhoto())
+            val photoPanel = MaxiSelectedPhotoPanel(it, this, miniSelectedPhotoPanel.getPhoto())
             val scrollPane = JScrollPane(photoPanel)
             setZoomComponent(scrollPane)
         }
@@ -269,7 +268,7 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
 
     /**
      * aus Performance-Gründen:
-     * Bei nur minimalen Abweichungen keine neu Addresse suchen.
+     * Bei nur minimalen Abweichungen keine neu Adresse suchen.
      */
     private fun maybeFindAddress() {
         if (distanceStraight(searchedAddressForPosition, offensePosition) > NEARBY_METERS) {
@@ -288,10 +287,11 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
 
     /**
      * Die Methode wird vom OK-Button aufgerufen.
+     * Speichert die Meldung in der Datenbank.
      */
     fun saveNotice() {
-        noticeForm.getNoticeFormFields().saveNotice()
-        val dbRepo = app.getDatabaseRepo()?:return
+        noticeForm.getNoticeFormFields().getNotice()
+        val dbRepo = app.getDatabaseRepo() ?: return
         notice?.let {
             it.setGeoPosition(offensePosition)
             if (it.id == null) {
@@ -306,9 +306,10 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
 
     /**
      * Die Methode wird vom Löschen-Button aufgerufen.
+     * Löscht die Meldung aus der Datenbank.
      */
     fun deleteNotice() {
-        val dbRepo = app.getDatabaseRepo()?:return
+        val dbRepo = app.getDatabaseRepo() ?: return
         notice?.let {
             dbRepo.deleteNotice(it)
             app.noticeDeleted(it)
@@ -320,7 +321,7 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
      * todo Prio 3: asynchroner E-Mail-Versand. Vierten Status einführen, Meldung ist im Postausgang, aber noch nicht gesendet.
      */
     fun sendNotice() {
-        saveNotice()
+        notice = getNotice()
         notice?.let {
             sendEmail()
             it.sentTime = ZonedDateTime.now()
@@ -336,9 +337,31 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
     }
 
     private fun sendEmail() {
-        log.debug("sending email is not yet implemented")
-        // todo Prio 1: E-Mail versenden
+        log.debug("sendEmail()")
+
+        app.getSettings()?.let { setti ->
+            notice?.let { n ->
+                n.recipient?.let { reci ->
+                    val from = EmailAddressWithName(setti.witness.emailAddress, setti.witness.getFullName())
+                    // todo Prio 3: mehrere Empfänger erlauben
+                    val to = setOf(EmailAddressWithName(reci))
+                    var subject = "Anzeige"
+                    n.licensePlate?.let { lic ->
+                        subject += " $lic"
+                    }
+                    val content = buildMailContent(n, setti.witness)
+                    val message = EmailMessage(from, to, subject, content, setOf(from), n.photos)
+                    // todo Prio 3: Nicht jedes Mal einen neuen User Agent instanziieren
+
+                    val agent = EmailUserAgent()
+                    agent.setEmailServerConfig(setti.emailServerConfig)
+                    agent.sendMailAfterConfirmation(message)
+                }
+            }
+        }
     }
+
+
 
     /**
      * tausche nicht ausgewähltes durch ausgewähltes Foto,
@@ -391,7 +414,7 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
      * liefert eine Referenz auf das MaxiMapForm,
      * falls dieses gerade angezeigt wird, sonst null
      */
-    fun getMaxiMapForm(): MaxiMapForm? {
+    private fun getMaxiMapForm(): MaxiMapForm? {
         val zoomComp = getZoomComponent()
         return if (zoomComp is MaxiMapForm) {
             zoomComp
@@ -485,6 +508,7 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
     companion object {
 
         private val LOG = LoggerFactory.getLogger(this::class.java.canonicalName)
+
         /**
          * Berechnet die Distanz zwischen 2 Punkten nach dem Satz vom Pythagoras
          * Die Distanz der Längengrade nimmt vom Equator zu den Poln ab.
@@ -524,6 +548,60 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
             val num = " %.7f".format(distance)
             LOG.debug("distance: $num")
             return distance
+        }
+
+        fun buildMailContent(n: Notice, w: Witness): String {
+            fun htmlEncode(str: String?): String {
+                str?.let {
+                    return it
+                        .replace("&", "&amp;")
+                        .replace("<", "&lt;")
+                        .replace(">", "&gt;")
+                }
+                return ""
+            }
+
+            fun tableRow(label: String, value: String?): String {
+                return if(value == null) {
+                    ""
+                } else {
+                    "|    <tr><td>$label:</td><td>${htmlEncode(value)}</td></tr>\n"
+                }
+            }
+
+            val countryRow = tableRow("Land", n.countrySymbol)
+            val licensePlateRow = tableRow("Kennzeichen", n.licensePlate)
+            val makeRow = tableRow("Marke", n.vehicleMake)
+            val colorRow = tableRow("Farbe", n.color)
+            val content = """
+              |<html>
+              |  <p>Sehr geehrte Damen und Herren,</p>
+              |  <p>hiermit zeige ich, mit der Bitte um Weiterverfolgung, folgende Verkehrsordnungswidrigkeit an:</p>
+              |  <h1>Falldaten</h1>
+              |  <table>
+              $countryRow$licensePlateRow$makeRow$colorRow
+              |  </table>
+              |  <h1>Zeuge</h1>
+              |  <p>....</p>
+              |  <h1>Anlagen</h1>
+              |  <p>....</p>
+              |  <h1>Erklärung</h1>
+              |  <p>Hiermit bestätige ich, dass ich die Datenschutzerklärung zur Kenntnis genommen habe und ihr zustimme.
+              |    Meine oben gemachten Angaben einschließlich meiner Personalien sind zutreffend und vollständig.
+              |    Als Zeuge bin ich zur wahrheitsgemäßen Aussage und auch zu einem möglichen Erscheinen vor Gericht verpflichtet.
+              |    Vorsätzlich falsche Angaben zu angeblichen Ordnungswidrigkeiten können eine Straftat darstellen.
+              |    Ich weiß, dass mir die Kosten des Verfahrens und die Auslagen des Betroffenen auferlegt werden,
+              |    wenn ich vorsätzlich oder leichtfertig eine unwahre Anzeige erstatte.</p>
+              |  <p>Beweisfotos, aus denen Kennzeichen und Tatvorwurf erkennbar hervorgehen, befinden sich im Anhang.
+              |    Bitte prüfen Sie den Sachverhalt auch auf etwaige andere Verstöße, die aus den Beweisfotos zu ersehen sind.</p>
+              |  <p>Bitte bestätigen Sie Ihre Zuständigkeit und den Erhalt dieser Anzeige mit der Zusendung des Aktenzeichens an hz@heikozelt.de.
+              |    Falls Sie nicht zuständig sein sollten, leiten Sie bitte meine Anzeige weiter und informieren Sie mich darüber.
+              |    Sie dürfen meine persönlichen Daten auch weiterleiten und diese für die Dauer des Verfahrens speichern.</p>                                  
+              |  <p>Mit freundlichen Grüßen</p>
+              |  <p>${w.getFullName()}</p>
+              |</html>""".trimMargin()
+            LOG.debug("html content:\n$content")
+            return content
         }
 
         private const val EARTH_CIRCUMFERENCE = 40_075_000.0 // at the equator in meters (not at the poles)

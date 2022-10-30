@@ -2,6 +2,7 @@ package de.heikozelt.wegefrei.emailmessageframe
 
 import de.heikozelt.wegefrei.EmailUserAgent
 import de.heikozelt.wegefrei.model.EmailMessage
+import org.slf4j.LoggerFactory
 import java.awt.Dimension
 import javax.swing.*
 
@@ -24,7 +25,7 @@ import javax.swing.*
  * siehe: https://www.compart.com/en/unicode/U+2B24
  */
 class EmailMessageDialog(private val emailUserAgent: EmailUserAgent) : JFrame() {
-
+    private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
     private val emailMessagePanel = EmailMessagePanel()
     private val statusLabel = JLabel()
     private var emailMessage: EmailMessage? = null
@@ -81,14 +82,17 @@ class EmailMessageDialog(private val emailUserAgent: EmailUserAgent) : JFrame() 
         isVisible = true
     }
 
-    fun loadData(emailMessage: EmailMessage) {
+    fun setEmailMessage(emailMessage: EmailMessage) {
+        log.debug("setEmailMessage(subject=${emailMessage.subject})")
         this.emailMessage = emailMessage
-        emailMessagePanel.loadData(emailMessage)
+        emailMessagePanel.setEmailMessage(emailMessage)
     }
 
     private fun send() {
+        log.debug("send()")
         emailMessage?.let { eMessage ->
-            statusLabel.text = "Wird gesendet..."
+            statusLabel.text = "wird gesendet..."
+            log.debug("subject=${eMessage.subject} wird gesendet")
             sendButton.isEnabled = false
             emailUserAgent.sendMailDirectly(eMessage) { success -> done(success) }
         }

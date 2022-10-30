@@ -5,16 +5,13 @@ import org.slf4j.LoggerFactory
 import javax.swing.*
 
 /**
- * Meldungs-Formular mit Eingabe-Feldern und Buttonleiste
+ * Meldungsformular mit Eingabefeldern und Button-Leiste
  */
 class NoticeForm(private val noticeFrame: NoticeFrame) : JPanel() {
-
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
     private val noticeFormFields = NoticeFormFields(noticeFrame)
     private var noticeFormFieldsScrollPane = JScrollPane(noticeFormFields)
-    //private val noticeFormButtonBar = NoticeFormButtonsBar(noticeFrame)
     private val deleteButton = JButton("Löschen")
-
 
     init {
         val okButton = JButton("Ok")
@@ -59,25 +56,27 @@ class NoticeForm(private val noticeFrame: NoticeFrame) : JPanel() {
                 )
         )
         layout = lay
-
-        /*
-        layout = BorderLayout()
-        background = FORM_BACKGROUND
-        border = NO_BORDER
-        add(noticeFormFieldsScrollPane, BorderLayout.CENTER)
-        add(noticeFormButtonBar, BorderLayout.SOUTH)
-        isVisible = true
-        */
     }
 
-    fun loadData(notice: Notice) {
-        noticeFormFields.loadData()
+    /**
+     * delegiert und aktualisiert die Buttons-Leiste
+     */
+    fun setNotice(notice: Notice) {
+        noticeFormFields.setNotice(notice)
 
-        // Nur beim Bearbeiten einer existierenden Meldung
-        // einen Lösch-Button anzeigen.
+        // Nur beim Bearbeiten einer bereits existierenden Meldung einen Löschen-Button anzeigen.
         if(notice.id != null) {
             deleteButton.isVisible = true
         }
+
+        // todo Prio 2: Text des Senden-Buttons ändern in "E-Mail erneut senden", wenn bereits gesendet.
+    }
+
+    /**
+     * delegiert nur
+     */
+    fun getNotice(): Notice {
+        return noticeFormFields.getNotice()
     }
 
     fun getNoticeFormFields(): NoticeFormFields {

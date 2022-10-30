@@ -37,7 +37,7 @@ class Notice(
      * Breitengrad des Adress-Markers.
      * Y-Achse, Richtung Norden, , z.B. 50.08 für Wiesbaden.
      * Die Geo-Koordinaten müssen nicht zwingend ans Ordnungsamt übermittelt werden.
-     * Sie sind aber zur eigenen Nutzung sinnvoll.
+     * Sie sind aber zur eigenen Nutzung sehr sinnvoll.
      */
     @Column
     var latitude: Float? = null,
@@ -168,6 +168,9 @@ class Notice(
         }
     }
 
+    /**
+     * Achtung: liefert bei jedem Aufruf ein neues Objekt
+     */
     fun getGeoPosition(): GeoPosition? {
         val lat = latitude
         val lon = longitude

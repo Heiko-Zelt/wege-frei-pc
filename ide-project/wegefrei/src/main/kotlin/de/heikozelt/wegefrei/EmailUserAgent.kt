@@ -5,14 +5,12 @@ import de.heikozelt.wegefrei.gui.SmtpAuthenticator
 import de.heikozelt.wegefrei.json.EmailServerConfig
 import de.heikozelt.wegefrei.json.Tls
 import de.heikozelt.wegefrei.model.EmailMessage
-import de.heikozelt.wegefrei.settingsframe.SettingsFormFields
 import org.slf4j.LoggerFactory
 import java.util.*
 import javax.mail.Message
 import javax.mail.MessagingException
 import javax.mail.Session
 import javax.mail.Transport
-import javax.mail.internet.InternetAddress
 import javax.mail.internet.MimeMessage
 import javax.swing.JOptionPane
 
@@ -26,7 +24,8 @@ import javax.swing.JOptionPane
  *   <li>Sends email to SMTP server</li>
  *   <li>Calls back if successful or not</li>
  * </ol>
- * The E-Mail-Body must be HTML code.
+ * The email body must be HTML code.
+ * The email may have photos attached.
  * todo Prio 3: Einstellungen speichern nach erfolgreichem Test?
  * todo Prio 2: Passwort merken, aber wie jederzeit änderbar?
  * Sobald der E-Mail-Versand einmal gescheitert ist, Passwort wieder vergessen.
@@ -44,7 +43,7 @@ class EmailUserAgent {
      */
     fun sendMailAfterConfirmation(emailMessage: EmailMessage) {
         val emailMessageDialog = EmailMessageDialog(this)
-        emailMessageDialog.loadData(emailMessage)
+        emailMessageDialog.setEmailMessage(emailMessage)
     }
 
     /**
@@ -82,10 +81,11 @@ class EmailUserAgent {
             log.debug("session: $session")
 
             val msg = MimeMessage(session)
-            msg.addHeader("User-Agent", SettingsFormFields.MAIL_USER_AGENT);
-            msg.setFrom(InternetAddress(emailMessage.fromAddress, emailMessage.fromName))
-            msg.setRecipient(Message.RecipientType.TO, InternetAddress(emailMessage.toAddress, emailMessage.toName))
-            msg.setSubject(emailMessage.subject, "UTF-8");
+            msg.addHeader("User-Agent", MAIL_USER_AGENT)
+            msg.setFrom(emailMessage.from.asInternetAddress())
+            emailMessage.to.forEach{ msg.addRecipient(Message.RecipientType.TO, it.asInternetAddress()) }
+            emailMessage.cc?.forEach{ msg.addRecipient(Message.RecipientType.CC, it.asInternetAddress()) }
+            msg.setSubject(emailMessage.subject, "UTF-8")
             msg.setContent(emailMessage.content, "text/html; charset=utf-8")
 
             try {
@@ -93,7 +93,7 @@ class EmailUserAgent {
                 doneCallback(true)
                 JOptionPane.showMessageDialog(
                     null,
-                    "Die E-Mail-Nachricht wurde erfolgreich versendet.\n\nBitte prüfe deinen Post-Eingang!",
+                    "Die E-Mail-Nachricht wurde erfolgreich versendet.",
                     "E-Mail abgeschickt",
                     JOptionPane.INFORMATION_MESSAGE
                 )
@@ -117,6 +117,12 @@ class EmailUserAgent {
                     JOptionPane.ERROR_MESSAGE
                 )
             }
+        }?: run {
+            log.error("emailServerConfig is null")
         }
+    }
+
+    companion object {
+        const val MAIL_USER_AGENT = "Wege frei! https://github.com/Heiko-Zelt/wege-frei-pc"
     }
 }

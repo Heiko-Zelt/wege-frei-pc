@@ -8,6 +8,7 @@ import de.heikozelt.wegefrei.gui.TrimmingTextField
 import de.heikozelt.wegefrei.json.EmailServerConfig
 import de.heikozelt.wegefrei.json.Settings
 import de.heikozelt.wegefrei.json.Tls
+import de.heikozelt.wegefrei.model.EmailAddressWithName
 import de.heikozelt.wegefrei.model.EmailMessage
 import org.slf4j.LoggerFactory
 import java.awt.Dimension
@@ -289,6 +290,7 @@ class SettingsFormFields : JPanel() {
         val fullName = "${givenNameTextField.text.trim()} ${surnameTextField.text.trim()}"
         val senderName = fullName.ifBlank { TEST_MAIL_FROM_NAME }
         val senderEmailAddress = emailAddressTextField.text.trim()
+        val from = EmailAddressWithName(senderName,senderEmailAddress)
 
         val emailServerConfig = EmailServerConfig(
             smtpHostTextField.text.trim(),
@@ -297,11 +299,10 @@ class SettingsFormFields : JPanel() {
             Tls.values()[encryptionComboBox.selectedIndex]
         )
 
+
         val eMessage = EmailMessage(
-            senderName,
-            senderEmailAddress,
-            senderName,
-            senderEmailAddress,
+            from,
+            setOf(from),
             TEST_MAIL_SUBJECT,
             TEST_MAIL_CONTENT
         )
@@ -312,7 +313,6 @@ class SettingsFormFields : JPanel() {
 
     companion object {
         const val MAX_COLUMNS = 15
-        const val MAIL_USER_AGENT = "Wege frei! https://github.com/Heiko-Zelt/wege-frei-pc"
         const val TEST_MAIL_SUBJECT = "Wege frei! Test-E-Mail"
         const val TEST_MAIL_FROM_NAME = "Wege frei!"
         const val TEST_MAIL_CONTENT =

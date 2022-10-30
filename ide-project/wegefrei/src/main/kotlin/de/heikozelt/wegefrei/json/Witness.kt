@@ -26,6 +26,10 @@ data class Witness (
     var telephoneNumber: String = ""
 ): Cloneable {
 
+    fun getFullName(): String {
+        return "$givenName $surname"
+    }
+
     /**
      * Deep copy.
      * There is no difference to copy().

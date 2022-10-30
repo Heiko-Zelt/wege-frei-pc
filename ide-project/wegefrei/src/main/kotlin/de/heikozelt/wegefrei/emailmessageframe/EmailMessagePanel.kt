@@ -82,9 +82,10 @@ class EmailMessagePanel : JPanel() {
         layout = lay
     }
 
-    fun loadData(emailMessage: EmailMessage) {
-        fromField.text = "${emailMessage.fromName} <${emailMessage.fromAddress}>"
-        toField.text = "${emailMessage.toName} <${emailMessage.toAddress}>"
+    fun setEmailMessage(emailMessage: EmailMessage) {
+        fromField.text = emailMessage.from.asText()
+        // todo Prio 3: ggf. mehrere Empfänger und CC anzeigen
+        toField.text = emailMessage.to.first().asText()
         subjectField.text = emailMessage.subject
         contentField.text = emailMessage.content
         //revalidate()

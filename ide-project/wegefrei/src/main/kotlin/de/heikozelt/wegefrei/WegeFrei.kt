@@ -130,7 +130,7 @@ open class WegeFrei(private val settingsRepo: SettingsRepo = SettingsFileRepo())
         noticeFrames.add(noticeFrame)
         EventQueue.invokeLater {
             // Thread.sleep(5000) // simulate slowness
-            noticeFrame.loadData(notice)
+            noticeFrame.setNotice(notice)
         }
     }
 

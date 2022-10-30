@@ -1,5 +1,6 @@
 package de.heikozelt.wegefrei.noticeframe
 
+import de.heikozelt.wegefrei.entities.Notice
 import de.heikozelt.wegefrei.entities.Photo
 import de.heikozelt.wegefrei.gui.*
 import de.heikozelt.wegefrei.maps.MiniMap
@@ -26,6 +27,7 @@ import javax.swing.text.AbstractDocument
 class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel(), SelectedPhotosObserver {
 
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
+
     private val countrySymbolComboBox = JComboBox(CountrySymbol.COUNTRY_SYMBOLS)
     private val licensePlateTextField = TrimmingTextField(10)
     private val vehicleMakeComboBox = JComboBox(ListVehicleMakes.VEHICLE_MAKES)
@@ -49,8 +51,13 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel(), Selecte
     private val inspectionMonthTextField = JTextField(2)
     private val monthYearSeparatorLabel = JLabel("/")
     private val inspectionYearTextField = JTextField(4)
+    // Idealfall: Addresse wird automatisch eingetragen, Ausnahmefall Benutzer wählt aus Adressbuch
+    // todo Prio 3: Auswahl des Empfängers aus Addressbuch (Button öffnet "AddressChooser")
+    // todo Prio 3: eine Adresse aus der Datenbank anhand der GeoPosition vorschlagen
     private val recipientTextField = TrimmingTextField(30)
     private val noteTextArea = JTextArea(3, 40)
+
+    private var notice: Notice? = null
 
     init {
         log.debug("init")
@@ -295,8 +302,8 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel(), Selecte
      * Initialisieren der einzelnen Eingabe-Felder
      * Mapping von Notice zu GUI-Components
      */
-    fun loadData() {
-        val notice = noticeFrame.getNotice() ?: return
+    fun setNotice(notice: Notice) {
+        this.notice = notice
 
         notice.getGeoPosition()?.let {
             miniMap.setOffensePosition(it)
@@ -341,29 +348,31 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel(), Selecte
      * Mapping der Werte der GUI-Komponenten zu Notice
      */
     // todo Prio 1: form validation, Validierungsfehler bei Eingabefeldern anzeigen
-    fun saveNotice() {
-        val notice = noticeFrame.getNotice() ?: return
+    fun getNotice(): Notice {
+        // Normalerweise sollte vorher setNotice() aufgerufen worden sein.
+        // Aber falls nicht, wird ein neues Notice-Objekt instanziiert.
+        val n = notice?:Notice()
 
-        notice.photos = noticeFrame.getSelectedPhotos().getPhotos()
+        n.photos = noticeFrame.getSelectedPhotos().getPhotos()
 
         val selectedCountry = countrySymbolComboBox.selectedObjects[0] as CountrySymbol
-        notice.countrySymbol = if (selectedCountry.countryName == null) {
+        n.countrySymbol = if (selectedCountry.countryName == null) {
             null
         } else {
             selectedCountry.abbreviation
         }
 
-        notice.licensePlate = trimmedOrNull(licensePlateTextField.text)
+        n.licensePlate = trimmedOrNull(licensePlateTextField.text)
 
         val selectedVehicleMake = vehicleMakeComboBox.selectedObjects[0] as String
-        notice.vehicleMake = if (selectedVehicleMake == "--") {
+        n.vehicleMake = if (selectedVehicleMake == "--") {
             null
         } else {
             selectedVehicleMake
         }
 
         val selectedColor = colorComboBox.selectedObjects[0] as VehicleColor
-        notice.color = if (selectedColor.color == null) {
+        n.color = if (selectedColor.color == null) {
             null
         } else {
             selectedColor.colorName
@@ -371,12 +380,12 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel(), Selecte
 
         // todo Prio 1: map addressLocation
 
-        notice.street = trimmedOrNull(streetTextField.text)
-        notice.zipCode = trimmedOrNull(zipCodeTextField.text)
-        notice.town = trimmedOrNull(townTextField.text)
-        notice.locationDescription = trimmedOrNull(locationDescriptionTextField.text)
+        n.street = trimmedOrNull(streetTextField.text)
+        n.zipCode = trimmedOrNull(zipCodeTextField.text)
+        n.town = trimmedOrNull(townTextField.text)
+        n.locationDescription = trimmedOrNull(locationDescriptionTextField.text)
         val selectedOffense = offenseComboBox.selectedItem
-        notice.offense = if (selectedOffense is Offense) {
+        n.offense = if (selectedOffense is Offense) {
             selectedOffense.id
         } else {
             null
@@ -384,7 +393,7 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel(), Selecte
 
         val format = DateTimeFormatter.ofPattern("d.M.yyyy")
         val obsDateTxt = observationDateTextField.text
-        notice.observationTime = if (obsDateTxt.isBlank()) {
+        n.observationTime = if (obsDateTxt.isBlank()) {
             null
         } else {
             val dat: LocalDate = LocalDate.parse(obsDateTxt, format)
@@ -402,25 +411,26 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel(), Selecte
             ZonedDateTime.of(dat, tim, ZoneId.systemDefault())
         }
 
-        notice.duration = intOrNull(durationTextField.text)
-        notice.obstruction = obstructionCheckBox.isSelected
-        notice.endangering = endangeringCheckBox.isSelected
-        notice.environmentalStickerMissing = environmentalStickerCheckBox.isSelected
-        notice.vehicleInspectionExpired = vehicleInspectionStickerCheckBox.isSelected
-        notice.vehicleInspectionYear = if (notice.vehicleInspectionExpired) {
+        n.duration = intOrNull(durationTextField.text)
+        n.obstruction = obstructionCheckBox.isSelected
+        n.endangering = endangeringCheckBox.isSelected
+        n.environmentalStickerMissing = environmentalStickerCheckBox.isSelected
+        n.vehicleInspectionExpired = vehicleInspectionStickerCheckBox.isSelected
+        n.vehicleInspectionYear = if (n.vehicleInspectionExpired) {
             shortOrNull(inspectionYearTextField.text)
         } else {
             null
         }
-        notice.vehicleInspectionMonth = if (notice.vehicleInspectionExpired) {
+        n.vehicleInspectionMonth = if (n.vehicleInspectionExpired) {
             byteOrNull(inspectionMonthTextField.text)
         } else {
             null
         }
-        notice.vehicleAbandoned = abandonedCheckBox.isSelected
-        notice.warningLights = warningLightsCheckBox.isSelected
-        notice.recipient = trimmedOrNull(recipientTextField.text)
-        notice.note = trimmedOrNull(noteTextArea.text)
+        n.vehicleAbandoned = abandonedCheckBox.isSelected
+        n.warningLights = warningLightsCheckBox.isSelected
+        n.recipient = trimmedOrNull(recipientTextField.text)
+        n.note = trimmedOrNull(noteTextArea.text)
+        return n
     }
 
     fun getMiniMap(): MiniMap {
@@ -444,8 +454,11 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel(), Selecte
      * wenn die Meldung bereits versendet wurde.
      */
     fun enableOrDisableEditing() {
-        val notice = noticeFrame.getNotice()
-        val enab = (notice != null) && !notice.isSent()
+        var enab = false
+        notice?.let {
+            enab = !it.isSent()
+        }
+        //val enab = (notice != null) && !notice.isSent()
         countrySymbolComboBox.isEnabled = enab
         licensePlateTextField.isEnabled = enab
         vehicleMakeComboBox.isEnabled = enab
@@ -588,6 +601,4 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel(), Selecte
             }
         }
     }
-
-
 }
