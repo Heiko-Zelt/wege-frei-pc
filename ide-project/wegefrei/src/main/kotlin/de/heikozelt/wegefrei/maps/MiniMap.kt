@@ -1,9 +1,9 @@
 package de.heikozelt.wegefrei.maps
 
-import de.heikozelt.wegefrei.noticeframe.NoticeFrame
 import de.heikozelt.wegefrei.gui.Styles.Companion.HIGHLIGHT_BORDER
 import de.heikozelt.wegefrei.gui.Styles.Companion.NORMAL_BORDER
 import de.heikozelt.wegefrei.model.SelectedPhotosObserver
+import de.heikozelt.wegefrei.noticeframe.NoticeFrame
 import org.slf4j.LoggerFactory
 import java.awt.Dimension
 
@@ -23,8 +23,9 @@ class MiniMap(
     init {
         log.debug("init")
         border = NORMAL_BORDER
-        size = Dimension(150, 150)
         preferredSize = Dimension(150, 150)
+        minimumSize = preferredSize
+        maximumSize = preferredSize
         addMouseListener(MiniMapMouseListener(noticeFrame))
     }
 

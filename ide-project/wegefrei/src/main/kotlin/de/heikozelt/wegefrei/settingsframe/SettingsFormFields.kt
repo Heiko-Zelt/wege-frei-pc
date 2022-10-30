@@ -3,6 +3,7 @@ package de.heikozelt.wegefrei.settingsframe
 import de.heikozelt.wegefrei.EmailUserAgent
 import de.heikozelt.wegefrei.gui.CharPredicateDocFilter
 import de.heikozelt.wegefrei.gui.PatternVerifier
+import de.heikozelt.wegefrei.gui.Styles
 import de.heikozelt.wegefrei.gui.TrimmingTextField
 import de.heikozelt.wegefrei.json.EmailServerConfig
 import de.heikozelt.wegefrei.json.Settings
@@ -45,13 +46,6 @@ class SettingsFormFields : JPanel() {
     private val databaseDirButton = JButton("Ordner auswählen")
 
     init {
-        /**
-         * set maximum height to preferred height
-         */
-        fun restrictHeight(component: JComponent) {
-            component.maximumSize = Dimension(component.maximumSize.width, component.preferredSize.height)
-        }
-
         /**
          * increase minimum height by constant factor
          */
@@ -227,9 +221,10 @@ class SettingsFormFields : JPanel() {
                 //.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.PREFERRED_SIZE, Int.MAX_VALUE)
         )
         layout = lay
-
-        components.filterIsInstance<JTextField>().forEach(::restrictHeight)
-        components.filterIsInstance<JComboBox<*>>().forEach(::restrictHeight)
+        components.filterIsInstance<JTextField>().forEach(Styles::restrictHeight)
+        components.filterIsInstance<JComboBox<*>>().forEach(Styles::restrictSize)
+        Styles.restrictSize(zipCodeTextField)
+        Styles.restrictSize(smtpPortTextField)
     }
 
     /**

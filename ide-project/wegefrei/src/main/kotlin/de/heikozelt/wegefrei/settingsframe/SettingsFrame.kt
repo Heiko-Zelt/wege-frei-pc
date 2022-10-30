@@ -3,6 +3,7 @@ package de.heikozelt.wegefrei.settingsframe
 import de.heikozelt.wegefrei.WegeFrei
 import de.heikozelt.wegefrei.json.Settings
 import org.slf4j.LoggerFactory
+import java.awt.Dimension
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 import javax.swing.*
@@ -59,9 +60,12 @@ class SettingsFrame(private val app: WegeFrei) : JFrame() {
         lay.linkSize(SwingConstants.HORIZONTAL, okButton, cancelButton)
         layout = lay
 
-
+        minimumSize = Dimension(250, 250)
+        //pack()
+        //size = Dimension(width + 100, height + 50)
+        size = Dimension(preferredSize.width + 120, preferredSize.height + 40)
         //setSize(600, 600)
-        pack()
+
         isVisible = true
         defaultCloseOperation = WindowConstants.DO_NOTHING_ON_CLOSE
         //addWindowListener(SettingsWindowListener(this))

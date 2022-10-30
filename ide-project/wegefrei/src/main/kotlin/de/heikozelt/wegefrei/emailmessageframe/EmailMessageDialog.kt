@@ -41,7 +41,6 @@ class EmailMessageDialog(private val emailUserAgent: EmailUserAgent) : JFrame() 
 
         title = "E-Mail-Nachricht"
         defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
-        size = Dimension(400, 300)
         val lay = GroupLayout(contentPane)
         lay.autoCreateGaps = false
         lay.autoCreateContainerGaps = false
@@ -77,6 +76,8 @@ class EmailMessageDialog(private val emailUserAgent: EmailUserAgent) : JFrame() 
         )
         lay.linkSize(SwingConstants.HORIZONTAL, sendButton, cancelButton)
         layout = lay
+        minimumSize = Dimension(250, 250)
+        size = Dimension(400, 300)
         isVisible = true
     }
 

@@ -1,6 +1,7 @@
 package de.heikozelt.wegefrei.gui
 
 import java.awt.Color
+import java.awt.Dimension
 import java.awt.Font
 import java.awt.Insets
 import javax.swing.*
@@ -12,6 +13,27 @@ import javax.swing.border.Border
  */
 class Styles {
     companion object {
+        /**
+         * set maximum height to preferred height
+         */
+        fun restrictHeight(component: JComponent) {
+            component.maximumSize = Dimension(component.maximumSize.width, component.preferredSize.height)
+        }
+
+        /**
+         * set maximum width to preferred width
+         */
+        fun restrictWidth(component: JComponent) {
+            component.maximumSize = Dimension(component.preferredSize.width, component.maximumSize.height)
+        }
+
+        /**
+         * set maximum size to preferred size
+         */
+        fun restrictSize(component: JComponent) {
+            component.maximumSize = component.preferredSize
+        }
+
         val TEXTFIELD_FONT = JTextField().font ?: Font("Dialog", Font.PLAIN, 12)
 
         const val BUTTONS_DISTANCE = 15
