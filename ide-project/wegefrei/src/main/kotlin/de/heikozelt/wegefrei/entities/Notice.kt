@@ -1,5 +1,6 @@
 package de.heikozelt.wegefrei.entities
 
+import de.heikozelt.wegefrei.model.CountrySymbol
 import de.heikozelt.wegefrei.model.NoticeState
 import jakarta.persistence.*
 import org.jxmapviewer.viewer.GeoPosition
@@ -181,9 +182,67 @@ class Notice(
         }
     }
 
+    fun getGeoPositionFormatted(): String? {
+        return if (latitude != null && longitude != null) {
+            val lat = "%.5f".format(latitude)
+            val lon = "%.5f".format(longitude)
+            "$lat, $lon"
+        } else {
+            null
+        }
+    }
+
     fun setGeoPosition(position: GeoPosition?) {
         latitude = position?.latitude?.toFloat()
         longitude = position?.longitude?.toFloat()
+    }
+
+    fun getAddress(): String? {
+        return if(street == null && zipCode == null && town == null ) {
+            null
+        } else {
+            "$street, $zipCode $town"
+        }
+    }
+
+    fun getDurationFormatted(): String? {
+        return duration?.let {
+            when(it) {
+                0 -> "weniger als 1 Minute"
+                1 -> "1 Minute"
+                else -> "${duration?.toString()} Minuten"
+            }
+        }
+    }
+
+    fun getCountryFormatted(): String? {
+        return countrySymbol?.let {
+            val name = CountrySymbol.fromAbbreviation(it).countryName
+            "$it ($name)"
+        }
+    }
+
+    fun getCircumstancesHtml(): String? {
+        val lines = mutableListOf<String>()
+        if(vehicleAbandoned) lines.add("Das Fahrzeug war verlassen")
+        if(warningLights) lines.add("Die Warnblinkanlage war eingeschaltet")
+        if(obstruction) lines.add("mit Behinderung")
+        if(endangering) lines.add("mit Gefährdung")
+        if(environmentalStickerMissing) lines.add("Die Umweltplakette fehlte/war ungültig")
+        if(vehicleInspectionExpired) lines.add("Die HU-Plakette war abgelaufen")
+        return if(lines.isEmpty()) {
+            null
+        } else {
+            lines.joinToString("<br>")
+        }
+    }
+
+    fun getInspectionMonthYear(): String? {
+        return if(vehicleInspectionMonth == null || vehicleInspectionYear == null) {
+            null
+        } else {
+            "$vehicleInspectionMonth/$vehicleInspectionYear"
+        }
     }
 
     /**

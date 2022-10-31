@@ -9,10 +9,7 @@ import de.heikozelt.wegefrei.gui.Styles.Companion.FRAME_BACKGROUND
 import de.heikozelt.wegefrei.jobs.AddressWorker
 import de.heikozelt.wegefrei.json.Witness
 import de.heikozelt.wegefrei.maps.MaxiMapForm
-import de.heikozelt.wegefrei.model.EmailAddressWithName
-import de.heikozelt.wegefrei.model.EmailMessage
-import de.heikozelt.wegefrei.model.SelectedPhotos
-import de.heikozelt.wegefrei.model.SelectedPhotosObserver
+import de.heikozelt.wegefrei.model.*
 import org.jxmapviewer.viewer.GeoPosition
 import org.slf4j.LoggerFactory
 import java.awt.Component
@@ -540,13 +537,15 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
             val lat2 = positionB.latitude
             val lon1 = positionA.longitude
             val lon2 = positionB.longitude
-            val latDegrees = (lat1 + lat2) / 2 // Gradmaß
-            val latRadian = latDegrees * (PI / 180) // Bogenmaß
+            val latDegrees = (lat1 + lat2) / 2f // Gradmaß
+            val latRadian = latDegrees * (PI / 180f) // Bogenmaß
             val dx = METERS_PER_DEGREE * cos(latRadian) * abs(lon1 - lon2)
+            val dxText = "%.10f".format(dx)
             val dy = METERS_PER_DEGREE * abs(lat1 - lat2)
+            val dyText = "%.10f".format(dy)
             val distance = sqrt(dx * dx + dy * dy)
-            val num = " %.7f".format(distance)
-            LOG.debug("distance: $num")
+            val distanceText = "%.10f".format(distance)
+            LOG.debug("in meters: dx: $dxText, dy: $dyText, distance: $distanceText")
             return distance
         }
 
@@ -562,25 +561,44 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
             }
 
             fun tableRow(label: String, value: String?): String {
-                return if(value == null) {
+                return if(value.isNullOrBlank()) {
                     ""
                 } else {
                     "|    <tr><td>$label:</td><td>${htmlEncode(value)}</td></tr>\n"
                 }
             }
 
-            val countryRow = tableRow("Land", n.countrySymbol)
+            fun tableRowHtmlValue(label: String, value: String?): String {
+                return if(value.isNullOrBlank()) {
+                    ""
+                } else {
+                    "|    <tr><td>$label:</td><td>$value</td></tr>\n"
+                }
+            }
+
+
+            val countryRow = tableRow("Landeskennzeichen", n.getCountryFormatted())
             val licensePlateRow = tableRow("Kennzeichen", n.licensePlate)
             val makeRow = tableRow("Marke", n.vehicleMake)
             val colorRow = tableRow("Farbe", n.color)
+            val offenseAddressRow = tableRow("Tatortadresse", n.getAddress())
+            val locationDescriptionRow = tableRow("Tatortbeschreibung", n.locationDescription)
+            val positionRow = tableRow("Geoposition", n.getGeoPositionFormatted())
+            val offenseRow = tableRow("Verstoß", Offense.fromId(n.offense).text)
+            val circumstancesRow = tableRowHtmlValue("Umstände", n.getCircumstancesHtml())
+            val inspectionDateRow = tableRow("HU-Fälligkeit", n.getInspectionMonthYear())
+            val observationTimeRow = tableRow("Beobachtungszeit", n.getObservationTimeFormatted())
+            val observationDurationRow = tableRow("Beobachtungsdauer", n.getDurationFormatted())
+            val noteRow = tableRow("Hinweis", n.note)
+
             val content = """
               |<html>
               |  <p>Sehr geehrte Damen und Herren,</p>
               |  <p>hiermit zeige ich, mit der Bitte um Weiterverfolgung, folgende Verkehrsordnungswidrigkeit an:</p>
               |  <h1>Falldaten</h1>
               |  <table>
-              $countryRow$licensePlateRow$makeRow$colorRow
-              |  </table>
+              $countryRow$licensePlateRow$makeRow$colorRow$offenseAddressRow$locationDescriptionRow$positionRow$offenseRow$circumstancesRow$inspectionDateRow$observationTimeRow$observationDurationRow$noteRow
+              |  </table>  
               |  <h1>Zeuge</h1>
               |  <p>....</p>
               |  <h1>Anlagen</h1>

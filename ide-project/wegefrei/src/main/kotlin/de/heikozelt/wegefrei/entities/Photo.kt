@@ -105,6 +105,16 @@ class Photo (
         }
     }
 
+    fun getGeoPositionFormatted(): String? {
+        return if (latitude != null && longitude != null) {
+            val lat = "%.5f".format(latitude)
+            val lon = "%.5f".format(longitude)
+            "$lat, $lon"
+        } else {
+            null
+        }
+    }
+
     /**
      * liefert einen ToolTipText
      * Beispiel:
@@ -124,8 +134,8 @@ class Photo (
         if (date != null) {
             lines.add(getDateFormatted())
         }
-        if (latitude != null && longitude != null) {
-            lines.add("$latitude, $longitude")
+        getGeoPositionFormatted()?.let {
+            lines.add(it)
         }
         val text = "<html>${lines.joinToString("<br>")}</html>"
         //log.debug(text)
