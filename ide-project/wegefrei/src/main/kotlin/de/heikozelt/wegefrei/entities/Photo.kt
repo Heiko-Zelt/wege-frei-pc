@@ -115,6 +115,10 @@ class Photo (
         }
     }
 
+    fun getHashHex(): String? {
+        return hash?.joinToString(separator = "") { byte -> "%02x".format(byte) }
+    }
+
     /**
      * liefert einen ToolTipText
      * Beispiel:

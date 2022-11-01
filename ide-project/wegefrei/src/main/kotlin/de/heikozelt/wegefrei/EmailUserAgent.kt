@@ -11,7 +11,9 @@ import javax.mail.Message
 import javax.mail.MessagingException
 import javax.mail.Session
 import javax.mail.Transport
+import javax.mail.internet.MimeBodyPart
 import javax.mail.internet.MimeMessage
+import javax.mail.internet.MimeMultipart
 import javax.swing.JOptionPane
 
 /**
@@ -88,7 +90,18 @@ class EmailUserAgent {
             emailMessage.tos.forEach{ msg.addRecipient(Message.RecipientType.TO, it.asInternetAddress()) }
             emailMessage.ccs.forEach{ msg.addRecipient(Message.RecipientType.CC, it.asInternetAddress()) }
             msg.setSubject(emailMessage.subject, "UTF-8")
-            msg.setContent(emailMessage.content, "text/html; charset=utf-8")
+
+
+            val multipart = MimeMultipart()
+            val mainPart = MimeBodyPart()
+            mainPart.setText(emailMessage.coverLetter, "utf-8", "html")
+            multipart.addBodyPart(mainPart)
+
+            emailMessage.attachments.forEach {
+                multipart.addBodyPart(it.asMimeBodyPart())
+            }
+
+            msg.setContent(multipart)
 
             try {
                 Transport.send(msg)

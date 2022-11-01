@@ -13,6 +13,7 @@ import de.heikozelt.wegefrei.model.*
 import org.jxmapviewer.viewer.GeoPosition
 import org.slf4j.LoggerFactory
 import java.awt.Component
+import java.nio.file.Paths
 import java.time.ZonedDateTime
 import java.util.*
 import javax.swing.*
@@ -361,8 +362,13 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
                     }
                     val content = buildMailContent(n, setti.witness)
                     val message = EmailMessage(from, tos, subject, content)
-                    if(from != to) message.ccs.add(from)
-                    message.attachedPhotos.addAll(selectedPhotos.getPhotos())
+                    if(from.address != to.address) message.ccs.add(from)
+
+                    selectedPhotos.getPhotos().forEach {
+                        val path = Paths.get(setti.photosDirectory, it.filename)
+                        val attachment = EmailAttachment(path)
+                        message.attachments.add(attachment)
+                    }
 
                     // todo Prio 3: Nicht jedes Mal einen neuen User Agent instanziieren
 
@@ -611,6 +617,16 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
             val witnessEmailRow = tableRow("E-Mail", w.emailAddress)
             val telephoneRow = tableRow("Telefon", w.telephoneNumber)
 
+            val attachmentsSection = if(n.photos.isEmpty()) {
+                ""
+            } else {
+                val sb = StringBuilder()
+                sb.append("|  <h1>Anlagen</h1>\n")
+                sb.append("|  <ol>\n")
+                n.photos.forEach { sb.append("|    <li>${it.filename} (SHA1: ${it.getHashHex()})</li>\n")}
+                sb.append("|  </ol>\n")
+            }
+
             val content = """
               |<html>
               |  <p>Sehr geehrte Damen und Herren,</p>
@@ -623,8 +639,7 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
               |  <table>
               $nameRow$witnessAddressRow$witnessEmailRow$telephoneRow  
               |  </table>
-              |  <h1>Anlagen</h1>
-              |  <p>....</p>
+              $attachmentsSection
               |  <h1>Erklärung</h1>
               |  <p>Hiermit bestätige ich, dass ich die Datenschutzerklärung zur Kenntnis genommen habe und ihr zustimme.
               |    Meine oben gemachten Angaben einschließlich meiner Personalien sind zutreffend und vollständig.

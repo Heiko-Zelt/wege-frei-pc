@@ -1,6 +1,5 @@
 package de.heikozelt.wegefrei.model
 
-import de.heikozelt.wegefrei.entities.Photo
 import java.util.*
 
 /**
@@ -12,7 +11,7 @@ data class EmailMessage(
     val from: EmailAddressWithName,
     val tos: TreeSet<EmailAddressWithName> = TreeSet<EmailAddressWithName>(),
     val subject: String,
-    val content: String,
+    val coverLetter: String,
     val ccs: TreeSet<EmailAddressWithName> = TreeSet<EmailAddressWithName>(),
-    val attachedPhotos: TreeSet<Photo> = TreeSet<Photo>()
+    val attachments: LinkedList<EmailAttachment> = LinkedList<EmailAttachment>()
 )
