@@ -55,7 +55,7 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel(), Selecte
     // todo Prio 3: Auswahl des Empfängers aus Addressbuch (Button öffnet "AddressChooser")
     // todo Prio 3: eine Adresse aus der Datenbank anhand der GeoPosition vorschlagen
     private val recipientTextField = TrimmingTextField(30)
-    private val noteTextArea = JTextArea(3, 40)
+    private val noteTextArea = JTextArea(2, 40)
 
     private var notice: Notice? = null
 
@@ -63,15 +63,13 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel(), Selecte
         log.debug("init")
 
         // GUI components
-        val countrySymbolLabel = JLabel("Landeskennzeichen:")
+        val licensePlateLabel = JLabel("<html>Landes- & Kfz-Kennzeichen<sup>*</sup>:</html>")
         countrySymbolComboBox.renderer = CountrySymbolListCellRenderer()
-        val licensePlateLabel = JLabel("<html>Kfz-Kennzeichen:<sup>*</sup></html>")
         val licensePlateDoc = licensePlateTextField.document
         if (licensePlateDoc is AbstractDocument) {
             licensePlateDoc.documentFilter = UppercaseDocumentFilter()
         }
-        val vehicleMakeLabel = JLabel("Fahrzeugmarke:")
-        val colorLabel = JLabel("Farbe:")
+        val vehicleMakeLabel = JLabel("Fahrzeugmarke & Farbe:")
         colorComboBox.renderer = ColorListCellRenderer()
         colorComboBox.maximumRowCount = VehicleColor.COLORS.size
         miniMap.toolTipText = "Bitte positionieren Sie den roten Pin."
@@ -146,10 +144,8 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel(), Selecte
                     lay.createSequentialGroup()
                         .addGroup( // labels
                             lay.createParallelGroup(GroupLayout.Alignment.LEADING)
-                                .addComponent(countrySymbolLabel)
                                 .addComponent(licensePlateLabel)
                                 .addComponent(vehicleMakeLabel)
-                                .addComponent(colorLabel)
                                 .addComponent(coordinatesLabel)
                                 .addComponent(streetLabel)
                                 .addComponent(zipCodeTownLabel)
@@ -163,10 +159,16 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel(), Selecte
                         )
                         .addGroup( // form fields
                             lay.createParallelGroup(GroupLayout.Alignment.LEADING)
-                                .addComponent(countrySymbolComboBox)
-                                .addComponent(licensePlateTextField)
-                                .addComponent(vehicleMakeComboBox)
-                                .addComponent(colorComboBox)
+                                .addGroup(
+                                    lay.createSequentialGroup()
+                                        .addComponent(countrySymbolComboBox)
+                                        .addComponent(licensePlateTextField)
+                                )
+                                .addGroup(
+                                    lay.createSequentialGroup()
+                                        .addComponent(vehicleMakeComboBox)
+                                        .addComponent(colorComboBox)
+                                )
                                 .addComponent(miniMap)
                                 .addComponent(streetTextField)
                                 .addGroup(
@@ -217,19 +219,11 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel(), Selecte
             lay.createSequentialGroup()
                 .addGroup(
                     lay.createParallelGroup(GroupLayout.Alignment.CENTER)
-                        .addComponent(countrySymbolLabel).addComponent(countrySymbolComboBox)
+                        .addComponent(licensePlateLabel).addComponent(countrySymbolComboBox).addComponent(licensePlateTextField)
                 )
                 .addGroup(
                     lay.createParallelGroup(GroupLayout.Alignment.CENTER)
-                        .addComponent(licensePlateLabel).addComponent(licensePlateTextField)
-                )
-                .addGroup(
-                    lay.createParallelGroup(GroupLayout.Alignment.CENTER)
-                        .addComponent(vehicleMakeLabel).addComponent(vehicleMakeComboBox)
-                )
-                .addGroup(
-                    lay.createParallelGroup(GroupLayout.Alignment.CENTER)
-                        .addComponent(colorLabel).addComponent(colorComboBox)
+                        .addComponent(vehicleMakeLabel).addComponent(vehicleMakeComboBox).addComponent(colorComboBox)
                 )
                 .addGroup(
                     lay.createParallelGroup(GroupLayout.Alignment.CENTER)
@@ -288,6 +282,7 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel(), Selecte
         components.filterIsInstance<JTextField>().forEach(Styles::restrictHeight)
         components.filterIsInstance<JComboBox<*>>().forEach(Styles::restrictSize)
         components.filterIsInstance<JLabel>().forEach(Styles::restrictSize)
+        Styles.restrictSize(licensePlateTextField)
         Styles.restrictSize(zipCodeTextField)
         Styles.restrictSize(observationDateTextField)
         Styles.restrictSize(observationTimeTextField)
