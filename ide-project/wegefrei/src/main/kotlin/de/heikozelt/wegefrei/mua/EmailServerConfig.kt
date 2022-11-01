@@ -1,6 +1,7 @@
-package de.heikozelt.wegefrei.json
+package de.heikozelt.wegefrei.mua
 
 import com.beust.klaxon.Json
+import de.heikozelt.wegefrei.json.Tls
 
 /**
  * Part of Settings.

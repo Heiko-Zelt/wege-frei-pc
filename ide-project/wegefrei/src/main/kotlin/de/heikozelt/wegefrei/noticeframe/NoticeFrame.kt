@@ -1,7 +1,7 @@
 package de.heikozelt.wegefrei.noticeframe
 
 import de.heikozelt.wegefrei.DatabaseRepo
-import de.heikozelt.wegefrei.EmailUserAgent
+import de.heikozelt.wegefrei.mua.EmailUserAgent
 import de.heikozelt.wegefrei.WegeFrei
 import de.heikozelt.wegefrei.entities.Notice
 import de.heikozelt.wegefrei.entities.Photo
@@ -10,6 +10,9 @@ import de.heikozelt.wegefrei.jobs.AddressWorker
 import de.heikozelt.wegefrei.json.Witness
 import de.heikozelt.wegefrei.maps.MaxiMapForm
 import de.heikozelt.wegefrei.model.*
+import de.heikozelt.wegefrei.mua.EmailAddressWithName
+import de.heikozelt.wegefrei.mua.EmailAttachment
+import de.heikozelt.wegefrei.mua.EmailMessage
 import org.jxmapviewer.viewer.GeoPosition
 import org.slf4j.LoggerFactory
 import java.awt.Component

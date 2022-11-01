@@ -1,4 +1,4 @@
-package de.heikozelt.wegefrei.gui
+package de.heikozelt.wegefrei.mua
 
 import org.slf4j.LoggerFactory
 import javax.mail.Authenticator

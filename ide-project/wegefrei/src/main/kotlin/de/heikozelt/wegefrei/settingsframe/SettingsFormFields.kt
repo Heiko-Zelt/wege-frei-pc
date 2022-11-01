@@ -1,15 +1,15 @@
 package de.heikozelt.wegefrei.settingsframe
 
-import de.heikozelt.wegefrei.EmailUserAgent
+import de.heikozelt.wegefrei.mua.EmailUserAgent
 import de.heikozelt.wegefrei.gui.CharPredicateDocFilter
 import de.heikozelt.wegefrei.gui.PatternVerifier
 import de.heikozelt.wegefrei.gui.Styles
 import de.heikozelt.wegefrei.gui.TrimmingTextField
-import de.heikozelt.wegefrei.json.EmailServerConfig
+import de.heikozelt.wegefrei.mua.EmailServerConfig
 import de.heikozelt.wegefrei.json.Settings
 import de.heikozelt.wegefrei.json.Tls
-import de.heikozelt.wegefrei.model.EmailAddressWithName
-import de.heikozelt.wegefrei.model.EmailMessage
+import de.heikozelt.wegefrei.mua.EmailAddressWithName
+import de.heikozelt.wegefrei.mua.EmailMessage
 import org.slf4j.LoggerFactory
 import java.awt.Dimension
 import java.util.*

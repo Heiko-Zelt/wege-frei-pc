@@ -1,10 +1,6 @@
-package de.heikozelt.wegefrei
+package de.heikozelt.wegefrei.mua
 
-import de.heikozelt.wegefrei.emailmessageframe.EmailMessageDialog
-import de.heikozelt.wegefrei.gui.SmtpAuthenticator
-import de.heikozelt.wegefrei.json.EmailServerConfig
 import de.heikozelt.wegefrei.json.Tls
-import de.heikozelt.wegefrei.model.EmailMessage
 import org.slf4j.LoggerFactory
 import java.util.*
 import javax.mail.Message
@@ -17,6 +13,7 @@ import javax.mail.internet.MimeMultipart
 import javax.swing.JOptionPane
 
 /**
+ * A simple mail user agent (MUA)
  * use case
  * <ol>
  *   <li>Displays the email message</li>
@@ -24,7 +21,7 @@ import javax.swing.JOptionPane
  *   <li>Asks for password (and remembers it)</li>
  *   <li>Displays status bar/label</li>
  *   <li>Sends email to SMTP server</li>
- *   <li>Calls back if successful or not</li>
+ *   <li>Calls application back if successful or not</li>
  * </ol>
  * The email body must be HTML code.
  * The email may have photos attached.

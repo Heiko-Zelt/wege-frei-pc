@@ -1,4 +1,4 @@
-package de.heikozelt.wegefrei.model
+package de.heikozelt.wegefrei.mua
 
 import java.nio.file.Path
 import javax.activation.DataHandler

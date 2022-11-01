@@ -1,7 +1,5 @@
-package de.heikozelt.wegefrei.emailmessageframe
+package de.heikozelt.wegefrei.mua
 
-import de.heikozelt.wegefrei.EmailUserAgent
-import de.heikozelt.wegefrei.model.EmailMessage
 import org.slf4j.LoggerFactory
 import java.awt.Dimension
 import javax.swing.*

@@ -1,4 +1,4 @@
-package de.heikozelt.wegefrei.gui
+package de.heikozelt.wegefrei.mua
 
 import javax.swing.JLabel
 import javax.swing.JPanel

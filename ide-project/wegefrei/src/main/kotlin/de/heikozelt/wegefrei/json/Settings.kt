@@ -1,6 +1,7 @@
 package de.heikozelt.wegefrei.json
 
 import com.beust.klaxon.Json
+import de.heikozelt.wegefrei.mua.EmailServerConfig
 import org.slf4j.LoggerFactory
 import javax.swing.UIManager
 
