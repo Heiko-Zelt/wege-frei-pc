@@ -82,13 +82,14 @@ class EmailMessagePanel : JPanel() {
         layout = lay
     }
 
+    /**
+     * todo Anlagen anzeigen
+     */
     fun setEmailMessage(emailMessage: EmailMessage) {
         fromField.text = emailMessage.from.asText()
         // todo Prio 3: ggf. mehrere Empfänger und CC anzeigen
-        toField.text = emailMessage.to.first().asText()
+        toField.text = emailMessage.tos.first().asText()
         subjectField.text = emailMessage.subject
         contentField.text = emailMessage.content
-        //revalidate()
-        //repaint()
     }
 }

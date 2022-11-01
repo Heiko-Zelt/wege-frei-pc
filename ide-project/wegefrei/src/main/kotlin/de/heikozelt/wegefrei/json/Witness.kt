@@ -31,6 +31,17 @@ data class Witness (
     }
 
     /**
+     * Es gibt 3 Arten von Adressen: Zeuge, NominatimResponse und Notice
+     */
+    fun getAddress(): String? {
+        return if(street.isBlank() && zipCode.isBlank() && town.isBlank() ) {
+            null
+        } else {
+            "$street, $zipCode $town"
+        }
+    }
+
+    /**
      * Deep copy.
      * There is no difference to copy().
      * String values are not copied because they are immutable.

@@ -48,6 +48,7 @@ class EmailUserAgent {
 
     /**
      * Jetzt aber wirklich absenden (und eventuell nach Passwort fragen).
+     * todo: Anlagen
      */
     fun sendMailDirectly(emailMessage: EmailMessage, doneCallback: (Boolean) -> Unit) {
         emailServerConfig?.let { serverConfig ->
@@ -77,14 +78,15 @@ class EmailUserAgent {
                 }
             }
 
+            // todo close session, finally or try with?
             val session = Session.getInstance(props, authenticator)
             log.debug("session: $session")
 
             val msg = MimeMessage(session)
             msg.addHeader("User-Agent", MAIL_USER_AGENT)
             msg.setFrom(emailMessage.from.asInternetAddress())
-            emailMessage.to.forEach{ msg.addRecipient(Message.RecipientType.TO, it.asInternetAddress()) }
-            emailMessage.cc?.forEach{ msg.addRecipient(Message.RecipientType.CC, it.asInternetAddress()) }
+            emailMessage.tos.forEach{ msg.addRecipient(Message.RecipientType.TO, it.asInternetAddress()) }
+            emailMessage.ccs.forEach{ msg.addRecipient(Message.RecipientType.CC, it.asInternetAddress()) }
             msg.setSubject(emailMessage.subject, "UTF-8")
             msg.setContent(emailMessage.content, "text/html; charset=utf-8")
 
@@ -98,7 +100,7 @@ class EmailUserAgent {
                     JOptionPane.INFORMATION_MESSAGE
                 )
             } catch (ex: MessagingException) {
-                log.debug("exception while sending test message", ex)
+                log.debug("exception while sending message", ex)
                 log.debug("exception: ${ex.message}")
                 ex.cause?.let {
                     log.debug("cause: ${it.message}")

@@ -12,6 +12,7 @@ import de.heikozelt.wegefrei.model.EmailAddressWithName
 import de.heikozelt.wegefrei.model.EmailMessage
 import org.slf4j.LoggerFactory
 import java.awt.Dimension
+import java.util.*
 import javax.swing.*
 import javax.swing.text.AbstractDocument
 
@@ -288,9 +289,11 @@ class SettingsFormFields : JPanel() {
         log.debug("sendTestEmail()")
 
         val fullName = "${givenNameTextField.text.trim()} ${surnameTextField.text.trim()}"
-        val senderName = fullName.ifBlank { TEST_MAIL_FROM_NAME }
+        val senderName = fullName.ifBlank { TEST_DEFAULT_MAIL_FROM_NAME }
         val senderEmailAddress = emailAddressTextField.text.trim()
-        val from = EmailAddressWithName(senderName,senderEmailAddress)
+        val from = EmailAddressWithName(senderEmailAddress, senderName)
+        val tos = TreeSet<EmailAddressWithName>()
+        tos.add(from)
 
         val emailServerConfig = EmailServerConfig(
             smtpHostTextField.text.trim(),
@@ -299,10 +302,9 @@ class SettingsFormFields : JPanel() {
             Tls.values()[encryptionComboBox.selectedIndex]
         )
 
-
         val eMessage = EmailMessage(
             from,
-            setOf(from),
+            tos,
             TEST_MAIL_SUBJECT,
             TEST_MAIL_CONTENT
         )
@@ -314,7 +316,7 @@ class SettingsFormFields : JPanel() {
     companion object {
         const val MAX_COLUMNS = 15
         const val TEST_MAIL_SUBJECT = "Wege frei! Test-E-Mail"
-        const val TEST_MAIL_FROM_NAME = "Wege frei!"
+        const val TEST_DEFAULT_MAIL_FROM_NAME = "Wege frei!"
         const val TEST_MAIL_CONTENT =
             "<html><h1>Dies ist ein Test</h1>\n<p>Diese E-Mail-Nachricht wurde automatisch von der Wege frei!-Anwendung generiert.</p></html>"
     }

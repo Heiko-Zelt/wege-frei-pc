@@ -15,10 +15,7 @@ import org.slf4j.LoggerFactory
 import java.awt.Component
 import java.time.ZonedDateTime
 import java.util.*
-import javax.swing.JFrame
-import javax.swing.JPanel
-import javax.swing.JScrollPane
-import javax.swing.JSplitPane
+import javax.swing.*
 import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.cos
@@ -316,14 +313,26 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
     /**
      * Die Methode wird vom E-Mail-absenden-Button aufgerufen.
      * todo Prio 3: asynchroner E-Mail-Versand. Vierten Status einführen, Meldung ist im Postausgang, aber noch nicht gesendet.
+     * todo weitere Validierung, nicht nur prüfen, ob Empfänger-E-Mail-Adresse angegeben ist.
+     * todo Detaillierte Rückmeldung über den Grund, warum die Validierung fehlgeschlagen ist
+     * todo Bei Validierung: Differenzierung zwischen Warnung und Fehler
      */
     fun sendNotice() {
         notice = getNotice()
         notice?.let {
-            sendEmail()
-            it.sentTime = ZonedDateTime.now()
-            disableFormFields()
-            saveNotice()
+            if(it.recipient == null) {
+                JOptionPane.showMessageDialog(
+                    null,
+                    "Kein Empfänger angegeben.",
+                    "Validierungsfehler",
+                    JOptionPane.INFORMATION_MESSAGE
+                )
+            } else {
+                sendEmail()
+                it.sentTime = ZonedDateTime.now()
+                disableFormFields()
+                saveNotice()
+            }
         }
     }
 
@@ -333,6 +342,8 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
         getMaxiMapForm()?.enableOrDisableEditing()
     }
 
+    /**
+     */
     private fun sendEmail() {
         log.debug("sendEmail()")
 
@@ -341,13 +352,18 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
                 n.recipient?.let { reci ->
                     val from = EmailAddressWithName(setti.witness.emailAddress, setti.witness.getFullName())
                     // todo Prio 3: mehrere Empfänger erlauben
-                    val to = setOf(EmailAddressWithName(reci))
+                    val to = EmailAddressWithName(reci)
+                    val tos = TreeSet<EmailAddressWithName>()
+                    tos.add(to)
                     var subject = "Anzeige"
                     n.licensePlate?.let { lic ->
                         subject += " $lic"
                     }
                     val content = buildMailContent(n, setti.witness)
-                    val message = EmailMessage(from, to, subject, content, setOf(from), n.photos)
+                    val message = EmailMessage(from, tos, subject, content)
+                    if(from != to) message.ccs.add(from)
+                    message.attachedPhotos.addAll(selectedPhotos.getPhotos())
+
                     // todo Prio 3: Nicht jedes Mal einen neuen User Agent instanziieren
 
                     val agent = EmailUserAgent()
@@ -576,7 +592,6 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
                 }
             }
 
-
             val countryRow = tableRow("Landeskennzeichen", n.getCountryFormatted())
             val licensePlateRow = tableRow("Kennzeichen", n.licensePlate)
             val makeRow = tableRow("Marke", n.vehicleMake)
@@ -591,6 +606,11 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
             val observationDurationRow = tableRow("Beobachtungsdauer", n.getDurationFormatted())
             val noteRow = tableRow("Hinweis", n.note)
 
+            val nameRow = tableRow("Name", w.getFullName())
+            val witnessAddressRow = tableRow("Name", w.getAddress())
+            val witnessEmailRow = tableRow("E-Mail", w.emailAddress)
+            val telephoneRow = tableRow("Telefon", w.telephoneNumber)
+
             val content = """
               |<html>
               |  <p>Sehr geehrte Damen und Herren,</p>
@@ -600,7 +620,9 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
               $countryRow$licensePlateRow$makeRow$colorRow$offenseAddressRow$locationDescriptionRow$positionRow$offenseRow$circumstancesRow$inspectionDateRow$observationTimeRow$observationDurationRow$noteRow
               |  </table>  
               |  <h1>Zeuge</h1>
-              |  <p>....</p>
+              |  <table>
+              $nameRow$witnessAddressRow$witnessEmailRow$telephoneRow  
+              |  </table>
               |  <h1>Anlagen</h1>
               |  <p>....</p>
               |  <h1>Erklärung</h1>

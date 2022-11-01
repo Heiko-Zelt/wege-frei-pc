@@ -5,9 +5,9 @@ import javax.mail.internet.InternetAddress
 /**
  * like javax.mail.internet.InternetAddress but less complicated
  */
-class EmailAddressWithName(val address: String, val name: String? = null) {
+data class EmailAddressWithName(val address: String, val name: String? = null): Comparable<EmailAddressWithName> {
     fun asInternetAddress(): InternetAddress {
-        return InternetAddress(address, name)
+        return InternetAddress(address, name) // address, personal
     }
 
     fun asText(): String {
@@ -16,5 +16,9 @@ class EmailAddressWithName(val address: String, val name: String? = null) {
         } else {
             "${name} <${address}>"
         }
+    }
+
+    override fun compareTo(other: EmailAddressWithName): Int {
+        return asText().compareTo(other.asText())
     }
 }
