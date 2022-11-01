@@ -25,6 +25,8 @@ class EmailMessagePanel : JPanel() {
     private val ccsLabel = JLabel("in Kopie:")
     private val ccsField = JLabel()
     private val subjectField = JLabel()
+    private val attachmentsLabel = JLabel("Anlagen:")
+    private val attachmentsField = JLabel()
     private val contentField = JLabel()
 
     init {
@@ -51,6 +53,7 @@ class EmailMessagePanel : JPanel() {
                                 .addComponent(tosLabel)
                                 .addComponent(ccsLabel)
                                 .addComponent(subjectLabel)
+                                .addComponent(attachmentsLabel)
                         )
                         .addGroup(
                             lay.createParallelGroup(GroupLayout.Alignment.LEADING)
@@ -58,6 +61,7 @@ class EmailMessagePanel : JPanel() {
                                 .addComponent(tosField)
                                 .addComponent(ccsField)
                                 .addComponent(subjectField)
+                                .addComponent(attachmentsField)
                         )
                 )
                 .addComponent(contentField)
@@ -85,13 +89,18 @@ class EmailMessagePanel : JPanel() {
                         .addComponent(subjectLabel)
                         .addComponent(subjectField)
                 )
+                .addGroup(
+                    lay.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addComponent(attachmentsLabel)
+                        .addComponent(attachmentsField)
+                )
                 .addComponent(contentField)
         )
         layout = lay
     }
 
     /**
-     * todo CC und Anlagen anzeigen
+     * maps the fields of an emailMessage object to GUI components
      */
     fun setEmailMessage(emailMessage: EmailMessage) {
         fromField.text = emailMessage.from.asText()
@@ -101,6 +110,12 @@ class EmailMessagePanel : JPanel() {
         ccsLabel.isVisible = hasCc
         if(hasCc) {
             ccsField.text = emailMessage.ccs.first().asText()
+        }
+        val hasAttachments = emailMessage.attachments.isNotEmpty()
+        attachmentsLabel.isVisible = hasAttachments
+        if(hasAttachments) {
+            attachmentsField.text = emailMessage.attachments.size.toString()
+            // todo Prio 4: zusätzlich die Dateinamen der Anlagen anzeigen
         }
         subjectField.text = emailMessage.subject
         contentField.text = emailMessage.coverLetter
