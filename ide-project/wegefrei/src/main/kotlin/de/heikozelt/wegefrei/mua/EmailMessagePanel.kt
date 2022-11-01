@@ -21,7 +21,9 @@ class EmailMessagePanel : JPanel() {
 
     // GUI components
     private val fromField = JLabel()
-    private val toField = JLabel()
+    private val tosField = JLabel()
+    private val ccsLabel = JLabel("in Kopie:")
+    private val ccsField = JLabel()
     private val subjectField = JLabel()
     private val contentField = JLabel()
 
@@ -30,7 +32,7 @@ class EmailMessagePanel : JPanel() {
 
         // GUI components
         val fromLabel = JLabel("von:")
-        val toLabel = JLabel("an:")
+        val tosLabel = JLabel("an:")
         val subjectLabel = JLabel("Betreff:")
 
         // layout:
@@ -46,13 +48,15 @@ class EmailMessagePanel : JPanel() {
                         .addGroup(
                             lay.createParallelGroup(GroupLayout.Alignment.LEADING)
                                 .addComponent(fromLabel)
-                                .addComponent(toLabel)
+                                .addComponent(tosLabel)
+                                .addComponent(ccsLabel)
                                 .addComponent(subjectLabel)
                         )
                         .addGroup(
                             lay.createParallelGroup(GroupLayout.Alignment.LEADING)
                                 .addComponent(fromField)
-                                .addComponent(toField)
+                                .addComponent(tosField)
+                                .addComponent(ccsField)
                                 .addComponent(subjectField)
                         )
                 )
@@ -68,8 +72,13 @@ class EmailMessagePanel : JPanel() {
                 )
                 .addGroup(
                     lay.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                        .addComponent(toLabel)
-                        .addComponent(toField)
+                        .addComponent(tosLabel)
+                        .addComponent(tosField)
+                )
+                .addGroup(
+                    lay.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addComponent(ccsLabel)
+                        .addComponent(ccsField)
                 )
                 .addGroup(
                     lay.createParallelGroup(GroupLayout.Alignment.BASELINE)
@@ -87,7 +96,12 @@ class EmailMessagePanel : JPanel() {
     fun setEmailMessage(emailMessage: EmailMessage) {
         fromField.text = emailMessage.from.asText()
         // todo Prio 3: ggf. mehrere Empfänger und CC anzeigen
-        toField.text = emailMessage.tos.first().asText()
+        tosField.text = emailMessage.tos.first().asText()
+        val hasCc = emailMessage.ccs.isNotEmpty()
+        ccsLabel.isVisible = hasCc
+        if(hasCc) {
+            ccsField.text = emailMessage.ccs.first().asText()
+        }
         subjectField.text = emailMessage.subject
         contentField.text = emailMessage.coverLetter
     }
