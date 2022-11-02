@@ -233,6 +233,12 @@ open class WegeFrei(private val settingsRepo: SettingsRepo = SettingsFileRepo())
         }
     }
 
+    /**
+     * I prefer the main class having a name of WegeFrei instead of WegeFreiKt.
+     * Defining a companion object mit JvmStatic function main
+     * instead of a main function outside a class solves it.
+     * Maybe the annotation @file:JvmName() would do the job as well.
+     */
     companion object {
         private val LOG = LoggerFactory.getLogger(this::class.java.canonicalName)
 

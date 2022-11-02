@@ -3,6 +3,7 @@ package de.heikozelt.wegefrei.model
 /**
  * Fahrzeugmarken
  * todo Prio 3: Logos als Icon hinzufügen
+ * todo Prio 3: "--" anzeigen aber null speichern, siehe VehicleColor
  */
 class ListVehicleMakes {
 

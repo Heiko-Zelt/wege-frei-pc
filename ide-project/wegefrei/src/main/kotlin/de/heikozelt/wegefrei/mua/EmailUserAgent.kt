@@ -101,6 +101,7 @@ class EmailUserAgent {
             msg.setContent(multipart)
 
             try {
+                // "Note that send is a static method that creates and manages its own connection."
                 Transport.send(msg)
                 doneCallback(true)
                 JOptionPane.showMessageDialog(

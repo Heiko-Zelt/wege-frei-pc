@@ -34,6 +34,7 @@ class NoticesTableModel: AbstractTableModel() {
     }
 
     fun getNoticeAt(rowIndex: Int): Notice {
+        log.debug("getNoticeAt(rowIndex=$rowIndex)")
         return notices[rowIndex]
     }
 
@@ -68,6 +69,7 @@ class NoticesTableModel: AbstractTableModel() {
     }
 
     override fun getValueAt(rowIndex: Int, columnIndex: Int): Any? {
+        log.debug("getValueAt(rowIndex=$rowIndex, columnIndex=$columnIndex)")
         val notice = notices[rowIndex]
         return when (columnIndex) {
             0 -> notice.id
