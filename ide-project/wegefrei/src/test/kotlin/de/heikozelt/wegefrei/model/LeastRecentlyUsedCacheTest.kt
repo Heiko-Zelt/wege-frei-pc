@@ -72,4 +72,28 @@ class LeastRecentlyUsedCacheTest {
         assertEquals('y', cache[3])
         assertEquals('7', cache[7])
     }
+
+    @Test
+    fun stringByteCache_moveToEnd() {
+        val cache = LeastRecentlyUsedCache<String, Byte>(2)
+        assertNull(cache["eins"])
+        assertNull(cache["zwei"])
+
+        cache["eins"] = 1
+        assertEquals(1, cache["eins"])
+        assertNull(cache["zwei"])
+
+        cache["zwei"] = 2
+        assertEquals(1, cache["eins"])
+        assertEquals(2, cache["zwei"])
+
+        cache["eins"] = 1
+        assertEquals(1, cache["eins"])
+        assertEquals(2, cache["zwei"])
+
+        cache["drei"] = 3
+        assertEquals(1, cache["eins"])
+        assertNull(cache["zwei"])
+        assertEquals(3, cache["drei"])
+    }
 }
