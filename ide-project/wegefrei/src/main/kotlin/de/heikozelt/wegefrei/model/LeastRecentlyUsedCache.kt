@@ -65,7 +65,7 @@ class LeastRecentlyUsedCache<K, V>(private var limit: Int) {
      * could be optimized, if existing entry is not removed and recreated but moved
      */
     @Synchronized
-    fun add(id: K, element: V) {
+    operator fun set(id: K, element: V) {
         log.debug("add(id=$id, element=$element)")
         // remove an existing entry, if an entry with this id already exists
         val existingEntry = map[id]
@@ -85,7 +85,7 @@ class LeastRecentlyUsedCache<K, V>(private var limit: Int) {
     }
 
     @Synchronized
-    fun get(id: K): V? {
+    operator fun get(id: K): V? {
         log.debug("get(id=$id)")
         return map[id]?.element
     }
