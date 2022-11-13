@@ -1,103 +1,117 @@
 package de.heikozelt.wegefrei.noticeframe
 
-import de.heikozelt.wegefrei.entities.Photo
-import de.heikozelt.wegefrei.gui.Styles.Companion.HIGHLIGHT_BORDER
-import de.heikozelt.wegefrei.gui.Styles.Companion.NORMAL_BORDER
-import de.heikozelt.wegefrei.gui.Styles.Companion.SELECT_BUTTON_SIZE
 import de.heikozelt.wegefrei.gui.Styles.Companion.THUMBNAIL_SIZE
-import de.heikozelt.wegefrei.jobs.ThumbnailWorker
+import de.heikozelt.wegefrei.model.Photo
 import org.slf4j.LoggerFactory
+import java.awt.Color
 import java.awt.Dimension
-import java.awt.Insets
-import javax.swing.JButton
+import java.awt.FlowLayout
 import javax.swing.JLabel
 import javax.swing.JPanel
-import javax.swing.SwingConstants
 
 
-class MiniPhotoPanel(private val photosDir: String, private val noticeFrame: NoticeFrame, private val photo: Photo, private var active: Boolean) :
+class MiniPhotoPanel(
+    noticeId: Int?,
+    photo: Photo?,
+    active: Boolean,
+    selected: Boolean
+) :
     JPanel() {
-
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
-    private val thumbnailLabel = JLabel("not loaded", SwingConstants.CENTER)
-    private val mouseListener: MiniPhotoPanelMouseListener
-    private val button = JButton("+")
-    private var borderVisible = false
-
-    /**
-     * macht aus dem Foto-Image ein Thumbnail-Image.
-     * scalieren und ggf. grau machen
-     */
 
     init {
+        val thumbnail = photo?.getPhotoFile()?.thumbnail
+
         layout = null
-        // + 2 wegen Border
-        preferredSize = Dimension(THUMBNAIL_SIZE + 2, THUMBNAIL_SIZE + 2)
+        preferredSize = Dimension(THUMBNAIL_SIZE, THUMBNAIL_SIZE)
         minimumSize = preferredSize
         maximumSize = preferredSize
 
-        thumbnailLabel.toolTipText = photo.getToolTipText()
-        thumbnailLabel.setBounds(0, 0, THUMBNAIL_SIZE, THUMBNAIL_SIZE)
-        thumbnailLabel.border = NORMAL_BORDER
-
-        mouseListener = MiniPhotoPanelMouseListener(noticeFrame, this)
-        //thumbnailLabel.isEnabled = active
-        //thumbnailLabel.addMouseListener(mouseListener)
-        if(active) {
-            thumbnailLabel.addMouseListener(mouseListener)
-        }
-
+        /*
+        val button = JButton("+")
         button.isEnabled = active
-        button.addActionListener { selectPhoto() }
-        // + 1 wegen Border
-        val buttonXY = THUMBNAIL_SIZE - SELECT_BUTTON_SIZE + 1
+        val buttonXY = THUMBNAIL_SIZE - SELECT_BUTTON_SIZE
         button.setBounds(buttonXY, buttonXY, SELECT_BUTTON_SIZE, SELECT_BUTTON_SIZE)
         button.margin = Insets(0, 0, 0, 0)
-
         add(button)
-        add(thumbnailLabel)
+         */
+        //val layered = JLayeredPane()
 
-        // Loading the image from the filesystem and resizing it is time-consuming. So, do it later...
-        val worker = ThumbnailWorker(photosDir, photo, active, thumbnailLabel)
-        worker.execute()
+        // lazy loading database access? in EDT?
+        val noticeIds = photo?.getPhotoEntity()?.noticeEntities?.map { it.id }?.filter { it != noticeId }?.sortedBy{it}
+        log.debug("noticeIds: $noticeIds")
+        noticeIds?.let { ids ->
+            if (ids.isNotEmpty()) {
+                val layer = JPanel()
+                layer.layout = FlowLayout(FlowLayout.LEFT)
+                layer.maximumSize = Dimension(THUMBNAIL_SIZE, THUMBNAIL_SIZE)
+                layer.isOpaque = false
+                ids.forEach { id ->
+                    val lbl = JLabel("$id")
+
+                    lbl.isOpaque = true
+                    lbl.background = Color(255,255, 255, 100)
+                    //lbl.background = Color.orange
+                    layer.add(lbl)
+                }
+                val layerSize = layer.preferredSize
+                //layer.setBounds(0, THUMBNAIL_SIZE - layerSize.height, THUMBNAIL_SIZE, layerSize.height)
+                layer.setBounds(0, 0, THUMBNAIL_SIZE, THUMBNAIL_SIZE)
+                //layer.revalidate()
+                add(layer)
+            }
+        }
+
+        add(ThumbnailLabel(thumbnail, active, selected))
     }
 
+    /*
     fun selectPhoto() {
-        noticeFrame.selectPhoto(photo)
+        noticeFrame.selectPhoto(photoEntity)
     }
+     */
 
-    fun getPhoto(): Photo {
-        return photo
+    /*
+    fun getPhoto(): PhotoEntity {
+        return photoEntity
     }
+     */
 
+    /*
     fun isActive(): Boolean {
         return active
     }
+     */
 
+    /*
     fun activate() {
         log.debug("activate()")
         active = true
 
-        val worker = ThumbnailWorker(photosDir, photo, active, thumbnailLabel)
+        val worker = ThumbnailWorker(photoEntity, active, thumbnailLabel)
         worker.execute()
 
         button.isEnabled = true
         //thumbnailLabel.isEnabled = true
         thumbnailLabel.addMouseListener(mouseListener)
     }
+     */
 
+    /*
     fun deactivate() {
         log.debug("deactivate()")
         active = false
 
-        val worker = ThumbnailWorker(photosDir, photo, active, thumbnailLabel)
+        val worker = ThumbnailWorker(photoEntity, active, thumbnailLabel)
         worker.execute()
 
         button.isEnabled = false
         //thumbnailLabel.isEnabled = false
         thumbnailLabel.removeMouseListener(mouseListener)
     }
+     */
 
+    /*
     fun displayBorder(visible: Boolean) {
         if (visible && !borderVisible) {
             thumbnailLabel.border = HIGHLIGHT_BORDER
@@ -109,4 +123,5 @@ class MiniPhotoPanel(private val photosDir: String, private val noticeFrame: Not
             borderVisible = false
         }
     }
+    */
 }

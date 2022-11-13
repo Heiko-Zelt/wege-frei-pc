@@ -1,6 +1,6 @@
 package de.heikozelt.wegefrei.noticeframe
 
-import de.heikozelt.wegefrei.entities.Photo
+import de.heikozelt.wegefrei.entities.PhotoEntity
 import de.heikozelt.wegefrei.gui.Styles.Companion.NO_BORDER
 import de.heikozelt.wegefrei.gui.Styles.Companion.SELECTED_PHOTOS_BACKGROUND
 import de.heikozelt.wegefrei.model.SelectedPhotosObserver
@@ -38,6 +38,7 @@ class SelectedPhotosPanel(private val noticeFrame: NoticeFrame) : JPanel(),
             i++
         }
         */
+
         autoscrolls = true
     }
 
@@ -49,9 +50,9 @@ class SelectedPhotosPanel(private val noticeFrame: NoticeFrame) : JPanel(),
     /**
      * get Panel of Photo
      */
-    private fun panelWithPhoto(photo: Photo): MiniSelectedPhotoPanel? {
+    private fun panelWithPhoto(photoEntity: PhotoEntity): MiniSelectedPhotoPanel? {
         for (photoPanel in miniSelectedPhotoPanels) {
-            if (photoPanel.getPhoto() == photo) {
+            if (photoPanel.getPhoto() == photoEntity) {
                 return photoPanel
             }
         }
@@ -72,9 +73,9 @@ class SelectedPhotosPanel(private val noticeFrame: NoticeFrame) : JPanel(),
      * zeigt bei einem Panel den Rahmen hervorgehoben an,
      * bei allen anderen normal
      */
-    fun showBorder(photo: Photo) {
+    fun showBorder(photoEntity: PhotoEntity) {
         for (panel in miniSelectedPhotoPanels) {
-            panel.displayBorder(photo == panel.getPhoto())
+            panel.displayBorder(photoEntity == panel.getPhoto())
         }
     }
 
@@ -87,10 +88,10 @@ class SelectedPhotosPanel(private val noticeFrame: NoticeFrame) : JPanel(),
         }
     }
 
-    override fun selectedPhoto(index: Int, photo: Photo) {
+    override fun selectedPhoto(index: Int, photoEntity: PhotoEntity) {
         log.debug("added photo")
         photosDir?.let { dir ->
-            val panel = MiniSelectedPhotoPanel(dir, noticeFrame, photo, index)
+            val panel = MiniSelectedPhotoPanel(dir, noticeFrame, photoEntity, index)
             miniSelectedPhotoPanels.add(index, panel)
             log.debug("add selected photo panel to container. component count: $componentCount")
             add(panel, index)
@@ -104,12 +105,12 @@ class SelectedPhotosPanel(private val noticeFrame: NoticeFrame) : JPanel(),
             // todo Prio 3: gemeinsame Basis-Klasse für MaxiPhotoPanel und MaxiSelectedPhotoPanel
             val zoomComponent = noticeFrame.getZoomComponent()
             if (zoomComponent is MaxiPhotoPanel) {
-                if (photo == zoomComponent.getPhoto()) {
+                if (photoEntity == zoomComponent.getPhoto()) {
                     panel.displayBorder(true)
                 }
             }
             if (zoomComponent is MaxiSelectedPhotoPanel) {
-                if (photo == zoomComponent.getPhoto()) {
+                if (photoEntity == zoomComponent.getPhoto()) {
                     panel.displayBorder(true)
                 }
             }
@@ -119,9 +120,9 @@ class SelectedPhotosPanel(private val noticeFrame: NoticeFrame) : JPanel(),
         }
     }
 
-    override fun unselectedPhoto(index: Int, photo: Photo) {
+    override fun unselectedPhoto(index: Int, photoEntity: PhotoEntity) {
         log.debug("removed photo")
-        val panel = panelWithPhoto(photo)
+        val panel = panelWithPhoto(photoEntity)
         miniSelectedPhotoPanels.remove(panel)
         log.debug("miniSelectedPhotoPanels.size: ${miniSelectedPhotoPanels.size}")
         // bei allen nachfolgenden Fotos den Index-Text ändern
@@ -137,11 +138,11 @@ class SelectedPhotosPanel(private val noticeFrame: NoticeFrame) : JPanel(),
         repaint()
     }
 
-    override fun replacedPhotoSelection(photos: TreeSet<Photo>) {
+    override fun replacedPhotoSelection(photoEntities: TreeSet<PhotoEntity>) {
         photosDir?.let { dir ->
             removeAll()
             miniSelectedPhotoPanels.clear()
-            for ((i, photo) in photos.withIndex()) {
+            for ((i, photo) in photoEntities.withIndex()) {
                 val panel = MiniSelectedPhotoPanel(dir, noticeFrame, photo, i)
                 miniSelectedPhotoPanels.add(panel)
                 add(panel)

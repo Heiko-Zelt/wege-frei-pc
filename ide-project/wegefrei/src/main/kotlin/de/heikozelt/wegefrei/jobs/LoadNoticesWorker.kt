@@ -1,7 +1,7 @@
 package de.heikozelt.wegefrei.jobs
 
 import de.heikozelt.wegefrei.DatabaseRepo
-import de.heikozelt.wegefrei.entities.Notice
+import de.heikozelt.wegefrei.entities.NoticeEntity
 import de.heikozelt.wegefrei.model.NoticesTableModel
 import org.slf4j.LoggerFactory
 import java.util.*
@@ -16,25 +16,26 @@ class LoadNoticesWorker(
     private val databaseRepo: DatabaseRepo,
     private val noticesTableModel: NoticesTableModel
 )
-: SwingWorker<MutableList<Notice>, MutableList<Notice>>() {
+: SwingWorker<MutableList<NoticeEntity>, MutableList<NoticeEntity>>() {
 
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
-    private var notices: MutableList<Notice>? = null
+    private var noticeEntities: MutableList<NoticeEntity>? = null
 
     /**
      * This is done in own Thread
      */
-    override fun doInBackground(): MutableList<Notice>? {
+    override fun doInBackground(): MutableList<NoticeEntity>? {
         log.info("doInBackground()")
-        notices = LinkedList(databaseRepo.getAllNoticesDesc())
-        return notices
+        noticeEntities = LinkedList(databaseRepo.findAllNoticesDesc())
+        log.debug("finished in background. size=${noticeEntities?.size}")
+        return noticeEntities
     }
 
     /**
      * this is done in the Swing Event Dispatcher Thread (EDT)
      */
     override fun done() {
-        notices?.let {
+        noticeEntities?.let {
             noticesTableModel.setNoticesList(it)
         }
     }

@@ -1,6 +1,6 @@
 package de.heikozelt.wegefrei
 
-import de.heikozelt.wegefrei.entities.Notice
+import de.heikozelt.wegefrei.entities.NoticeEntity
 import de.heikozelt.wegefrei.json.Settings
 import de.heikozelt.wegefrei.noticeframe.NoticeFrame
 import de.heikozelt.wegefrei.noticesframe.NoticesFrame
@@ -122,15 +122,17 @@ open class WegeFrei(private val settingsRepo: SettingsRepo = SettingsFileRepo())
 
     /**
      * Opens Window to create new or edit existing notice
-     * @param notice The notice to edit or new notice if omitted.
+     * @param noticeEntity The notice to edit or new notice if omitted.
      */
-    fun openNoticeFrame(notice: Notice = Notice()) {
+    fun openNoticeFrame(noticeEntity: NoticeEntity = NoticeEntity()) {
         log.debug("Anzahl NoticeFrames: " + noticeFrames.size)
-        val noticeFrame = NoticeFrame(this)
-        noticeFrames.add(noticeFrame)
-        EventQueue.invokeLater {
-            // Thread.sleep(5000) // simulate slowness
-            noticeFrame.setNotice(notice)
+        databaseRepo?.let { dbRepo ->
+            val noticeFrame = NoticeFrame(this, dbRepo)
+            noticeFrames.add(noticeFrame)
+            EventQueue.invokeLater {
+                // Thread.sleep(5000) // simulate slowness
+                noticeFrame.setNotice(noticeEntity)
+            }
         }
     }
 
@@ -181,22 +183,22 @@ open class WegeFrei(private val settingsRepo: SettingsRepo = SettingsFileRepo())
     /**
      * called, when new notice is saved, added to database
      */
-    fun noticeAdded(notice: Notice) {
-        noticesFrame?.noticeAdded(notice)
+    fun noticeAdded(noticeEntity: NoticeEntity) {
+        noticesFrame?.noticeAdded(noticeEntity)
     }
 
     /**
      * called, when existing notice is saved, updated in database
      */
-    fun noticeUpdated(notice: Notice) {
-        noticesFrame?.noticeUpdated(notice)
+    fun noticeUpdated(noticeEntity: NoticeEntity) {
+        noticesFrame?.noticeUpdated(noticeEntity)
     }
 
     /**
      * called, when existing notice is deleted
      */
-    fun noticeDeleted(notice: Notice) {
-        noticesFrame?.noticeDeleted(notice)
+    fun noticeDeleted(noticeEntity: NoticeEntity) {
+        noticesFrame?.noticeDeleted(noticeEntity)
     }
 
     private fun changeLookAndFeel() {

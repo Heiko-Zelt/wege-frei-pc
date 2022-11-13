@@ -1,7 +1,7 @@
 package de.heikozelt.wegefrei.noticesframe
 
 import de.heikozelt.wegefrei.WegeFrei
-import de.heikozelt.wegefrei.entities.Notice
+import de.heikozelt.wegefrei.entities.NoticeEntity
 import de.heikozelt.wegefrei.jobs.LoadNoticesWorker
 import de.heikozelt.wegefrei.model.NoticesTableModel
 import org.slf4j.LoggerFactory
@@ -23,7 +23,6 @@ class NoticesFrame(private val app: WegeFrei) : JFrame("Meldungen - Wege frei!")
 
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
     private val noticesTableModel = NoticesTableModel()
-
 
     init {
         log.debug("init")
@@ -107,15 +106,15 @@ class NoticesFrame(private val app: WegeFrei) : JFrame("Meldungen - Wege frei!")
     /**
      * called, when new notice is saved, added to database
      */
-    fun noticeAdded(notice: Notice) {
-        noticesTableModel.addNotice(notice)
+    fun noticeAdded(noticeEntity: NoticeEntity) {
+        noticesTableModel.addNotice(noticeEntity)
     }
 
-    fun noticeUpdated(notice: Notice) {
-        noticesTableModel.updateNotice(notice)
+    fun noticeUpdated(noticeEntity: NoticeEntity) {
+        noticesTableModel.updateNotice(noticeEntity)
     }
 
-    fun noticeDeleted(notice: Notice) {
-        noticesTableModel.removeNotice(notice)
+    fun noticeDeleted(noticeEntity: NoticeEntity) {
+        noticesTableModel.removeNotice(noticeEntity)
     }
 }

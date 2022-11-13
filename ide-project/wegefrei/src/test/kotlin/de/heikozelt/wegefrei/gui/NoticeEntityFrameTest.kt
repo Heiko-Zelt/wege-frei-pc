@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.jxmapviewer.viewer.GeoPosition
 
-class NoticeFrameTest {
+class NoticeEntityFrameTest {
 
     /**
      * https://www.luftlinie.org/Wiesbaden/Frankfurt

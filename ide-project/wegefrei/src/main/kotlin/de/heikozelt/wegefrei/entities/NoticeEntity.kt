@@ -10,7 +10,7 @@ import java.time.format.DateTimeFormatter
 @Entity
 @Table(name = "NOTICES")
 // todo Prio 3: two constructors instead of default values
-class Notice(
+class NoticeEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Int? = null,
@@ -138,7 +138,7 @@ class Notice(
         joinColumns = [JoinColumn(name = "id" /*, referencedColumnName = "filename" */)],
         inverseJoinColumns = [JoinColumn(name = "filename" /*, referencedColumnName = "id" */)]
     )
-    var photos: Set<Photo> = setOf(),
+    var photoEntities: MutableSet<PhotoEntity> = mutableSetOf(),
 
     @Column
     var note: String? = null
@@ -261,7 +261,7 @@ class Notice(
             else -> vehicleInspectionMonth != null && vehicleInspectionYear != null
         }
         return isOffenseComplete && isVehicleInspectionComplete && licensePlate != null && street != null
-                && zipCode != null && town != null && observationTime != null && photos.isNotEmpty()
+                && zipCode != null && town != null && observationTime != null && photoEntities.isNotEmpty()
     }
 
     /**

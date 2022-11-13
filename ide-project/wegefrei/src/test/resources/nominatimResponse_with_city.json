@@ -1,0 +1,33 @@
+{
+  "place_id": 11593534,
+  "licence": "Data © OpenStreetMap contributors, ODbL 1.0. https://osm.org/copyright",
+  "osm_type": "node",
+  "osm_id": 1234950308,
+  "lat": "50.0774268",
+  "lon": "8.2396101",
+  "place_rank": 30,
+  "category": "place",
+  "type": "house",
+  "importance": 0,
+  "addresstype": "place",
+  "name": null,
+  "display_name": "42, Rheinstraße, Mitte, Wiesbaden, Hessen, 65185, Deutschland",
+  "address": {
+    "house_number": "42",
+    "road": "Rheinstraße",
+    "city_district": "Mitte",
+    "city": "Wiesbaden",
+    "county": "Wiesbaden",
+    "state": "Hessen",
+    "ISO3166-2-lvl4": "DE-HE",
+    "postcode": "65185",
+    "country": "Deutschland",
+    "country_code": "de"
+  },
+  "boundingbox": [
+    "50.0773768",
+    "50.0774768",
+    "8.2395601",
+    "8.2396601"
+  ]
+}

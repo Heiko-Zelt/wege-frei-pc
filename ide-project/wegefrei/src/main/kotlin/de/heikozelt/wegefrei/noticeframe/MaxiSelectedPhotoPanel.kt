@@ -1,6 +1,6 @@
 package de.heikozelt.wegefrei.noticeframe
 
-import de.heikozelt.wegefrei.entities.Photo
+import de.heikozelt.wegefrei.entities.PhotoEntity
 import de.heikozelt.wegefrei.gui.Styles.Companion.NO_BORDER
 import de.heikozelt.wegefrei.gui.Styles.Companion.ZOOM_PANEL_BACKGROUND
 import org.slf4j.LoggerFactory
@@ -11,7 +11,7 @@ import javax.swing.*
 class MaxiSelectedPhotoPanel(
     private val photosDir: String,
     private val noticeFrame: NoticeFrame,
-    private val photo: Photo): JPanel()
+    private val photoEntity: PhotoEntity): JPanel()
 {
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
 
@@ -23,13 +23,13 @@ class MaxiSelectedPhotoPanel(
         //val file = File(PHOTO_DIR, filename)
         //val photo = readPhotoMetadata(file)
         //val img = ImageIO.read(file)
-        val scaledImg = photo.getImage(photosDir)?.getScaledInstance(600,400, Image.SCALE_SMOOTH)
+        val scaledImg = photoEntity.getImage()?.getScaledInstance(600,400, Image.SCALE_SMOOTH)
         val label = if(scaledImg == null) {
             JLabel("not loaded")
         } else {
             JLabel(ImageIcon(scaledImg))
         }
-        label.toolTipText = "<html>${photo.filename}<br>${photo.getDateFormatted()}<br>${photo.latitude}, ${photo.longitude}</html>"
+        label.toolTipText = "<html>${photoEntity.path}<br>${photoEntity.getDateFormatted()}<br>${photoEntity.latitude}, ${photoEntity.longitude}</html>"
         label.alignmentX = CENTER_ALIGNMENT
         add(label)
 
@@ -37,13 +37,13 @@ class MaxiSelectedPhotoPanel(
         button.margin = Insets(0, 0, 0, 0)
         button.alignmentX = CENTER_ALIGNMENT
         button.addActionListener {
-            noticeFrame.unselectPhoto(photo)
+            noticeFrame.unselectPhoto(photoEntity)
         }
 
         add(button)
     }
 
-    fun getPhoto(): Photo {
-        return photo
+    fun getPhoto(): PhotoEntity {
+        return photoEntity
     }
 }

@@ -1,6 +1,6 @@
 package de.heikozelt.wegefrei.model
 
-import de.heikozelt.wegefrei.entities.Notice
+import de.heikozelt.wegefrei.entities.NoticeEntity
 import org.slf4j.LoggerFactory
 import javax.swing.table.AbstractTableModel
 
@@ -18,42 +18,42 @@ import javax.swing.table.AbstractTableModel
 class NoticesTableModel: AbstractTableModel() {
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
 
-    private var notices: MutableList<Notice> = mutableListOf<Notice>()
+    private var noticeEntities: MutableList<NoticeEntity> = mutableListOf<NoticeEntity>()
 
-    fun setNoticesList(notices: MutableList<Notice>) {
-        this.notices = notices
+    fun setNoticesList(noticeEntities: MutableList<NoticeEntity>) {
+        this.noticeEntities = noticeEntities
         fireTableDataChanged()
     }
 
     override fun getRowCount(): Int {
-        return notices.size
+        return noticeEntities.size
     }
 
     override fun getColumnCount(): Int {
         return COLUMN_NAMES.size
     }
 
-    fun getNoticeAt(rowIndex: Int): Notice {
+    fun getNoticeAt(rowIndex: Int): NoticeEntity {
         log.debug("getNoticeAt(rowIndex=$rowIndex)")
-        return notices[rowIndex]
+        return noticeEntities[rowIndex]
     }
 
     /**
      * fügt eine Meldung am Anfang der Tabelle hinzu,
      * und aktualisiert die View(s)
      */
-    fun addNotice(notice: Notice) {
-        log.debug("add notice #${notice.id}")
-        notices.add(0, notice)
+    fun addNotice(noticeEntity: NoticeEntity) {
+        log.debug("add notice #${noticeEntity.id}")
+        noticeEntities.add(0, noticeEntity)
         fireTableRowsInserted(0,0)
     }
 
     /**
      * aktualisiert die View(s) nach Änderungen
      */
-    fun updateNotice(notice: Notice) {
-        log.debug("update notice #${notice.id}")
-        val rowIndex = notices.indexOf(notice)
+    fun updateNotice(noticeEntity: NoticeEntity) {
+        log.debug("update notice #${noticeEntity.id}")
+        val rowIndex = noticeEntities.indexOf(noticeEntity)
         fireTableRowsUpdated(rowIndex, rowIndex)
     }
 
@@ -61,25 +61,26 @@ class NoticesTableModel: AbstractTableModel() {
      * entfernt eine Meldung
      * und aktualisiert die View(s)
      */
-    fun removeNotice(notice: Notice) {
-        log.debug("remove notice #${notice.id}")
-        val rowIndex = notices.indexOf(notice)
-        notices.remove(notice)
+    fun removeNotice(noticeEntity: NoticeEntity) {
+        log.debug("remove notice #${noticeEntity.id}")
+        val rowIndex = noticeEntities.indexOf(noticeEntity)
+        noticeEntities.remove(noticeEntity)
         fireTableRowsDeleted(rowIndex, rowIndex)
     }
 
     override fun getValueAt(rowIndex: Int, columnIndex: Int): Any? {
         log.debug("getValueAt(rowIndex=$rowIndex, columnIndex=$columnIndex)")
-        val notice = notices[rowIndex]
+        val notice = noticeEntities[rowIndex]
         return when (columnIndex) {
             0 -> notice.id
-            1 -> notice.countrySymbol
-            2 -> notice.licensePlate
-            3 -> notice.vehicleMake
-            4 -> VehicleColor.fromColorName(notice.color)
-            5 -> notice.getCreatedTimeFormatted()
-            6 -> notice.getObservationTimeFormatted()
-            7 -> notice.getState()
+            1 -> notice.photoEntities.size
+            2 -> notice.countrySymbol
+            3 -> notice.licensePlate
+            4 -> notice.vehicleMake
+            5 -> VehicleColor.fromColorName(notice.color)
+            6 -> notice.getCreatedTimeFormatted()
+            7 -> notice.getObservationTimeFormatted()
+            8 -> notice.getState()
             else -> IndexOutOfBoundsException()
         }
     }
@@ -91,7 +92,7 @@ class NoticesTableModel: AbstractTableModel() {
 
     companion object {
         val COLUMN_NAMES = arrayOf(
-            "#", "Land", "Kennzeichen", "Marke", "Farbe", "Erstellt", "Beobachtet", "Status"
+            "#", "Fotos", "Land", "Kennzeichen", "Marke", "Farbe", "Erstellt", "Beobachtet", "Status"
         )
     }
 

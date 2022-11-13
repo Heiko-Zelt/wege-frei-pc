@@ -1,21 +1,27 @@
 package de.heikozelt.wegefrei.noticeframe
 
 import de.heikozelt.wegefrei.DatabaseRepo
-import de.heikozelt.wegefrei.mua.EmailUserAgent
 import de.heikozelt.wegefrei.WegeFrei
-import de.heikozelt.wegefrei.entities.Notice
-import de.heikozelt.wegefrei.entities.Photo
-import de.heikozelt.wegefrei.gui.Styles.Companion.FRAME_BACKGROUND
+import de.heikozelt.wegefrei.entities.NoticeEntity
+import de.heikozelt.wegefrei.entities.PhotoEntity
+import de.heikozelt.wegefrei.gui.Styles
 import de.heikozelt.wegefrei.jobs.AddressWorker
 import de.heikozelt.wegefrei.json.Witness
 import de.heikozelt.wegefrei.maps.MaxiMapForm
-import de.heikozelt.wegefrei.model.*
+import de.heikozelt.wegefrei.model.Offense
+import de.heikozelt.wegefrei.model.Photo
+import de.heikozelt.wegefrei.model.SelectedPhotos
+import de.heikozelt.wegefrei.model.SelectedPhotosObserver
 import de.heikozelt.wegefrei.mua.EmailAddressWithName
 import de.heikozelt.wegefrei.mua.EmailAttachment
 import de.heikozelt.wegefrei.mua.EmailMessage
+import de.heikozelt.wegefrei.mua.EmailUserAgent
 import org.jxmapviewer.viewer.GeoPosition
 import org.slf4j.LoggerFactory
 import java.awt.Component
+import java.awt.Dimension
+import java.awt.event.WindowAdapter
+import java.awt.event.WindowEvent
 import java.nio.file.Paths
 import java.time.ZonedDateTime
 import java.util.*
@@ -49,11 +55,11 @@ import kotlin.math.sqrt
  * </ol>
  * todo Prio 2: Wenn Fenster geschlossen wird via Close-Button oder bei Änderung der Datenbank, fragen ob Daten gespeichert werden sollen (falls sie geändert wurden)
  */
-class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver {
+class NoticeFrame(private val app: WegeFrei, private val dbRepo: DatabaseRepo) : JFrame(), SelectedPhotosObserver {
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
 
     // Daten-Modell:
-    private var notice: Notice? = null // wozu brauche ich dieses Feld, wenn getNotice() delegiert
+    private var noticeEntity: NoticeEntity? = null // wozu brauche ich dieses Feld, wenn getNotice() delegiert
     private var selectedPhotos: SelectedPhotos = SelectedPhotos() // Achtung: Redundanz
     private var offensePosition: GeoPosition? = null // Achtung: Redundanz
 
@@ -63,25 +69,35 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
     private var searchedAddressForPosition: GeoPosition? = null
 
     // GUI-Komponenten:
-    private var allPhotosPanel = AllPhotosPanel(this)
+    private var browserPanel = BrowserPanel(this, dbRepo)
     private var selectedPhotosPanel = SelectedPhotosPanel(this)
     private var selectedPhotosScrollPane = JScrollPane(selectedPhotosPanel)
     private var noticeForm = NoticeForm(this)
 
     // Split-Panes:
-    private var topSplitPane = JSplitPane(JSplitPane.VERTICAL_SPLIT, allPhotosPanel, selectedPhotosScrollPane)
+    private var topSplitPane = JSplitPane(JSplitPane.VERTICAL_SPLIT, browserPanel, selectedPhotosScrollPane)
     private var bottomSplitPane = JSplitPane(JSplitPane.HORIZONTAL_SPLIT, noticeForm, JPanel())
     private var mainSplitPane = JSplitPane(JSplitPane.VERTICAL_SPLIT, topSplitPane, bottomSplitPane)
 
     init {
         log.debug("init")
         title = "Meldung - Wege frei!"
-        background = FRAME_BACKGROUND
+        //background = FRAME_BACKGROUND
+        selectedPhotosScrollPane.minimumSize = Dimension(Styles.THUMBNAIL_SIZE / 2, Styles.THUMBNAIL_SIZE / 2)
+
 
         //defaultCloseOperation = DISPOSE_ON_CLOSE ist egal
-        addWindowListener(NoticeFrameWindowListener(this))
+        //addWindowListener(NoticeFrameWindowListener(this))
+        addWindowListener(object: WindowAdapter() {
+            override fun windowClosing(e: WindowEvent?) {
+                e?.window?.let {
+                    if (it is NoticeFrame) it.saveAndClose()
+                }
+            }
+        })
 
-        setSize(1000, 700)
+        this.extendedState = MAXIMIZED_BOTH
+        //setSize(1000, 700)
 
         topSplitPane.apply {
             isOneTouchExpandable = true
@@ -112,11 +128,11 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
      * SelectedPhotosObservers werden frühzeitig registriert.
      * Fotos werden direkt danach ersetzt.
      * Zuletzt werden sonstige Daten geladen.
-     * @param notice
+     * @param noticeEntity
      */
-    fun setNotice(notice: Notice = Notice()) {
-        log.debug("setNotice(notice id: ${notice.id})")
-        this.notice = notice
+    fun setNotice(noticeEntity: NoticeEntity = NoticeEntity()) {
+        log.debug("setNotice(notice id: ${noticeEntity.id})")
+        this.noticeEntity = noticeEntity
 
         app.getSettings()?.let {
             selectedPhotosPanel.setPhotosDirectory(it.photosDirectory)
@@ -124,30 +140,34 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
 
         selectedPhotos.registerObserver(this)
         selectedPhotos.registerObserver(selectedPhotosPanel)
-        selectedPhotos.registerObserver(allPhotosPanel)
+        selectedPhotos.registerObserver(browserPanel)
         selectedPhotos.registerObserver(noticeForm.getNoticeFormFields())
         selectedPhotos.registerObserver(noticeForm.getNoticeFormFields().getMiniMap())
 
-        selectedPhotos.setPhotos(TreeSet(notice.photos))
+        selectedPhotos.setPhotos(TreeSet(noticeEntity.photoEntities))
+        browserPanel.setSelectedPhotos(selectedPhotos)
 
-        title = if (notice.id == null) {
+        title = if (noticeEntity.id == null) {
             "Neue Meldung - Wege frei!"
         } else {
-            "Meldung #${notice.id} - Wege frei!"
+            "Meldung #${noticeEntity.id} - Wege frei!"
         }
 
         app.getSettings()?.let {
-            allPhotosPanel.loadData(it.photosDirectory, "20220301_184952.jpg")
-            noticeForm.setNotice(notice)
+            browserPanel.loadData(it.getPhotosPath())
+            noticeForm.setNotice(noticeEntity)
+        }
+        noticeEntity.id?.let {
+            browserPanel.setNoticeId(it)
         }
 
-        offensePosition = notice.getGeoPosition()
+        offensePosition = noticeEntity.getGeoPosition()
     }
 
     /**
      * delegiert nur
      */
-    fun getNotice(): Notice {
+    fun getNotice(): NoticeEntity {
         return noticeForm.getNotice()
     }
 
@@ -162,18 +182,18 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
     /**
      * wählt ein Foto aus
      */
-    fun selectPhoto(photo: Photo) {
-        log.debug("selectPhoto(photo=${photo.filename}")
-        selectedPhotos.add(photo)
+    fun selectPhoto(photoEntity: PhotoEntity) {
+        log.debug("selectPhoto(photo=${photoEntity.path}")
+        selectedPhotos.add(photoEntity)
         // alle weiteren Aktionen via Observers
     }
 
     /**
      * entfernt ein Foto aus der Auswahl für die Meldung
      */
-    fun unselectPhoto(photo: Photo) {
-        log.debug("unselectPhoto(photo=${photo.filename}")
-        selectedPhotos.remove(photo)
+    fun unselectPhoto(photoEntity: PhotoEntity) {
+        log.debug("unselectPhoto(photo=${photoEntity.path}")
+        selectedPhotos.remove(photoEntity)
         // alle weiteren Aktionen via Observers
     }
 
@@ -188,13 +208,13 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
         setZoomComponent(maxiMapForm)
         maxiMapForm.setOffenseMarker(offensePosition)
         maxiMapForm.setPhotoMarkers(selectedPhotos)
-        notice?.let {
+        noticeEntity?.let {
             if (it.isSent()) {
                 maxiMapForm.enableOrDisableEditing()
             }
         }
         noticeForm.getNoticeFormFields().getMiniMap().displayBorder(true)
-        allPhotosPanel.hideBorder()
+        browserPanel.hideBorder()
         selectedPhotosPanel.hideBorder()
     }
 
@@ -203,28 +223,33 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
      */
     fun showPhoto(miniPhotoPanel: MiniPhotoPanel) {
         log.debug("show photo")
+
+        /*
         app.getSettings()?.photosDirectory?.let {
             val photoPanel = MaxiPhotoPanel(it, this, miniPhotoPanel.getPhoto())
             val scrollPane = JScrollPane(photoPanel)
             setZoomComponent(scrollPane)
         }
+         */
         noticeForm.getNoticeFormFields().getMiniMap().displayBorder(false)
-        allPhotosPanel.showBorder(miniPhotoPanel)
+        //browserPanel.showBorder(miniPhotoPanel)
         selectedPhotosPanel.hideBorder()
     }
 
     /**
      * zeigt im Zoom-Bereich ein großes Foto an
      */
-    private fun showPhoto(photo: Photo) {
+    fun showPhoto(photo: Photo) {
         log.debug("show photo")
-        app.getSettings()?.photosDirectory?.let {
-            val photoPanel = MaxiPhotoPanel(it, this, photo)
-            val scrollPane = JScrollPane(photoPanel)
-            setZoomComponent(scrollPane)
+        app.getSettings()?.photosDirectory?.let {dir ->
+            photo.getPhotoEntity()?.let { entity ->
+                val photoPanel = MaxiPhotoPanel(dir, this, entity)
+                val scrollPane = JScrollPane(photoPanel)
+                setZoomComponent(scrollPane)
+            }
         }
         noticeForm.getNoticeFormFields().getMiniMap().displayBorder(false)
-        allPhotosPanel.showBorder(photo)
+        //browserPanel.showBorder(photoEntity)
         selectedPhotosPanel.hideBorder()
     }
 
@@ -243,25 +268,25 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
         }
 
         noticeForm.getNoticeFormFields().getMiniMap().displayBorder(false)
-        allPhotosPanel.hideBorder()
+        browserPanel.hideBorder()
         selectedPhotosPanel.showBorder(miniSelectedPhotoPanel)
     }
 
     /**
      * zeigt im Zoom-Bereich ein großes bereits ausgewähltes Foto an
      */
-    private fun showSelectedPhoto(photo: Photo) {
+    private fun showSelectedPhoto(photoEntity: PhotoEntity) {
         log.debug("show selected photo")
 
         app.getSettings()?.photosDirectory?.let {
-            val photoPanel = MaxiSelectedPhotoPanel(it, this, photo)
+            val photoPanel = MaxiSelectedPhotoPanel(it, this, photoEntity)
             val scrollPane = JScrollPane(photoPanel)
             setZoomComponent(scrollPane)
         }
 
         noticeForm.getNoticeFormFields().getMiniMap().displayBorder(false)
-        allPhotosPanel.hideBorder()
-        selectedPhotosPanel.showBorder(photo)
+        browserPanel.hideBorder()
+        selectedPhotosPanel.showBorder(photoEntity)
     }
 
     /**
@@ -290,7 +315,7 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
     fun saveNotice() {
         noticeForm.getNoticeFormFields().getNotice()
         val dbRepo = app.getDatabaseRepo() ?: return
-        notice?.let {
+        noticeEntity?.let {
             it.setGeoPosition(offensePosition)
             if (it.id == null) {
                 dbRepo.insertNotice(it)
@@ -308,7 +333,7 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
      */
     fun deleteNotice() {
         val dbRepo = app.getDatabaseRepo() ?: return
-        notice?.let {
+        noticeEntity?.let {
             dbRepo.deleteNotice(it)
             app.noticeDeleted(it)
         }
@@ -322,8 +347,8 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
      * todo Bei Validierung: Differenzierung zwischen Warnung und Fehler
      */
     fun sendNotice() {
-        notice = getNotice()
-        notice?.let {
+        noticeEntity = getNotice()
+        noticeEntity?.let {
             if(it.recipient == null) {
                 JOptionPane.showMessageDialog(
                     null,
@@ -352,7 +377,7 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
         log.debug("sendEmail()")
 
         app.getSettings()?.let { setti ->
-            notice?.let { n ->
+            noticeEntity?.let { n ->
                 n.recipient?.let { reci ->
                     val from = EmailAddressWithName(setti.witness.emailAddress, setti.witness.getFullName())
                     // todo Prio 3: mehrere Empfänger erlauben
@@ -368,7 +393,7 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
                     if(from.address != to.address) message.ccs.add(from)
 
                     selectedPhotos.getPhotos().forEach {
-                        val path = Paths.get(setti.photosDirectory, it.filename)
+                        val path = Paths.get(setti.photosDirectory, it.path)
                         val attachment = EmailAttachment(path)
                         message.attachments.add(attachment)
                     }
@@ -389,13 +414,13 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
      * tausche nicht ausgewähltes durch ausgewähltes Foto,
      * nur falls es sich um das gleiche Foto handelt.
      */
-    override fun selectedPhoto(index: Int, photo: Photo) {
+    override fun selectedPhoto(index: Int, photoEntity: PhotoEntity) {
         getMaxiPhotoPanel()?.let {
-            if (photo == it.getPhoto()) {
-                showSelectedPhoto(photo)
+            if (photoEntity == it.getPhoto()) {
+                showSelectedPhoto(photoEntity)
             }
         }
-        photo.getGeoPosition()?.run {
+        photoEntity.getGeoPosition()?.run {
             updateOffensePositionFromSelectedPhotos()
         }
     }
@@ -404,18 +429,19 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
      * tausche ausgewähltes durch nicht ausgewähltes Foto,
      * nur falls es sich um das gleiche Foto handelt.
      */
-    override fun unselectedPhoto(index: Int, photo: Photo) {
+    override fun unselectedPhoto(index: Int, photoEntity: PhotoEntity) {
         getMaxiSelectedPhotoPanel()?.let {
-            if (photo == it.getPhoto()) {
-                showPhoto(photo)
+            if (photoEntity == it.getPhoto()) {
+                // todo reparieren
+                //showPhoto(photoEntity)
             }
         }
-        photo.getGeoPosition()?.run {
+        photoEntity.getGeoPosition()?.run {
             updateOffensePositionFromSelectedPhotos()
         }
     }
 
-    override fun replacedPhotoSelection(photos: TreeSet<Photo>) {
+    override fun replacedPhotoSelection(photoEntities: TreeSet<PhotoEntity>) {
         // todo was ist denn hier zu tun?
     }
 
@@ -574,7 +600,7 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
             return distance
         }
 
-        fun buildMailContent(n: Notice, w: Witness): String {
+        fun buildMailContent(n: NoticeEntity, w: Witness): String {
             fun htmlEncode(str: String?): String {
                 str?.let {
                     return it
@@ -620,13 +646,13 @@ class NoticeFrame(private val app: WegeFrei) : JFrame(), SelectedPhotosObserver 
             val witnessEmailRow = tableRow("E-Mail", w.emailAddress)
             val telephoneRow = tableRow("Telefon", w.telephoneNumber)
 
-            val attachmentsSection = if(n.photos.isEmpty()) {
+            val attachmentsSection = if(n.photoEntities.isEmpty()) {
                 ""
             } else {
                 val sb = StringBuilder()
                 sb.append("|  <h1>Anlagen</h1>\n")
                 sb.append("|  <ol>\n")
-                n.photos.forEach { sb.append("|    <li>${it.filename} (SHA1: ${it.getHashHex()})</li>\n")}
+                n.photoEntities.forEach { sb.append("|    <li>${it.path} (SHA1: ${it.getHashHex()})</li>\n")}
                 sb.append("|  </ol>\n")
             }
 

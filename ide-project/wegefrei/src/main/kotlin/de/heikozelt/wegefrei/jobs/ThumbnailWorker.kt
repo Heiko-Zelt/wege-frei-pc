@@ -1,6 +1,6 @@
 package de.heikozelt.wegefrei.jobs
 
-import de.heikozelt.wegefrei.entities.Photo
+import de.heikozelt.wegefrei.entities.PhotoEntity
 import de.heikozelt.wegefrei.gui.Styles
 import org.slf4j.LoggerFactory
 import java.awt.Image
@@ -16,8 +16,7 @@ import javax.swing.SwingWorker
  * generiert ein Thumbnail-Image und passt das Label an.
  */
 class ThumbnailWorker(
-    private val photosDir: String,
-    private val photo: Photo,
+    private val photoEntity: PhotoEntity,
     private val active: Boolean,
     private val label: JLabel)
 : SwingWorker<ImageIcon?, ImageIcon?>() {
@@ -31,13 +30,13 @@ class ThumbnailWorker(
     private var icon: ImageIcon? = null
 
     init{
-        log.debug("photosDir: $photosDir")
+        log.debug("init()")
     }
 
     private fun calculateThumbnail() {
         log.debug("calculateThumbnail()")
         //Thread.sleep(5000)
-        photo.getImage(photosDir)?.let { image ->
+        photoEntity.getImage()?.let { image ->
             log.debug("got image of photo")
             // Thumbnail-Größe auf die Längere der beiden Bild-Seiten anpassen
             if (image.height > image.width) {
@@ -56,7 +55,7 @@ class ThumbnailWorker(
     }
 
     private fun makeThumbnailImage() {
-        photo.getImage(photosDir)?.let { image ->
+        photoEntity.getImage()?.let { image ->
             thumbnailImage = image.getScaledInstance(thumbnailWidth, thumbnailHeight, Image.SCALE_SMOOTH)
             if (!active) {
                 val filter = GrayFilter(true, 50)
@@ -69,7 +68,7 @@ class ThumbnailWorker(
 
     /**
      * This is done in own Thread.
-     * Intense computing of icon.
+     * loading of image from disk.
      */
     override fun doInBackground(): ImageIcon? {
         log.debug("doInBackground()")
@@ -86,6 +85,8 @@ class ThumbnailWorker(
     /**
      * This is done in the Swing Event Dispatcher Thread.
      * Just update the user interface.
+     * fireTableRowsUpdated(rowIndex, rowIndex)
+     * ListModell.fireContentsChanged(Object source, int index0, int index1)
      */
     override fun done() {
         log.debug("done()")

@@ -6,10 +6,11 @@ import com.drew.metadata.exif.ExifSubIFDDirectory
 import com.drew.metadata.exif.GpsDirectory
 import de.heikozelt.wegefrei.DatabaseRepo
 import de.heikozelt.wegefrei.ImageFilenameFilter
-import de.heikozelt.wegefrei.entities.Photo
+import de.heikozelt.wegefrei.entities.PhotoEntity
 import de.heikozelt.wegefrei.scanframe.ScanFrame
 import org.slf4j.LoggerFactory
 import java.io.File
+import java.nio.file.Paths
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.*
@@ -64,7 +65,7 @@ class ScanWorker(
             publish(IntermediateResult.META_DATA)
             log.debug(filename)
             //JUL logger.log(Level.FINE, filename)
-            if (databaseRepo.getPhotoByFilename(filename) == null) {
+            if (databaseRepo.findPhotoByPath(Paths.get(filename)) == null) {
                 log.debug("image from file system is new")
                 val photo = readPhotoMetadata(File(photosDirectory, filename))
                 databaseRepo.insertPhoto(photo)
@@ -95,7 +96,7 @@ class ScanWorker(
         scanFrame.done()
     }
 
-    private fun readPhotoMetadata(file: File): Photo {
+    private fun readPhotoMetadata(file: File): PhotoEntity {
         var latitude: Float? = null
         var longitude: Float? = null
         var date: Date? = null
@@ -126,7 +127,7 @@ class ScanWorker(
             //Instant.ofEpochMilli(date.time).atZone(ZoneId.systemDefault()).toLocalDateTime()
         }
         val sha1Hash = "0123456789abcdefghij".toByteArray()
-        return Photo(file.name, sha1Hash, latitude, longitude, datTim, null)
+        return PhotoEntity(file.name, sha1Hash, latitude, longitude, datTim, null)
     }
 
     companion object {

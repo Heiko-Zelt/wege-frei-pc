@@ -6,7 +6,16 @@ import javax.swing.JList
 import javax.swing.JTextArea
 import javax.swing.ListCellRenderer
 
-class OffenseListCellRenderer: JTextArea(2, 40), ListCellRenderer<Offense> {
+class OffenseListCellRenderer: ListCellRenderer<Offense> {
+    val component = JTextArea(2, 40)
+
+    init {
+        component.apply {
+            isOpaque = true
+            lineWrap = true
+            wrapStyleWord = true
+        }
+    }
 
     override fun getListCellRendererComponent(
         list: JList<out Offense>?,
@@ -15,12 +24,10 @@ class OffenseListCellRenderer: JTextArea(2, 40), ListCellRenderer<Offense> {
         isSelected: Boolean,
         cellHasFocus: Boolean
     ): Component {
-        isOpaque = true
+
         value?.let {
-            text = it.text
+            component.text = it.text
         }
-        lineWrap = true
-        wrapStyleWord = true
-        return this
+        return component
     }
 }

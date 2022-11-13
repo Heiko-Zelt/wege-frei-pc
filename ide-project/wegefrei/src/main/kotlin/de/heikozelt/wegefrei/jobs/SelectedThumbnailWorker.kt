@@ -1,6 +1,6 @@
 package de.heikozelt.wegefrei.jobs
 
-import de.heikozelt.wegefrei.entities.Photo
+import de.heikozelt.wegefrei.entities.PhotoEntity
 import de.heikozelt.wegefrei.gui.Styles
 import org.slf4j.LoggerFactory
 import java.awt.Image
@@ -14,7 +14,7 @@ import javax.swing.SwingWorker
  */
 class SelectedThumbnailWorker(
     private val photosDir: String,
-    private val photo: Photo,
+    private val photoEntity: PhotoEntity,
     private val label: JLabel)
 : SwingWorker<ImageIcon?, ImageIcon?>() {
 
@@ -28,7 +28,7 @@ class SelectedThumbnailWorker(
 
     private fun calculateThumbnail() {
         //Thread.sleep(5000)
-        photo.getImage(photosDir)?.let { image ->
+        photoEntity.getImage()?.let { image ->
             // Thumbnail-Größe auf die Längere der beiden Bild-Seiten anpassen
             if (image.height > image.width) {
                 val scaleFactor = Styles.THUMBNAIL_SIZE.toFloat() / image.height
@@ -45,7 +45,7 @@ class SelectedThumbnailWorker(
     }
 
     private fun makeThumbnailImage() {
-        photo.getImage(photosDir)?.let { image ->
+        photoEntity.getImage()?.let { image ->
             thumbnailImage = image.getScaledInstance(thumbnailWidth, thumbnailHeight, Image.SCALE_SMOOTH)
         }
     }

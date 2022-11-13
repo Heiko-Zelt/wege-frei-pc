@@ -1,9 +1,10 @@
 package de.heikozelt.wegefrei.jobs
 
-import de.heikozelt.wegefrei.DatabaseRepo
-import de.heikozelt.wegefrei.entities.Photo
-import de.heikozelt.wegefrei.noticeframe.AllPhotosPanel
+import de.heikozelt.wegefrei.ImageFilenameFilter
+import de.heikozelt.wegefrei.entities.PhotoEntity
+import de.heikozelt.wegefrei.model.BrowserListModel
 import org.slf4j.LoggerFactory
+import java.io.File
 import javax.swing.SwingWorker
 
 /**
@@ -12,35 +13,48 @@ import javax.swing.SwingWorker
  * Werden die Daten in einem Rutsch aus der Datenbank geladen?
  * oder wäre auch ein Cursor / Stream-Verarbeitung möglich?
  */
-class LoadPhotosWorker(
-    private val databaseRepo: DatabaseRepo,
-    private val firstPhotoFilename: String,
-    private val allPhotosPanel: AllPhotosPanel
-)
-: SwingWorker<Set<Photo>, Set<Photo>>() {
+class LoadPhotosWorker(private val browserListModel: BrowserListModel)
+: SwingWorker<Set<PhotoEntity>, PhotoEntity>() {
 
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
-    private var photos: Set<Photo>? = null
+    /**
+     * not needed because of chunk processing
+     */
+    private var photoEntities = mutableSetOf<PhotoEntity>()
 
     /**
      * This is done in own Thread
+     * <ol>
+     *     <li>phase: read all filenames (and sort them)</li>
+     *     <li>phase: Load photos</li>
+     * </ol>
      */
-    override fun doInBackground(): Set<Photo>? {
-        log.info("doInBackground()")
-        photos = databaseRepo.getPhotos(firstPhotoFilename, 20)
-        log.debug("number of photos in database: ${photos?.size}")
-        return photos
+    override fun doInBackground(): Set<PhotoEntity>? {
+        log.debug("doInBackground()")
+        browserListModel.getDirectoryPath()?.let { path ->
+            val dir = File(path.toString())
+            if (!dir.isDirectory) {
+                 log.error("$path ist kein Verzeichnis.")
+                 return emptySet()
+            }
+            val unsortedFilenamesList = dir.list(ImageFilenameFilter()) ?: return emptySet()
+            val sortedFilenamesList = unsortedFilenamesList.sorted()
+            sortedFilenamesList.forEach {
+                val photoEntity = PhotoEntity.fromPath(path, it)
+                photoEntities.add(photoEntity)
+                publish(photoEntity)
+            }
+            return photoEntities
+        }
+        log.error("photos directory is null")
+        return emptySet()
     }
 
     /**
+     * give chunks of result to the list model
      * this is done in the Swing Event Dispatcher Thread (EDT)
      */
-    override fun done() {
-        photos?.let {
-            for (photo in it) {
-                allPhotosPanel.appendPhoto(photo)
-            }
-        }
+    override fun process(chunks: List<PhotoEntity>) {
+        //allPhotosListModel.appendPhotos(chunks)
     }
-
 }

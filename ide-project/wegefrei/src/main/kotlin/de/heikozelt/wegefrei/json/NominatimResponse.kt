@@ -40,5 +40,5 @@ import com.beust.klaxon.Json
  */
 class NominatimResponse(
     @Json(name="display_name") val displayName: String,
-    val address: Address?
+    @Json(name="address") val nominatimAddress: NominatimAddress?
 )

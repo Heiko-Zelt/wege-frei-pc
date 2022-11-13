@@ -6,19 +6,23 @@
         <!-- Persistence provider -->
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
         <!-- Entity classes -->
-        <class>de.heikozelt.wegefrei.entities.Photo</class>
-        <class>de.heikozelt.wegefrei.entities.Notice</class>
+        <class>de.heikozelt.wegefrei.entities.PhotoEntity</class>
+        <class>de.heikozelt.wegefrei.entities.NoticeEntity</class>
         <properties>
             <property name="jakarta.persistence.jdbc.driver" value="org.h2.Driver" />
             <!--property name="jakarta.persistence.jdbc.url" value="jdbc:h2:file:~/wege_frei_v1" /-->
             <property name="jakarta.persistence.jdbc.user" value="wegefrei" />
             <property name="jakarta.persistence.jdbc.password" value="" />
+            <property name="hibernate.connection.provider_class" value="org.hibernate.hikaricp.internal.HikariCPConnectionProvider"/>
             <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect"/>
             <property name="hibernate.hbm2ddl.auto" value="update"/>
-            <property name="hibernate.show_sql" value="false"/>
+            <property name="hibernate.show_sql" value="true"/>
             <property name="hibernate.temp.use_jdbc_metadata_defaults" value="false"/>
             <property name="hibernate.format_sql" value="true"/>
             <property name="hibernate.use_sql_comments" value="true"/>
+            <property name="hibernate.generate_statistics" value="true"/>
+            <property name="hibernate.hikari.minimumIdle" value="1" />
+            <property name="hibernate.hikari.maximumPoolSize" value="3" />
             <!--property name="hibernate.globally_quoted_identifiers" value="true"/-->
         </properties>
     </persistence-unit>

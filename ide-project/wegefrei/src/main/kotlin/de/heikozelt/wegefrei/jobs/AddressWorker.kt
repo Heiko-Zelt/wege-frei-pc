@@ -1,8 +1,8 @@
 package de.heikozelt.wegefrei.jobs
 
 import com.beust.klaxon.Klaxon
-import de.heikozelt.wegefrei.noticeframe.NoticeForm
 import de.heikozelt.wegefrei.json.NominatimResponse
+import de.heikozelt.wegefrei.noticeframe.NoticeForm
 import org.jxmapviewer.viewer.GeoPosition
 import org.slf4j.LoggerFactory
 import java.net.HttpURLConnection
@@ -26,7 +26,7 @@ class AddressWorker(
     private var nominatimResponse: NominatimResponse? = null
 
     /**
-     * This is done in own Thread
+     * This is done in a background thread
      */
     override fun doInBackground(): NominatimResponse? {
         log.info("doInBackground()")
@@ -40,12 +40,22 @@ class AddressWorker(
         println(connection.responseCode)
         println(connection.getHeaderField("Content-Type"))
         val text = connection.inputStream.use { it.reader().use { reader -> reader.readText() } }
-        log.debug(text)
+        log.debug("text: $text")
 
-        nominatimResponse = Klaxon().parse<NominatimResponse>(text)
+        try {
+            nominatimResponse = Klaxon().parse<NominatimResponse>(text)
+        } catch(ex: Exception) {
+            log.error("parsing exception", ex)
+        }
+        if(nominatimResponse == null) {
+            log.error("parsing error")
+        }
+        if(nominatimResponse?.nominatimAddress == null) {
+            log.error("parsing error - no address")
+        }
         log.debug("displayName: ${nominatimResponse?.displayName}")
-        log.debug("road: ${nominatimResponse?.address?.road}")
-        log.debug("houseNumber: ${nominatimResponse?.address?.houseNumber}")
+        log.debug("road: ${nominatimResponse?.nominatimAddress?.road}")
+        log.debug("houseNumber: ${nominatimResponse?.nominatimAddress?.houseNumber}")
         return nominatimResponse
     }
 
@@ -54,24 +64,15 @@ class AddressWorker(
      */
     override fun done() {
         log.debug("done()")
-        nominatimResponse?.address?.let {
-            log.debug("adr")
-            if (it.road != null) {
-                log.debug("road")
-                var street = it.road
-                if (it.houseNumber != null) {
-                    log.debug("house number")
-                    street += " " + it.houseNumber
-                }
-                log.debug("street")
-                noticeForm.getNoticeFormFields().setStreet(street)
+        nominatimResponse?.nominatimAddress?.let { adr ->
+            adr.getStreetAndHouseNumber()?.let {
+                noticeForm.getNoticeFormFields().setStreet(it)
             }
-            if (it.postcode != null) {
-                log.debug("postcode")
-                noticeForm.getNoticeFormFields().setZipCode(it.postcode)
+            adr.postcode?.let {
+                noticeForm.getNoticeFormFields().setZipCode(it)
             }
-            if (it.city != null) {
-                noticeForm.getNoticeFormFields().setTown(it.city)
+            adr.getCityOrTown()?.let {
+              noticeForm.getNoticeFormFields().setTown(it)
             }
         }
     }

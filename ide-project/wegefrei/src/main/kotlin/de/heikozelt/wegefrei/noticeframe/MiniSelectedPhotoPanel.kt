@@ -1,6 +1,6 @@
 package de.heikozelt.wegefrei.noticeframe
 
-import de.heikozelt.wegefrei.entities.Photo
+import de.heikozelt.wegefrei.entities.PhotoEntity
 import de.heikozelt.wegefrei.gui.Styles
 import de.heikozelt.wegefrei.gui.Styles.Companion.HIGHLIGHT_BORDER
 import de.heikozelt.wegefrei.gui.Styles.Companion.NORMAL_BORDER
@@ -16,7 +16,7 @@ import javax.swing.SwingConstants
 class MiniSelectedPhotoPanel(
     private val photosDir: String,
     private val noticeFrame: NoticeFrame,
-    private val photo: Photo,
+    private val photoEntity: PhotoEntity,
     private var index: Int): JPanel()
 {
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
@@ -34,7 +34,7 @@ class MiniSelectedPhotoPanel(
 
         //background = Color.green
 
-        thumbnailLabel.toolTipText = photo.getToolTipText()
+        thumbnailLabel.toolTipText = photoEntity.getToolTipText()
         thumbnailLabel.setBounds(0, 0, Styles.THUMBNAIL_SIZE, Styles.THUMBNAIL_SIZE)
         thumbnailLabel.border = NORMAL_BORDER
         thumbnailLabel.addMouseListener(MiniSelectedPhotoPanelMouseListener(noticeFrame, this))
@@ -58,12 +58,12 @@ class MiniSelectedPhotoPanel(
         add(thumbnailLabel)
 
         // Loading the image from the filesystem and resizing it is time-consuming. So, do it later...
-        val worker = SelectedThumbnailWorker(photosDir, photo, thumbnailLabel)
+        val worker = SelectedThumbnailWorker(photosDir, photoEntity, thumbnailLabel)
         worker.execute()
     }
 
     fun unselectPhoto() {
-        noticeFrame.unselectPhoto(photo)
+        noticeFrame.unselectPhoto(photoEntity)
     }
 
     fun displayBorder(visible: Boolean) {
@@ -78,8 +78,8 @@ class MiniSelectedPhotoPanel(
         }
     }
 
-    fun getPhoto(): Photo {
-        return photo
+    fun getPhoto(): PhotoEntity {
+        return photoEntity
     }
 
     fun updateText(index: Int) {

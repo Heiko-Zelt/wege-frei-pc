@@ -1,0 +1,31 @@
+{
+  "place_id": 344300977,
+  "licence": "Data © OpenStreetMap contributors, ODbL 1.0. https://osm.org/copyright",
+  "osm_type": "node",
+  "osm_id": 10054713419,
+  "lat": "50.014963",
+  "lon": "8.4499361",
+  "place_rank": 30,
+  "category": "place",
+  "type": "house",
+  "importance": 0,
+  "addresstype": "place",
+  "name": null,
+  "display_name": "4, Schulstraße, Raunheim, Kreis Groß-Gerau, Hessen, 65479, Deutschland",
+  "address": {
+    "road": "Schulstraße",
+    "town": "Raunheim",
+    "county": "Kreis Groß-Gerau",
+    "state": "Hessen",
+    "ISO3166-2-lvl4": "DE-HE",
+    "postcode": "65479",
+    "country": "Deutschland",
+    "country_code": "de"
+  },
+  "boundingbox": [
+    "50.014913",
+    "50.015013",
+    "8.4498861",
+    "8.4499861"
+  ]
+}

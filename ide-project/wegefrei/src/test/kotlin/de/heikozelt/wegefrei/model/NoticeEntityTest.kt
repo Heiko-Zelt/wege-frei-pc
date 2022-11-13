@@ -1,17 +1,17 @@
 package de.heikozelt.wegefrei.model
 
-import de.heikozelt.wegefrei.entities.Notice
-import de.heikozelt.wegefrei.entities.Photo
+import de.heikozelt.wegefrei.entities.NoticeEntity
+import de.heikozelt.wegefrei.entities.PhotoEntity
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import java.time.ZoneId
 import java.time.ZonedDateTime
 
-class NoticeTest {
+class NoticeEntityTest {
 
     @Test
     fun constructor_with_no_arguments() {
-        val n = Notice()
+        val n = NoticeEntity()
         n.apply {
             assertNull(id)
             assertNull(countrySymbol)
@@ -30,7 +30,7 @@ class NoticeTest {
             assertNull(vehicleInspectionYear)
             assertNull(vehicleInspectionMonth)
             assertFalse(vehicleAbandoned)
-            assertEquals(0, photos.size)
+            assertEquals(0, photoEntities.size)
         }
     }
 
@@ -47,12 +47,12 @@ class NoticeTest {
 
         val hash1 = "0123456789abcdefghij".toByteArray()
         val hash2 = "abcdefghij0123456789".toByteArray()
-        val photos = hashSetOf(
-            Photo("img1.jpeg", hash1,50.111f, 8.111f, photoTime1),
-            Photo("img2.jpeg", hash2,50.222f, 8.222f, photoTime2)
+        val photoEntities = hashSetOf(
+            PhotoEntity("img1.jpeg", hash1,50.111f, 8.111f, photoTime1),
+            PhotoEntity("img2.jpeg", hash2,50.222f, 8.222f, photoTime2)
         )
 
-        val n = Notice(
+        val n = NoticeEntity(
             123,
             photoTime1,
             expectedSentTime,
@@ -77,7 +77,7 @@ class NoticeTest {
             12,
             false,
             "verwarngeldstelle@notice-j-unit-test.de",
-            photos
+            photoEntities
         )
         n.apply {
             assertEquals(123, id)
@@ -98,7 +98,7 @@ class NoticeTest {
             assertEquals(12, vehicleInspectionMonth)
             assertTrue(vehicleAbandoned)
             assertEquals("verwarngeldstelle@notice-j-unit-test.de", recipient)
-            assertEquals(2, photos.size)
+            assertEquals(2, photoEntities.size)
         }
     }
 }

@@ -41,11 +41,16 @@ class Styles {
         const val SELECT_BUTTON_SIZE = 26
         val BUTTON_MARGIN = Insets(0, 5, 0, 5)
 
-        val NORMAL_BORDER: Border = BorderFactory.createLineBorder(Color.black)
-        val HIGHLIGHT_BORDER: Border? = BorderFactory.createLineBorder(Color.yellow)
+        const val BORDER_THICKNESS = 1
+
+        // The border is on the inside of the component (JxMapViewer/MiniMap or JLabel) cropping the visible image
+        val NORMAL_BORDER: Border = BorderFactory.createLineBorder(Color.black, BORDER_THICKNESS)
+        val HIGHLIGHT_BORDER: Border? = BorderFactory.createLineBorder(Color.yellow, BORDER_THICKNESS)
         val NO_BORDER: Border? = BorderFactory.createEmptyBorder()
 
         val TEXT_COLOR: Color? = JLabel().foreground ?: Color.black
+
+        val FULLY_TRANSPARENT = Color(0,0,0,0)
 
         val FRAME_BACKGROUND = JPanel().background ?: Color(238, 238, 238)
         val PHOTO_MARKER_BACKGROUND = Color(101, 162, 235)

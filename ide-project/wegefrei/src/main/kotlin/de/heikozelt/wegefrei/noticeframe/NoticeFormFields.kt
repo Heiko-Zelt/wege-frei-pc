@@ -1,7 +1,7 @@
 package de.heikozelt.wegefrei.noticeframe
 
-import de.heikozelt.wegefrei.entities.Notice
-import de.heikozelt.wegefrei.entities.Photo
+import de.heikozelt.wegefrei.entities.NoticeEntity
+import de.heikozelt.wegefrei.entities.PhotoEntity
 import de.heikozelt.wegefrei.gui.*
 import de.heikozelt.wegefrei.maps.MiniMap
 import de.heikozelt.wegefrei.model.*
@@ -57,7 +57,7 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel(), Selecte
     private val recipientTextField = TrimmingTextField(30)
     private val noteTextArea = JTextArea(2, 40)
 
-    private var notice: Notice? = null
+    private var noticeEntity: NoticeEntity? = null
 
     init {
         log.debug("init")
@@ -297,44 +297,44 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel(), Selecte
      * Initialisieren der einzelnen Eingabe-Felder
      * Mapping von Notice zu GUI-Components
      */
-    fun setNotice(notice: Notice) {
-        this.notice = notice
+    fun setNotice(noticeEntity: NoticeEntity) {
+        this.noticeEntity = noticeEntity
 
-        notice.getGeoPosition()?.let {
+        noticeEntity.getGeoPosition()?.let {
             miniMap.setOffensePosition(it)
         }
 
-        val countrySymbol = CountrySymbol.fromAbbreviation(notice.countrySymbol)
+        val countrySymbol = CountrySymbol.fromAbbreviation(noticeEntity.countrySymbol)
         countrySymbolComboBox.selectedItem = countrySymbol
-        licensePlateTextField.text = notice.licensePlate
+        licensePlateTextField.text = noticeEntity.licensePlate
 
-        val make = ListVehicleMakes.VEHICLE_MAKES.find { it == notice.vehicleMake }
+        val make = ListVehicleMakes.VEHICLE_MAKES.find { it == noticeEntity.vehicleMake }
         make?.let {
             vehicleMakeComboBox.selectedItem = make
         }
 
-        colorComboBox.selectedItem = VehicleColor.fromColorName(notice.color)
-        streetTextField.text = notice.street
-        zipCodeTextField.text = notice.zipCode
-        townTextField.text = notice.town
-        locationDescriptionTextField.text = notice.locationDescription
-        offenseComboBox.selectedItem = Offense.fromId(notice.offense)
-        observationDateTextField.text = blankOrDateString(notice.observationTime)
-        observationTimeTextField.text = blankOrTimeString(notice.observationTime)
-        durationTextField.text = blankOrIntString(notice.duration)
-        obstructionCheckBox.isSelected = notice.obstruction
-        endangeringCheckBox.isSelected = notice.endangering
-        environmentalStickerCheckBox.isSelected = notice.environmentalStickerMissing
-        vehicleInspectionStickerCheckBox.isSelected = notice.vehicleInspectionExpired
+        colorComboBox.selectedItem = VehicleColor.fromColorName(noticeEntity.color)
+        streetTextField.text = noticeEntity.street
+        zipCodeTextField.text = noticeEntity.zipCode
+        townTextField.text = noticeEntity.town
+        locationDescriptionTextField.text = noticeEntity.locationDescription
+        offenseComboBox.selectedItem = Offense.fromId(noticeEntity.offense)
+        observationDateTextField.text = blankOrDateString(noticeEntity.observationTime)
+        observationTimeTextField.text = blankOrTimeString(noticeEntity.observationTime)
+        durationTextField.text = blankOrIntString(noticeEntity.duration)
+        obstructionCheckBox.isSelected = noticeEntity.obstruction
+        endangeringCheckBox.isSelected = noticeEntity.endangering
+        environmentalStickerCheckBox.isSelected = noticeEntity.environmentalStickerMissing
+        vehicleInspectionStickerCheckBox.isSelected = noticeEntity.vehicleInspectionExpired
         inspectionMonthYearLabel.isVisible = inspectionYearTextField.text.isNotBlank()
         inspectionYearTextField.isVisible = inspectionYearTextField.text.isNotBlank()
-        inspectionYearTextField.text = blankOrShortString(notice.vehicleInspectionYear)
+        inspectionYearTextField.text = blankOrShortString(noticeEntity.vehicleInspectionYear)
         inspectionMonthTextField.isVisible = inspectionMonthTextField.text.isNotBlank()
-        inspectionMonthTextField.text = blankOrByteString(notice.vehicleInspectionMonth)
-        abandonedCheckBox.isSelected = notice.vehicleAbandoned
-        warningLightsCheckBox.isSelected = notice.warningLights
-        recipientTextField.text = notice.recipient
-        noteTextArea.text = notice.note
+        inspectionMonthTextField.text = blankOrByteString(noticeEntity.vehicleInspectionMonth)
+        abandonedCheckBox.isSelected = noticeEntity.vehicleAbandoned
+        warningLightsCheckBox.isSelected = noticeEntity.warningLights
+        recipientTextField.text = noticeEntity.recipient
+        noteTextArea.text = noticeEntity.note
 
         enableOrDisableEditing()
     }
@@ -343,12 +343,12 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel(), Selecte
      * Mapping der Werte der GUI-Komponenten zu Notice
      */
     // todo Prio 1: form validation, Validierungsfehler bei Eingabefeldern anzeigen
-    fun getNotice(): Notice {
+    fun getNotice(): NoticeEntity {
         // Normalerweise sollte vorher setNotice() aufgerufen worden sein.
         // Aber falls nicht, wird ein neues Notice-Objekt instanziiert.
-        val n = notice?:Notice()
+        val n = noticeEntity?:NoticeEntity()
 
-        n.photos = noticeFrame.getSelectedPhotos().getPhotos()
+        n.photoEntities = noticeFrame.getSelectedPhotos().getPhotos()
 
         val selectedCountry = countrySymbolComboBox.selectedObjects[0] as CountrySymbol
         n.countrySymbol = if (selectedCountry.countryName == null) {
@@ -450,7 +450,7 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel(), Selecte
      */
     fun enableOrDisableEditing() {
         var enab = false
-        notice?.let {
+        noticeEntity?.let {
             enab = !it.isSent()
         }
         //val enab = (notice != null) && !notice.isSent()
@@ -477,20 +477,20 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel(), Selecte
         noteTextArea.isEnabled = enab
     }
 
-    override fun selectedPhoto(index: Int, photo: Photo) {
-        if (photo.date != null) {
+    override fun selectedPhoto(index: Int, photoEntity: PhotoEntity) {
+        if (photoEntity.dateTime != null) {
             updateDateTimeAndDuration()
         }
     }
 
-    override fun unselectedPhoto(index: Int, photo: Photo) {
-        if (photo.date != null) {
+    override fun unselectedPhoto(index: Int, photoEntity: PhotoEntity) {
+        if (photoEntity.dateTime != null) {
             updateDateTimeAndDuration()
         }
     }
 
-    override fun replacedPhotoSelection(photos: TreeSet<Photo>) {
-        if (photos.size != 0) {
+    override fun replacedPhotoSelection(photoEntities: TreeSet<PhotoEntity>) {
+        if (photoEntities.size != 0) {
             updateDateTimeAndDuration()
         }
     }

@@ -3,6 +3,8 @@ package de.heikozelt.wegefrei.json
 import com.beust.klaxon.Json
 import de.heikozelt.wegefrei.mua.EmailServerConfig
 import org.slf4j.LoggerFactory
+import java.nio.file.Path
+import java.nio.file.Paths
 import javax.swing.UIManager
 
 
@@ -32,6 +34,10 @@ data class Settings (
      */
     fun getLookAndFeelInfo(): UIManager.LookAndFeelInfo? {
         return UIManager.getInstalledLookAndFeels().firstOrNull { it.name == lookAndFeel }
+    }
+
+    fun getPhotosPath(): Path {
+        return Paths.get(photosDirectory)
     }
 
     /**

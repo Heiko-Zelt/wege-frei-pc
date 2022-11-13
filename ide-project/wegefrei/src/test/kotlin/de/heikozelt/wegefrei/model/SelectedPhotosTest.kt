@@ -1,6 +1,6 @@
 package de.heikozelt.wegefrei.model
 
-import de.heikozelt.wegefrei.entities.Photo
+import de.heikozelt.wegefrei.entities.PhotoEntity
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.time.ZonedDateTime
@@ -14,39 +14,39 @@ class SelectedPhotosTest {
 
     @Test
     fun calculateMarkerIndex_3_photos_3_markers() {
-       val photo1 = Photo("1.jpeg", hash1,50.08f, 8.24f, ZonedDateTime.now())
-       val photo2 = Photo("2.jpeg", hash2,50.08f, 8.24f, ZonedDateTime.now())
-       val photo3 = Photo("3.jpeg", hash3,50.08f, 8.24f, ZonedDateTime.now())
+       val photoEntity1 = PhotoEntity("1.jpeg", hash1,50.08f, 8.24f, ZonedDateTime.now())
+       val photoEntity2 = PhotoEntity("2.jpeg", hash2,50.08f, 8.24f, ZonedDateTime.now())
+       val photoEntity3 = PhotoEntity("3.jpeg", hash3,50.08f, 8.24f, ZonedDateTime.now())
        val selectedPhotos = SelectedPhotos()
-       selectedPhotos.add(photo1)
-       selectedPhotos.add(photo2)
-       selectedPhotos.add(photo3)
+       selectedPhotos.add(photoEntity1)
+       selectedPhotos.add(photoEntity2)
+       selectedPhotos.add(photoEntity3)
        assertEquals(2, selectedPhotos.calculateMarkerIndex(2)) // letztes Foto
        assertEquals(3, selectedPhotos.calculateMarkerIndex(3)) // letztes Foto wurde entfernt
     }
 
     @Test
     fun calculateMarkerIndex_3_photos_2_markers_a() {
-        val photo1 = Photo("1.jpeg", hash1,null, null, ZonedDateTime.now())
-        val photo2 = Photo("2.jpeg", hash2,50.08f, 8.24f, ZonedDateTime.now())
-        val photo3 = Photo("3.jpeg", hash3,50.08f, 8.24f, ZonedDateTime.now())
+        val photoEntity1 = PhotoEntity("1.jpeg", hash1,null, null, ZonedDateTime.now())
+        val photoEntity2 = PhotoEntity("2.jpeg", hash2,50.08f, 8.24f, ZonedDateTime.now())
+        val photoEntity3 = PhotoEntity("3.jpeg", hash3,50.08f, 8.24f, ZonedDateTime.now())
         val selectedPhotos = SelectedPhotos()
-        selectedPhotos.add(photo1)
-        selectedPhotos.add(photo2)
-        selectedPhotos.add(photo3)
+        selectedPhotos.add(photoEntity1)
+        selectedPhotos.add(photoEntity2)
+        selectedPhotos.add(photoEntity3)
         assertEquals(1, selectedPhotos.calculateMarkerIndex(2)) // letztes Foto
         assertEquals(2, selectedPhotos.calculateMarkerIndex(3)) // letztes Foto wurde entfernt
     }
 
     @Test
     fun calculateMarkerIndex_3_photos_2_markers_b() {
-        val photo1 = Photo("1.jpeg", hash1,50.08f, 8.24f, ZonedDateTime.now())
-        val photo2 = Photo("2.jpeg", hash2,50.08f, 8.24f, ZonedDateTime.now())
-        val photo3 = Photo("3.jpeg", hash3,null, null, ZonedDateTime.now())
+        val photoEntity1 = PhotoEntity("1.jpeg", hash1,50.08f, 8.24f, ZonedDateTime.now())
+        val photoEntity2 = PhotoEntity("2.jpeg", hash2,50.08f, 8.24f, ZonedDateTime.now())
+        val photoEntity3 = PhotoEntity("3.jpeg", hash3,null, null, ZonedDateTime.now())
         val selectedPhotos = SelectedPhotos()
-        selectedPhotos.add(photo1)
-        selectedPhotos.add(photo2)
-        selectedPhotos.add(photo3)
+        selectedPhotos.add(photoEntity1)
+        selectedPhotos.add(photoEntity2)
+        selectedPhotos.add(photoEntity3)
         assertEquals(2, selectedPhotos.calculateMarkerIndex(2)) // letztes Foto
         assertEquals(2, selectedPhotos.calculateMarkerIndex(3)) // letztes Foto wurde entfernt
     }

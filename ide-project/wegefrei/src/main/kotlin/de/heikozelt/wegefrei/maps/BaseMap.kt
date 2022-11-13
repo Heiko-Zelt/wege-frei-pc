@@ -1,6 +1,6 @@
 package de.heikozelt.wegefrei.maps
 
-import de.heikozelt.wegefrei.entities.Photo
+import de.heikozelt.wegefrei.entities.PhotoEntity
 import de.heikozelt.wegefrei.model.SelectedPhotosObserver
 import de.heikozelt.wegefrei.noticeframe.NoticeFrame
 import org.jxmapviewer.JXMapViewer
@@ -89,7 +89,7 @@ open class BaseMap(
      * Observer-Methode
      * index zählt intern ab 0, in der Marker-Darstellung aber ab "1"
      */
-    override fun selectedPhoto(index: Int, photo: Photo) {
+    override fun selectedPhoto(index: Int, photoEntity: PhotoEntity) {
         log.debug("selectedPhoto(index=$index)")
 
         // Marker hinzufügen, falls Geo-Position vorhanden ist
@@ -102,7 +102,7 @@ open class BaseMap(
             photoMarkers[i].incrementPhotoIndex()
         }
 
-        val pos = photo.getGeoPosition()
+        val pos = photoEntity.getGeoPosition()
         if (pos != null) {
             log.debug("add waypoint")
             val marker = PhotoMarker(index, pos)
@@ -131,14 +131,14 @@ open class BaseMap(
     /**
      * Observer-Methode
      */
-    override fun unselectedPhoto(index: Int, photo: Photo) {
+    override fun unselectedPhoto(index: Int, photoEntity: PhotoEntity) {
         log.debug("unselectedPhoto(index=$index)")
 
         val markerIndex = selectedPhotos.calculateMarkerIndex(index)
         log.debug("markerIndex: $markerIndex")
 
         // Marker und dessen Label entfernen, falls er/es existiert hat
-        if (photo.getGeoPosition() != null) {
+        if (photoEntity.getGeoPosition() != null) {
             remove(photoMarkers[markerIndex].getLabel())
             photoMarkers.removeAt(markerIndex)
         }
@@ -165,8 +165,8 @@ open class BaseMap(
     /**
      * alle Foto-Markers müssen ersetzt werden
      */
-    override fun replacedPhotoSelection(photos: TreeSet<Photo>) {
-        log.debug("replacedPhotoSelection(photos.size=${photos.size})")
+    override fun replacedPhotoSelection(photoEntities: TreeSet<PhotoEntity>) {
+        log.debug("replacedPhotoSelection(photos.size=${photoEntities.size})")
         // alle bestehenden Foto-Marker entfernen
         // (aber den ggf. existieren Adress-Marker behalten)
         for (photoMarker in photoMarkers) {
@@ -174,7 +174,7 @@ open class BaseMap(
         }
         photoMarkers.clear()
 
-        for ((i, photo) in photos.withIndex()) {
+        for ((i, photo) in photoEntities.withIndex()) {
             val position = photo.getGeoPosition()
             if (position != null) {
                 log.debug("add photo marker #$i")

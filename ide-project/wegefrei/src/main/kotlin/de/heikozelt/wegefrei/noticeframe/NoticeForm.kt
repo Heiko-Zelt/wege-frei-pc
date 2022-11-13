@@ -1,6 +1,6 @@
 package de.heikozelt.wegefrei.noticeframe
 
-import de.heikozelt.wegefrei.entities.Notice
+import de.heikozelt.wegefrei.entities.NoticeEntity
 import org.slf4j.LoggerFactory
 import javax.swing.*
 
@@ -61,11 +61,11 @@ class NoticeForm(private val noticeFrame: NoticeFrame) : JPanel() {
     /**
      * delegiert und aktualisiert die Buttons-Leiste
      */
-    fun setNotice(notice: Notice) {
-        noticeFormFields.setNotice(notice)
+    fun setNotice(noticeEntity: NoticeEntity) {
+        noticeFormFields.setNotice(noticeEntity)
 
         // Nur beim Bearbeiten einer bereits existierenden Meldung einen Löschen-Button anzeigen.
-        if(notice.id != null) {
+        if(noticeEntity.id != null) {
             deleteButton.isVisible = true
         }
 
@@ -75,7 +75,7 @@ class NoticeForm(private val noticeFrame: NoticeFrame) : JPanel() {
     /**
      * delegiert nur
      */
-    fun getNotice(): Notice {
+    fun getNotice(): NoticeEntity {
         return noticeFormFields.getNotice()
     }
 
