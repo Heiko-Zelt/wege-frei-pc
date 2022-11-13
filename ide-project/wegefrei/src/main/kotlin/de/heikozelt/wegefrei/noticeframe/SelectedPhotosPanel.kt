@@ -1,8 +1,8 @@
 package de.heikozelt.wegefrei.noticeframe
 
-import de.heikozelt.wegefrei.entities.PhotoEntity
 import de.heikozelt.wegefrei.gui.Styles.Companion.NO_BORDER
 import de.heikozelt.wegefrei.gui.Styles.Companion.SELECTED_PHOTOS_BACKGROUND
+import de.heikozelt.wegefrei.model.Photo
 import de.heikozelt.wegefrei.model.SelectedPhotosObserver
 import org.slf4j.LoggerFactory
 import java.util.*
@@ -50,9 +50,9 @@ class SelectedPhotosPanel(private val noticeFrame: NoticeFrame) : JPanel(),
     /**
      * get Panel of Photo
      */
-    private fun panelWithPhoto(photoEntity: PhotoEntity): MiniSelectedPhotoPanel? {
+    private fun panelWithPhoto(photo: Photo): MiniSelectedPhotoPanel? {
         for (photoPanel in miniSelectedPhotoPanels) {
-            if (photoPanel.getPhoto() == photoEntity) {
+            if (photoPanel.getPhoto() == photo) {
                 return photoPanel
             }
         }
@@ -73,9 +73,9 @@ class SelectedPhotosPanel(private val noticeFrame: NoticeFrame) : JPanel(),
      * zeigt bei einem Panel den Rahmen hervorgehoben an,
      * bei allen anderen normal
      */
-    fun showBorder(photoEntity: PhotoEntity) {
+    fun showBorder(photo: Photo) {
         for (panel in miniSelectedPhotoPanels) {
-            panel.displayBorder(photoEntity == panel.getPhoto())
+            panel.displayBorder(photo == panel.getPhoto())
         }
     }
 
@@ -88,10 +88,10 @@ class SelectedPhotosPanel(private val noticeFrame: NoticeFrame) : JPanel(),
         }
     }
 
-    override fun selectedPhoto(index: Int, photoEntity: PhotoEntity) {
+    override fun selectedPhoto(index: Int, photo: Photo) {
         log.debug("added photo")
         photosDir?.let { dir ->
-            val panel = MiniSelectedPhotoPanel(dir, noticeFrame, photoEntity, index)
+            val panel = MiniSelectedPhotoPanel(dir, noticeFrame, photo, index)
             miniSelectedPhotoPanels.add(index, panel)
             log.debug("add selected photo panel to container. component count: $componentCount")
             add(panel, index)
@@ -105,12 +105,12 @@ class SelectedPhotosPanel(private val noticeFrame: NoticeFrame) : JPanel(),
             // todo Prio 3: gemeinsame Basis-Klasse für MaxiPhotoPanel und MaxiSelectedPhotoPanel
             val zoomComponent = noticeFrame.getZoomComponent()
             if (zoomComponent is MaxiPhotoPanel) {
-                if (photoEntity == zoomComponent.getPhoto()) {
+                if (photo == zoomComponent.getPhoto()) {
                     panel.displayBorder(true)
                 }
             }
             if (zoomComponent is MaxiSelectedPhotoPanel) {
-                if (photoEntity == zoomComponent.getPhoto()) {
+                if (photo == zoomComponent.getPhoto()) {
                     panel.displayBorder(true)
                 }
             }
@@ -120,9 +120,9 @@ class SelectedPhotosPanel(private val noticeFrame: NoticeFrame) : JPanel(),
         }
     }
 
-    override fun unselectedPhoto(index: Int, photoEntity: PhotoEntity) {
+    override fun unselectedPhoto(index: Int, photo: Photo) {
         log.debug("removed photo")
-        val panel = panelWithPhoto(photoEntity)
+        val panel = panelWithPhoto(photo)
         miniSelectedPhotoPanels.remove(panel)
         log.debug("miniSelectedPhotoPanels.size: ${miniSelectedPhotoPanels.size}")
         // bei allen nachfolgenden Fotos den Index-Text ändern
@@ -138,11 +138,11 @@ class SelectedPhotosPanel(private val noticeFrame: NoticeFrame) : JPanel(),
         repaint()
     }
 
-    override fun replacedPhotoSelection(photoEntities: TreeSet<PhotoEntity>) {
+    override fun replacedPhotoSelection(photos: TreeSet<Photo>) {
         photosDir?.let { dir ->
             removeAll()
             miniSelectedPhotoPanels.clear()
-            for ((i, photo) in photoEntities.withIndex()) {
+            for ((i, photo) in photos.withIndex()) {
                 val panel = MiniSelectedPhotoPanel(dir, noticeFrame, photo, i)
                 miniSelectedPhotoPanels.add(panel)
                 add(panel)

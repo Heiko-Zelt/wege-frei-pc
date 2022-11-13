@@ -1,7 +1,6 @@
 package de.heikozelt.wegefrei.model
 
 import de.heikozelt.wegefrei.ImageFilenameFilter
-import de.heikozelt.wegefrei.entities.PhotoEntity
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.lang.Math.min
@@ -54,8 +53,8 @@ class BrowserListModel(
         this.fireContentsChanged(this, index, index)
     }
 
-    fun unselectedPhoto(photoEntity: PhotoEntity) {
-        val index = filenames.indexOf(Paths.get(photoEntity.path))
+    fun unselectedPhoto(photo: Photo) {
+        val index = filenames.indexOf(photo.getPath())
         this.fireContentsChanged(this, index, index)
     }
 

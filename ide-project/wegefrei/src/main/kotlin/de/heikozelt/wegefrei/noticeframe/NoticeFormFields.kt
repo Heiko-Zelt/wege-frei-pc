@@ -348,7 +348,14 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel(), Selecte
         // Aber falls nicht, wird ein neues Notice-Objekt instanziiert.
         val n = noticeEntity?:NoticeEntity()
 
-        n.photoEntities = noticeFrame.getSelectedPhotos().getPhotos()
+        val photoEntities = mutableSetOf<PhotoEntity>()
+        noticeFrame.getSelectedPhotos().getPhotos().forEach {photo ->
+            val entity = photo.getPhotoEntity()
+            entity?.let {
+                photoEntities.add(it)
+            }
+        }
+        n.photoEntities = photoEntities
 
         val selectedCountry = countrySymbolComboBox.selectedObjects[0] as CountrySymbol
         n.countrySymbol = if (selectedCountry.countryName == null) {
@@ -477,20 +484,20 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel(), Selecte
         noteTextArea.isEnabled = enab
     }
 
-    override fun selectedPhoto(index: Int, photoEntity: PhotoEntity) {
-        if (photoEntity.dateTime != null) {
+    override fun selectedPhoto(index: Int, photo: Photo) {
+        if (photo.getDateTime() != null) {
             updateDateTimeAndDuration()
         }
     }
 
-    override fun unselectedPhoto(index: Int, photoEntity: PhotoEntity) {
-        if (photoEntity.dateTime != null) {
+    override fun unselectedPhoto(index: Int, photo: Photo) {
+        if (photo.getDateTime() != null) {
             updateDateTimeAndDuration()
         }
     }
 
-    override fun replacedPhotoSelection(photoEntities: TreeSet<PhotoEntity>) {
-        if (photoEntities.size != 0) {
+    override fun replacedPhotoSelection(photos: TreeSet<Photo>) {
+        if (photos.size != 0) {
             updateDateTimeAndDuration()
         }
     }

@@ -3,15 +3,11 @@ package de.heikozelt.wegefrei.noticeframe
 import de.heikozelt.wegefrei.DatabaseRepo
 import de.heikozelt.wegefrei.WegeFrei
 import de.heikozelt.wegefrei.entities.NoticeEntity
-import de.heikozelt.wegefrei.entities.PhotoEntity
 import de.heikozelt.wegefrei.gui.Styles
 import de.heikozelt.wegefrei.jobs.AddressWorker
 import de.heikozelt.wegefrei.json.Witness
 import de.heikozelt.wegefrei.maps.MaxiMapForm
-import de.heikozelt.wegefrei.model.Offense
-import de.heikozelt.wegefrei.model.Photo
-import de.heikozelt.wegefrei.model.SelectedPhotos
-import de.heikozelt.wegefrei.model.SelectedPhotosObserver
+import de.heikozelt.wegefrei.model.*
 import de.heikozelt.wegefrei.mua.EmailAddressWithName
 import de.heikozelt.wegefrei.mua.EmailAttachment
 import de.heikozelt.wegefrei.mua.EmailMessage
@@ -22,6 +18,7 @@ import java.awt.Component
 import java.awt.Dimension
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
+import java.nio.file.Path
 import java.nio.file.Paths
 import java.time.ZonedDateTime
 import java.util.*
@@ -67,9 +64,11 @@ class NoticeFrame(private val app: WegeFrei, private val dbRepo: DatabaseRepo) :
      * last offense position, for which an address was searched for
      */
     private var searchedAddressForPosition: GeoPosition? = null
+    private var cache = LeastRecentlyUsedCache<Path, Photo>(128)
+    private val photoLoader = PhotoLoader(dbRepo)
 
     // GUI-Komponenten:
-    private var browserPanel = BrowserPanel(this, dbRepo)
+    private var browserPanel = BrowserPanel(this, dbRepo, cache, photoLoader)
     private var selectedPhotosPanel = SelectedPhotosPanel(this)
     private var selectedPhotosScrollPane = JScrollPane(selectedPhotosPanel)
     private var noticeForm = NoticeForm(this)
@@ -144,7 +143,20 @@ class NoticeFrame(private val app: WegeFrei, private val dbRepo: DatabaseRepo) :
         selectedPhotos.registerObserver(noticeForm.getNoticeFormFields())
         selectedPhotos.registerObserver(noticeForm.getNoticeFormFields().getMiniMap())
 
-        selectedPhotos.setPhotos(TreeSet(noticeEntity.photoEntities))
+        val photos = TreeSet<Photo>()
+        noticeEntity.photoEntities.forEach {photoEntity ->
+            photoEntity.path?.let { pathStr ->
+                val path = Paths.get(pathStr)
+                val photo = Photo(path)
+                photo.setPhotoEntity(photoEntity)
+                val photoFile = cache[path]
+                if(photoFile == null) {
+                    photoLoader.loadPhotoFile(photo)
+                }
+                photos.add(photo)
+            }
+        }
+        selectedPhotos.setPhotos(photos)
         browserPanel.setSelectedPhotos(selectedPhotos)
 
         title = if (noticeEntity.id == null) {
@@ -182,18 +194,18 @@ class NoticeFrame(private val app: WegeFrei, private val dbRepo: DatabaseRepo) :
     /**
      * wählt ein Foto aus
      */
-    fun selectPhoto(photoEntity: PhotoEntity) {
-        log.debug("selectPhoto(photo=${photoEntity.path}")
-        selectedPhotos.add(photoEntity)
+    fun selectPhoto(photo: Photo) {
+        log.debug("selectPhoto(photo=${photo.getPath()}")
+        selectedPhotos.add(photo)
         // alle weiteren Aktionen via Observers
     }
 
     /**
      * entfernt ein Foto aus der Auswahl für die Meldung
      */
-    fun unselectPhoto(photoEntity: PhotoEntity) {
-        log.debug("unselectPhoto(photo=${photoEntity.path}")
-        selectedPhotos.remove(photoEntity)
+    fun unselectPhoto(photo: Photo) {
+        log.debug("unselectPhoto(photo=${photo.getPath()}")
+        selectedPhotos.remove(photo)
         // alle weiteren Aktionen via Observers
     }
 
@@ -242,11 +254,9 @@ class NoticeFrame(private val app: WegeFrei, private val dbRepo: DatabaseRepo) :
     fun showPhoto(photo: Photo) {
         log.debug("show photo")
         app.getSettings()?.photosDirectory?.let {dir ->
-            photo.getPhotoEntity()?.let { entity ->
-                val photoPanel = MaxiPhotoPanel(dir, this, entity)
+                val photoPanel = MaxiPhotoPanel(dir, this, photo)
                 val scrollPane = JScrollPane(photoPanel)
                 setZoomComponent(scrollPane)
-            }
         }
         noticeForm.getNoticeFormFields().getMiniMap().displayBorder(false)
         //browserPanel.showBorder(photoEntity)
@@ -275,18 +285,18 @@ class NoticeFrame(private val app: WegeFrei, private val dbRepo: DatabaseRepo) :
     /**
      * zeigt im Zoom-Bereich ein großes bereits ausgewähltes Foto an
      */
-    private fun showSelectedPhoto(photoEntity: PhotoEntity) {
+    private fun showSelectedPhoto(photo: Photo) {
         log.debug("show selected photo")
 
         app.getSettings()?.photosDirectory?.let {
-            val photoPanel = MaxiSelectedPhotoPanel(it, this, photoEntity)
+            val photoPanel = MaxiSelectedPhotoPanel(it, this, photo)
             val scrollPane = JScrollPane(photoPanel)
             setZoomComponent(scrollPane)
         }
 
         noticeForm.getNoticeFormFields().getMiniMap().displayBorder(false)
         browserPanel.hideBorder()
-        selectedPhotosPanel.showBorder(photoEntity)
+        selectedPhotosPanel.showBorder(photo)
     }
 
     /**
@@ -393,8 +403,7 @@ class NoticeFrame(private val app: WegeFrei, private val dbRepo: DatabaseRepo) :
                     if(from.address != to.address) message.ccs.add(from)
 
                     selectedPhotos.getPhotos().forEach {
-                        val path = Paths.get(setti.photosDirectory, it.path)
-                        val attachment = EmailAttachment(path)
+                        val attachment = EmailAttachment(it.getPath())
                         message.attachments.add(attachment)
                     }
 
@@ -414,13 +423,13 @@ class NoticeFrame(private val app: WegeFrei, private val dbRepo: DatabaseRepo) :
      * tausche nicht ausgewähltes durch ausgewähltes Foto,
      * nur falls es sich um das gleiche Foto handelt.
      */
-    override fun selectedPhoto(index: Int, photoEntity: PhotoEntity) {
+    override fun selectedPhoto(index: Int, photo: Photo) {
         getMaxiPhotoPanel()?.let {
-            if (photoEntity == it.getPhoto()) {
-                showSelectedPhoto(photoEntity)
+            if (photo == it.getPhoto()) {
+                showSelectedPhoto(photo)
             }
         }
-        photoEntity.getGeoPosition()?.run {
+        photo.getGeoPosition()?.run {
             updateOffensePositionFromSelectedPhotos()
         }
     }
@@ -429,19 +438,19 @@ class NoticeFrame(private val app: WegeFrei, private val dbRepo: DatabaseRepo) :
      * tausche ausgewähltes durch nicht ausgewähltes Foto,
      * nur falls es sich um das gleiche Foto handelt.
      */
-    override fun unselectedPhoto(index: Int, photoEntity: PhotoEntity) {
+    override fun unselectedPhoto(index: Int, photo: Photo) {
         getMaxiSelectedPhotoPanel()?.let {
-            if (photoEntity == it.getPhoto()) {
+            if (photo == it.getPhoto()) {
                 // todo reparieren
                 //showPhoto(photoEntity)
             }
         }
-        photoEntity.getGeoPosition()?.run {
+        photo.getGeoPosition()?.run {
             updateOffensePositionFromSelectedPhotos()
         }
     }
 
-    override fun replacedPhotoSelection(photoEntities: TreeSet<PhotoEntity>) {
+    override fun replacedPhotoSelection(photos: TreeSet<Photo>) {
         // todo was ist denn hier zu tun?
     }
 

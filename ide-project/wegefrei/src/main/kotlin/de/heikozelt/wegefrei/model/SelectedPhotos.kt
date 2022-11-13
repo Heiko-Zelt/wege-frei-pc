@@ -1,6 +1,5 @@
 package de.heikozelt.wegefrei.model
 
-import de.heikozelt.wegefrei.entities.PhotoEntity
 import org.jxmapviewer.viewer.GeoPosition
 import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
@@ -10,7 +9,7 @@ import java.util.*
  * Fotos sind immer nach Dateiname (also in der Regel auch chronologisch) sortiert.
  * todo TreeSet<PhotoEntity> ersetzen durch TreeSet<Photo>
  */
-class SelectedPhotos(private var photoEntities: TreeSet<PhotoEntity> = TreeSet<PhotoEntity>()) {
+class SelectedPhotos(private var photos: TreeSet<Photo> = TreeSet<Photo>()) {
 
     /**
      * Jeder Observer kann nur einmal registriert sein.
@@ -19,32 +18,32 @@ class SelectedPhotos(private var photoEntities: TreeSet<PhotoEntity> = TreeSet<P
      */
     private val observers = HashSet<SelectedPhotosObserver>()
 
-    fun add(photoEntity: PhotoEntity) {
-        photoEntities.add(photoEntity)
-        val index = photoEntities.indexOf(photoEntity)
-        observers.forEach { it.selectedPhoto(index, photoEntity) }
+    fun add(photo: Photo) {
+        photos.add(photo)
+        val index = photos.indexOf(photo)
+        observers.forEach { it.selectedPhoto(index, photo) }
     }
 
-    fun remove(photoEntity: PhotoEntity) {
-        val index = photoEntities.indexOf(photoEntity)
-        photoEntities.remove(photoEntity)
-        observers.forEach { it.unselectedPhoto(index, photoEntity) }
+    fun remove(photo: Photo) {
+        val index = photos.indexOf(photo)
+        photos.remove(photo)
+        observers.forEach { it.unselectedPhoto(index, photo) }
     }
 
     /**
      * Gefahr: Nicht verwenden, um Änderungen an den Fotos durchzuführen,
      * von denen die Observers nichts mitkriegen!
      */
-    fun getPhotos(): TreeSet<PhotoEntity> {
-        return photoEntities
+    fun getPhotos(): TreeSet<Photo> {
+        return photos
     }
 
     /**
      * Observers benachrichtigen?
      */
-    fun setPhotos(photoEntities: TreeSet<PhotoEntity>) {
-        this.photoEntities = photoEntities
-        observers.forEach { it.replacedPhotoSelection(photoEntities) }
+    fun setPhotos(photos: TreeSet<Photo>) {
+        this.photos = photos
+        observers.forEach { it.replacedPhotoSelection(photos) }
     }
 
     fun registerObserver(observer: SelectedPhotosObserver) {
@@ -62,17 +61,17 @@ class SelectedPhotos(private var photoEntities: TreeSet<PhotoEntity> = TreeSet<P
      * from all photos with a date, get the earliest date
      */
     fun getStartTime(): ZonedDateTime? {
-        val firstPhotoWithDate = photoEntities.find { it.dateTime != null }
-        return firstPhotoWithDate?.dateTime
+        val firstPhotoWithDate = photos.find { it.getDateTime() != null }
+        return firstPhotoWithDate?.getDateTime()
     }
 
     /**
      * from all photos with a date, get the latest date
      */
     fun getEndTime(): ZonedDateTime? {
-        val reversedList = photoEntities.reversed()
-        val lastPhotoWithDate = reversedList.find { it.dateTime != null }
-        return lastPhotoWithDate?.dateTime
+        val reversedList = photos.reversed()
+        val lastPhotoWithDate = reversedList.find { it.getDateTime() != null }
+        return lastPhotoWithDate?.getDateTime()
     }
 
     /**
@@ -98,7 +97,7 @@ class SelectedPhotos(private var photoEntities: TreeSet<PhotoEntity> = TreeSet<P
      */
     fun calculateMarkerIndex(photoIndex: Int): Int {
         var markerIndex = 0
-        val photoIter = photoEntities.iterator()
+        val photoIter = photos.iterator()
         var i = 0
         while(photoIter.hasNext() && i < photoIndex) {
             i++
@@ -111,7 +110,7 @@ class SelectedPhotos(private var photoEntities: TreeSet<PhotoEntity> = TreeSet<P
 
     fun calculateMarkerIndex_alternativ(photoIndex: Int): Int {
         var markerIndex = 0
-        val photosArray: Array<PhotoEntity> = photoEntities.toTypedArray()
+        val photosArray: Array<Photo> = photos.toTypedArray()
         for (i in 0 until photoIndex) {
             if (photosArray[i].getGeoPosition() != null) {
                 markerIndex++
@@ -129,9 +128,9 @@ class SelectedPhotos(private var photoEntities: TreeSet<PhotoEntity> = TreeSet<P
     fun getAveragePosition(): GeoPosition? {
         val latitudes = mutableListOf<Float>()
         val longitudes = mutableListOf<Float>()
-        photoEntities.forEach { photo ->
-            photo.latitude?.let { lat ->
-                photo.longitude?.let { lon ->
+        photos.forEach { photo ->
+            photo.getLatitude()?.let { lat ->
+                photo.getLongitude()?.let { lon ->
                     latitudes.add(lat)
                     longitudes.add(lon)
                 }

@@ -1,9 +1,11 @@
 package de.heikozelt.wegefrei.model
 
 import de.heikozelt.wegefrei.entities.PhotoEntity
+import org.jxmapviewer.viewer.GeoPosition
 import java.nio.file.Path
+import java.time.ZonedDateTime
 
-class Photo(private var path: Path) {
+class Photo(private var path: Path): Comparable<Photo> {
     private var photoFile: PhotoFile? = null
     private var photoEntity: PhotoEntity? = null
     private var fileState = States.UNINITIALIZED
@@ -71,6 +73,46 @@ class Photo(private var path: Path) {
         photoEntity?.dateTime = photoFile?.dateTime
     }
 
+    fun getDateTime(): ZonedDateTime? {
+        photoEntity?.dateTime?.let {
+            return it
+        }
+        photoFile?.dateTime?.let {
+            return it
+        }
+        return null
+    }
+
+    fun getGeoPosition(): GeoPosition? {
+        photoEntity?.getGeoPosition()?.let {
+            return it
+        }
+        photoFile?.getGeoPosition()?.let {
+            return it
+        }
+        return null
+    }
+
+    fun getLatitude(): Float? {
+        photoEntity?.latitude?.let {
+            return it
+        }
+        photoFile?.latitude?.let {
+            return it
+        }
+        return null
+    }
+
+    fun getLongitude(): Float? {
+        photoEntity?.longitude?.let {
+            return it
+        }
+        photoFile?.longitude?.let {
+            return it
+        }
+        return null
+    }
+
     fun getToolTipText(): String? {
         photoFile?.let {
             return it.getToolTipText()
@@ -85,5 +127,9 @@ class Photo(private var path: Path) {
         enum class States {
             UNINITIALIZED, LOADING, FOUND, NOT_FOUND
         }
+    }
+
+    override fun compareTo(other: Photo): Int {
+        return this.path.compareTo(other.path)
     }
 }

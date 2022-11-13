@@ -44,9 +44,7 @@ class BrowserListCellRenderer(): ListCellRenderer<Photo?> {
 
         var active = false
         selectedPhotos?.getPhotos()?.let { set ->
-            value?.getPhotoEntity()?.let {entity ->
-                active = entity in set
-            }
+            active = value in set
         }
 
         return MiniPhotoPanel(noticeId, value, active, isSelected)

@@ -3,7 +3,6 @@ package de.heikozelt.wegefrei.noticeframe
 import de.heikozelt.wegefrei.DatabaseRepo
 import de.heikozelt.wegefrei.dirnavi.AbsolutePath
 import de.heikozelt.wegefrei.dirnavi.DirectoryNavigation
-import de.heikozelt.wegefrei.entities.PhotoEntity
 import de.heikozelt.wegefrei.gui.Styles
 import de.heikozelt.wegefrei.model.*
 import org.slf4j.LoggerFactory
@@ -24,13 +23,19 @@ import javax.swing.JScrollPane
  * (/) (home) (heiko) (Pictures) (----<)
  * horizontal list
  * </pre>
+ *
+ * LeastRecentlyUsedCache(128)
  */
-class BrowserPanel(private val noticeFrame: NoticeFrame, private val dbRepo: DatabaseRepo) : JPanel(), SelectedPhotosObserver {
+class BrowserPanel(
+    private val noticeFrame: NoticeFrame,
+    private val dbRepo: DatabaseRepo,
+    private val cache: LeastRecentlyUsedCache<Path, Photo>,
+    private val photoLoader: PhotoLoader
+) : JPanel(), SelectedPhotosObserver {
 
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
     private val selectedPhotos = noticeFrame.getSelectedPhotos()
-    private val photoLoader = PhotoLoader(dbRepo)
-    private val browserListModel = BrowserListModel(LeastRecentlyUsedCache(128), photoLoader)
+    private val browserListModel = BrowserListModel(cache, photoLoader)
     private val browserListCellRenderer = BrowserListCellRenderer()
     private val browserList = JList(browserListModel)
     private val scrollPane = JScrollPane(browserList)
@@ -156,7 +161,7 @@ class BrowserPanel(private val noticeFrame: NoticeFrame, private val dbRepo: Dat
     /**
      * Observer-Methode
      */
-    override fun selectedPhoto(index: Int, photoEntity: PhotoEntity) {
+    override fun selectedPhoto(index: Int, photo: Photo) {
         log.debug("selectedPhoto(index = $index)")
         hideBorder()
     }
@@ -164,16 +169,16 @@ class BrowserPanel(private val noticeFrame: NoticeFrame, private val dbRepo: Dat
     /**
      * Observer-Methode
      */
-    override fun unselectedPhoto(index: Int, photoEntity: PhotoEntity) {
+    override fun unselectedPhoto(index: Int, photo: Photo) {
         log.debug("unselectedPhoto(index = $index)")
-        browserListModel.unselectedPhoto(photoEntity)
+        browserListModel.unselectedPhoto(photo)
     }
 
     /**
      * all selected photos have been replaced
      * active or deactivate panels
      */
-    override fun replacedPhotoSelection(photoEntities: TreeSet<PhotoEntity>) {
+    override fun replacedPhotoSelection(photo: TreeSet<Photo>) {
         log.debug("replacedPhotoSelection()")
         /*
         for(panel in miniPhotoPanels) {

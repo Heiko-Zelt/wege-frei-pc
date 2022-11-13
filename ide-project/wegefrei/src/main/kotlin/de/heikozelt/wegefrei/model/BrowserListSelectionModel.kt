@@ -16,8 +16,8 @@ class BrowserListSelectionModel(
         log.debug("setSelectionInterval($index0, $index1)")
         val photo = listModel.getElementAt(index0)
         log.debug("entity: ${photo?.getPhotoEntity()} in ${selectedPhotos.getPhotos()}?")
-        val entity = photo?.getPhotoEntity()
-        entity?.let {
+
+        photo?.let {
             if(it !in selectedPhotos.getPhotos()) {
                 super.setSelectionInterval(index0, index1)
             }

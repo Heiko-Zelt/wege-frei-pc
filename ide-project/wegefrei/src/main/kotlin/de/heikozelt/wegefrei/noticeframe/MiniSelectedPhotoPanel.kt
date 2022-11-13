@@ -1,10 +1,10 @@
 package de.heikozelt.wegefrei.noticeframe
 
-import de.heikozelt.wegefrei.entities.PhotoEntity
 import de.heikozelt.wegefrei.gui.Styles
 import de.heikozelt.wegefrei.gui.Styles.Companion.HIGHLIGHT_BORDER
 import de.heikozelt.wegefrei.gui.Styles.Companion.NORMAL_BORDER
 import de.heikozelt.wegefrei.jobs.SelectedThumbnailWorker
+import de.heikozelt.wegefrei.model.Photo
 import org.slf4j.LoggerFactory
 import java.awt.Dimension
 import java.awt.Insets
@@ -16,7 +16,7 @@ import javax.swing.SwingConstants
 class MiniSelectedPhotoPanel(
     private val photosDir: String,
     private val noticeFrame: NoticeFrame,
-    private val photoEntity: PhotoEntity,
+    private val photo: Photo,
     private var index: Int): JPanel()
 {
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
@@ -34,7 +34,7 @@ class MiniSelectedPhotoPanel(
 
         //background = Color.green
 
-        thumbnailLabel.toolTipText = photoEntity.getToolTipText()
+        thumbnailLabel.toolTipText = photo.getToolTipText()
         thumbnailLabel.setBounds(0, 0, Styles.THUMBNAIL_SIZE, Styles.THUMBNAIL_SIZE)
         thumbnailLabel.border = NORMAL_BORDER
         thumbnailLabel.addMouseListener(MiniSelectedPhotoPanelMouseListener(noticeFrame, this))
@@ -58,12 +58,14 @@ class MiniSelectedPhotoPanel(
         add(thumbnailLabel)
 
         // Loading the image from the filesystem and resizing it is time-consuming. So, do it later...
-        val worker = SelectedThumbnailWorker(photosDir, photoEntity, thumbnailLabel)
-        worker.execute()
+        photo.getPhotoEntity()?.let {
+            val worker = SelectedThumbnailWorker(photosDir, it, thumbnailLabel)
+            worker.execute()
+        }
     }
 
     fun unselectPhoto() {
-        noticeFrame.unselectPhoto(photoEntity)
+        noticeFrame.unselectPhoto(photo)
     }
 
     fun displayBorder(visible: Boolean) {
@@ -78,8 +80,8 @@ class MiniSelectedPhotoPanel(
         }
     }
 
-    fun getPhoto(): PhotoEntity {
-        return photoEntity
+    fun getPhoto(): Photo {
+        return photo
     }
 
     fun updateText(index: Int) {
