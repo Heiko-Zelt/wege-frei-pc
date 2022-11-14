@@ -28,7 +28,7 @@ class SelectedPhotosListModel(
     fun add(photo: Photo) {
         selectedPhotos.add(photo)
         val index = indexOf(photo)
-        fireIntervalAdded(this, index, index)
+        fireIntervalAdded(this, index, index, listOf(photo))
     }
 
     fun remove(photo: Photo) {
@@ -175,6 +175,18 @@ class SelectedPhotosListModel(
         } else {
             val unit = ChronoUnit.MINUTES
             unit.between(start, end).toInt()
+        }
+    }
+
+    private fun fireIntervalAdded(source: Any, index0: Int, index1: Int, photos: List<Photo>) {
+        val listeners = listenerList.listenerList
+        var i = listeners.size - 2
+        while (i >= 0) {
+            if (listeners[i] === ListDataListener::class.java) {
+                val e = SelectedPhotosListDataEvent(source, ListDataEvent.INTERVAL_REMOVED, index0, index1, photos)
+                (listeners[i + 1] as ListDataListener).intervalAdded(e)
+            }
+            i -= 2
         }
     }
 

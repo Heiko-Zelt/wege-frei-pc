@@ -161,6 +161,17 @@ class BrowserPanel(
     fun getBrowserListModel(): BrowserListModel {
         return browserListModel
     }
+
+    fun getBrowserList(): JList<Photo?> {
+        return browserList
+    }
+
+    fun setSelectedValue(photo: Photo) {
+        val path = photo.getPath()
+        if(path.fileName in browserListModel.getFilenames() && path.parent == browserListModel.getDirectoryPath()) {
+            browserList.setSelectedValue(photo, true)
+        }
+    }
 }
 
 /*

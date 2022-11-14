@@ -36,7 +36,7 @@ class SelectedPhotosListCellRenderer: ListCellRenderer<Photo?> {
         cellHasFocus: Boolean
     ): Component {
 
-        return MiniPhotoPanel(noticeId, value, false, isSelected)
+        return MiniPhotoPanel(noticeId, value, false, isSelected, index)
     }
 
 }

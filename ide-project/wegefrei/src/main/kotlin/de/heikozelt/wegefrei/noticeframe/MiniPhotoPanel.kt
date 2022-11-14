@@ -1,5 +1,6 @@
 package de.heikozelt.wegefrei.noticeframe
 
+import de.heikozelt.wegefrei.gui.Styles
 import de.heikozelt.wegefrei.gui.Styles.Companion.THUMBNAIL_SIZE
 import de.heikozelt.wegefrei.model.Photo
 import org.slf4j.LoggerFactory
@@ -14,7 +15,8 @@ class MiniPhotoPanel(
     noticeId: Int?,
     photo: Photo?,
     active: Boolean,
-    selected: Boolean
+    selected: Boolean,
+    selectedIndex: Int
 ) :
     JPanel() {
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
@@ -27,15 +29,17 @@ class MiniPhotoPanel(
         minimumSize = preferredSize
         maximumSize = preferredSize
 
-        /*
-        val button = JButton("+")
-        button.isEnabled = active
-        val buttonXY = THUMBNAIL_SIZE - SELECT_BUTTON_SIZE
-        button.setBounds(buttonXY, buttonXY, SELECT_BUTTON_SIZE, SELECT_BUTTON_SIZE)
-        button.margin = Insets(0, 0, 0, 0)
-        add(button)
-         */
-        //val layered = JLayeredPane()
+        if(selectedIndex != -1) {
+            log.debug("selectedIndexLabel")
+            val selectedIndexLabel = JLabel(" ${selectedIndex + 1} ")
+            selectedIndexLabel.border = Styles.NORMAL_BORDER
+            selectedIndexLabel.background = Styles.PHOTO_MARKER_BACKGROUND
+            selectedIndexLabel.isOpaque = true
+            selectedIndexLabel.size = selectedIndexLabel.preferredSize
+            // links, unten:
+            selectedIndexLabel.setLocation(0, THUMBNAIL_SIZE - selectedIndexLabel.height)
+            add(selectedIndexLabel)
+        }
 
         // lazy loading database access? in EDT?
         val noticeIds = photo?.getPhotoEntity()?.noticeEntities?.map { it.id }?.filter { it != noticeId }?.sortedBy{it}
@@ -54,7 +58,7 @@ class MiniPhotoPanel(
                     //lbl.background = Color.orange
                     layer.add(lbl)
                 }
-                val layerSize = layer.preferredSize
+                //val layerSize = layer.preferredSize
                 //layer.setBounds(0, THUMBNAIL_SIZE - layerSize.height, THUMBNAIL_SIZE, layerSize.height)
                 layer.setBounds(0, 0, THUMBNAIL_SIZE, THUMBNAIL_SIZE)
                 //layer.revalidate()

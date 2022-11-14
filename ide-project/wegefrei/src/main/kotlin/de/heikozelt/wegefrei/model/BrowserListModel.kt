@@ -44,6 +44,10 @@ class BrowserListModel(
         return filenames.size
     }
 
+    fun getFilenames(): List<Path> {
+        return filenames
+    }
+
     override fun doneLoadingFile(photo: Photo) {
         val index = filenames.indexOf(photo.getPath())
         this.fireContentsChanged(this, index, index)

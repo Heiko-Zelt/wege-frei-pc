@@ -33,21 +33,13 @@ class BrowserListCellRenderer(): ListCellRenderer<Photo?> {
         isSelected: Boolean,
         cellHasFocus: Boolean
     ): Component {
-        /*
-        if(value == null) {
-            val label = JLabel("value == null")
-            label.preferredSize = Dimension(Styles.THUMBNAIL_SIZE, Styles.THUMBNAIL_SIZE)
-            log.error("value == null")
-            return label
-        }
-        */
 
         var active = false
         selectedPhotosListModel?.getSelectedPhotos()?.let { set ->
             active = value in set
         }
 
-        return MiniPhotoPanel(noticeId, value, active, isSelected)
+        return MiniPhotoPanel(noticeId, value, active, isSelected, -1)
     }
 
     fun setSelectedPhotos(selectedPhotosListModel: SelectedPhotosListModel) {
