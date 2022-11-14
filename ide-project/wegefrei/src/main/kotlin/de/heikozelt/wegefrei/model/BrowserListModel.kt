@@ -6,8 +6,9 @@ import java.io.File
 import java.lang.Math.min
 import java.nio.file.Path
 import java.nio.file.Paths
-import java.util.concurrent.Executors
 import javax.swing.AbstractListModel
+import javax.swing.event.ListDataEvent
+import javax.swing.event.ListDataListener
 
 /**
  * 2 phases:
@@ -27,13 +28,13 @@ import javax.swing.AbstractListModel
  */
 class BrowserListModel(
     private val cache: LeastRecentlyUsedCache<Path, Photo>,
-    private val photoLoader: PhotoLoader
-): AbstractListModel<Photo?>(), PhotoLoaderObserver {
+    private val photoLoader: PhotoLoader,
+    private val selectedPhotosListModel: SelectedPhotosListModel
+): AbstractListModel<Photo?>(), ListDataListener, PhotoLoaderObserver {
 
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
     private var directoryPath: Path? = null
     private val filenames = mutableListOf<Path>()
-    private val executorService = Executors.newFixedThreadPool(4)
 
     init {
         photoLoader.registerObserver(this)
@@ -49,11 +50,6 @@ class BrowserListModel(
     }
 
     override fun doneLoadingEntity(photo: Photo) {
-        val index = filenames.indexOf(photo.getPath())
-        this.fireContentsChanged(this, index, index)
-    }
-
-    fun unselectedPhoto(photo: Photo) {
         val index = filenames.indexOf(photo.getPath())
         this.fireContentsChanged(this, index, index)
     }
@@ -124,20 +120,50 @@ class BrowserListModel(
         }
     }
 
+    /**
+     * a photo has been added to the selected photos list
+     * gray it out
+     */
+    override fun intervalAdded(e: ListDataEvent?) {
+        e?.let { event ->
+            for(selectedIndex in event.index0..event.index1) {
+                val photo = selectedPhotosListModel.getElementAt(selectedIndex)
+                photo?.let { p ->
+                    val browserIndex = filenames.indexOf(p.getPath())
+                    this.fireContentsChanged(this, browserIndex, browserIndex)
+                }
+            }
+        }
+    }
 
     /*
-     * simple callback method for background job
-
-    fun appendPhoto(photo: Photo) {
-        photos.add(photo)
+    fun unselectedPhoto(photo: Photo) {
+        val index = filenames.indexOf(photo.getPath())
+        this.fireContentsChanged(this, index, index)
     }
-     */
+    */
 
     /**
-     * even better callback method for background job
-    fun appendPhotos(photos: List<Photo>) {
-    this.photos.addAll(photos)
-    }
+     * a photo has been removed from the selected photos list
+     * show it colorful again
      */
+    override fun intervalRemoved(e: ListDataEvent?) {
+        if(e is SelectedPhotosListDataEvent) {
+            for(photo in e.photos) {
+                val index = filenames.indexOfFirst { it == photo.getPath() }
+                if(index >= 0) {
+                    this.fireContentsChanged(this, index, index)
+                }
+            }
+        }
+    }
 
+    /**
+     * content of the selected photos list changed
+     * file or entity loaded?
+     * BrowserListModel is PhotoLoaderObserver, so it's already updated
+     */
+    override fun contentsChanged(e: ListDataEvent?) {
+        // ignore
+    }
 }

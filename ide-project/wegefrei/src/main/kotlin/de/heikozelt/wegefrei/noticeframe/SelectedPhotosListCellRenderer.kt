@@ -1,7 +1,6 @@
 package de.heikozelt.wegefrei.noticeframe
 
 import de.heikozelt.wegefrei.model.Photo
-import de.heikozelt.wegefrei.model.SelectedPhotosListModel
 import org.slf4j.LoggerFactory
 import java.awt.Component
 import javax.swing.JList
@@ -17,9 +16,12 @@ import javax.swing.ListCellRenderer
  * <ol>
  */
 
-class BrowserListCellRenderer(): ListCellRenderer<Photo?> {
+class SelectedPhotosListCellRenderer: ListCellRenderer<Photo?> {
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
-    private var selectedPhotosListModel: SelectedPhotosListModel? = null
+
+    /**
+     * contains the notice id of the notice currently edited or null if it is a new notice not yet saved to the database
+     */
     private var noticeId: Int? = null
 
     fun setNoticeId(noticeId: Int) {
@@ -33,24 +35,8 @@ class BrowserListCellRenderer(): ListCellRenderer<Photo?> {
         isSelected: Boolean,
         cellHasFocus: Boolean
     ): Component {
-        /*
-        if(value == null) {
-            val label = JLabel("value == null")
-            label.preferredSize = Dimension(Styles.THUMBNAIL_SIZE, Styles.THUMBNAIL_SIZE)
-            log.error("value == null")
-            return label
-        }
-        */
 
-        var active = false
-        selectedPhotosListModel?.getSelectedPhotos()?.let { set ->
-            active = value in set
-        }
-
-        return MiniPhotoPanel(noticeId, value, active, isSelected)
+        return MiniPhotoPanel(noticeId, value, false, isSelected)
     }
 
-    fun setSelectedPhotos(selectedPhotosListModel: SelectedPhotosListModel) {
-        this.selectedPhotosListModel = selectedPhotosListModel
-    }
 }

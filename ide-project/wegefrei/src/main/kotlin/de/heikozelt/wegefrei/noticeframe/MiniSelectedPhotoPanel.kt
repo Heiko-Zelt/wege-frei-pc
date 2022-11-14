@@ -3,7 +3,6 @@ package de.heikozelt.wegefrei.noticeframe
 import de.heikozelt.wegefrei.gui.Styles
 import de.heikozelt.wegefrei.gui.Styles.Companion.HIGHLIGHT_BORDER
 import de.heikozelt.wegefrei.gui.Styles.Companion.NORMAL_BORDER
-import de.heikozelt.wegefrei.jobs.SelectedThumbnailWorker
 import de.heikozelt.wegefrei.model.Photo
 import org.slf4j.LoggerFactory
 import java.awt.Dimension
@@ -48,7 +47,7 @@ class MiniSelectedPhotoPanel(
 
         updateText(index)
         label.border = NORMAL_BORDER
-        label.background = Styles.PHOTO_MARKER_BACKGROUND
+        //label.background = Styles.PHOTO_MARKER_BACKGROUND
         label.isOpaque = true
         val labelSize = label.preferredSize
         label.setBounds(0, 0, labelSize.width, labelSize.height)
@@ -58,10 +57,12 @@ class MiniSelectedPhotoPanel(
         add(thumbnailLabel)
 
         // Loading the image from the filesystem and resizing it is time-consuming. So, do it later...
+        /*
         photo.getPhotoEntity()?.let {
             val worker = SelectedThumbnailWorker(photosDir, it, thumbnailLabel)
             worker.execute()
         }
+         */
     }
 
     fun unselectPhoto() {

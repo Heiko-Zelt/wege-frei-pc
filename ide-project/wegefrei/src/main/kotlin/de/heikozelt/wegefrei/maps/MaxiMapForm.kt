@@ -1,9 +1,11 @@
 package de.heikozelt.wegefrei.maps
 
-import de.heikozelt.wegefrei.model.SelectedPhotos
+import de.heikozelt.wegefrei.model.Photo
+import de.heikozelt.wegefrei.model.SelectedPhotosListModel
 import de.heikozelt.wegefrei.noticeframe.NoticeFrame
 import org.jxmapviewer.viewer.GeoPosition
 import org.slf4j.LoggerFactory
+import java.util.*
 import javax.swing.GroupLayout
 import javax.swing.JButton
 import javax.swing.JPanel
@@ -13,10 +15,13 @@ import javax.swing.LayoutStyle
  * große füllende Karte und darunter Buttons,
  * um den Marker zu setzen oder zu entfernen
  */
-class MaxiMapForm(private val noticeFrame: NoticeFrame) : JPanel() {
+class MaxiMapForm(
+    private val noticeFrame: NoticeFrame,
+    selectedPhotosListModel: SelectedPhotosListModel
+) : JPanel() {
 
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
-    private val maxiMap = MaxiMap(noticeFrame)
+    private val maxiMap = MaxiMap(noticeFrame, selectedPhotosListModel)
     //private val maxiMapButtonsBar = MaxiMapButtonsBar(noticeFrame, this)
 
     private val fitButton = JButton("Anpassen")
@@ -93,8 +98,8 @@ class MaxiMapForm(private val noticeFrame: NoticeFrame) : JPanel() {
         addButton.isVisible = !addressMarkerVisible
     }
 
-    fun setPhotoMarkers(selectedPhotos: SelectedPhotos) {
-        maxiMap.replacedPhotoSelection(selectedPhotos.getPhotos())
+    fun setPhotoMarkers(selectedPhotos: TreeSet<Photo>) {
+        maxiMap.replacedPhotoSelection(selectedPhotos)
     }
 
     fun enableOrDisableEditing() {

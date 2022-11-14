@@ -1,6 +1,7 @@
 package de.heikozelt.wegefrei.maps
 
 import de.heikozelt.wegefrei.gui.Styles
+import de.heikozelt.wegefrei.model.SelectedPhotosListModel
 import de.heikozelt.wegefrei.noticeframe.NoticeFrame
 import org.jxmapviewer.input.PanMouseInputListener
 import org.jxmapviewer.input.ZoomMouseWheelListenerCenter
@@ -13,7 +14,10 @@ import org.slf4j.LoggerFactory
  * Maus ziehen, um Ausschnitt zu ändern.
  * Der Adress-Marker kann manuell geändert werden.
  */
-class MaxiMap(private val noticeFrame: NoticeFrame): BaseMap(noticeFrame) {
+class MaxiMap(
+    private val noticeFrame: NoticeFrame,
+    selectedPhotosListModel: SelectedPhotosListModel
+): BaseMap(noticeFrame, selectedPhotosListModel) {
 
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
 

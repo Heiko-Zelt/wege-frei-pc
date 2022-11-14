@@ -24,7 +24,10 @@ import javax.swing.text.AbstractDocument
  * [] Warnblinkanlage eingeschaltet [] mit Gefährdung  [] HU-Plakette abgelaufen
  * </pre>
  */
-class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel(), SelectedPhotosObserver {
+class NoticeFormFields(
+    private val noticeFrame: NoticeFrame,
+    private val selectedPhotosListModel: SelectedPhotosListModel
+) : JPanel(), SelectedPhotosObserver {
 
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
 
@@ -32,7 +35,7 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel(), Selecte
     private val licensePlateTextField = TrimmingTextField(10)
     private val vehicleMakeComboBox = JComboBox(ListVehicleMakes.VEHICLE_MAKES)
     private val colorComboBox = JComboBox(VehicleColor.COLORS)
-    private val miniMap = MiniMap(noticeFrame)
+    private val miniMap = MiniMap(noticeFrame, selectedPhotosListModel)
     private var streetTextField = TrimmingTextField(30)
     private var zipCodeTextField = TrimmingTextField(5)
     private var townTextField = TrimmingTextField(30)
@@ -349,7 +352,7 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel(), Selecte
         val n = noticeEntity?:NoticeEntity()
 
         val photoEntities = mutableSetOf<PhotoEntity>()
-        noticeFrame.getSelectedPhotos().getPhotos().forEach {photo ->
+        selectedPhotosListModel.getSelectedPhotos().forEach {photo ->
             val entity = photo.getPhotoEntity()
             entity?.let {
                 photoEntities.add(it)
@@ -504,10 +507,10 @@ class NoticeFormFields(private val noticeFrame: NoticeFrame) : JPanel(), Selecte
 
     private fun updateDateTimeAndDuration() {
         val selectedPhotos = noticeFrame.getSelectedPhotos()
-        val newStartTime = selectedPhotos.getStartTime()
+        val newStartTime = selectedPhotosListModel.getStartTime()
         observationDateTextField.text = blankOrDateString(newStartTime)
         observationTimeTextField.text = blankOrTimeString(newStartTime)
-        durationTextField.text = blankOrIntString(selectedPhotos.getDuartion())
+        durationTextField.text = blankOrIntString(selectedPhotosListModel.getDuration())
     }
 
     companion object {

@@ -8,7 +8,6 @@ import de.heikozelt.wegefrei.model.*
 import org.slf4j.LoggerFactory
 import java.awt.Dimension
 import java.nio.file.Path
-import java.util.*
 import javax.swing.GroupLayout
 import javax.swing.JList
 import javax.swing.JPanel
@@ -29,13 +28,14 @@ import javax.swing.JScrollPane
 class BrowserPanel(
     private val noticeFrame: NoticeFrame,
     private val dbRepo: DatabaseRepo,
-    private val cache: LeastRecentlyUsedCache<Path, Photo>,
-    private val photoLoader: PhotoLoader
-) : JPanel(), SelectedPhotosObserver {
+    cache: LeastRecentlyUsedCache<Path, Photo>,
+    photoLoader: PhotoLoader,
+    private val selectedPhotosListModel: SelectedPhotosListModel
+) : JPanel() /*SelectedPhotosObserver*/ {
 
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
-    private val selectedPhotos = noticeFrame.getSelectedPhotos()
-    private val browserListModel = BrowserListModel(cache, photoLoader)
+    //private val selectedPhotos = noticeFrame.getSelectedPhotos()
+    private val browserListModel = BrowserListModel(cache, photoLoader, selectedPhotosListModel)
     private val browserListCellRenderer = BrowserListCellRenderer()
     private val browserList = JList(browserListModel)
     private val scrollPane = JScrollPane(browserList)
@@ -78,11 +78,11 @@ class BrowserPanel(
             }
         )
          */
-        browserList.selectionModel = BrowserListSelectionModel(selectedPhotos, browserListModel)
-        browserList.addListSelectionListener{
-            browserList.selectedValue?.let {photo ->
+        browserList.selectionModel = BrowserListSelectionModel(selectedPhotosListModel, browserListModel)
+        browserList.addListSelectionListener {
+            browserList.selectedValue?.let { photo ->
                 //if(photo.getPhotoEntity() !in selectedPhotos.getPhotos()) {
-                    noticeFrame.showPhoto(photo)
+                noticeFrame.showPhoto(photo)
                 //}
             }
         }
@@ -98,7 +98,7 @@ class BrowserPanel(
         lay.setVerticalGroup(
             lay.createSequentialGroup()
                 .addComponent(directoryNavigation)
-                        .addComponent(scrollPane)
+                .addComponent(scrollPane)
         )
         layout = lay
 
@@ -120,8 +120,8 @@ class BrowserPanel(
 
     }
 
-    fun setSelectedPhotos(selectedPhotos: SelectedPhotos) {
-        browserListCellRenderer.setSelectedPhotos(selectedPhotos)
+    fun setSelectedPhotos(selectedPhotosListModel: SelectedPhotosListModel) {
+        browserListCellRenderer.setSelectedPhotos(selectedPhotosListModel)
     }
 
     fun setNoticeId(noticeId: Int) {
@@ -158,39 +158,36 @@ class BrowserPanel(
         browserList.clearSelection()
     }
 
-    /**
-     * Observer-Methode
-     */
-    override fun selectedPhoto(index: Int, photo: Photo) {
-        log.debug("selectedPhoto(index = $index)")
-        hideBorder()
+    fun getBrowserListModel(): BrowserListModel {
+        return browserListModel
     }
-
-    /**
-     * Observer-Methode
-     */
-    override fun unselectedPhoto(index: Int, photo: Photo) {
-        log.debug("unselectedPhoto(index = $index)")
-        browserListModel.unselectedPhoto(photo)
-    }
-
-    /**
-     * all selected photos have been replaced
-     * active or deactivate panels
-     */
-    override fun replacedPhotoSelection(photo: TreeSet<Photo>) {
-        log.debug("replacedPhotoSelection()")
-        /*
-        for(panel in miniPhotoPanels) {
-            val photo = panel.getPhoto()
-            if(photo in photos && panel.isActive()) {
-                panel.deactivate()
-            }
-            if(photo !in photos && !panel.isActive()) {
-                panel.activate()
-            }
-        }
-         */
-    }
-
 }
+
+/*
+ * Observer-Methode
+override fun selectedPhoto(index: Int, photo: Photo) {
+    log.debug("selectedPhoto(index = $index)")
+    hideBorder()
+}
+
+ * Observer-Methode
+override fun unselectedPhoto(index: Int, photo: Photo) {
+    log.debug("unselectedPhoto(index = $index)")
+    browserListModel.unselectedPhoto(photo)
+}
+
+ * all selected photos have been replaced
+ * active or deactivate panels
+override fun replacedPhotoSelection(photo: TreeSet<Photo>) {
+    log.debug("replacedPhotoSelection()")
+    for(panel in miniPhotoPanels) {
+        val photo = panel.getPhoto()
+        if(photo in photos && panel.isActive()) {
+            panel.deactivate()
+        }
+        if(photo !in photos && !panel.isActive()) {
+            panel.activate()
+        }
+    }
+}
+*/

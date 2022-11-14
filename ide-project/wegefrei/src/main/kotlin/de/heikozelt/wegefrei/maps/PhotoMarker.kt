@@ -27,4 +27,8 @@ class PhotoMarker(private var photoIndex: Int, coord: GeoPosition?) : Marker(coo
     fun updateText() {
         lbl.text = " ${photoIndex + 1} "
     }
+
+    fun getPhotoIndex(): Int {
+        return photoIndex
+    }
 }

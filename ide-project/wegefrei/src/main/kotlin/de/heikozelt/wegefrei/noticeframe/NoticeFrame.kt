@@ -57,7 +57,7 @@ class NoticeFrame(private val app: WegeFrei, private val dbRepo: DatabaseRepo) :
 
     // Daten-Modell:
     private var noticeEntity: NoticeEntity? = null // wozu brauche ich dieses Feld, wenn getNotice() delegiert
-    private var selectedPhotos: SelectedPhotos = SelectedPhotos() // Achtung: Redundanz
+    //private var selectedPhotos: SelectedPhotos = SelectedPhotos() // Achtung: Redundanz
     private var offensePosition: GeoPosition? = null // Achtung: Redundanz
 
     /**
@@ -68,10 +68,15 @@ class NoticeFrame(private val app: WegeFrei, private val dbRepo: DatabaseRepo) :
     private val photoLoader = PhotoLoader(dbRepo)
 
     // GUI-Komponenten:
-    private var browserPanel = BrowserPanel(this, dbRepo, cache, photoLoader)
-    private var selectedPhotosPanel = SelectedPhotosPanel(this)
-    private var selectedPhotosScrollPane = JScrollPane(selectedPhotosPanel)
-    private var noticeForm = NoticeForm(this)
+    private var selectedPhotosListModel = SelectedPhotosListModel(photoLoader)
+    private var browserPanel = BrowserPanel(this, dbRepo, cache, photoLoader, selectedPhotosListModel)
+    //private var selectedPhotosPanel = SelectedPhotosPanel(this)
+    //private var selectedPhotosScrollPane = JScrollPane(selectedPhotosPanel)
+
+    private val selectedPhotosListCellRenderer = SelectedPhotosListCellRenderer()
+    private var selectedPhotosList = JList(selectedPhotosListModel)
+    private var selectedPhotosScrollPane = JScrollPane(selectedPhotosList)
+    private var noticeForm = NoticeForm(this, selectedPhotosListModel)
 
     // Split-Panes:
     private var topSplitPane = JSplitPane(JSplitPane.VERTICAL_SPLIT, browserPanel, selectedPhotosScrollPane)
@@ -84,6 +89,17 @@ class NoticeFrame(private val app: WegeFrei, private val dbRepo: DatabaseRepo) :
         //background = FRAME_BACKGROUND
         selectedPhotosScrollPane.minimumSize = Dimension(Styles.THUMBNAIL_SIZE / 2, Styles.THUMBNAIL_SIZE / 2)
 
+        selectedPhotosList.cellRenderer = selectedPhotosListCellRenderer
+
+        selectedPhotosList.fixedCellWidth = Styles.THUMBNAIL_SIZE
+        selectedPhotosList.fixedCellHeight = Styles.THUMBNAIL_SIZE
+        selectedPhotosList.visibleRowCount = 1
+        selectedPhotosList.layoutOrientation = JList.HORIZONTAL_WRAP
+        selectedPhotosList.addListSelectionListener {
+            selectedPhotosList.selectedValue?.let { photo ->
+                this.showSelectedPhoto(photo)
+            }
+        }
 
         //defaultCloseOperation = DISPOSE_ON_CLOSE ist egal
         //addWindowListener(NoticeFrameWindowListener(this))
@@ -113,6 +129,8 @@ class NoticeFrame(private val app: WegeFrei, private val dbRepo: DatabaseRepo) :
             setDividerLocation(0.4)
         }
         add(mainSplitPane)
+
+        minimumSize = Dimension(250, 250)
         isVisible = true
         log.debug("init finished")
     }
@@ -133,15 +151,21 @@ class NoticeFrame(private val app: WegeFrei, private val dbRepo: DatabaseRepo) :
         log.debug("setNotice(notice id: ${noticeEntity.id})")
         this.noticeEntity = noticeEntity
 
+        /*
         app.getSettings()?.let {
             selectedPhotosPanel.setPhotosDirectory(it.photosDirectory)
         }
+        */
 
+        selectedPhotosListModel.addListDataListener(browserPanel.getBrowserListModel())
+        /*
         selectedPhotos.registerObserver(this)
         selectedPhotos.registerObserver(selectedPhotosPanel)
+
         selectedPhotos.registerObserver(browserPanel)
         selectedPhotos.registerObserver(noticeForm.getNoticeFormFields())
         selectedPhotos.registerObserver(noticeForm.getNoticeFormFields().getMiniMap())
+        */
 
         val photos = TreeSet<Photo>()
         noticeEntity.photoEntities.forEach {photoEntity ->
@@ -156,8 +180,9 @@ class NoticeFrame(private val app: WegeFrei, private val dbRepo: DatabaseRepo) :
                 photos.add(photo)
             }
         }
-        selectedPhotos.setPhotos(photos)
-        browserPanel.setSelectedPhotos(selectedPhotos)
+        //selectedPhotos.setPhotos(photos)
+        selectedPhotosListModel.setSelectedPhotos(photos)
+        browserPanel.setSelectedPhotos(selectedPhotosListModel)
 
         title = if (noticeEntity.id == null) {
             "Neue Meldung - Wege frei!"
@@ -171,6 +196,7 @@ class NoticeFrame(private val app: WegeFrei, private val dbRepo: DatabaseRepo) :
         }
         noticeEntity.id?.let {
             browserPanel.setNoticeId(it)
+            selectedPhotosListCellRenderer.setNoticeId(it)
         }
 
         offensePosition = noticeEntity.getGeoPosition()
@@ -187,8 +213,8 @@ class NoticeFrame(private val app: WegeFrei, private val dbRepo: DatabaseRepo) :
         return app.getDatabaseRepo()
     }
 
-    fun getSelectedPhotos(): SelectedPhotos {
-        return selectedPhotos
+    fun getSelectedPhotos(): TreeSet<Photo> {
+        return selectedPhotosListModel.getSelectedPhotos()
     }
 
     /**
@@ -196,7 +222,7 @@ class NoticeFrame(private val app: WegeFrei, private val dbRepo: DatabaseRepo) :
      */
     fun selectPhoto(photo: Photo) {
         log.debug("selectPhoto(photo=${photo.getPath()}")
-        selectedPhotos.add(photo)
+        selectedPhotosListModel.add(photo)
         // alle weiteren Aktionen via Observers
     }
 
@@ -205,7 +231,7 @@ class NoticeFrame(private val app: WegeFrei, private val dbRepo: DatabaseRepo) :
      */
     fun unselectPhoto(photo: Photo) {
         log.debug("unselectPhoto(photo=${photo.getPath()}")
-        selectedPhotos.remove(photo)
+        selectedPhotosListModel.remove(photo)
         // alle weiteren Aktionen via Observers
     }
 
@@ -215,11 +241,11 @@ class NoticeFrame(private val app: WegeFrei, private val dbRepo: DatabaseRepo) :
     fun showMaxiMap() {
         log.debug("show maxi map")
         // todo Prio 4: do nothing if it is already shown
-        val maxiMapForm = MaxiMapForm(this)
-        selectedPhotos.registerObserver(maxiMapForm.getMaxiMap())
+        val maxiMapForm = MaxiMapForm(this, selectedPhotosListModel)
+        selectedPhotosListModel.addListDataListener(maxiMapForm.getMaxiMap())
         setZoomComponent(maxiMapForm)
         maxiMapForm.setOffenseMarker(offensePosition)
-        maxiMapForm.setPhotoMarkers(selectedPhotos)
+        maxiMapForm.setPhotoMarkers(selectedPhotosListModel.getSelectedPhotos())
         noticeEntity?.let {
             if (it.isSent()) {
                 maxiMapForm.enableOrDisableEditing()
@@ -227,7 +253,7 @@ class NoticeFrame(private val app: WegeFrei, private val dbRepo: DatabaseRepo) :
         }
         noticeForm.getNoticeFormFields().getMiniMap().displayBorder(true)
         browserPanel.hideBorder()
-        selectedPhotosPanel.hideBorder()
+        //selectedPhotosPanel.hideBorder()
     }
 
     /**
@@ -245,7 +271,7 @@ class NoticeFrame(private val app: WegeFrei, private val dbRepo: DatabaseRepo) :
          */
         noticeForm.getNoticeFormFields().getMiniMap().displayBorder(false)
         //browserPanel.showBorder(miniPhotoPanel)
-        selectedPhotosPanel.hideBorder()
+        //selectedPhotosPanel.hideBorder()
     }
 
     /**
@@ -260,7 +286,7 @@ class NoticeFrame(private val app: WegeFrei, private val dbRepo: DatabaseRepo) :
         }
         noticeForm.getNoticeFormFields().getMiniMap().displayBorder(false)
         //browserPanel.showBorder(photoEntity)
-        selectedPhotosPanel.hideBorder()
+        //selectedPhotosPanel.hideBorder()
     }
 
     /**
@@ -279,7 +305,7 @@ class NoticeFrame(private val app: WegeFrei, private val dbRepo: DatabaseRepo) :
 
         noticeForm.getNoticeFormFields().getMiniMap().displayBorder(false)
         browserPanel.hideBorder()
-        selectedPhotosPanel.showBorder(miniSelectedPhotoPanel)
+        //selectedPhotosPanel.showBorder(miniSelectedPhotoPanel)
     }
 
     /**
@@ -296,7 +322,7 @@ class NoticeFrame(private val app: WegeFrei, private val dbRepo: DatabaseRepo) :
 
         noticeForm.getNoticeFormFields().getMiniMap().displayBorder(false)
         browserPanel.hideBorder()
-        selectedPhotosPanel.showBorder(photo)
+        //selectedPhotosPanel.showBorder(photo)
     }
 
     /**
@@ -402,7 +428,7 @@ class NoticeFrame(private val app: WegeFrei, private val dbRepo: DatabaseRepo) :
                     val message = EmailMessage(from, tos, subject, content)
                     if(from.address != to.address) message.ccs.add(from)
 
-                    selectedPhotos.getPhotos().forEach {
+                    selectedPhotosListModel.getSelectedPhotos().forEach {
                         val attachment = EmailAttachment(it.getPath())
                         message.attachments.add(attachment)
                     }
@@ -462,7 +488,7 @@ class NoticeFrame(private val app: WegeFrei, private val dbRepo: DatabaseRepo) :
         // ggf. Observer entfernen, wichtig zur Vermeidung eines Memory-Leaks
         val oldComp = getZoomComponent()
         if (oldComp is MaxiMapForm) {
-            selectedPhotos.unregisterObserver(oldComp.getMaxiMap())
+            selectedPhotosListModel.removeListDataListener(oldComp.getMaxiMap())
         }
         bottomSplitPane.rightComponent = comp
     }
@@ -517,7 +543,7 @@ class NoticeFrame(private val app: WegeFrei, private val dbRepo: DatabaseRepo) :
      * und benachrichtigt die MiniMap und ggf. die MaxiMap.
      */
     fun updateOffensePositionFromSelectedPhotos() {
-        offensePosition = selectedPhotos.getAveragePosition()
+        offensePosition = selectedPhotosListModel.getAveragePosition()
         noticeForm.getNoticeFormFields().getMiniMap().setOffensePosition(offensePosition)
         getMaxiMapForm()?.setOffenseMarker(offensePosition)
         maybeFindAddress()

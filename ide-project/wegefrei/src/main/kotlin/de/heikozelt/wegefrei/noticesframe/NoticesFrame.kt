@@ -5,6 +5,7 @@ import de.heikozelt.wegefrei.entities.NoticeEntity
 import de.heikozelt.wegefrei.jobs.LoadNoticesWorker
 import de.heikozelt.wegefrei.model.NoticesTableModel
 import org.slf4j.LoggerFactory
+import java.awt.Dimension
 import javax.swing.*
 
 /**
@@ -88,6 +89,7 @@ class NoticesFrame(private val app: WegeFrei) : JFrame("Meldungen - Wege frei!")
         add(noticesToolBar, BorderLayout.SOUTH)
         */
 
+        minimumSize = Dimension(250, 250)
         setSize(1000, 700)
         defaultCloseOperation = EXIT_ON_CLOSE
         isVisible = true

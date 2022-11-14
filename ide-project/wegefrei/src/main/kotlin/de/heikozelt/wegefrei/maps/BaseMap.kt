@@ -1,7 +1,7 @@
 package de.heikozelt.wegefrei.maps
 
 import de.heikozelt.wegefrei.model.Photo
-import de.heikozelt.wegefrei.model.SelectedPhotosObserver
+import de.heikozelt.wegefrei.model.SelectedPhotosListModel
 import de.heikozelt.wegefrei.noticeframe.NoticeFrame
 import org.jxmapviewer.JXMapViewer
 import org.jxmapviewer.OSMTileFactoryInfo
@@ -11,6 +11,8 @@ import org.slf4j.LoggerFactory
 import java.awt.Graphics
 import java.awt.Point
 import java.util.*
+import javax.swing.event.ListDataEvent
+import javax.swing.event.ListDataListener
 
 /**
  * Beispiele für components:
@@ -28,13 +30,14 @@ import java.util.*
  *
  */
 open class BaseMap(
-    private val noticeFrame: NoticeFrame
-) : JXMapViewer(), SelectedPhotosObserver {
+    private val noticeFrame: NoticeFrame,
+    private val selectedPhotosListModel: SelectedPhotosListModel
+) : JXMapViewer(), ListDataListener {
 
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
     private val photoMarkers = LinkedList<PhotoMarker>()
     private var offenseMarker: OffenseMarker? = null
-    private var selectedPhotos = noticeFrame.getSelectedPhotos()
+
 
     init {
         log.debug("init")
@@ -85,15 +88,28 @@ open class BaseMap(
     }
      */
 
+    override fun intervalAdded(e: ListDataEvent?) {
+        e?.let {event ->
+            val index = event.index0
+            val source = event.source
+            if(source is SelectedPhotosListModel) {
+                val photo = source.getElementAt(index)
+                photo?.let {
+                    selectedPhoto(index, photo)
+                }
+            }
+        }
+    }
+
     /**
      * Observer-Methode
      * index zählt intern ab 0, in der Marker-Darstellung aber ab "1"
      */
-    override fun selectedPhoto(index: Int, photo: Photo) {
+    fun selectedPhoto(index: Int, photo: Photo) {
         log.debug("selectedPhoto(index=$index)")
 
         // Marker hinzufügen, falls Geo-Position vorhanden ist
-        val markerIndex = selectedPhotos.calculateMarkerIndex(index)
+        val markerIndex = selectedPhotosListModel.calculateMarkerIndex(index)
         log.debug("markerIndex: $markerIndex")
 
         // Bei allen darauffolgenden Photos/Markers die angezeigte Nummer um eins erhöhen
@@ -127,20 +143,27 @@ open class BaseMap(
         }
     }
 
+    override fun intervalRemoved(e: ListDataEvent?) {
+        e?.let {event ->
+            val index = event.index0
+            unselectedPhoto(index)
+        }
+    }
 
     /**
      * Observer-Methode
      */
-    override fun unselectedPhoto(index: Int, photo: Photo) {
+    fun unselectedPhoto(index: Int) {
         log.debug("unselectedPhoto(index=$index)")
 
-        val markerIndex = selectedPhotos.calculateMarkerIndex(index)
+        val markerIndex = selectedPhotosListModel.calculateMarkerIndex(index)
         log.debug("markerIndex: $markerIndex")
 
         // Marker und dessen Label entfernen, falls er/es existiert hat
-        if (photo.getGeoPosition() != null) {
-            remove(photoMarkers[markerIndex].getLabel())
-            photoMarkers.removeAt(markerIndex)
+        val photoMarker = photoMarkers.find { it.getPhotoIndex() == index }
+        photoMarker?.let {
+            photoMarkers.remove(it)
+            remove(it.getLabel())
         }
 
         log.debug("number of photo markers: " + photoMarkers.size)
@@ -162,10 +185,19 @@ open class BaseMap(
         }
     }
 
+    override fun contentsChanged(e: ListDataEvent?) {
+        e?.let {event ->
+            val source = event.source
+            if(source is SelectedPhotosListModel) {
+               replacedPhotoSelection(source.getSelectedPhotos())
+            }
+        }
+    }
+
     /**
      * alle Foto-Markers müssen ersetzt werden
      */
-    override fun replacedPhotoSelection(photos: TreeSet<Photo>) {
+    fun replacedPhotoSelection(photos: TreeSet<Photo>) {
         log.debug("replacedPhotoSelection(photos.size=${photos.size})")
         // alle bestehenden Foto-Marker entfernen
         // (aber den ggf. existieren Adress-Marker behalten)
