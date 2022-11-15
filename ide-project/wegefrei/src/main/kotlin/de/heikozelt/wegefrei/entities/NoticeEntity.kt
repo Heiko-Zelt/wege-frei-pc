@@ -132,7 +132,7 @@ class NoticeEntity(
     @Column
     var recipient: String? = null,
 
-    @ManyToMany
+    @ManyToMany(cascade = [CascadeType.ALL])
     @JoinTable(
         name = "NOTICES_PHOTOS",
         joinColumns = [JoinColumn(name = "id" /*, referencedColumnName = "filename" */)],

@@ -109,6 +109,9 @@ class NoticeFrame(
 
         //defaultCloseOperation = DISPOSE_ON_CLOSE ist egal
         //addWindowListener(NoticeFrameWindowListener(this))
+        //todo Prio 1: bug: SaveNotice: jakarta.persistence.EntityNotFoundException:
+        // Unable to find de.heikozelt.wegefrei.entities.PhotoEntity with id /home/heiko/Pictures/IMG_5148.jpg
+        // todo Prio 2: ask to save or cancel before closing
         addWindowListener(object : WindowAdapter() {
             override fun windowClosing(e: WindowEvent?) {
                 e?.window?.let {
@@ -361,7 +364,7 @@ class NoticeFrame(
      */
     fun saveNotice() {
         // todo Prio 1: bug: Fotos, die noch nicht in der Datenbank sind, werden nicht gespeichert.
-        noticeForm.getNoticeFormFields().getNotice()
+        noticeEntity = noticeForm.getNoticeFormFields().getNotice()
         val dbRepo = app.getDatabaseRepo() ?: return
         noticeEntity?.let {
             it.setGeoPosition(offensePosition)
@@ -372,6 +375,7 @@ class NoticeFrame(
                 dbRepo.updateNotice(it)
                 app.noticeUpdated(it)
             }
+            it.photoEntities = selectedPhotosListModel.getPhotoEntities()
         }
     }
 

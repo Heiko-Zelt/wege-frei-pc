@@ -1,5 +1,6 @@
 package de.heikozelt.wegefrei.model
 
+import de.heikozelt.wegefrei.entities.PhotoEntity
 import org.jxmapviewer.viewer.GeoPosition
 import org.slf4j.LoggerFactory
 import java.lang.Math.min
@@ -200,5 +201,23 @@ class SelectedPhotosListModel(
             }
             i -= 2
         }
+    }
+
+    /**
+     * is called before saving the notice to the database
+     */
+    fun getPhotoEntities(): MutableSet<PhotoEntity> {
+        val photoEntities = mutableSetOf<PhotoEntity>()
+        selectedPhotos.forEach { photo ->
+            if(photo.getPhotoEntity() == null) {
+                if(photo.getPhotoFile() != null) {
+                    photo.copyMetaDataFromFileToEntity()
+                }
+            }
+            photo.getPhotoEntity()?.let {
+                photoEntities.add(it)
+            }
+        }
+        return photoEntities
     }
 }

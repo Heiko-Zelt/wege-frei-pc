@@ -109,17 +109,6 @@ class DatabaseRepo(jdbcUrl: String) {
             if(tx.isActive) tx.rollback()
             if(session.isOpen) session.close()
         }
-
-        /*
-        val tx = em.transaction
-        try {
-            tx.begin()
-            em.persist(photoEntity)
-            tx.commit()
-        } finally {
-            if(tx.isActive) tx.rollback()
-        }
-        */
     }
 
     fun insertNotice(noticeEntity: NoticeEntity) {
@@ -134,40 +123,38 @@ class DatabaseRepo(jdbcUrl: String) {
             if(tx.isActive) tx.rollback()
             if(session.isOpen) session.close()
         }
-
-        /*
-        val tx = em.transaction
-        log.debug("insertNotice em $em")
-        log.debug("insertNotice Transaction $tx")
-        try {
-            tx.begin()
-            em.persist(noticeEntity)
-            tx.commit()
-        } finally {
-            if(tx.isActive) tx.rollback()
-        }
-        */
     }
 
     fun updateNotice(noticeEntity: NoticeEntity) {
-        val tx = em.transaction
+        log.debug("updateNotice(id=${noticeEntity.id})")
+        val session = sessionFactory.openSession()
+        log.debug("session: $session")
+        val tx = session.beginTransaction()
         try {
-            tx.begin()
-            em.merge(noticeEntity)
+            session.merge(noticeEntity)
             tx.commit()
         } finally {
             if(tx.isActive) tx.rollback()
+            if(session.isOpen) session.close()
         }
     }
 
     fun deleteNotice(noticeEntity: NoticeEntity) {
-        val tx = em.transaction
+        log.debug("deleteNotice(id=${noticeEntity.id})")
+        val session = sessionFactory.openSession()
+        log.debug("session: $session")
+        val tx = session.beginTransaction()
         try {
-            tx.begin()
+            //val mergedEntity = session.merge(noticeEntity)
+            //session.remove(mergedEntity)
+            session.remove(if (session.contains(noticeEntity)) noticeEntity else session.merge(noticeEntity))
+            //session.remove(noticeEntity)
             tx.commit()
         } finally {
             if(tx.isActive) tx.rollback()
+            if(session.isOpen) session.close()
         }
+
     }
 
     fun close() {

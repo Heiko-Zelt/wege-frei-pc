@@ -1,7 +1,6 @@
 package de.heikozelt.wegefrei.noticeframe
 
 import de.heikozelt.wegefrei.entities.NoticeEntity
-import de.heikozelt.wegefrei.entities.PhotoEntity
 import de.heikozelt.wegefrei.gui.*
 import de.heikozelt.wegefrei.maps.MiniMap
 import de.heikozelt.wegefrei.model.*
@@ -350,15 +349,6 @@ class NoticeFormFields(
         // Normalerweise sollte vorher setNotice() aufgerufen worden sein.
         // Aber falls nicht, wird ein neues Notice-Objekt instanziiert.
         val n = noticeEntity?:NoticeEntity()
-
-        val photoEntities = mutableSetOf<PhotoEntity>()
-        selectedPhotosListModel.getSelectedPhotos().forEach {photo ->
-            val entity = photo.getPhotoEntity()
-            entity?.let {
-                photoEntities.add(it)
-            }
-        }
-        n.photoEntities = photoEntities
 
         val selectedCountry = countrySymbolComboBox.selectedObjects[0] as CountrySymbol
         n.countrySymbol = if (selectedCountry.countryName == null) {
