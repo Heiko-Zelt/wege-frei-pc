@@ -167,6 +167,7 @@ class NoticeFrame(
         selectedPhotosListModel.addListDataListener(browserPanel.getBrowserListModel())
         selectedPhotosListModel.addListDataListener(this)
         selectedPhotosListModel.addListDataListener(noticeForm.getNoticeFormFields())
+        selectedPhotosListModel.addListDataListener(noticeForm.getNoticeFormFields().getMiniMap())
         /*
         selectedPhotos.registerObserver(selectedPhotosPanel)
         selectedPhotos.registerObserver(noticeForm.getNoticeFormFields().getMiniMap())
@@ -261,7 +262,7 @@ class NoticeFrame(
         }
         noticeForm.getNoticeFormFields().getMiniMap().displayBorder(true)
         browserPanel.hideBorder()
-        //selectedPhotosPanel.hideBorder()
+        selectedPhotosList.clearSelection()
     }
 
     /**
