@@ -289,7 +289,7 @@ class NoticeFrame(
     fun showPhoto(photo: Photo) {
         log.debug("show photo")
         app.getSettings()?.photosDirectory?.let { dir ->
-            val photoPanel = MaxiPhotoPanel(dir, this, photo)
+            val photoPanel = MaxiPhotoPanel(this, photo)
             val scrollPane = JScrollPane(photoPanel)
             setZoomComponent(scrollPane)
         }
@@ -307,11 +307,10 @@ class NoticeFrame(
 
         //todo Prio 3: Photos zoombar (scollpane)
         //todo Prio 3: 2 Methoden für den gleichen Zweck, eine soll die andere Aufrufen
-        app.getSettings()?.photosDirectory?.let {
-            val photoPanel = MaxiSelectedPhotoPanel(it, this, miniSelectedPhotoPanel.getPhoto())
-            val scrollPane = JScrollPane(photoPanel)
-            setZoomComponent(scrollPane)
-        }
+
+        val photoPanel = MaxiSelectedPhotoPanel( this, miniSelectedPhotoPanel.getPhoto())
+        val scrollPane = JScrollPane(photoPanel)
+        setZoomComponent(scrollPane)
 
         noticeForm.getNoticeFormFields().getMiniMap().displayBorder(false)
         browserPanel.hideBorder()
@@ -325,7 +324,7 @@ class NoticeFrame(
         log.debug("show selected photo")
 
         app.getSettings()?.photosDirectory?.let {
-            val photoPanel = MaxiSelectedPhotoPanel(it, this, photo)
+            val photoPanel = MaxiSelectedPhotoPanel( this, photo)
             val scrollPane = JScrollPane(photoPanel)
             setZoomComponent(scrollPane)
         }
