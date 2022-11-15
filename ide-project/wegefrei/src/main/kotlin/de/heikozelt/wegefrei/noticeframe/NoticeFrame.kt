@@ -94,9 +94,7 @@ class NoticeFrame(
         title = "Meldung - Wege frei!"
         //background = FRAME_BACKGROUND
         selectedPhotosScrollPane.minimumSize = Dimension(Styles.THUMBNAIL_SIZE / 2, Styles.THUMBNAIL_SIZE / 2)
-
         selectedPhotosList.cellRenderer = selectedPhotosListCellRenderer
-
         selectedPhotosList.fixedCellWidth = Styles.THUMBNAIL_SIZE
         selectedPhotosList.fixedCellHeight = Styles.THUMBNAIL_SIZE
         selectedPhotosList.visibleRowCount = 1
@@ -168,12 +166,9 @@ class NoticeFrame(
 
         selectedPhotosListModel.addListDataListener(browserPanel.getBrowserListModel())
         selectedPhotosListModel.addListDataListener(this)
+        selectedPhotosListModel.addListDataListener(noticeForm.getNoticeFormFields())
         /*
-        selectedPhotos.registerObserver(this)
         selectedPhotos.registerObserver(selectedPhotosPanel)
-
-        selectedPhotos.registerObserver(browserPanel)
-        selectedPhotos.registerObserver(noticeForm.getNoticeFormFields())
         selectedPhotos.registerObserver(noticeForm.getNoticeFormFields().getMiniMap())
         */
 
@@ -190,7 +185,6 @@ class NoticeFrame(
                 photos.add(photo)
             }
         }
-        //selectedPhotos.setPhotos(photos)
         selectedPhotosListModel.setSelectedPhotos(photos)
         browserPanel.setSelectedPhotos(selectedPhotosListModel)
 
@@ -235,6 +229,7 @@ class NoticeFrame(
         selectedPhotosListModel.add(photo)
         selectedPhotosList.setSelectedValue(photo, true)
         // alle weiteren Aktionen via Observers
+        // todo Beobachtungszeit updaten
     }
 
     /**

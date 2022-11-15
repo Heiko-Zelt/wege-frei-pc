@@ -12,6 +12,8 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
 import javax.swing.*
+import javax.swing.event.ListDataEvent
+import javax.swing.event.ListDataListener
 import javax.swing.text.AbstractDocument
 
 /**
@@ -26,7 +28,7 @@ import javax.swing.text.AbstractDocument
 class NoticeFormFields(
     private val noticeFrame: NoticeFrame,
     private val selectedPhotosListModel: SelectedPhotosListModel
-) : JPanel(), SelectedPhotosObserver {
+) : JPanel(), ListDataListener /* SelectedPhotosObserver */ {
 
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
 
@@ -477,19 +479,19 @@ class NoticeFormFields(
         noteTextArea.isEnabled = enab
     }
 
-    override fun selectedPhoto(index: Int, photo: Photo) {
+    fun selectedPhoto(photo: Photo) {
         if (photo.getDateTime() != null) {
             updateDateTimeAndDuration()
         }
     }
 
-    override fun unselectedPhoto(index: Int, photo: Photo) {
+    fun unselectedPhoto(photo: Photo) {
         if (photo.getDateTime() != null) {
             updateDateTimeAndDuration()
         }
     }
 
-    override fun replacedPhotoSelection(photos: TreeSet<Photo>) {
+    fun replacedPhotoSelection(photos: TreeSet<Photo>) {
         if (photos.size != 0) {
             updateDateTimeAndDuration()
         }
@@ -595,5 +597,21 @@ class NoticeFormFields(
                 fmt.format(zdt)
             }
         }
+    }
+
+    override fun intervalAdded(e: ListDataEvent?) {
+        if(e is SelectedPhotosListDataEvent) {
+            e.photos.forEach { selectedPhoto(it) }
+        }
+    }
+
+    override fun intervalRemoved(e: ListDataEvent?) {
+        if(e is SelectedPhotosListDataEvent) {
+            e.photos.forEach { unselectedPhoto(it) }
+        }
+    }
+
+    override fun contentsChanged(e: ListDataEvent?) {
+        // ignore
     }
 }
