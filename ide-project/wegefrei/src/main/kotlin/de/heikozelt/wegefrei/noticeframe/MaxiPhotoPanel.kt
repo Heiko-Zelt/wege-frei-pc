@@ -12,24 +12,32 @@ class MaxiPhotoPanel(
     private val photo: Photo
 ): JPanel() {
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
-    private val label = MaxiPhotoLabel(photo)
-    private var scrollPane = JScrollPane(label)
+
+    private var scrollPane = JScrollPane()
+    private val label = MaxiPhotoLabel(scrollPane.viewport, photo)
+    private var zoomLevel: Short = 0
 
     init {
         background = ZOOM_PANEL_BACKGROUND
         border = NO_BORDER
         layout = BoxLayout(this, BoxLayout.Y_AXIS)
 
+        scrollPane.setViewportView(label)
+
         //val file = File(PHOTO_DIR, photo.filename)
         //val photo = readPhotoMetadata(file)
         //val img = ImageIO.read(file)
 
-        val button = JButton("+")
-        button.margin = Insets(0, 0, 0, 0)
-        button.alignmentX = CENTER_ALIGNMENT
-        button.addActionListener {
+        val addButton = JButton("hinzufügen")
+        addButton.margin = Insets(0, 0, 0, 0)
+        addButton.addActionListener {
            noticeFrame.selectPhoto(photo)
         }
+
+        val zoomInButton = JButton("+")
+        zoomInButton.addActionListener { zoomIn() }
+        val zoomOutButton = JButton("-")
+        zoomOutButton.addActionListener { zoomOut() }
 
         val lay = GroupLayout(this)
         lay.autoCreateGaps = false
@@ -45,7 +53,9 @@ class MaxiPhotoPanel(
                             GroupLayout.PREFERRED_SIZE,
                             Int.MAX_VALUE
                         )
-                        .addComponent(button)
+                        .addComponent(zoomInButton)
+                        .addComponent(zoomOutButton)
+                        .addComponent(addButton)
                 )
         )
         // top to bottom
@@ -54,14 +64,37 @@ class MaxiPhotoPanel(
                 .addComponent(scrollPane)
                 .addGroup(
                     lay.createParallelGroup()
-                        .addComponent(button)
+                        .addComponent(zoomInButton)
+                        .addComponent(zoomOutButton)
+                        .addComponent(addButton)
                 )
         )
+        zoomInButton.margin = Insets(0, 10, 0, 10)
+        lay.linkSize(SwingConstants.HORIZONTAL, zoomInButton, zoomOutButton)
         layout = lay
     }
 
     fun getPhoto(): Photo {
         return photo
+    }
+
+    private fun zoomIn() {
+        if(zoomLevel < 7) {
+            zoomLevel++
+            label.zoomTo(zoomLevel)
+        }
+    }
+
+    private fun zoomOut() {
+        if(zoomLevel > 0) {
+            zoomLevel--
+            label.zoomTo(zoomLevel)
+        }
+    }
+
+    fun fit() {
+        zoomLevel = 0
+        label.zoomTo(zoomLevel)
     }
 
 }

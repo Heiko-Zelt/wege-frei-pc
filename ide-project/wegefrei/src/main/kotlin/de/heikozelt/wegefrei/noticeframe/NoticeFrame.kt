@@ -16,6 +16,7 @@ import org.jxmapviewer.viewer.GeoPosition
 import org.slf4j.LoggerFactory
 import java.awt.Component
 import java.awt.Dimension
+import java.awt.EventQueue
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 import java.nio.file.Path
@@ -290,8 +291,10 @@ class NoticeFrame(
         log.debug("show photo")
         app.getSettings()?.photosDirectory?.let { dir ->
             val photoPanel = MaxiPhotoPanel(this, photo)
-            val scrollPane = JScrollPane(photoPanel)
-            setZoomComponent(scrollPane)
+            setZoomComponent(photoPanel)
+            EventQueue.invokeLater {
+                photoPanel.fit()
+            }
         }
         noticeForm.getNoticeFormFields().getMiniMap().displayBorder(false)
         //browserPanel.showBorder(photoEntity)
@@ -309,8 +312,7 @@ class NoticeFrame(
         //todo Prio 3: 2 Methoden für den gleichen Zweck, eine soll die andere Aufrufen
 
         val photoPanel = MaxiSelectedPhotoPanel( this, miniSelectedPhotoPanel.getPhoto())
-        val scrollPane = JScrollPane(photoPanel)
-        setZoomComponent(scrollPane)
+        setZoomComponent(photoPanel)
 
         noticeForm.getNoticeFormFields().getMiniMap().displayBorder(false)
         browserPanel.hideBorder()
@@ -325,8 +327,7 @@ class NoticeFrame(
 
         app.getSettings()?.photosDirectory?.let {
             val photoPanel = MaxiSelectedPhotoPanel( this, photo)
-            val scrollPane = JScrollPane(photoPanel)
-            setZoomComponent(scrollPane)
+            setZoomComponent(photoPanel)
         }
 
         noticeForm.getNoticeFormFields().getMiniMap().displayBorder(false)
@@ -486,11 +487,8 @@ class NoticeFrame(
      */
     private fun getMaxiPhotoPanel(): MaxiPhotoPanel? {
         val zoomComp = getZoomComponent()
-        if (zoomComp is JScrollPane) {
-            val v = zoomComp.viewport.view
-            if (v is MaxiPhotoPanel) {
-                return v
-            }
+        if (zoomComp is MaxiPhotoPanel) {
+            return zoomComp
         }
         return null
     }
@@ -501,11 +499,8 @@ class NoticeFrame(
      */
     private fun getMaxiSelectedPhotoPanel(): MaxiSelectedPhotoPanel? {
         val zoomComp = getZoomComponent()
-        if (zoomComp is JScrollPane) {
-            val v = zoomComp.viewport.view
-            if (v is MaxiSelectedPhotoPanel) {
-                return v
-            }
+        if (zoomComp is MaxiSelectedPhotoPanel) {
+             return zoomComp
         }
         return null
     }

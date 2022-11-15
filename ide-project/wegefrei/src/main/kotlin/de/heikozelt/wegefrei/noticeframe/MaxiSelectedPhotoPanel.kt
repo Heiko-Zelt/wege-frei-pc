@@ -1,7 +1,5 @@
 package de.heikozelt.wegefrei.noticeframe
 
-import de.heikozelt.wegefrei.gui.Styles.Companion.NO_BORDER
-import de.heikozelt.wegefrei.gui.Styles.Companion.ZOOM_PANEL_BACKGROUND
 import de.heikozelt.wegefrei.model.Photo
 import org.slf4j.LoggerFactory
 import java.awt.Insets
@@ -13,15 +11,12 @@ class MaxiSelectedPhotoPanel(
 ): JPanel()
 {
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
-    private val label = MaxiPhotoLabel(photo)
+    private val label = MaxiPhotoLabel(this, photo)
     private var scrollPane = JScrollPane(label)
 
     init {
-        background = ZOOM_PANEL_BACKGROUND
-        border = NO_BORDER
-
-
-        layout = BoxLayout(this, BoxLayout.Y_AXIS)
+        //background = ZOOM_PANEL_BACKGROUND
+        //border = NO_BORDER
 
         //val file = File(PHOTO_DIR, filename)
         //val photo = readPhotoMetadata(file)
