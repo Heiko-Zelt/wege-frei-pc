@@ -289,13 +289,11 @@ class NoticeFrame(
      */
     fun showPhoto(photo: Photo) {
         log.debug("show photo")
-        app.getSettings()?.photosDirectory?.let { dir ->
-            val photoPanel = MaxiPhotoPanel(this, photo)
-            setZoomComponent(photoPanel)
-            EventQueue.invokeLater {
-                photoPanel.fit()
-            }
-        }
+
+        val photoPanel = MaxiPhotoPanel(this, photo)
+        setZoomComponent(photoPanel)
+        EventQueue.invokeLater { photoPanel.fit() }
+
         noticeForm.getNoticeFormFields().getMiniMap().displayBorder(false)
         //browserPanel.showBorder(photoEntity)
         //selectedPhotosPanel.hideBorder()
@@ -308,11 +306,11 @@ class NoticeFrame(
     fun showSelectedPhoto(miniSelectedPhotoPanel: MiniSelectedPhotoPanel) {
         log.debug("show selected photo")
 
-        //todo Prio 3: Photos zoombar (scollpane)
         //todo Prio 3: 2 Methoden für den gleichen Zweck, eine soll die andere Aufrufen
 
         val photoPanel = MaxiSelectedPhotoPanel( this, miniSelectedPhotoPanel.getPhoto())
         setZoomComponent(photoPanel)
+        EventQueue.invokeLater { photoPanel.fit() }
 
         noticeForm.getNoticeFormFields().getMiniMap().displayBorder(false)
         browserPanel.hideBorder()
@@ -325,10 +323,9 @@ class NoticeFrame(
     private fun showSelectedPhoto(photo: Photo) {
         log.debug("show selected photo")
 
-        app.getSettings()?.photosDirectory?.let {
-            val photoPanel = MaxiSelectedPhotoPanel( this, photo)
-            setZoomComponent(photoPanel)
-        }
+        val photoPanel = MaxiSelectedPhotoPanel( this, photo)
+        setZoomComponent(photoPanel)
+        EventQueue.invokeLater { photoPanel.fit() }
 
         noticeForm.getNoticeFormFields().getMiniMap().displayBorder(false)
         browserPanel.hideBorder()

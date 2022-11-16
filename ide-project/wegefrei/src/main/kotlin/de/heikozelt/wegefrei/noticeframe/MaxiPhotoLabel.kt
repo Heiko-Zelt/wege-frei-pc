@@ -57,6 +57,6 @@ class MaxiPhotoLabel(private val parentContainer: Container, private val photo: 
     }
 
     companion object {
-        const val BASE = 1.2
+        const val BASE = 1.3
     }
 }
