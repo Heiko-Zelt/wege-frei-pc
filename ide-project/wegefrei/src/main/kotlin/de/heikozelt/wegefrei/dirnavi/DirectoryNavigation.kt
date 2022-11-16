@@ -6,9 +6,6 @@ import java.awt.event.ActionEvent
 import java.awt.event.ActionListener
 import java.awt.event.ItemEvent
 import java.awt.event.ItemListener
-import java.io.File
-import java.nio.file.Path
-import java.nio.file.Paths
 import javax.swing.*
 
 class DirectoryNavigation(private val directoryChangedCallback: (AbsolutePath) -> Unit): JPanel() {
@@ -37,7 +34,7 @@ class DirectoryNavigation(private val directoryChangedCallback: (AbsolutePath) -
     init {
         //default: java.awt.FlowLayout[hgap=5,vgap=5,align=center]
         //log.debug("layout: $layout")
-        layout = FlowLayout(FlowLayout.LEFT)
+        layout = FlowLayout(FlowLayout.LEFT, 0, 0)
     }
 
     private fun updateLayout() {

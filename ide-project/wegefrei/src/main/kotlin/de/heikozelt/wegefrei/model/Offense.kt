@@ -34,6 +34,15 @@ class Offense(val id: Int, val text: String, val selectable: Boolean) {
         }
 
         /**
+         * used by autocomplete/filtered combo box
+         * @param: filter in lower case
+         */
+        fun offensesFiltered(filter: String): List<Offense> {
+            val lowercaseFilter = filter.lowercase()
+            return OFFENSES.filter { (lowercaseFilter in it.text.lowercase()) && it.selectable}
+        }
+
+        /**
          * Anzeige-Reihenfolge in der ComboBox wie hier in diesem Array.
          */
         val OFFENSES = arrayOf(

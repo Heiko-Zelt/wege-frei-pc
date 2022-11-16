@@ -201,6 +201,7 @@ open class BaseMap(
         log.debug("replacedPhotoSelection(photos.size=${photos.size})")
         // alle bestehenden Foto-Marker entfernen
         // (aber den ggf. existieren Adress-Marker behalten)
+        // todo bug: Cannot read field "next" because "this.next" is null
         for (photoMarker in photoMarkers) {
             remove(photoMarker.getLabel())
         }

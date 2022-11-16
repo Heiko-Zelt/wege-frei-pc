@@ -16,6 +16,9 @@ import javax.swing.event.ListDataEvent
 import javax.swing.event.ListDataListener
 import javax.swing.text.AbstractDocument
 
+
+
+
 /**
  * Panel mit den Formular-Feldern
  *
@@ -34,14 +37,16 @@ class NoticeFormFields(
 
     private val countrySymbolComboBox = JComboBox(CountrySymbol.COUNTRY_SYMBOLS)
     private val licensePlateTextField = TrimmingTextField(10)
-    private val vehicleMakeComboBox = JComboBox(ListVehicleMakes.VEHICLE_MAKES)
+    //private val vehicleMakeComboBox = JComboBox(ListVehicleMakes.VEHICLE_MAKES)
+    private val vehicleMakeComboBox = VehicleMakeComboBox()
     private val colorComboBox = JComboBox(VehicleColor.COLORS)
     private val miniMap = MiniMap(noticeFrame, selectedPhotosListModel)
     private var streetTextField = TrimmingTextField(30)
     private var zipCodeTextField = TrimmingTextField(5)
     private var townTextField = TrimmingTextField(30)
     private var locationDescriptionTextField = TrimmingTextField(40)
-    private var offenseComboBox = JComboBox(Offense.selectableOffenses())
+    private var offenseComboBox = OffenseComboBox()
+    //private var offenseComboBox = JComboBox(Offense.selectableOffenses())
     private val observationDateTextField = JTextField(10)
     private val observationTimeTextField = TrimmingTextField(5)
     private val durationTextField = JTextField(3)
@@ -74,6 +79,9 @@ class NoticeFormFields(
             licensePlateDoc.documentFilter = UppercaseDocumentFilter()
         }
         val vehicleMakeLabel = JLabel("Fahrzeugmarke & Farbe:")
+        //vehicleMakeComboBox.isEditable = true
+
+
         colorComboBox.renderer = ColorListCellRenderer()
         colorComboBox.maximumRowCount = VehicleColor.COLORS.size
         miniMap.toolTipText = "Bitte positionieren Sie den roten Pin."
@@ -85,13 +93,18 @@ class NoticeFormFields(
         val locationDescriptionLabel = JLabel("Tatort:")
         townTextField.toolTipText = "z.B. Wiesbaden"
         locationDescriptionTextField.toolTipText = "z.B. Bushaltestelle Kochbrunnen"
+
+        // todo Prio 1: Auto-complete
+        // Benutzer gibt ein Wortbestandteil ein. Die Einträge im PullDownMenü werden gefiltert.
         val offenseLabel = JLabel("<html>Verstoß:<sup>*</sup></html>")
         offenseComboBox.renderer = OffenseListCellRenderer()
+
         val observationDateTimeLabel = JLabel("<html>Beobachtungsdatum<sup>*</sup>, Uhrzeit:<sup>*</sup></html>")
         val observationDateDoc = observationDateTextField.document
         if (observationDateDoc is AbstractDocument) {
             observationDateDoc.documentFilter = CharPredicateDocFilter.dateDocFilter
         }
+
         observationDateTextField.toolTipText = "z.B. 31.12.2021"
         observationDateTextField.inputVerifier = PatternVerifier.dateVerifier
         val observationTimeDoc = observationTimeTextField.document
@@ -312,7 +325,7 @@ class NoticeFormFields(
         countrySymbolComboBox.selectedItem = countrySymbol
         licensePlateTextField.text = noticeEntity.licensePlate
 
-        val make = ListVehicleMakes.VEHICLE_MAKES.find { it == noticeEntity.vehicleMake }
+        val make = VehicleMakesComboBoxModel.VEHICLE_MAKES.find { it == noticeEntity.vehicleMake }
         make?.let {
             vehicleMakeComboBox.selectedItem = make
         }
@@ -498,7 +511,6 @@ class NoticeFormFields(
     }
 
     private fun updateDateTimeAndDuration() {
-        val selectedPhotos = noticeFrame.getSelectedPhotos()
         val newStartTime = selectedPhotosListModel.getStartTime()
         observationDateTextField.text = blankOrDateString(newStartTime)
         observationTimeTextField.text = blankOrTimeString(newStartTime)
