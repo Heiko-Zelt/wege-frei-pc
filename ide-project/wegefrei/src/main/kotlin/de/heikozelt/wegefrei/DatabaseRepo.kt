@@ -56,14 +56,21 @@ class DatabaseRepo(jdbcUrl: String) {
 
     }
 
+    // todo Prio 1: bug: Nach Ändern einer Anzeige und erstellen einer neuen, wird die Anzeige in Browser wird nicht aktualisiert
+    // Problem: Die Änderung wird nicht in der Datenbank gespeichert.
+    // Gibt es zu einem Foto 2 unterschiedliche PhotoEntities?
     fun findNoticeById(id: Int): NoticeEntity? {
-        log.debug("getNoticeById($id)")
-        val noticeEntity = em.find(NoticeEntity::class.java, id)
-        if(noticeEntity == null) {
-            log.debug("notice $id not found in database")
-        } else {
-            log.debug("id $id found in database")
-            log.debug("make ${noticeEntity.vehicleMake}")
+        log.debug("findNoticeById($id)")
+        var noticeEntity: NoticeEntity? = null
+        val session = sessionFactory.openSession()
+        log.debug("session: $session")
+        val tx = session.beginTransaction()
+        try {
+            noticeEntity = session.find(NoticeEntity::class.java, id)
+            tx.commit()
+        } finally {
+            if(tx.isActive) tx.rollback()
+            if(session.isOpen) session.close()
         }
         return noticeEntity
     }

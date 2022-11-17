@@ -28,6 +28,7 @@ import javax.swing.text.AbstractDocument
  * [] Fahrzeug war verlassen        [] mit Behinderung [] Umweltplakette fehlt/ungültig
  * [] Warnblinkanlage eingeschaltet [] mit Gefährdung  [] HU-Plakette abgelaufen
  * </pre>
+ * todo Prio 4: Rechtschreibprüfung insbesondere für Hinweis-Textarea
  */
 class NoticeFormFields(
     private val noticeFrame: NoticeFrame,
