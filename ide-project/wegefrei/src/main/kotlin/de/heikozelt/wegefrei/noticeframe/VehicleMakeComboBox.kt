@@ -32,8 +32,13 @@ class VehicleMakeComboBox: JComboBox<String?>() {
         }
     }
 
-    // todo Groß-Kleinschreibung automatisch korrigieren
-    // todo Sonstige Rechtschreibkorrekturen beim Bearbeiten
+    /**
+     * Serialisierung.
+     * Der Status der ComboBox wird in einer Zeichenkette gespeichert.
+     *
+     * todo Groß-Kleinschreibung automatisch korrigieren
+     * todo Sonstige Rechtschreibkorrekturen beim Bearbeiten
+     */
     fun getValue(): String? {
         selectedItem?.let {
             if(it is String) {
@@ -44,6 +49,8 @@ class VehicleMakeComboBox: JComboBox<String?>() {
     }
 
     /**
+     * Deserialisierung.
+     * Eine Zeichenkette setzt den Status der ComboBox.
      * null --> [0] = [""]
      * "" --> [""]
      * " " --> [""]
@@ -56,11 +63,11 @@ class VehicleMakeComboBox: JComboBox<String?>() {
         } else {
             val txt = text.trim()
             val lowerTxt = txt.lowercase()
-            val vehicleMake = VehicleMakesComboBoxModel.VEHICLE_MAKES.find { lowerTxt == it.lowercase() }
-            if (vehicleMake == null) {
+            val sItem = VehicleMakesComboBoxModel.VEHICLE_MAKES.find { lowerTxt == it.lowercase() }
+            if (sItem == null) {
                 setEditorText(txt)
             } else {
-                selectedItem = vehicleMake
+                selectedItem = sItem
             }
         }
     }

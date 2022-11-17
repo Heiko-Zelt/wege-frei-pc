@@ -1,43 +1,39 @@
 package de.heikozelt.wegefrei.noticeframe
 
-import de.heikozelt.wegefrei.model.Offense
 import java.awt.Component
 import javax.swing.JList
 import javax.swing.JTextArea
 import javax.swing.ListCellRenderer
 
-class OffenseListCellRenderer: ListCellRenderer<Offense> {
-
-    init {
-        /*
-        component.apply {
-            isOpaque = true
-            lineWrap = true
-            wrapStyleWord = true
-        }
-
-         */
-    }
+class OffenseListCellRenderer : ListCellRenderer<String?>, JTextArea(2, 40) {
 
     override fun getListCellRendererComponent(
-        list: JList<out Offense>?,
-        value: Offense?,
+        list: JList<out String>?,
+        value: String?,
         index: Int,
         isSelected: Boolean,
         cellHasFocus: Boolean
     ): Component {
-
-        val component = JTextArea(2, 40)
-        value?.let {
-
-            component.text = it.text
-            component.maximumSize= component.preferredSize
-            component.apply {
-                isOpaque = true
-                lineWrap = true
-                wrapStyleWord = true
+        isOpaque = true
+        list?.let {
+            background = if (isSelected) {
+                list.selectionBackground
+            } else {
+                list.background
+            }
+            foreground = if (isSelected) {
+                list.selectionForeground
+            } else {
+                list.foreground
             }
         }
-        return component
+
+        value?.let {
+            text = it
+            maximumSize = preferredSize
+            lineWrap = true
+            wrapStyleWord = true
+        }
+        return this
     }
 }

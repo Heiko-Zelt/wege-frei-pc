@@ -1,7 +1,6 @@
 package de.heikozelt.wegefrei.noticeframe
 
 import de.heikozelt.wegefrei.gui.Styles.Companion.NO_BORDER
-import de.heikozelt.wegefrei.gui.Styles.Companion.ZOOM_PANEL_BACKGROUND
 import de.heikozelt.wegefrei.model.Photo
 import org.slf4j.LoggerFactory
 import java.awt.Insets
@@ -19,17 +18,9 @@ open class BasePhotoViewer(
     protected val actionButton = JButton()
 
     init {
-        background = ZOOM_PANEL_BACKGROUND
         border = NO_BORDER
-        layout = BoxLayout(this, BoxLayout.Y_AXIS)
 
         scrollPane.setViewportView(label)
-
-        //val file = File(PHOTO_DIR, photo.filename)
-        //val photo = readPhotoMetadata(file)
-        //val img = ImageIO.read(file)
-
-        actionButton.margin = Insets(0, 0, 0, 0)
 
         val zoomInButton = JButton("+")
         zoomInButton.addActionListener { zoomIn() }
@@ -66,7 +57,8 @@ open class BasePhotoViewer(
                         .addComponent(actionButton)
                 )
         )
-        zoomInButton.margin = Insets(0, 10, 0, 10)
+        val m = zoomInButton.margin
+        zoomInButton.margin = Insets(m.top,10, m.bottom, 10)
         lay.linkSize(SwingConstants.HORIZONTAL, zoomInButton, zoomOutButton)
         layout = lay
     }

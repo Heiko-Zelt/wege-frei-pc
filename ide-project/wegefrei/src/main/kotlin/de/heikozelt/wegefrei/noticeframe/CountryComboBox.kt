@@ -1,16 +1,18 @@
 package de.heikozelt.wegefrei.noticeframe
 
-import de.heikozelt.wegefrei.model.OffenseComboBoxModel
+import de.heikozelt.wegefrei.gui.CountryListCellRenderer
+import de.heikozelt.wegefrei.model.CountryComboBoxModel
+import de.heikozelt.wegefrei.model.CountrySymbol
 import org.slf4j.LoggerFactory
 import java.awt.event.KeyAdapter
 import java.awt.event.KeyEvent
 import javax.swing.JComboBox
 import javax.swing.text.JTextComponent
 
-class OffenseComboBox: JComboBox<String?>() {
-
+// todo Synonyme: D = BRD = Deutschland = Germany
+class CountryComboBox: JComboBox<CountrySymbol?>() {
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
-    private val mod = OffenseComboBoxModel()
+    private val mod = CountryComboBoxModel()
 
     fun getEditorText(): String {
         editor.editorComponent?.let { comp ->
@@ -38,11 +40,14 @@ class OffenseComboBox: JComboBox<String?>() {
      *
      * todo Groß-Kleinschreibung automatisch korrigieren
      * todo Sonstige Rechtschreibkorrekturen beim Bearbeiten
+     *
+     * val countrySymbol = CountrySymbol.fromAbbreviation(noticeEntity.countrySymbol)
+     * countryComboBox.selectedItem = countrySymbol
      */
     fun getValue(): String? {
         selectedItem?.let {
-            if(it is String) {
-                return it.ifEmpty { null }
+            if(it is CountrySymbol) {
+                return it.abbreviation.ifEmpty { null }
             }
         }
         return getEditorText()
@@ -51,11 +56,11 @@ class OffenseComboBox: JComboBox<String?>() {
     /**
      * Deserialisierung.
      * Eine Zeichenkette setzt den Status der ComboBox.
-     * null --> [0] = [""]
-     * "" --> [""]
-     * " " --> [""]
-     * "Halten/Parken auf Gehweg" --> ["Halten/Parken auf Gehweg"]
-     * "Beschädigung eines Pollers" --> editor text = "Beschädigung eines Pollers"
+     * null --> [0] = { "", null }
+     * "" --> { "", null }
+     * " " --> { "", null }
+     * "AND" --> { "AND, "Andorra"}
+     * "Wunderland" --> editor text = "Wunderland"
      */
     fun setValue(text: String?) {
         if(text == null) {
@@ -63,19 +68,16 @@ class OffenseComboBox: JComboBox<String?>() {
         } else {
             val txt = text.trim()
             val lowerTxt = txt.lowercase()
-            val sItem = OffenseComboBoxModel.OFFENSES.find { lowerTxt == it.lowercase() }
-            if (sItem == null) {
+            val countrySymbol = CountryComboBoxModel.COUNTRY_SYMBOLS.find { lowerTxt == it.abbreviation.lowercase() }
+            if (countrySymbol == null) {
                 setEditorText(txt)
             } else {
-                selectedItem = sItem
+                selectedItem = countrySymbol
             }
         }
     }
 
     init {
-        model = mod
-        renderer = OffenseListCellRenderer()
-
         val keyListener = object: KeyAdapter() {
             override fun keyReleased(e: KeyEvent?) {
                 log.debug("keyReleased()")
@@ -85,14 +87,14 @@ class OffenseComboBox: JComboBox<String?>() {
             }
         }
 
+        model = mod
+        setRenderer(CountryListCellRenderer())
         setEditable(true)
         maximumRowCount = 15
-
         val editComp = editor.editorComponent
         if(editComp is JTextComponent) {
             log.debug("editorComponent is JTextComponent")
             editComp.addKeyListener(keyListener)
         }
     }
-
 }

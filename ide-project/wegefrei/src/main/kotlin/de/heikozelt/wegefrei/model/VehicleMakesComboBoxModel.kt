@@ -12,10 +12,10 @@ import javax.swing.DefaultComboBoxModel
 class VehicleMakesComboBoxModel: DefaultComboBoxModel<String>() {
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
 
-    private val filteredVehicleMakes = mutableListOf<String>()
+    private val filteredList = mutableListOf<String>()
 
     init {
-        filteredVehicleMakes.addAll(VEHICLE_MAKES)
+        filteredList.addAll(VEHICLE_MAKES)
     }
 
     /**
@@ -25,12 +25,12 @@ class VehicleMakesComboBoxModel: DefaultComboBoxModel<String>() {
     fun setFilter(syllable: String) {
         selectedItem = syllable
         log.debug("setFilter(syllable=$syllable)")
-        val oldSize = filteredVehicleMakes.size
+        val oldSize = filteredList.size
         val normalized = syllable.lowercase()
-        filteredVehicleMakes.clear()
-        filteredVehicleMakes.addAll(VEHICLE_MAKES.filter { normalized in it.lowercase() })
+        filteredList.clear()
+        filteredList.addAll(VEHICLE_MAKES.filter { normalized in it.lowercase() })
         //VEHICLE_MAKES.forEach { if(normalized in it) filteredVehicleMakes.add(it) }
-        val newSize = filteredVehicleMakes.size
+        val newSize = filteredList.size
         log.debug("newSize = $newSize")
         //EventQueue.invokeLater {
             if (newSize != 0 || oldSize != 0) fireContentsChanged(this, 0, min(oldSize, newSize) - 1)
@@ -40,11 +40,11 @@ class VehicleMakesComboBoxModel: DefaultComboBoxModel<String>() {
     }
 
     override fun getSize(): Int {
-        return filteredVehicleMakes.size
+        return filteredList.size
     }
 
     override fun getElementAt(index: Int): String {
-        return filteredVehicleMakes[index]
+        return filteredList[index]
     }
 
     companion object {
@@ -65,6 +65,4 @@ class VehicleMakesComboBoxModel: DefaultComboBoxModel<String>() {
             "Vauxhall", "Volkswagen", "Volvo", "Yamaha", "Wartburg"
         )
     }
-
-
 }

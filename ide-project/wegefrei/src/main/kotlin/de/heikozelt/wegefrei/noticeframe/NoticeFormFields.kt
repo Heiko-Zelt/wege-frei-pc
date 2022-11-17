@@ -3,7 +3,10 @@ package de.heikozelt.wegefrei.noticeframe
 import de.heikozelt.wegefrei.entities.NoticeEntity
 import de.heikozelt.wegefrei.gui.*
 import de.heikozelt.wegefrei.maps.MiniMap
-import de.heikozelt.wegefrei.model.*
+import de.heikozelt.wegefrei.model.Photo
+import de.heikozelt.wegefrei.model.SelectedPhotosListDataEvent
+import de.heikozelt.wegefrei.model.SelectedPhotosListModel
+import de.heikozelt.wegefrei.model.VehicleColor
 import org.slf4j.LoggerFactory
 import java.time.LocalDate
 import java.time.LocalTime
@@ -15,8 +18,6 @@ import javax.swing.*
 import javax.swing.event.ListDataEvent
 import javax.swing.event.ListDataListener
 import javax.swing.text.AbstractDocument
-
-
 
 
 /**
@@ -35,8 +36,10 @@ class NoticeFormFields(
 
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
 
-    private val countrySymbolComboBox = JComboBox(CountrySymbol.COUNTRY_SYMBOLS)
+    //private val countrySymbolComboBox = JComboBox(CountrySymbol.COUNTRY_SYMBOLS)
+    private val countryComboBox = CountryComboBox()
     private val licensePlateTextField = TrimmingTextField(10)
+
     //private val vehicleMakeComboBox = JComboBox(ListVehicleMakes.VEHICLE_MAKES)
     private val vehicleMakeComboBox = VehicleMakeComboBox()
     private val colorComboBox = JComboBox(VehicleColor.COLORS)
@@ -46,6 +49,7 @@ class NoticeFormFields(
     private var townTextField = TrimmingTextField(30)
     private var locationDescriptionTextField = TrimmingTextField(40)
     private var offenseComboBox = OffenseComboBox()
+
     //private var offenseComboBox = JComboBox(Offense.selectableOffenses())
     private val observationDateTextField = JTextField(10)
     private val observationTimeTextField = TrimmingTextField(5)
@@ -60,6 +64,7 @@ class NoticeFormFields(
     private val inspectionMonthTextField = JTextField(2)
     private val monthYearSeparatorLabel = JLabel("/")
     private val inspectionYearTextField = JTextField(4)
+
     // Idealfall: Addresse wird automatisch eingetragen, Ausnahmefall Benutzer wählt aus Adressbuch
     // todo Prio 3: Auswahl des Empfängers aus Addressbuch (Button öffnet "AddressChooser")
     // todo Prio 3: eine Adresse aus der Datenbank anhand der GeoPosition vorschlagen
@@ -73,7 +78,7 @@ class NoticeFormFields(
 
         // GUI components
         val licensePlateLabel = JLabel("<html>Landes- & Kfz-Kennzeichen<sup>*</sup>:</html>")
-        countrySymbolComboBox.renderer = CountrySymbolListCellRenderer()
+        //countryComboBox.renderer = CountrySymbolListCellRenderer()
         val licensePlateDoc = licensePlateTextField.document
         if (licensePlateDoc is AbstractDocument) {
             licensePlateDoc.documentFilter = UppercaseDocumentFilter()
@@ -97,7 +102,7 @@ class NoticeFormFields(
         // todo Prio 1: Auto-complete
         // Benutzer gibt ein Wortbestandteil ein. Die Einträge im PullDownMenü werden gefiltert.
         val offenseLabel = JLabel("<html>Verstoß:<sup>*</sup></html>")
-        offenseComboBox.renderer = OffenseListCellRenderer()
+        //offenseComboBox.renderer = OffenseListCellRenderer()
 
         val observationDateTimeLabel = JLabel("<html>Beobachtungsdatum<sup>*</sup>, Uhrzeit:<sup>*</sup></html>")
         val observationDateDoc = observationDateTextField.document
@@ -178,7 +183,7 @@ class NoticeFormFields(
                             lay.createParallelGroup(GroupLayout.Alignment.LEADING)
                                 .addGroup(
                                     lay.createSequentialGroup()
-                                        .addComponent(countrySymbolComboBox)
+                                        .addComponent(countryComboBox)
                                         .addComponent(licensePlateTextField)
                                 )
                                 .addGroup(
@@ -236,7 +241,8 @@ class NoticeFormFields(
             lay.createSequentialGroup()
                 .addGroup(
                     lay.createParallelGroup(GroupLayout.Alignment.CENTER)
-                        .addComponent(licensePlateLabel).addComponent(countrySymbolComboBox).addComponent(licensePlateTextField)
+                        .addComponent(licensePlateLabel).addComponent(countryComboBox)
+                        .addComponent(licensePlateTextField)
                 )
                 .addGroup(
                     lay.createParallelGroup(GroupLayout.Alignment.CENTER)
@@ -320,22 +326,15 @@ class NoticeFormFields(
         noticeEntity.getGeoPosition()?.let {
             miniMap.setOffensePosition(it)
         }
-
-        val countrySymbol = CountrySymbol.fromAbbreviation(noticeEntity.countrySymbol)
-        countrySymbolComboBox.selectedItem = countrySymbol
+        countryComboBox.setValue(noticeEntity.countrySymbol)
         licensePlateTextField.text = noticeEntity.licensePlate
-
-        val make = VehicleMakesComboBoxModel.VEHICLE_MAKES.find { it == noticeEntity.vehicleMake }
-        make?.let {
-            vehicleMakeComboBox.selectedItem = make
-        }
-
+        vehicleMakeComboBox.setValue(noticeEntity.vehicleMake)
         colorComboBox.selectedItem = VehicleColor.fromColorName(noticeEntity.color)
         streetTextField.text = noticeEntity.street
         zipCodeTextField.text = noticeEntity.zipCode
         townTextField.text = noticeEntity.town
         locationDescriptionTextField.text = noticeEntity.locationDescription
-        offenseComboBox.selectedItem = Offense.fromId(noticeEntity.offense)
+        offenseComboBox.setValue(noticeEntity.offense)
         observationDateTextField.text = blankOrDateString(noticeEntity.observationTime)
         observationTimeTextField.text = blankOrTimeString(noticeEntity.observationTime)
         durationTextField.text = blankOrIntString(noticeEntity.duration)
@@ -363,23 +362,12 @@ class NoticeFormFields(
     fun getNotice(): NoticeEntity {
         // Normalerweise sollte vorher setNotice() aufgerufen worden sein.
         // Aber falls nicht, wird ein neues Notice-Objekt instanziiert.
-        val n = noticeEntity?:NoticeEntity()
+        val n = noticeEntity ?: NoticeEntity()
 
-        val selectedCountry = countrySymbolComboBox.selectedObjects[0] as CountrySymbol
-        n.countrySymbol = if (selectedCountry.countryName == null) {
-            null
-        } else {
-            selectedCountry.abbreviation
-        }
 
+        n.countrySymbol = countryComboBox.getValue()
         n.licensePlate = trimmedOrNull(licensePlateTextField.text)
-
-        val selectedVehicleMake = vehicleMakeComboBox.selectedObjects[0] as String
-        n.vehicleMake = if (selectedVehicleMake == "--") {
-            null
-        } else {
-            selectedVehicleMake
-        }
+        n.vehicleMake = vehicleMakeComboBox.getValue()
 
         val selectedColor = colorComboBox.selectedObjects[0] as VehicleColor
         n.color = if (selectedColor.color == null) {
@@ -394,12 +382,7 @@ class NoticeFormFields(
         n.zipCode = trimmedOrNull(zipCodeTextField.text)
         n.town = trimmedOrNull(townTextField.text)
         n.locationDescription = trimmedOrNull(locationDescriptionTextField.text)
-        val selectedOffense = offenseComboBox.selectedItem
-        n.offense = if (selectedOffense is Offense) {
-            selectedOffense.id
-        } else {
-            null
-        }
+        n.offense = offenseComboBox.getValue()
 
         val format = DateTimeFormatter.ofPattern("d.M.yyyy")
         val obsDateTxt = observationDateTextField.text
@@ -469,7 +452,7 @@ class NoticeFormFields(
             enab = !it.isSent()
         }
         //val enab = (notice != null) && !notice.isSent()
-        countrySymbolComboBox.isEnabled = enab
+        countryComboBox.isEnabled = enab
         licensePlateTextField.isEnabled = enab
         vehicleMakeComboBox.isEnabled = enab
         colorComboBox.isEnabled = enab
@@ -612,13 +595,13 @@ class NoticeFormFields(
     }
 
     override fun intervalAdded(e: ListDataEvent?) {
-        if(e is SelectedPhotosListDataEvent) {
+        if (e is SelectedPhotosListDataEvent) {
             e.photos.forEach { selectedPhoto(it) }
         }
     }
 
     override fun intervalRemoved(e: ListDataEvent?) {
-        if(e is SelectedPhotosListDataEvent) {
+        if (e is SelectedPhotosListDataEvent) {
             e.photos.forEach { unselectedPhoto(it) }
         }
     }

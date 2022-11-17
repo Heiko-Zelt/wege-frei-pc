@@ -78,7 +78,7 @@ class NoticeEntity(
      * American English: offense, British: offence
      */
     @Column
-    var offense: Int? = null,
+    var offense: String? = null,
 
     /**
      * mit Behinderung
@@ -251,16 +251,11 @@ class NoticeEntity(
      * aber zum Absenden einer E-Mail müssen bestimmte Felder ausgefüllt sein. )
      */
     fun isComplete(): Boolean {
-        val isOffenseComplete = when (offense) {
-            null -> false // keine Angabe
-            1 -> note != null // sonstiges Vergehen, siehe Hinweis
-            else -> true // Vergehen aus Katalog
-        }
         val isVehicleInspectionComplete = when (vehicleInspectionExpired) {
             false -> true
             else -> vehicleInspectionMonth != null && vehicleInspectionYear != null
         }
-        return isOffenseComplete && isVehicleInspectionComplete && licensePlate != null && street != null
+        return offense != null && isVehicleInspectionComplete && licensePlate != null && street != null
                 && zipCode != null && town != null && observationTime != null && photoEntities.isNotEmpty()
     }
 

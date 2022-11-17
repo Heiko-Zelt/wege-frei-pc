@@ -7,6 +7,7 @@ import java.awt.event.ActionListener
 import java.awt.event.ItemEvent
 import java.awt.event.ItemListener
 import javax.swing.*
+import javax.swing.border.EmptyBorder
 
 class DirectoryNavigation(private val directoryChangedCallback: (AbsolutePath) -> Unit): JPanel() {
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
@@ -34,6 +35,7 @@ class DirectoryNavigation(private val directoryChangedCallback: (AbsolutePath) -
     init {
         //default: java.awt.FlowLayout[hgap=5,vgap=5,align=center]
         //log.debug("layout: $layout")
+        label.border = EmptyBorder(0, 5, 0, 5)
         layout = FlowLayout(FlowLayout.LEFT, 0, 0)
     }
 

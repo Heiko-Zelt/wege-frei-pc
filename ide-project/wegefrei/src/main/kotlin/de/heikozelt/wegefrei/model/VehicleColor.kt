@@ -20,7 +20,7 @@ class VehicleColor(val colorName: String, val color: Color?) {
         }
 
         val COLORS = arrayOf(
-            VehicleColor("--", null),
+            VehicleColor("", null),
             VehicleColor("Weiß", Color.white),
             VehicleColor("Silber", Color(192, 192, 192)),
             VehicleColor("Grau", Color.gray),

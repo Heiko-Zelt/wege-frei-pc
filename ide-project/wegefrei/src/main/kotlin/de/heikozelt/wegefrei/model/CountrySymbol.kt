@@ -9,6 +9,14 @@ package de.heikozelt.wegefrei.model
  */
 class CountrySymbol(val abbreviation: String, val countryName: String?) {
 
+    override fun toString(): String {
+        var txt = abbreviation
+        if(countryName != null) {
+            txt += " - $countryName"
+        }
+        return txt
+    }
+
     companion object {
         /**
          * null -> COUNTRY_SYMBOLS[0]
@@ -17,26 +25,26 @@ class CountrySymbol(val abbreviation: String, val countryName: String?) {
          */
         fun fromAbbreviation(abbreviation: String?): CountrySymbol {
             return if(abbreviation == null) {
-                COUNTRY_SYMBOLS[0]
+                CountryComboBoxModel.COUNTRY_SYMBOLS[0]
             } else {
-                val c = COUNTRY_SYMBOLS.find { it.abbreviation == abbreviation }
-                c ?: COUNTRY_SYMBOLS[0]
+                val c = CountryComboBoxModel.COUNTRY_SYMBOLS.find { it.abbreviation == abbreviation }
+                c ?: CountryComboBoxModel.COUNTRY_SYMBOLS[0]
             }
         }
 
-        val COUNTRY_SYMBOLS = arrayOf(
-            CountrySymbol("--", null),
-            CountrySymbol("A", "Österreich"),
-            CountrySymbol("AL", "Albanien"),
-            CountrySymbol("AND", "Andorra"),
-            CountrySymbol("B", "Belgien"),
-            CountrySymbol("BG", "Bulgarien"),
-            CountrySymbol("BIH", "Bosnien-Herzegowina"),
-            CountrySymbol("BY", "Belarus"),
-            CountrySymbol("CH", "Schweiz"),
-            CountrySymbol("CY", "Zypern"),
-            CountrySymbol("CZ", "Tschechische Republik"),
-            CountrySymbol("D", "Deutschland")
-        )
+        /**
+         * "BIH - Bosnien-Herzegowina" --> "BIH"
+         * "Wunderland" --> "Wunderland"
+         * " " --> null
+         */
+        fun abbreviationFromString(text: String): String? {
+            val needle = text.trim()
+            return if(needle.isBlank()) {
+                null
+            } else {
+                val symbol = CountryComboBoxModel.COUNTRY_SYMBOLS.find { needle == it.toString() }
+                symbol?.abbreviation ?: needle
+            }
+        }
     }
 }

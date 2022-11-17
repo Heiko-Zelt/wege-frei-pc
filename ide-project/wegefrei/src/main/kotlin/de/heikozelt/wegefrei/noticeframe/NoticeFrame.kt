@@ -77,9 +77,6 @@ class NoticeFrame(
     // GUI-Komponenten:
     private var selectedPhotosListModel = SelectedPhotosListModel(photoLoader)
     private var browserPanel = BrowserPanel(this, dbRepo, cache, photoLoader, selectedPhotosListModel)
-    //private var selectedPhotosPanel = SelectedPhotosPanel(this)
-    //private var selectedPhotosScrollPane = JScrollPane(selectedPhotosPanel)
-
     private val selectedPhotosListCellRenderer = SelectedPhotosListCellRenderer()
     private var selectedPhotosList = JList(selectedPhotosListModel)
     private var selectedPhotosScrollPane = JScrollPane(selectedPhotosList)
@@ -685,7 +682,7 @@ class NoticeFrame(
             val offenseAddressRow = tableRow("Tatortadresse", n.getAddress())
             val locationDescriptionRow = tableRow("Tatortbeschreibung", n.locationDescription)
             val positionRow = tableRow("Geoposition", n.getGeoPositionFormatted())
-            val offenseRow = tableRow("Verstoß", Offense.fromId(n.offense).text)
+            val offenseRow = tableRow("Verstoß", n.offense)
             val circumstancesRow = tableRowHtmlValue("Umstände", n.getCircumstancesHtml())
             val inspectionDateRow = tableRow("HU-Fälligkeit", n.getInspectionMonthYear())
             val observationTimeRow = tableRow("Beobachtungszeit", n.getObservationTimeFormatted())
