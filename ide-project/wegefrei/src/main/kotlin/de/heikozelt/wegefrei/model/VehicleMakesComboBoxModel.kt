@@ -49,7 +49,8 @@ class VehicleMakesComboBoxModel: DefaultComboBoxModel<String>() {
 
     companion object {
         val VEHICLE_MAKES = arrayOf(
-            "--", "Abarth", "Alfa Romeo", "Aston Martin", "Audi",
+            "",
+            "Abarth", "Alfa Romeo", "Aston Martin", "Audi",
             "Bentley", "BMW", "Bugatti",
             "Cadillac", "Chevrolet", "Chrysler", "Citroën", "Crysler",
             "Dacia", "Daewoo", "Daihatsu", "Dodge", "DS", "Ducati",
