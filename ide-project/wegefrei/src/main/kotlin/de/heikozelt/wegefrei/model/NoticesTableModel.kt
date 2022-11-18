@@ -71,16 +71,16 @@ class NoticesTableModel: AbstractTableModel() {
     override fun getValueAt(rowIndex: Int, columnIndex: Int): Any? {
         log.debug("getValueAt(rowIndex=$rowIndex, columnIndex=$columnIndex)")
         val notice = noticeEntities[rowIndex]
+        //1 -> notice.photoEntities.size
         return when (columnIndex) {
             0 -> notice.id
-            1 -> notice.photoEntities.size
-            2 -> notice.countrySymbol
-            3 -> notice.licensePlate
-            4 -> notice.vehicleMake
-            5 -> VehicleColor.fromColorName(notice.color)
-            6 -> notice.getCreatedTimeFormatted()
-            7 -> notice.getObservationTimeFormatted()
-            8 -> notice.getState()
+            1 -> notice.countrySymbol
+            2 -> notice.licensePlate
+            3 -> notice.vehicleMake
+            4 -> VehicleColor.fromColorName(notice.color)
+            5 -> notice.getCreatedTimeFormatted()
+            6 -> notice.getObservationTimeFormatted()
+            7 -> notice.getState()
             else -> IndexOutOfBoundsException()
         }
     }
@@ -92,7 +92,7 @@ class NoticesTableModel: AbstractTableModel() {
 
     companion object {
         val COLUMN_NAMES = arrayOf(
-            "#", "Fotos", "Land", "Kennzeichen", "Marke", "Farbe", "Erstellt", "Beobachtet", "Status"
+            "#", "Land", "Kennzeichen", "Marke", "Farbe", "Erstellt", "Beobachtet", "Status"
         )
     }
 

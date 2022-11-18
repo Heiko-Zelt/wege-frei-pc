@@ -8,7 +8,6 @@ import org.hibernate.Session
 import org.hibernate.SessionFactory
 import org.slf4j.LoggerFactory
 import java.nio.file.Path
-import java.util.*
 
 
 class DatabaseRepo(jdbcUrl: String) {
@@ -26,14 +25,25 @@ class DatabaseRepo(jdbcUrl: String) {
     }
 
     fun findPhotoByPath(path: Path): PhotoEntity? {
-        log.debug("findPhotoByPath($path)")
-        val photoEntity = em.find(PhotoEntity::class.java, path.toString())
-        if(photoEntity == null) {
-            log.debug("image $path not found in database")
-        } else {
-            log.debug("image $path found in database")
-            log.debug("latitude: ${photoEntity.latitude}")
-            log.debug("longitude: ${photoEntity.longitude}")
+        log.debug("findPhotoByPath(path=$path)")
+        return findPhotoByPath(path.toString())
+    }
+
+    fun findPhotoByPath(path: String): PhotoEntity? {
+        log.debug("findPhotoByPath(str=$path)")
+        val photoEntity: PhotoEntity?
+        val session = sessionFactory.openSession()
+        log.debug("session: $session")
+        val tx = session.beginTransaction()
+        try {
+            photoEntity = session.find(PhotoEntity::class.java, path)
+            tx.commit()
+            if(photoEntity == null) {
+                log.debug("image $path not found in database")
+            }
+        } finally {
+            if(tx.isActive) tx.rollback()
+            if(session.isOpen) session.close()
         }
         return photoEntity
     }
@@ -52,13 +62,11 @@ class DatabaseRepo(jdbcUrl: String) {
         log.info("successfulTransactionCount: ${stats.successfulTransactionCount}")
         log.info("connecCount: ${stats.connectCount}")
         stats.logSummary()
-
-
     }
 
     fun findNoticeById(id: Int): NoticeEntity? {
         log.debug("findNoticeById($id)")
-        var noticeEntity: NoticeEntity? = null
+        val noticeEntity: NoticeEntity?
         val session = sessionFactory.openSession()
         log.debug("session: $session")
         val tx = session.beginTransaction()
@@ -74,22 +82,50 @@ class DatabaseRepo(jdbcUrl: String) {
 
     /**
      * liefert ein sortiertes Set von Fotos
-     */
     fun findPhotos(firstPhotoFilename: String, limit: Int): Set<PhotoEntity> {
         val resultList: List<PhotoEntity> = em.createQuery("SELECT ph FROM PhotoEntity ph WHERE ph.filename >= :filename ORDER BY ph.filename", PhotoEntity::class.java)
             .setParameter("filename", firstPhotoFilename).setMaxResults(limit).resultList
         return TreeSet(resultList)
     }
+    */
 
     /**
      * liefert ein umgekehrt sortiertes Set von Meldungen
      * neueste (mit der höchsten ID) zuerst
      */
-    fun findAllNoticesDesc(): List<NoticeEntity> {
+    fun findAllNoticesDesc(): List<NoticeEntity>? {
         log.debug("getAllNoticesDesc()")
         //Thread.sleep(5000) Simulation langsamer Datenbank
-        val resultList: List<NoticeEntity> = em.createQuery("SELECT n FROM NoticeEntity n ORDER BY n.id DESC", NoticeEntity::class.java).resultList
-        log.debug("got result. size=${resultList.size}")
+        val resultList: List<NoticeEntity>?
+        val session = sessionFactory.openSession()
+        log.debug("session: $session")
+        val tx = session.beginTransaction()
+        try {
+            resultList = session.createQuery("SELECT n FROM NoticeEntity n ORDER BY n.id DESC", NoticeEntity::class.java).resultList
+            tx.commit()
+        } finally {
+            if(tx.isActive) tx.rollback()
+            if(session.isOpen) session.close()
+        }
+        log.debug("got result. size=${resultList?.size}")
+        return resultList
+    }
+
+    fun findAllNoticesIds(): List<Int>? {
+        log.debug("getAllNoticesIds()")
+        //Thread.sleep(5000) Simulation langsamer Datenbank
+        val resultList: List<Int>?
+        val session = sessionFactory.openSession()
+        log.debug("session: $session")
+        val tx = session.beginTransaction()
+        try {
+            resultList = session.createQuery("SELECT n.id FROM NoticeEntity n ORDER BY n.id DESC", Int::class.java).resultList
+            tx.commit()
+        } finally {
+            if(tx.isActive) tx.rollback()
+            if(session.isOpen) session.close()
+        }
+        log.debug("got result. size=${resultList?.size}")
         return resultList
     }
 

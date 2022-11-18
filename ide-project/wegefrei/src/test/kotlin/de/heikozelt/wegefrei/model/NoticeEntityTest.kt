@@ -67,7 +67,7 @@ class NoticeEntityTest {
             "Wiesbaden",
             "gegenüber Bäcker",
             3,
-            1,
+            "Öl läuft aus",
             true,
             true,
             true,
