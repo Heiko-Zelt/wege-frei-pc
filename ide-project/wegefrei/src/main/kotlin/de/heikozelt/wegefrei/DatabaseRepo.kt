@@ -56,9 +56,6 @@ class DatabaseRepo(jdbcUrl: String) {
 
     }
 
-    // todo Prio 1: bug: Nach Ändern einer Anzeige und erstellen einer neuen, wird die Anzeige in Browser wird nicht aktualisiert
-    // Problem: Die Änderung wird nicht in der Datenbank gespeichert.
-    // Gibt es zu einem Foto 2 unterschiedliche PhotoEntities?
     fun findNoticeById(id: Int): NoticeEntity? {
         log.debug("findNoticeById($id)")
         var noticeEntity: NoticeEntity? = null

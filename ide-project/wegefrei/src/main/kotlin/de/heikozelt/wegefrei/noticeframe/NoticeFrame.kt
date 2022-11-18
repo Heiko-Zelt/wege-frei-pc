@@ -212,14 +212,6 @@ class NoticeFrame(
         return noticeForm.getNotice()
     }
 
-    fun getDatabaseRepo(): DatabaseRepo? {
-        return app.getDatabaseRepo()
-    }
-
-    fun getSelectedPhotos(): TreeSet<Photo> {
-        return selectedPhotosListModel.getSelectedPhotos()
-    }
-
     /**
      * fügt ein Foto zur Auswahl für diese Meldung hinzu
      */
@@ -266,24 +258,6 @@ class NoticeFrame(
     /**
      * zeigt im Zoom-Bereich ein großes Foto an
      */
-    fun showPhoto(miniPhotoPanel: MiniPhotoPanel) {
-        log.debug("show photo")
-
-        /*
-        app.getSettings()?.photosDirectory?.let {
-            val photoPanel = MaxiPhotoPanel(it, this, miniPhotoPanel.getPhoto())
-            val scrollPane = JScrollPane(photoPanel)
-            setZoomComponent(scrollPane)
-        }
-         */
-        noticeForm.getNoticeFormFields().getMiniMap().displayBorder(false)
-        //browserPanel.showBorder(miniPhotoPanel)
-        //selectedPhotosPanel.hideBorder()
-    }
-
-    /**
-     * zeigt im Zoom-Bereich ein großes Foto an
-     */
     fun showPhoto(photo: Photo) {
         log.debug("show photo")
 
@@ -292,8 +266,6 @@ class NoticeFrame(
         EventQueue.invokeLater { photoPanel.fit() }
 
         noticeForm.getNoticeFormFields().getMiniMap().displayBorder(false)
-        //browserPanel.showBorder(photoEntity)
-        //selectedPhotosPanel.hideBorder()
         selectedPhotosList.clearSelection()
     }
 
@@ -358,6 +330,7 @@ class NoticeFrame(
         val dbRepo = app.getDatabaseRepo() ?: return
         noticeEntity?.let {
             it.setGeoPosition(offensePosition)
+            it.photoEntities = selectedPhotosListModel.getPhotoEntities()
             if (it.id == null) {
                 dbRepo.insertNotice(it)
                 app.noticeAdded(it)
@@ -365,7 +338,6 @@ class NoticeFrame(
                 dbRepo.updateNotice(it)
                 app.noticeUpdated(it)
             }
-            it.photoEntities = selectedPhotosListModel.getPhotoEntities()
         }
     }
 
