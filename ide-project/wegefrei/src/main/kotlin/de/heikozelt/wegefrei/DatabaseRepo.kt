@@ -82,14 +82,6 @@ class DatabaseRepo(jdbcUrl: String) {
     }
 
     /**
-     * liefert ein sortiertes Set von Meldungen
-     */
-    fun findAllNotices(): List<NoticeEntity> {
-        val resultList: List<NoticeEntity> = em.createQuery("SELECT n FROM NoticeEntity n ORDER BY n.id", NoticeEntity::class.java).resultList
-        return resultList
-    }
-
-    /**
      * liefert ein umgekehrt sortiertes Set von Meldungen
      * neueste (mit der höchsten ID) zuerst
      */
@@ -121,6 +113,8 @@ class DatabaseRepo(jdbcUrl: String) {
         log.debug("session: $session")
         val tx = session.beginTransaction()
         try {
+            //todo Illegal attempt to associate a collection with two open sessions: Collection :
+            // [de.heikozelt.wegefrei.entities.PhotoEntity.noticeEntities
             session.persist(noticeEntity)
             tx.commit()
         } finally {

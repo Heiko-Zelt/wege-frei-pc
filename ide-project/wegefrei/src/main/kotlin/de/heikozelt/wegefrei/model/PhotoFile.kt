@@ -91,7 +91,7 @@ class PhotoFile(
     // todo: may return null, if no date is given
     fun getDateFormatted(): String {
         dateTime?.let {
-              return it.format(PhotoFileWithFuture.format)
+              return it.format(Photo.dateTimeFormat)
         }
         return ""
     }

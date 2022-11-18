@@ -4,6 +4,7 @@ import de.heikozelt.wegefrei.entities.PhotoEntity
 import org.jxmapviewer.viewer.GeoPosition
 import java.nio.file.Path
 import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 
 class Photo(private var path: Path): Comparable<Photo> {
     private var photoFile: PhotoFile? = null
@@ -123,13 +124,16 @@ class Photo(private var path: Path): Comparable<Photo> {
         return null
     }
 
+    override fun compareTo(other: Photo): Int {
+        return this.path.compareTo(other.path)
+    }
+
     companion object {
         enum class States {
             UNINITIALIZED, LOADING, FOUND, NOT_FOUND
         }
+
+        val dateTimeFormat: DateTimeFormatter? = DateTimeFormatter.ofPattern("dd.MM.yyyy, HH:mm:ss z")
     }
 
-    override fun compareTo(other: Photo): Int {
-        return this.path.compareTo(other.path)
-    }
 }
