@@ -108,7 +108,8 @@ class DatabaseRepo(jdbcUrl: String) {
         log.debug("session: $session")
         val tx = session.beginTransaction()
         try {
-            resultList = session.createQuery("SELECT n FROM NoticeEntity n ORDER BY n.id DESC", NoticeEntity::class.java).resultList
+            val jpql = "SELECT n FROM NoticeEntity n ORDER BY n.id DESC"
+            resultList = session.createQuery(jpql, NoticeEntity::class.java).resultList
             tx.commit()
         } finally {
             if(tx.isActive) tx.rollback()
@@ -126,7 +127,8 @@ class DatabaseRepo(jdbcUrl: String) {
         log.debug("session: $session")
         val tx = session.beginTransaction()
         try {
-            resultList = session.createQuery("SELECT n.id FROM NoticeEntity n ORDER BY n.id DESC", Int::class.java).resultList
+            val jpql = "SELECT n.id FROM NoticeEntity n ORDER BY n.id DESC"
+            resultList = session.createQuery(jpql, Int::class.java).resultList
             tx.commit()
         } finally {
             if(tx.isActive) tx.rollback()
