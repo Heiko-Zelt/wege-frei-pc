@@ -363,8 +363,7 @@ class NoticeFormFields(
     fun getNotice(): NoticeEntity {
         // Normalerweise sollte vorher setNotice() aufgerufen worden sein.
         // Aber falls nicht, wird ein neues Notice-Objekt instanziiert.
-        val n = noticeEntity ?: NoticeEntity()
-
+        val n = noticeEntity ?: NoticeEntity.createdNow()
 
         n.countrySymbol = countryComboBox.getValue()
         n.licensePlate = trimmedOrNull(licensePlateTextField.text)

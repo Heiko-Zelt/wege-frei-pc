@@ -152,7 +152,7 @@ class NoticeFrame(
      * Zuletzt werden sonstige Daten geladen.
      * @param noticeEntity
      */
-    fun setNotice(noticeEntity: NoticeEntity = NoticeEntity()) {
+    fun setNotice(noticeEntity: NoticeEntity = NoticeEntity.createdNow()) {
         log.debug("setNotice(notice id: ${noticeEntity.id})")
         this.noticeEntity = noticeEntity
 

@@ -127,7 +127,7 @@ class ScanWorker(
             //Instant.ofEpochMilli(date.time).atZone(ZoneId.systemDefault()).toLocalDateTime()
         }
         val sha1Hash = "0123456789abcdefghij".toByteArray()
-        return PhotoEntity(file.name, sha1Hash, latitude, longitude, datTim, null)
+        return PhotoEntity(file.name, sha1Hash, latitude, longitude, datTim)
     }
 
     companion object {

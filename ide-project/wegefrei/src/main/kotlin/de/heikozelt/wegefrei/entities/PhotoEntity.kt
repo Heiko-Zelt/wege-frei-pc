@@ -60,7 +60,7 @@ class PhotoEntity(
 
     // todo Prio 2: show in AllPhotosPanel, which photos have been used for which notice
     @ManyToMany(mappedBy = "photoEntities")
-    var noticeEntities: MutableSet<NoticeEntity>? = null
+    var noticeEntities: MutableSet<NoticeEntity> = mutableSetOf()
 ) : Comparable<PhotoEntity> {
 
     @jakarta.persistence.Transient
@@ -216,7 +216,7 @@ class PhotoEntity(
                 //Instant.ofEpochMilli(date.time).atZone(ZoneId.systemDefault()).toLocalDateTime()
             }
             val sha1Hash = "0123456789abcdefghij".toByteArray()
-            return PhotoEntity(file.absolutePath, sha1Hash, latitude, longitude, datTim, null)
+            return PhotoEntity(file.absolutePath, sha1Hash, latitude, longitude, datTim)
         }
     }
 }

@@ -125,7 +125,7 @@ open class WegeFrei(private val settingsRepo: SettingsRepo = SettingsFileRepo())
      * Opens Window to create new or edit existing notice
      * @param noticeEntity The notice to edit or new notice if omitted.
      */
-    fun openNoticeFrame(noticeEntity: NoticeEntity = NoticeEntity()) {
+    fun openNoticeFrame(noticeEntity: NoticeEntity = NoticeEntity.createdNow()) {
         log.debug("Anzahl NoticeFrames: " + noticeFrames.size)
         databaseRepo?.let { dbRepo ->
             val noticeFrame = NoticeFrame(this, dbRepo)

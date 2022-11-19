@@ -31,6 +31,7 @@ class NoticeEntityTest {
             assertNull(vehicleInspectionMonth)
             assertFalse(vehicleAbandoned)
             assertEquals(0, photoEntities.size)
+            assertEquals("xx", getCreatedTimeFormatted())
         }
     }
 

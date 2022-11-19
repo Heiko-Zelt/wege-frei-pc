@@ -135,8 +135,8 @@ class NoticeEntity(
     @ManyToMany(cascade = [CascadeType.ALL])
     @JoinTable(
         name = "NOTICES_PHOTOS",
-        joinColumns = [JoinColumn(name = "id" /*, referencedColumnName = "filename" */)],
-        inverseJoinColumns = [JoinColumn(name = "filename" /*, referencedColumnName = "id" */)]
+        joinColumns = [JoinColumn(name = "notice_id", foreignKey = ForeignKey(name = "FK_NOTICE_ID")) ],
+        inverseJoinColumns = [JoinColumn(name = "photo_path", foreignKey = ForeignKey(name = "FK_PHOTO_PATH"))]
     )
     var photoEntities: MutableSet<PhotoEntity> = mutableSetOf(),
 
@@ -145,7 +145,7 @@ class NoticeEntity(
 ) {
 
     @Column
-    val createdTime = ZonedDateTime.now()
+    var createdTime: ZonedDateTime? = null
 
     fun getCreatedTimeFormatted(): String {
         val d = createdTime
@@ -154,6 +154,10 @@ class NoticeEntity(
         } else {
             d.format(dateTimeFormat)
         }
+    }
+
+    fun setCreatedTimeNow() {
+        createdTime = ZonedDateTime.now()
     }
 
     /**
@@ -256,8 +260,7 @@ class NoticeEntity(
             else -> vehicleInspectionMonth != null && vehicleInspectionYear != null
         }
         return offense != null && isVehicleInspectionComplete && licensePlate != null && street != null
-                && zipCode != null && town != null && observationTime != null
-                // photoEntities.isNotEmpty()
+                && zipCode != null && town != null && observationTime != null && photoEntities.isNotEmpty()
     }
 
     /**
@@ -283,5 +286,11 @@ class NoticeEntity(
 
     companion object {
         val dateTimeFormat: DateTimeFormatter? = DateTimeFormatter.ofPattern("dd.MM.yyyy, HH:mm z")
+
+        fun createdNow(): NoticeEntity {
+            val n = NoticeEntity()
+            n.setCreatedTimeNow()
+            return n
+        }
     }
 }
