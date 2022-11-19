@@ -36,7 +36,7 @@ class LoadNoticesWorker(
      */
     override fun done() {
         noticeEntities?.let {
-            noticesTableModel.setNoticesList(it)
+            //noticesTableModel.setNoticesList(it)
         }
     }
 

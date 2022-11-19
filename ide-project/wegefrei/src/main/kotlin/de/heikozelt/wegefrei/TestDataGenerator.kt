@@ -1,11 +1,11 @@
 package de.heikozelt.wegefrei
 
 import de.heikozelt.wegefrei.entities.NoticeEntity
-import de.heikozelt.wegefrei.model.VehicleMakesComboBoxModel.Companion.VEHICLE_MAKES
 import de.heikozelt.wegefrei.model.Photo
 import de.heikozelt.wegefrei.model.PhotoLoader
 import de.heikozelt.wegefrei.model.PhotoLoaderObserver
 import de.heikozelt.wegefrei.model.VehicleColor.Companion.COLORS
+import de.heikozelt.wegefrei.model.VehicleMakesComboBoxModel.Companion.VEHICLE_MAKES
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.lang.Thread.sleep
@@ -34,9 +34,9 @@ class TestDataGenerator {
         fun main(args: Array<String>) {
             try {
                 LOG.info("TestDataGenerator.main()")
-                generatePhotos()
+                //generatePhotos()
                 generateNotices()
-                generateManyToMany1()
+                //generateManyToMany1()
                 //generateManyToMany2()
 
                 // wait for threads in thread pool to complete

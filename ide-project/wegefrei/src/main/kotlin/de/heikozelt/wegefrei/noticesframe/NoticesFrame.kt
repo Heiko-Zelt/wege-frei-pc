@@ -2,7 +2,6 @@ package de.heikozelt.wegefrei.noticesframe
 
 import de.heikozelt.wegefrei.WegeFrei
 import de.heikozelt.wegefrei.entities.NoticeEntity
-import de.heikozelt.wegefrei.jobs.LoadNoticesWorker
 import de.heikozelt.wegefrei.model.NoticesTableModel
 import org.slf4j.LoggerFactory
 import java.awt.Dimension
@@ -101,8 +100,9 @@ class NoticesFrame(private val app: WegeFrei) : JFrame("Meldungen - Wege frei!")
             log.error("databaseRepo ist null")
             return
         }
-        val worker = LoadNoticesWorker(dbRepo, noticesTableModel)
-        worker.execute()
+        //val worker = LoadNoticesWorker(dbRepo, noticesTableModel)
+        //worker.execute()
+        noticesTableModel.setDatabaseRepo(dbRepo)
     }
 
     /**

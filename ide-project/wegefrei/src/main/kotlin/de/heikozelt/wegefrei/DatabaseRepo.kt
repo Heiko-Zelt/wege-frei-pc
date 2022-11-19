@@ -71,7 +71,14 @@ class DatabaseRepo(jdbcUrl: String) {
         log.debug("session: $session")
         val tx = session.beginTransaction()
         try {
+            /*
             noticeEntity = session.find(NoticeEntity::class.java, id)
+            log.debug("not so lazy: ${noticeEntity?.photoEntities?.size}")
+             */
+            val jpql = "SELECT n FROM NoticeEntity n LEFT JOIN FETCH n.photoEntities WHERE n.id = ?1"
+            val qry = session.createQuery(jpql, NoticeEntity::class.java)
+            qry.setParameter(1, id)
+            noticeEntity = qry.singleResultOrNull
             tx.commit()
         } finally {
             if(tx.isActive) tx.rollback()
@@ -111,7 +118,7 @@ class DatabaseRepo(jdbcUrl: String) {
         return resultList
     }
 
-    fun findAllNoticesIds(): List<Int>? {
+    fun findAllNoticesIdsDesc(): List<Int>? {
         log.debug("getAllNoticesIds()")
         //Thread.sleep(5000) Simulation langsamer Datenbank
         val resultList: List<Int>?

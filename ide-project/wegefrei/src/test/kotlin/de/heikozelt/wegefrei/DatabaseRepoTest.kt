@@ -29,7 +29,7 @@ internal class DatabaseRepoTest {
 
     @Test
     fun findAllNoticesIds() {
-        val noticeIds = databaseRepo.findAllNoticesIds()
+        val noticeIds = databaseRepo.findAllNoticesIdsDesc()
         assertEquals(10, noticeIds?.size)
         assertEquals(10, noticeIds?.get(0))
         assertEquals(1, noticeIds?.get(9))
