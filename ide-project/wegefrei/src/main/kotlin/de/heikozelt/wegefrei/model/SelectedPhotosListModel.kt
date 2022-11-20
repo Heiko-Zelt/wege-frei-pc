@@ -44,12 +44,16 @@ class SelectedPhotosListModel(
 
     override fun doneLoadingFile(photo: Photo) {
         val index = selectedPhotos.indexOf(photo)
-        this.fireContentsChanged(this, index, index)
+        if(index != -1) {
+            this.fireContentsChanged(this, index, index)
+        }
     }
 
     override fun doneLoadingEntity(photo: Photo) {
         val index = selectedPhotos.indexOf(photo)
-        this.fireContentsChanged(this, index, index)
+        if(index != -1) {
+            this.fireContentsChanged(this, index, index)
+        }
     }
 
     /**

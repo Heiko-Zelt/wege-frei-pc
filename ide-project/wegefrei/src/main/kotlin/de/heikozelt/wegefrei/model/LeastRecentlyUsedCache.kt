@@ -4,7 +4,7 @@ import org.slf4j.LoggerFactory
 
 /**
  * Speichert eine limitierte Zahl von Elementen.
- * Zugriff, also Hinzufügen und Lesen von Elementen über eine ID.
+ * Zugriff, also Hinzufügen und Lesen von Elementen über einen Schlüssel/eine ID.
  * Wenn das Limit erreicht ist,
  * werden alte Elemente nach der Least Recently Used-Strategie rausgeschmissen.
  *
@@ -17,12 +17,12 @@ class LeastRecentlyUsedCache<K, V>(private var limit: Int) {
     /**
      * Node represents an entry in the HashMap as well as an entry in the queue/doubly linked list
      */
-    class Node<K, V>(val id: K, var element: V, var previous: Node<K, V>?, var next: Node<K, V>?)
+    class Node<K, V>(val key: K, var element: V, var previous: Node<K, V>?, var next: Node<K, V>?)
 
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
 
     /**
-     * Ein "Primär-Index" = Abbildung von ID zu Element, um Elemente schnell wiederzufinden
+     * Ein "Primär-Index" = Abbildung von Schlüssel zu Element, um Elemente schnell wiederzufinden
      * und nicht die gesamte Liste scannen zu müssen.
      */
     private val map = HashMap<K, Node<K, V>>()
@@ -40,7 +40,7 @@ class LeastRecentlyUsedCache<K, V>(private var limit: Int) {
     private var last: Node<K, V>? = null
 
     private fun removeNodeFromQueue(existingNode: Node<K, V>) {
-        log.debug("  removeNodeFromQueue(existingEntry: id=${existingNode.id}, element=${existingNode.element})")
+        log.debug("  removeNodeFromQueue(existingEntry: key=${existingNode.key}, element=${existingNode.element})")
         existingNode.previous?.let {
             it.next = existingNode.next
         }
@@ -59,7 +59,7 @@ class LeastRecentlyUsedCache<K, V>(private var limit: Int) {
      * remove first entry from the queue
      */
     private fun evict() {
-        log.debug("  evict(first: id=${first?.id}, element=${first?.element})")
+        log.debug("  evict(first: key=${first?.key}, element=${first?.element})")
         first?.next?.previous = null
         first = first?.next
     }
@@ -67,9 +67,9 @@ class LeastRecentlyUsedCache<K, V>(private var limit: Int) {
     /**
      * adds an entry to the end of the queue
      */
-    private fun enqueue(id: K, element: V): Node<K, V> {
-        log.debug("  enqueue(id=$id, element=$element)")
-        val newNode = Node(id, element, last, null)
+    private fun enqueue(key: K, element: V): Node<K, V> {
+        log.debug("  enqueue(key=$key, element=$element)")
+        val newNode = Node(key, element, last, null)
         last?.next = newNode
         last = newNode
         if(first == null) {
@@ -82,7 +82,7 @@ class LeastRecentlyUsedCache<K, V>(private var limit: Int) {
      * moves the node from somewhere in the queue to the end of the queue
      */
     private fun moveNodeToEnd(node: Node<K, V>) {
-        log.debug("  moveNodeToEnd(entry: id=${node.id}, element=${node.element})")
+        log.debug("  moveNodeToEnd(entry: key=${node.key}, element=${node.element})")
         if(last == node) {
             return
         }
@@ -106,21 +106,21 @@ class LeastRecentlyUsedCache<K, V>(private var limit: Int) {
      * insert or update an element
      */
     @Synchronized
-    operator fun set(id: K, element: V) {
-        log.debug("set(id=$id, element=$element)")
-        val existingNode = map[id]
+    operator fun set(key: K, element: V) {
+        log.debug("set(key=$key, element=$element)")
+        val existingNode = map[key]
         existingNode?.let {
             moveNodeToEnd(existingNode)
             existingNode.element = element
             return
         }
 
-        val newNode = enqueue(id, element)
-        map[id] = newNode
+        val newNode = enqueue(key, element)
+        map[key] = newNode
 
         // wenn die Queue voll ist, den ersten Eintrag wieder herauswerfen
         if (map.size > limit) {
-            map.remove(first?.id)
+            map.remove(first?.key)
             evict()
         }
     }
@@ -129,8 +129,8 @@ class LeastRecentlyUsedCache<K, V>(private var limit: Int) {
      * returns element, if it exists, null otherwise
      */
     @Synchronized
-    operator fun get(id: K): V? {
-        log.debug("get(id=$id)")
-        return map[id]?.element
+    operator fun get(key: K): V? {
+        log.debug("get(key=$key)")
+        return map[key]?.element
     }
 }

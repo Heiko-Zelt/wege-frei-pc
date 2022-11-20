@@ -103,6 +103,11 @@ class NoticeFrame(
             }
         }
 
+        selectedPhotosListModel.addListDataListener(browserPanel.getBrowserListModel())
+        selectedPhotosListModel.addListDataListener(this)
+        selectedPhotosListModel.addListDataListener(noticeForm.getNoticeFormFields())
+        selectedPhotosListModel.addListDataListener(noticeForm.getNoticeFormFields().getMiniMap())
+
         //defaultCloseOperation = DISPOSE_ON_CLOSE ist egal
         //addWindowListener(NoticeFrameWindowListener(this))
         //todo Prio 1: bug: SaveNotice: jakarta.persistence.EntityNotFoundException:
@@ -153,39 +158,34 @@ class NoticeFrame(
      * @param noticeEntity
      */
     fun setNotice(noticeEntity: NoticeEntity = NoticeEntity.createdNow()) {
-        log.debug("setNotice(notice id: ${noticeEntity.id})")
+        log.debug("setNotice(id: ${noticeEntity.id})")
         this.noticeEntity = noticeEntity
-
-        /*
-        app.getSettings()?.let {
-            selectedPhotosPanel.setPhotosDirectory(it.photosDirectory)
-        }
-        */
-
-        selectedPhotosListModel.addListDataListener(browserPanel.getBrowserListModel())
-        selectedPhotosListModel.addListDataListener(this)
-        selectedPhotosListModel.addListDataListener(noticeForm.getNoticeFormFields())
-        selectedPhotosListModel.addListDataListener(noticeForm.getNoticeFormFields().getMiniMap())
-        /*
-        selectedPhotos.registerObserver(selectedPhotosPanel)
-        selectedPhotos.registerObserver(noticeForm.getNoticeFormFields().getMiniMap())
-        */
 
         val photos = TreeSet<Photo>()
         noticeEntity.photoEntities.forEach { photoEntity ->
             photoEntity.path?.let { pathStr ->
+                log.debug("photoEntity.path: $pathStr")
                 val path = Paths.get(pathStr)
-                val photo = Photo(path)
-                photo.setPhotoEntity(photoEntity)
-                val photoFile = cache[path]
-                if (photoFile == null) {
-                    photoLoader.loadPhotoFile(photo)
+                //photo.setPhotoEntity(photoEntity)
+                var photo = cache[path]
+                if (photo == null) {
+                    log.debug("not yet in cache")
+                    photo = Photo(path)
+
                 }
                 photos.add(photo)
             }
         }
         selectedPhotosListModel.setSelectedPhotos(photos)
         browserPanel.setSelectedPhotos(selectedPhotosListModel)
+        photos.forEach {
+            if(it.getFileState() == Photo.Companion.States.UNINITIALIZED) {
+                photoLoader.loadPhotoFile(it)
+            }
+            if(it.getEntityState() == Photo.Companion.States.UNINITIALIZED) {
+                photoLoader.loadPhotoEntity(it)
+            }
+        }
 
         title = if (noticeEntity.id == null) {
             "Neue Meldung - Wege frei!"

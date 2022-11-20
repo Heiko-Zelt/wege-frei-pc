@@ -260,7 +260,8 @@ class NoticeEntity(
             else -> vehicleInspectionMonth != null && vehicleInspectionYear != null
         }
         return offense != null && isVehicleInspectionComplete && licensePlate != null && street != null
-                && zipCode != null && town != null && observationTime != null && photoEntities.isNotEmpty()
+                && zipCode != null && town != null && observationTime != null && recipient != null
+                && photoEntities.isNotEmpty()
     }
 
     /**
