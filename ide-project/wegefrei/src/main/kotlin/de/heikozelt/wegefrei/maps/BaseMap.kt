@@ -1,6 +1,7 @@
 package de.heikozelt.wegefrei.maps
 
 import de.heikozelt.wegefrei.model.Photo
+import de.heikozelt.wegefrei.model.SelectedPhotosListDataEvent
 import de.heikozelt.wegefrei.model.SelectedPhotosListModel
 import de.heikozelt.wegefrei.noticeframe.NoticeFrame
 import org.jxmapviewer.JXMapViewer
@@ -89,13 +90,18 @@ open class BaseMap(
      */
 
     override fun intervalAdded(e: ListDataEvent?) {
-        e?.let {event ->
-            val index = event.index0
-            val source = event.source
-            if(source is SelectedPhotosListModel) {
-                val photo = source.getElementAt(index)
-                photo?.let {
-                    selectedPhoto(index, photo)
+        if (e is SelectedPhotosListDataEvent) {
+            log.debug("intervalAdded(${e.index0}..${e.index1})")
+            for(p in e.photos) {
+                log.debug("photo: path=${p.getPath()}, pos.latitude=${p.getGeoPosition()?.latitude}")
+            }
+            for(i in e.index0 .. e.index1) {
+                val source = e.source
+                if (source is SelectedPhotosListModel) {
+                    val photo = source.getElementAt(i)
+                    photo?.let {
+                        selectedPhoto(i, photo)
+                    }
                 }
             }
         }
@@ -119,6 +125,7 @@ open class BaseMap(
         }
 
         val pos = photo.getGeoPosition()
+        log.debug("pos: ${pos?.latitude}, ${pos?.longitude}")
         if (pos != null) {
             log.debug("add waypoint")
             val marker = PhotoMarker(index, pos)

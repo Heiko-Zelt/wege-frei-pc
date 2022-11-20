@@ -2,6 +2,7 @@ package de.heikozelt.wegefrei.model
 
 import de.heikozelt.wegefrei.entities.PhotoEntity
 import org.jxmapviewer.viewer.GeoPosition
+import org.slf4j.LoggerFactory
 import java.nio.file.Path
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
@@ -11,6 +12,8 @@ class Photo(private var path: Path): Comparable<Photo> {
     private var photoEntity: PhotoEntity? = null
     private var fileState = States.UNINITIALIZED
     private var entityState = States.UNINITIALIZED
+
+    private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
 
     init {
         fileState = States.UNINITIALIZED
@@ -86,11 +89,14 @@ class Photo(private var path: Path): Comparable<Photo> {
 
     fun getGeoPosition(): GeoPosition? {
         photoEntity?.getGeoPosition()?.let {
+            log.debug("returns photoEntity.geoPosition()")
             return it
         }
         photoFile?.getGeoPosition()?.let {
+            log.debug("returns photoFile.geoPosition()")
             return it
         }
+        log.debug("returns neither nor")
         return null
     }
 

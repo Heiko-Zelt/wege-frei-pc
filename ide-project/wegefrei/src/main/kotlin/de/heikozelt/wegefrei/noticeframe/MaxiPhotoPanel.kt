@@ -12,7 +12,8 @@ class MaxiPhotoPanel(
     init {
         actionButton.text = "hinzufügen"
         actionButton.addActionListener {
-           noticeFrame.selectPhoto(photo)
+            log.debug("addActionListener(photo: pos.latitude=${photo.getGeoPosition()?.latitude})")
+            noticeFrame.selectPhoto(photo)
         }
     }
 }

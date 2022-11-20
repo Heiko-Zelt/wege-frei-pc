@@ -27,6 +27,7 @@ class SelectedPhotosListModel(
     }
 
     fun add(photo: Photo) {
+        log.debug("add(photo: path=${photo.getPath()}, pos.latitude=${photo.getGeoPosition()?.latitude})")
         selectedPhotos.add(photo)
         val index = indexOf(photo)
         fireIntervalAdded(this, index, index, listOf(photo))

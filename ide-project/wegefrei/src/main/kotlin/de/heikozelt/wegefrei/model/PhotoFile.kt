@@ -99,7 +99,7 @@ class PhotoFile(
     fun getGeoPosition(): GeoPosition? {
         latitude?.let { lat ->
             longitude?.let { lon ->
-                GeoPosition(lat.toDouble(), lon.toDouble())
+                return GeoPosition(lat.toDouble(), lon.toDouble())
             }
         }
         return null

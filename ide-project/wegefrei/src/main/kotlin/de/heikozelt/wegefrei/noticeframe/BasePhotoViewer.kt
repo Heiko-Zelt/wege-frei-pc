@@ -18,6 +18,9 @@ open class BasePhotoViewer(
     protected val actionButton = JButton()
 
     init {
+        log.debug("init(photo: pos.latitude=${photo.getGeoPosition()?.latitude})")
+        log.debug("photo: toolTipText=${photo.getToolTipText()})")
+
         border = NO_BORDER
 
         scrollPane.setViewportView(label)

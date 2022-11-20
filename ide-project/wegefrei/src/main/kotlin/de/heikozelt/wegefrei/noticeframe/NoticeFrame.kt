@@ -179,12 +179,8 @@ class NoticeFrame(
         selectedPhotosListModel.setSelectedPhotos(photos)
         browserPanel.setSelectedPhotos(selectedPhotosListModel)
         photos.forEach {
-            if(it.getFileState() == Photo.Companion.States.UNINITIALIZED) {
-                photoLoader.loadPhotoFile(it)
-            }
-            if(it.getEntityState() == Photo.Companion.States.UNINITIALIZED) {
-                photoLoader.loadPhotoEntity(it)
-            }
+            photoLoader.loadPhotoFile(it)
+            photoLoader.loadPhotoEntity(it)
         }
 
         title = if (noticeEntity.id == null) {
