@@ -36,7 +36,11 @@ class DatabaseRepo(jdbcUrl: String) {
         log.debug("session: $session")
         val tx = session.beginTransaction()
         try {
-            photoEntity = session.find(PhotoEntity::class.java, path)
+            val jpql = "SELECT p FROM PhotoEntity p LEFT JOIN FETCH p.noticeEntities WHERE p.path = ?1"
+            val qry = session.createQuery(jpql, PhotoEntity::class.java)
+            qry.setParameter(1, path)
+            photoEntity = qry.singleResultOrNull
+            //photoEntity = session.find(PhotoEntity::class.java, path)
             tx.commit()
             if(photoEntity == null) {
                 log.debug("image $path not found in database")
@@ -46,22 +50,6 @@ class DatabaseRepo(jdbcUrl: String) {
             if(session.isOpen) session.close()
         }
         return photoEntity
-    }
-
-    fun logStatistics() {
-        val nQuery = em.createQuery("select count(*) from NoticeEntity")
-        val nCount = nQuery.singleResult
-        log.info("NoticeEntity row count: $nCount")
-        val pQuery = em.createQuery("select count(*) from PhotoEntity")
-        val pCount = pQuery.singleResult
-        log.info("PhotoEntity row count: $pCount")
-
-        val stats = sessionFactory.statistics
-        log.info("isStatisticsEnabled: ${stats.isStatisticsEnabled}")
-        log.info("transactionCount: ${stats.transactionCount}")
-        log.info("successfulTransactionCount: ${stats.successfulTransactionCount}")
-        log.info("connecCount: ${stats.connectCount}")
-        stats.logSummary()
     }
 
     fun findNoticeById(id: Int): NoticeEntity? {
@@ -206,6 +194,22 @@ class DatabaseRepo(jdbcUrl: String) {
             em.close()
             log.debug("entity manager closed")
         }
+    }
+
+    fun logStatistics() {
+        val nQuery = em.createQuery("select count(*) from NoticeEntity")
+        val nCount = nQuery.singleResult
+        log.info("NoticeEntity row count: $nCount")
+        val pQuery = em.createQuery("select count(*) from PhotoEntity")
+        val pCount = pQuery.singleResult
+        log.info("PhotoEntity row count: $pCount")
+
+        val stats = sessionFactory.statistics
+        log.info("isStatisticsEnabled: ${stats.isStatisticsEnabled}")
+        log.info("transactionCount: ${stats.transactionCount}")
+        log.info("successfulTransactionCount: ${stats.successfulTransactionCount}")
+        log.info("connecCount: ${stats.connectCount}")
+        stats.logSummary()
     }
 
     companion object {
