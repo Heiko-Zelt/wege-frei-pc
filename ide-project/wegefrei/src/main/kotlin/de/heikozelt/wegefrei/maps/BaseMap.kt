@@ -44,6 +44,8 @@ open class BaseMap(
         log.debug("init")
         val info = OSMTileFactoryInfo()
         tileFactory = DefaultTileFactory(info)
+        log.debug("minimum zoom level: " + tileFactory.info.minimumZoomLevel)
+        log.debug("maximum zoom level: " + tileFactory.info.maximumZoomLevel)
     }
 
     fun pixelToGeo(point: Point): GeoPosition {

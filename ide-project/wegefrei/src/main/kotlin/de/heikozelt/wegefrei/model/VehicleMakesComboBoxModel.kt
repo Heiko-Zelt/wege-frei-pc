@@ -50,17 +50,19 @@ class VehicleMakesComboBoxModel: DefaultComboBoxModel<String>() {
     companion object {
         val VEHICLE_MAKES = arrayOf(
             "",
-            "Abarth", "Alfa Romeo", "Aston Martin", "Audi",
+            "Abarth", "Adria", "Alfa Romeo", "Aston Martin", "Audi",
             "Bentley", "BMW", "Bugatti",
             "Cadillac", "Chevrolet", "Chrysler", "Citroën", "Crysler",
-            "Dacia", "Daewoo", "Deutz-Fahr", "Daihatsu", "Dodge", "DS", "Ducati",
+            "Dacia", "Daewoo", "DAF", "Deutz-Fahr", "Daihatsu", "Dodge", "DS", "Ducati",
             "Fendt", "Ferrari", "Fiat", "Ford",
-            "Harley-Davidson", "Honda", "Hyundai",
-            "Isuzu", "Iveco", "Jaguar", "Jeep", "John Deere", "Kawasaki", "Kia", "KTM",
-            "Lada", "Lamborghini", "Lancia", "Land Rover", "Lexus", "Lotus",
-            "Maserati", "Mazda", "Mercedes", "MG", "Mini", "Mitsubishi", "Nissan", "Opel",
+            "Harley-Davidson", "Honda", "Hymer", "Hyundai",
+            "Isuzu", "Iveco", "Jaguar", "Jeep", "John Deere",
+            "Kässbohrer", "Kawasaki", "Kia", "KTM",
+            "Lada", "Lamborghini", "Lancia", "Land Rover", "Lexus", "Lotus", "Lynk & Co",
+            "MAN", "Maserati", "Mazda", "Mercedes", "MG", "Mini", "Mitsubishi",
+            "Nissan", "Opel",
             "Peugeot", "Piaggio", "Polestar", "Porsche", "Renault", "Rolls-Royce",
-            "Saab", "Scania", "Seat", "Škoda", "Smart", "SsangYong", "Subaru", "Suzuki",
+            "Saab", "Scania", "Seat", "Setra", "Škoda", "Smart", "SsangYong", "Subaru", "Suzuki",
             "Tesla", "Toyota", "Trabant",
             "Vauxhall", "Volkswagen", "Volvo", "Yamaha", "Wartburg"
         )

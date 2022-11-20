@@ -5,11 +5,9 @@ import de.heikozelt.wegefrei.model.SelectedPhotosListModel
 import de.heikozelt.wegefrei.noticeframe.NoticeFrame
 import org.jxmapviewer.viewer.GeoPosition
 import org.slf4j.LoggerFactory
+import java.awt.Insets
 import java.util.*
-import javax.swing.GroupLayout
-import javax.swing.JButton
-import javax.swing.JPanel
-import javax.swing.LayoutStyle
+import javax.swing.*
 
 /**
  * große füllende Karte und darunter Buttons,
@@ -24,11 +22,16 @@ class MaxiMapForm(
     private val maxiMap = MaxiMap(noticeFrame, selectedPhotosListModel)
     //private val maxiMapButtonsBar = MaxiMapButtonsBar(noticeFrame, this)
 
+    private val zoomInButton = JButton("+")
+    private val zoomOutButton = JButton("-")
     private val fitButton = JButton("Anpassen")
     private val addButton = JButton("Tatort-Marker setzen")
     private val removeButton = JButton("Tatort-Marker entfernen")
 
     init {
+        zoomInButton.addActionListener { zoomIn() }
+        zoomOutButton.addActionListener { zoomOut() }
+
         //border = NO_BORDER
 
         // GUI components
@@ -62,6 +65,8 @@ class MaxiMapForm(
                             GroupLayout.PREFERRED_SIZE,
                             Int.MAX_VALUE
                         )
+                        .addComponent(zoomInButton)
+                        .addComponent(zoomOutButton)
                         .addComponent(fitButton)
                         .addComponent(addButton)
                         .addComponent(removeButton)
@@ -73,11 +78,16 @@ class MaxiMapForm(
                 .addComponent(maxiMap)
                 .addGroup(
                     lay.createParallelGroup()
+                        .addComponent(zoomInButton)
+                        .addComponent(zoomOutButton)
                         .addComponent(fitButton)
                         .addComponent(addButton)
                         .addComponent(removeButton)
                 )
         )
+        val m = zoomInButton.margin
+        zoomInButton.margin = Insets(m.top,10, m.bottom, 10)
+        lay.linkSize(SwingConstants.HORIZONTAL, zoomInButton, zoomOutButton)
         layout = lay
 
         //add(maxiMap, BorderLayout.CENTER)
@@ -107,8 +117,44 @@ class MaxiMapForm(
         enableOrDisableOffenseMarkerButton()
     }
 
+    /**
+     * decrease zoom level, more details
+     */
+    private fun zoomIn() {
+        val minZoomLevel = maxiMap.tileFactory.info.minimumZoomLevel
+        val maxZoomLevel = maxiMap.tileFactory.info.maximumZoomLevel
+        if(maxiMap.zoom == maxZoomLevel) {
+            zoomOutButton.isEnabled = true
+        }
+        if(maxiMap.zoom > minZoomLevel) {
+            maxiMap.zoom--
+            if(maxiMap.zoom == minZoomLevel) {
+                zoomInButton.isEnabled = false
+            }
+        }
+    }
+
+    /**
+     * increase zoom level, lesser details
+     */
+    private fun zoomOut() {
+        val minZoomLevel = maxiMap.tileFactory.info.minimumZoomLevel
+        val maxZoomLevel = maxiMap.tileFactory.info.maximumZoomLevel
+        if(maxiMap.zoom == minZoomLevel) {
+            zoomInButton.isEnabled = true
+        }
+        if(maxiMap.zoom < maxZoomLevel) {
+            maxiMap.zoom++
+            if(maxiMap.zoom == maxZoomLevel) {
+                zoomOutButton.isEnabled = false
+            }
+        }
+    }
+
     fun fit() {
+        val minZoomLevel = maxiMap.tileFactory.info.minimumZoomLevel
         maxiMap.fitToMarkers()
+        zoomInButton.isEnabled = (maxiMap.zoom != minZoomLevel)
     }
 
     fun getMaxiMap(): MaxiMap {
@@ -120,5 +166,10 @@ class MaxiMapForm(
         val enab = (notice != null) && !notice.isSent()
         addButton.isEnabled = enab
         removeButton.isEnabled = enab
+    }
+
+    companion object {
+        const val MINIMUM_ZOOM_LEVEL = 0
+        const val MAXIMUM_ZOOM_LEVEL = 19
     }
 }
