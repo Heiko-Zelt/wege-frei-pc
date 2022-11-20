@@ -17,6 +17,9 @@ open class BasePhotoViewer(
     private var zoomLevel: Short = 0
     protected val actionButton = JButton()
 
+    private val zoomInButton = JButton("+")
+    private val zoomOutButton = JButton("-")
+
     init {
         log.debug("init(photo: pos.latitude=${photo.getGeoPosition()?.latitude})")
         log.debug("photo: toolTipText=${photo.getToolTipText()})")
@@ -25,10 +28,9 @@ open class BasePhotoViewer(
 
         scrollPane.setViewportView(label)
 
-        val zoomInButton = JButton("+")
         zoomInButton.addActionListener { zoomIn() }
-        val zoomOutButton = JButton("-")
         zoomOutButton.addActionListener { zoomOut() }
+        zoomOutButton.isEnabled = false
 
         val lay = GroupLayout(this)
         lay.autoCreateGaps = false
@@ -70,23 +72,47 @@ open class BasePhotoViewer(
         return photo
     }
 
+    /**
+     * increase zoom level, more details
+     */
+
     private fun zoomIn() {
-        if(zoomLevel < 7) {
+        if(zoomLevel == MIN_ZOOM_LEVEL) {
+            zoomOutButton.isEnabled = true
+        }
+        if(zoomLevel < MAX_ZOOM_LEVEL) {
             zoomLevel++
             label.zoomTo(zoomLevel)
+            if(zoomLevel == MAX_ZOOM_LEVEL) {
+                zoomInButton.isEnabled = false
+            }
         }
     }
 
+    /**
+     * decrease zoom level, lesser details
+     */
     private fun zoomOut() {
-        if(zoomLevel > 0) {
+        if(zoomLevel == MAX_ZOOM_LEVEL) {
+            zoomInButton.isEnabled = true
+        }
+        if(zoomLevel > MIN_ZOOM_LEVEL) {
             zoomLevel--
             label.zoomTo(zoomLevel)
+            if(zoomLevel == MIN_ZOOM_LEVEL) {
+                zoomOutButton.isEnabled = false
+            }
         }
     }
 
     fun fit() {
         zoomLevel = 0
         label.zoomTo(zoomLevel)
+    }
+
+    companion object {
+        const val MIN_ZOOM_LEVEL = 0.toShort()
+        const val MAX_ZOOM_LEVEL = 7.toShort()
     }
 
 }
