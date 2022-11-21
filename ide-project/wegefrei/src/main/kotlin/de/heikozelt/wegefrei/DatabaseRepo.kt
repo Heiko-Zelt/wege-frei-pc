@@ -170,6 +170,11 @@ class DatabaseRepo(jdbcUrl: String) {
         }
     }
 
+    /**
+     * todo Prio 1: bug: notice can't be removed, if a photo is part of another notice
+     * foreign key violation!
+     * solution: delete photos "manually", if they have no notices
+     */
     fun deleteNotice(noticeEntity: NoticeEntity) {
         log.debug("deleteNotice(id=${noticeEntity.id})")
         val session = sessionFactory.openSession()

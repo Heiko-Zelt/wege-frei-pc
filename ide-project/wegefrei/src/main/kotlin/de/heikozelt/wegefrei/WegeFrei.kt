@@ -185,6 +185,7 @@ open class WegeFrei(private val settingsRepo: SettingsRepo = SettingsFileRepo())
      * called, when new notice is saved, added to database
      */
     fun noticeAdded(noticeEntity: NoticeEntity) {
+        log.debug("noticeAdded(id=${noticeEntity.id})")
         noticesFrame?.noticeAdded(noticeEntity)
     }
 
@@ -192,6 +193,7 @@ open class WegeFrei(private val settingsRepo: SettingsRepo = SettingsFileRepo())
      * called, when existing notice is saved, updated in database
      */
     fun noticeUpdated(noticeEntity: NoticeEntity) {
+        log.debug("noticeUpdated(id=${noticeEntity.id})")
         noticesFrame?.noticeUpdated(noticeEntity)
     }
 

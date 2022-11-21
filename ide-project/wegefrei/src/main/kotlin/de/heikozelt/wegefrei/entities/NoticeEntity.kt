@@ -132,7 +132,7 @@ class NoticeEntity(
     @Column
     var recipient: String? = null,
 
-    @ManyToMany(cascade = [CascadeType.ALL])
+    @ManyToMany(cascade = [CascadeType.MERGE])
     @JoinTable(
         name = "NOTICES_PHOTOS",
         joinColumns = [JoinColumn(name = "notice_id", foreignKey = ForeignKey(name = "FK_NOTICE_ID")) ],

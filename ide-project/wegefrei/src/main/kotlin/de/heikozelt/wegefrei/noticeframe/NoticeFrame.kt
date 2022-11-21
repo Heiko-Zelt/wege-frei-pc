@@ -321,17 +321,21 @@ class NoticeFrame(
      * Speichert die Meldung in der Datenbank.
      */
     fun saveNotice() {
+        log.debug("saveNotice()")
         // todo Prio 1: bug: Fotos, die noch nicht in der Datenbank sind, werden nicht gespeichert.
         noticeEntity = noticeForm.getNoticeFormFields().getNotice()
         val dbRepo = app.getDatabaseRepo() ?: return
         noticeEntity?.let {
             it.setGeoPosition(offensePosition)
             it.photoEntities = selectedPhotosListModel.getPhotoEntities()
+            log.debug("noticeEntity.id = ${it.id}")
             if (it.id == null) {
                 dbRepo.insertNotice(it)
+                log.debug("added")
                 app.noticeAdded(it)
             } else {
                 dbRepo.updateNotice(it)
+                log.debug("updated")
                 app.noticeUpdated(it)
             }
         }

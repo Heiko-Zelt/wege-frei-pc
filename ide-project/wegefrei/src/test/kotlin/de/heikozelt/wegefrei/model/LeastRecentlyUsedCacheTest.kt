@@ -96,4 +96,58 @@ class LeastRecentlyUsedCacheTest {
         assertNull(cache["zwei"])
         assertEquals(3, cache["drei"])
     }
+
+    @Test
+    fun transformKeys_Int() {
+        fun transformation(key: Int): Int {
+            return key + 1
+        }
+
+        val cache = LeastRecentlyUsedCache<Int, String>(2)
+        cache[0] = "Z"
+        cache[1] = "Y"
+        cache.transformKeys { transformation(it) }
+        assertNull(cache[0])
+        assertEquals("Z", cache[1])
+        assertEquals("Y", cache[2])
+    }
+
+    @Test
+    fun transformKeys_with_predicate() {
+        val cache = LeastRecentlyUsedCache<Int, String>(2)
+        cache[0] = "Z"
+        cache[1] = "Y"
+        cache.transformKeys( transformation = { it + 1 }, predicate = { it == 1 })
+        assertEquals("Z", cache[0])
+        assertNull(cache[1])
+        assertEquals("Y", cache[2])
+        assertNull(cache[3])
+    }
+
+    @Test
+    fun transformKeys_String() {
+        val cache = LeastRecentlyUsedCache<String, Int>(2)
+        cache["A"] = 99
+        cache["B"] = 98
+        //cache.transformKeys { transformation(it) }
+        cache.transformKeys { it + "x" }
+        assertNull(cache["A"])
+        assertNull(cache["B"])
+        assertNull(cache["x"])
+        assertEquals(99, cache["Ax"])
+        assertEquals(98, cache["Bx"])
+    }
+
+    @Test
+    fun removeKey() {
+        val cache = LeastRecentlyUsedCache<String, Int>(4)
+        cache["A"] = 99
+        cache["B"] = 98
+        cache["C"] = 97
+        cache.removeKey("B")
+        assertEquals(99, cache["A"])
+        assertNull(cache["B"])
+        assertEquals(97, cache["C"])
+        assertNull(cache["D"])
+    }
 }

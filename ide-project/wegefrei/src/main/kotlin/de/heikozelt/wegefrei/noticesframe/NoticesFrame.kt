@@ -109,6 +109,7 @@ class NoticesFrame(private val app: WegeFrei) : JFrame("Meldungen - Wege frei!")
      * called, when new notice is saved, added to database
      */
     fun noticeAdded(noticeEntity: NoticeEntity) {
+        log.debug("noticeAdded(id=${noticeEntity.id})")
         noticesTableModel.addNotice(noticeEntity)
     }
 

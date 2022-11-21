@@ -17,7 +17,7 @@ class LeastRecentlyUsedCache<K, V>(private var limit: Int) {
     /**
      * Node represents an entry in the HashMap as well as an entry in the queue/doubly linked list
      */
-    class Node<K, V>(val key: K, var element: V, var previous: Node<K, V>?, var next: Node<K, V>?)
+    class Node<K, V>(var key: K, var element: V, var previous: Node<K, V>?, var next: Node<K, V>?)
 
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
 
@@ -38,6 +38,38 @@ class LeastRecentlyUsedCache<K, V>(private var limit: Int) {
      * last is the queue tail, enqueue
      */
     private var last: Node<K, V>? = null
+
+    @Synchronized
+    fun transformKeys(transformation: (K) -> K) {
+        map.clear()
+        var node = first
+        while(node != null) {
+            node.key = transformation(node.key)
+            map[node.key] = node
+            node = node.next
+        }
+    }
+
+    @Synchronized
+    fun transformKeys(transformation: (K) -> K, predicate: (K) -> Boolean) {
+        map.clear()
+        var node = first
+        while(node != null) {
+            if(predicate(node.key)) {
+                node.key = transformation(node.key)
+            }
+            map[node.key] = node
+            node = node.next
+        }
+    }
+
+    fun removeKey(key: K) {
+        val node = map[key]
+        node?.let {
+            removeNodeFromQueue(it)
+            map.remove(key)
+        }
+    }
 
     private fun removeNodeFromQueue(existingNode: Node<K, V>) {
         log.debug("  removeNodeFromQueue(existingEntry: key=${existingNode.key}, element=${existingNode.element})")

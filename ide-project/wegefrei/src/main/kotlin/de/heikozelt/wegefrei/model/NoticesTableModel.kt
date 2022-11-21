@@ -25,8 +25,11 @@ class NoticesTableModel : AbstractTableModel() {
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
 
     //private var noticeEntities: MutableList<NoticeEntity> = mutableListOf<NoticeEntity>()
-    private val noticeIds = mutableListOf<Int>()
+    private val noticeIds = mutableListOf<Int>() // = arrayListOf()
 
+    /**
+     * Schlüssel sind Zeilennummern der Tabelle beginnend bei 0
+     */
     private val cache = LeastRecentlyUsedCache<Int, Future<NoticeEntity?>>(300)
     private val executor = Executors.newFixedThreadPool(4)
     private var databaseRepo: DatabaseRepo? = null
@@ -52,6 +55,10 @@ class NoticesTableModel : AbstractTableModel() {
         return COLUMN_NAMES.size
     }
 
+    /**
+     * todo: im Cache nach Notice.ID speichern statt nach rowIndex oder alle Cache-Einträge anpassen
+     * ähnliches Problem beim Löschen. Oder einfach Cache leeren?
+     */
     fun getNoticeAt(rowIndex: Int): NoticeEntity {
         databaseRepo?.let { dbRepo ->
             log.debug("getNoticeAt(rowIndex=$rowIndex)")
@@ -97,14 +104,19 @@ class NoticesTableModel : AbstractTableModel() {
      * und aktualisiert die View(s)
      */
     fun addNotice(noticeEntity: NoticeEntity) {
+        log.debug("addNotice(${noticeEntity.id})")
         noticeEntity.id?.let { id ->
             log.debug("add notice #${noticeEntity.id}")
             //noticeEntities.add(0, noticeEntity)
             val callable = Callable { noticeEntity }
             val futureTask = FutureTask(callable)
             executor.execute(futureTask)
-            cache[id] = futureTask
+            cache.transformKeys { it + 1 }
+            cache[0] = futureTask
             noticeIds.add(0, id)
+            log.debug("noticeIds[0]=${noticeIds[0]}")
+            log.debug("noticeIds[1]=${noticeIds[1]}")
+            log.debug("fireTableRowsInserted(0, 0)")
             fireTableRowsInserted(0, 0)
         }
     }
@@ -125,9 +137,9 @@ class NoticesTableModel : AbstractTableModel() {
     fun removeNotice(noticeEntity: NoticeEntity) {
         log.debug("remove notice #${noticeEntity.id}")
         val rowIndex = noticeIds.indexOf(noticeEntity.id)
-        noticeIds.remove(noticeEntity.id)
-        // löschen aus Cache erfolgt automatisch, wenn neue Einträge reinkommen
-        // todo Prio 3: Speicher-Optimierung möglich, indem der Eintrag vorzeitig gelöscht wird
+        noticeIds.removeAt(rowIndex)
+        cache.removeKey(rowIndex)
+        cache.transformKeys (transformation = { it - 1 }, predicate = { it > rowIndex })
         fireTableRowsDeleted(rowIndex, rowIndex)
     }
 
@@ -136,7 +148,7 @@ class NoticesTableModel : AbstractTableModel() {
         val notice = getNoticeAt(rowIndex)
 
         return when (columnIndex) {
-            0 -> notice.id
+            0 -> { log.debug("notice.id=${notice.id}"); notice.id }
             1 -> notice.countrySymbol
             2 -> notice.licensePlate
             3 -> notice.vehicleMake
