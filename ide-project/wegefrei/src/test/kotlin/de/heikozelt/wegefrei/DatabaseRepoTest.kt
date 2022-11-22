@@ -30,7 +30,7 @@ internal class DatabaseRepoTest {
     }
 
     /**
-     * The notice with id 1 could be deleted by deleteNotice() test.
+     * The notice with id 1 may be deleted by deleteNotice() test.
      */
     @Test
     fun findAllNoticesIds() {
@@ -39,20 +39,65 @@ internal class DatabaseRepoTest {
         noticeIds?.let {
             assertTrue(2 in it)
             assertTrue(3 in it)
-            assertTrue(11 in it)
-            assertTrue(12 in it)
-            assertFalse(13 in it)
+            assertTrue(13 in it)
+            assertTrue(14 in it)
+            assertFalse(15 in it)
         }
+    }
+
+    @Test
+    fun updateNotice_after_one_photo_was_added() {
+        val notice = databaseRepo.findNoticeById(3)
+        assertNotNull(notice)
+        notice?.let { n ->
+            n.photoEntities.add(photos[4])
+            databaseRepo.updateNotice(n)
+        }
+
+        val notice2 = databaseRepo.findNoticeById(3)
+        assertNotNull(notice2)
+        notice2?.let{ n ->
+            n.photoEntities.forEach {
+                log.debug("path=${it.path}")
+            }
+            assertEquals(2, n.photoEntities.size)
+            val paths = n.photoEntities.map { it.path }
+            assertTrue("/tmp/2021-12-31_12-03-00.jpg" in paths)
+            assertTrue("/tmp/2021-12-31_12-04-00.jpg" in paths)
+        }
+    }
+
+    @Test
+    fun updateNotice_after_one_photo_was_removed() {
+        val notice = databaseRepo.findNoticeById(4)
+        assertNotNull(notice)
+        notice?.let { n ->
+            n.photoEntities.clear()
+            databaseRepo.updateNotice(n)
+        }
+
+        val notice2 = databaseRepo.findNoticeById(4)
+        assertNotNull(notice2)
+        notice2?.let{ n ->
+            n.photoEntities.forEach {
+                log.debug("path=${it.path}")
+            }
+            assertEquals(0, n.photoEntities.size)
+        }
+        val orphan = databaseRepo.findPhotoByPath("/tmp/2021-12-31_12-05-00.jpg")
+        assertNull(orphan)
     }
 
     @Test
     fun deleteNotice() {
         databaseRepo.deleteNotice(1)
 
+        val notice = databaseRepo.findNoticeById(1)
+        assertNull(notice)
         val photo0 = databaseRepo.findPhotoByPath("/tmp/2021-12-31_12-00-00.jpg")
-        val photo1 = databaseRepo.findPhotoByPath("/tmp/2021-12-31_12-01-00.jpg")
         assertNotNull(photo0)
-        assertNull(photo1)
+        val orphan = databaseRepo.findPhotoByPath("/tmp/2021-12-31_12-01-00.jpg")
+        assertNull(orphan)
     }
 
     companion object {
@@ -60,71 +105,82 @@ internal class DatabaseRepoTest {
 
         private val databaseRepo = DatabaseRepo.fromMemory()
 
-        @BeforeAll @JvmStatic
+        val photos = mutableListOf<PhotoEntity>()
+
+        @BeforeAll
+        @JvmStatic
         fun inserts() {
             LOG.debug("BeforeAll()")
-            val zdt0 = ZonedDateTime.of(2021, 12, 31, 12, 0, 0, 0, ZoneId.of("CET"))
-            val zdt1 = ZonedDateTime.of(2021, 12, 31, 12, 1, 0, 0, ZoneId.of("CET"))
-            val zdt2 = ZonedDateTime.of(2021, 12, 31, 12, 2, 0, 0, ZoneId.of("CET"))
-            val photo0a = PhotoEntity(
-                "/tmp/2021-12-31_12-00-00.jpg",
-                "0123456789ABCDEFGHIJ".toByteArray(),
-                50.0f,
-                8.0f,
-                zdt0
-            )
-            val photo1 = PhotoEntity(
-                "/tmp/2021-12-31_12-01-00.jpg",
-                "0123456789ABCDEFGHIJ".toByteArray(),
-                50.1f,
-                8.1f,
-                zdt1
-            )
-            val notice0 = NoticeEntity()
-            notice0.apply {
-                observationTime = zdt0
+
+            for (i in 0 ..5) {
+                val dateTime = ZonedDateTime.of(2021, 12, 31, 12, i, 0, 0, ZoneId.of("CET"))
+                val photo = PhotoEntity(
+                    "/tmp/2021-12-31_12-0$i-00.jpg",
+                    "0123456789ABCDEFGHIJ".toByteArray(),
+                    50.0f + i.toFloat() / 10,
+                    8.0f + i.toFloat() / 10,
+                    dateTime
+                )
+                photos.add(photo)
+            }
+
+            val notice1 = NoticeEntity()
+            notice1.apply {
+                observationTime = photos[0].dateTime
                 licensePlate = "DEL ET 0000"
                 vehicleMake = VehicleMakesComboBoxModel.VEHICLE_MAKES[1]
                 color = VehicleColor.COLORS[1].colorName
-                latitude = 50.0f
-                longitude = 8.0f
-                photoEntities.add(photo0a)
-                photoEntities.add(photo1)
+                latitude = 50.1f
+                longitude = 8.1f
+                photoEntities.add(photos[0])
+                photoEntities.add(photos[1])
             }
-            //databaseRepo.insertPhoto(photo0a)
-            //databaseRepo.insertPhoto(photo1)
-            databaseRepo.insertNotice(notice0)
+            databaseRepo.insertNotice(notice1)
 
-            val photo0b = databaseRepo.findPhotoByPath("/tmp/2021-12-31_12-00-00.jpg")
-            photo0b?.let {
-                val photo2 = PhotoEntity(
-                    "/tmp/2021-12-31_12-02-00.jpg",
-                    "0123456789ABCDEFGHIJ".toByteArray(),
-                    50.2f,
-                    8.2f,
-                    zdt2
-                )
-                val notice1 = NoticeEntity()
-                notice1.apply {
-                    observationTime = zdt1
-                    licensePlate = "KE EP 0001"
-                    vehicleMake = VehicleMakesComboBoxModel.VEHICLE_MAKES[2]
-                    color = VehicleColor.COLORS[2].colorName
-                    latitude = 50.1f
-                    longitude = 8.1f
-                    photoEntities.add(it)
-                    photoEntities.add(photo2)
-                }
-                //databaseRepo.insertPhoto(photo2)
-                databaseRepo.insertNotice(notice1)
+            val notice2 = NoticeEntity()
+            notice2.apply {
+                observationTime = photos[0].dateTime
+                licensePlate = "KE EP 0001"
+                vehicleMake = VehicleMakesComboBoxModel.VEHICLE_MAKES[2]
+                color = VehicleColor.COLORS[2].colorName
+                latitude = 50.2f
+                longitude = 8.2f
+                photoEntities.add(photos[0])
+                photoEntities.add(photos[2])
             }
+            databaseRepo.insertNotice(notice2)
+
+            val notice3 = NoticeEntity()
+            notice3.apply {
+                observationTime = photos[0].dateTime
+                licensePlate = "UPD AT 0002"
+                vehicleMake = VehicleMakesComboBoxModel.VEHICLE_MAKES[3]
+                color = VehicleColor.COLORS[3].colorName
+                latitude = 50.3f
+                longitude = 8.3f
+                photoEntities.add(photos[3])
+            }
+            databaseRepo.insertNotice(notice3)
+
+            val notice4 = NoticeEntity()
+            notice4.apply {
+                observationTime = photos[0].dateTime
+                licensePlate = "UPD AT 0002"
+                vehicleMake = VehicleMakesComboBoxModel.VEHICLE_MAKES[3]
+                color = VehicleColor.COLORS[3].colorName
+                latitude = 50.4f
+                longitude = 8.4f
+                photoEntities.add(photos[5])
+            }
+            databaseRepo.insertNotice(notice4)
 
             for (i in 1..10) {
                 val notice = NoticeEntity()
                 notice.apply {
                     observationTime = ZonedDateTime.now()
                     licensePlate = "AA XX 00$i"
-                    vehicleMake = VehicleMakesComboBoxModel.VEHICLE_MAKES[i % VehicleMakesComboBoxModel.VEHICLE_MAKES.size]
+                    vehicleMake =
+                        VehicleMakesComboBoxModel.VEHICLE_MAKES[i % VehicleMakesComboBoxModel.VEHICLE_MAKES.size]
                     color = VehicleColor.COLORS[i % VehicleColor.COLORS.size].colorName
                     latitude = 49 + i.toFloat() / 11
                     longitude = 8 + i.toFloat() / 13
@@ -132,6 +188,7 @@ internal class DatabaseRepoTest {
                 databaseRepo.insertNotice(notice)
             }
             databaseRepo.logStatistics()
+
         }
     }
 }

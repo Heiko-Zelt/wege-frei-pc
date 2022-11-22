@@ -146,30 +146,46 @@ class DatabaseRepo(jdbcUrl: String) {
         log.debug("session: $session")
         val tx = session.beginTransaction()
         try {
-            //todo Illegal attempt to associate a collection with two open sessions: Collection :
-            // [de.heikozelt.wegefrei.entities.PhotoEntity.noticeEntities
-            noticeEntity.photoEntities.forEach { photo ->
-                photo.path?.let { path ->
-                    val photoDb = findPhotoByPath(path)
-                    if (photoDb == null) {
-                        session.persist(photo)
-                    }
-                }
-                /*
-                // primary key exists!
-                try {
-                    session.persist(photo)
-                } catch(ex: Exception) {
-                    log.debug("Can't save photo:", ex)
-                }
-
-                 */
-            }
+            insertMissingPhotos(session, noticeEntity)
             session.persist(noticeEntity)
             tx.commit()
         } finally {
             if (tx.isActive) tx.rollback()
             if (session.isOpen) session.close()
+        }
+    }
+
+    private fun insertMissingPhotos(session: Session, noticeEntity: NoticeEntity) {
+        noticeEntity.photoEntities.forEach { photo ->
+            photo.path?.let { path ->
+                val photoDb = findPhotoByPath(path)
+                if (photoDb == null) {
+                    session.persist(photo)
+                }
+            }
+        }
+    }
+
+    /**
+    private fun deleteOrphanedPhotos(session: Session, noticeEntity: NoticeEntity) {
+        noticeEntity.photoEntities.forEach { photo ->
+            log.debug("found photo. path=${photo.path}")
+            if (photo.noticeEntities.size == 0) {
+                log.debug("REMOVE ORPHANED PHOTO")
+                session.remove(photo)
+            }
+        }
+    }
+    */
+
+    private fun deleteOrphanedPhotos(session: Session) {
+        val select = "SELECT p FROM PhotoEntity p WHERE p NOT IN (SELECT n.photoEntities FROM NoticeEntity n)"
+        //val jpql = "SELECT p FROM PhotoEntity p WHERE NOT EXITS (SELECT n FROM NoticeEntity n WHERE p MEMBER OF n.photoEntities)"
+        //val jpql = "SELECT p.path FROM PhotoEntity p WHERE COUNT(p.noticeEntities) = 0"
+        val result = session.createQuery(select, PhotoEntity::class.java).resultList
+        result?.forEach {
+            log.info("found orphaned photo: path=${it.path}, deleting it")
+            session.remove(it)
         }
     }
 
@@ -179,7 +195,9 @@ class DatabaseRepo(jdbcUrl: String) {
         log.debug("session: $session")
         val tx = session.beginTransaction()
         try {
+            insertMissingPhotos(session, noticeEntity)
             session.merge(noticeEntity)
+            deleteOrphanedPhotos(session)
             tx.commit()
         } finally {
             if (tx.isActive) tx.rollback()
@@ -198,37 +216,20 @@ class DatabaseRepo(jdbcUrl: String) {
         log.debug("session: $session")
         val tx = session.beginTransaction()
         try {
-            //val mergedEntity = session.merge(noticeEntity)
-            //session.remove(mergedEntity)
-
             val notice = session.find(NoticeEntity::class.java, noticeId)
             if (notice == null) {
-                log.warn("Can't delete notice because it is not found.")
+                log.warn("Can't delete notice because it was not found in the database.")
             } else {
                 log.debug("PHOTOS.SIZE=${notice.photoEntities.size}")
                 notice.photoEntities.forEach { it.noticeEntities.remove(notice) }
                 session.remove(notice)
-                //session.remove(noticeEntity)
-                notice.photoEntities.forEach { photo ->
-                    //val photo = session.find(PhotoEntity::class.java, p.path)
-                    //if(photo == null) {
-                    //    log.warn("Can't delete photo because it is not found.")
-                    //} else {
-                        log.debug("found photo. path=${photo.path}")
-                        if(photo.noticeEntities.size == 0) {
-                            log.debug("REMOVE ORPHANED PHOTO")
-                            log.debug("remove()")
-                            session.remove(photo)
-                        }
-                    //}
-                }
+                deleteOrphanedPhotos(session)
             }
             tx.commit()
         } finally {
             if (tx.isActive) tx.rollback()
             if (session.isOpen) session.close()
         }
-
     }
 
     fun close() {
