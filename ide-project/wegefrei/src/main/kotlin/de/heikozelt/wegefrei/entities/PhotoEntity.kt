@@ -4,6 +4,7 @@ import com.drew.imaging.ImageMetadataReader
 import com.drew.lang.GeoLocation
 import com.drew.metadata.exif.ExifSubIFDDirectory
 import com.drew.metadata.exif.GpsDirectory
+import de.heikozelt.wegefrei.Hash
 import jakarta.persistence.*
 import org.jxmapviewer.viewer.GeoPosition
 import org.slf4j.LoggerFactory
@@ -71,7 +72,7 @@ class PhotoEntity(
      */
     override fun compareTo(other: PhotoEntity): Int {
         path?.let {thisPath ->
-            other?.path?.let { otherPath ->
+            other.path?.let { otherPath ->
                 return thisPath.compareTo(otherPath)
             }
         }
@@ -126,7 +127,10 @@ class PhotoEntity(
     }
 
     fun getHashHex(): String? {
-        return hash?.joinToString(separator = "") { byte -> "%02x".format(byte) }
+        hash?.let {
+            return Hash.hex(it)
+        }
+        return null
     }
 
     /**

@@ -181,7 +181,7 @@ class DatabaseRepo(jdbcUrl: String) {
     private fun deleteOrphanedPhotos(session: Session) {
         val select = "SELECT p FROM PhotoEntity p WHERE p NOT IN (SELECT n.photoEntities FROM NoticeEntity n)"
         //val jpql = "SELECT p FROM PhotoEntity p WHERE NOT EXITS (SELECT n FROM NoticeEntity n WHERE p MEMBER OF n.photoEntities)"
-        //val jpql = "SELECT p.path FROM PhotoEntity p WHERE COUNT(p.noticeEntities) = 0"
+        //val jpql = "SELECT p FROM PhotoEntity p WHERE COUNT(p.noticeEntities) = 0"
         val result = session.createQuery(select, PhotoEntity::class.java).resultList
         result?.forEach {
             log.info("found orphaned photo: path=${it.path}, deleting it")
@@ -275,5 +275,6 @@ class DatabaseRepo(jdbcUrl: String) {
             LOG.info("use in memory database")
             return DatabaseRepo("jdbc:h2:mem:wege_frei_v1")
         }
+
     }
 }
