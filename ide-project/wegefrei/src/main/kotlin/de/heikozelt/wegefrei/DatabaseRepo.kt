@@ -42,12 +42,12 @@ class DatabaseRepo(jdbcUrl: String) {
             photoEntity = qry.singleResultOrNull
             //photoEntity = session.find(PhotoEntity::class.java, path)
             tx.commit()
-            if(photoEntity == null) {
+            if (photoEntity == null) {
                 log.debug("image $path not found in database")
             }
         } finally {
-            if(tx.isActive) tx.rollback()
-            if(session.isOpen) session.close()
+            if (tx.isActive) tx.rollback()
+            if (session.isOpen) session.close()
         }
         return photoEntity
     }
@@ -69,8 +69,8 @@ class DatabaseRepo(jdbcUrl: String) {
             noticeEntity = qry.singleResultOrNull
             tx.commit()
         } finally {
-            if(tx.isActive) tx.rollback()
-            if(session.isOpen) session.close()
+            if (tx.isActive) tx.rollback()
+            if (session.isOpen) session.close()
         }
         return noticeEntity
     }
@@ -78,11 +78,11 @@ class DatabaseRepo(jdbcUrl: String) {
     /**
      * liefert ein sortiertes Set von Fotos
     fun findPhotos(firstPhotoFilename: String, limit: Int): Set<PhotoEntity> {
-        val resultList: List<PhotoEntity> = em.createQuery("SELECT ph FROM PhotoEntity ph WHERE ph.filename >= :filename ORDER BY ph.filename", PhotoEntity::class.java)
-            .setParameter("filename", firstPhotoFilename).setMaxResults(limit).resultList
-        return TreeSet(resultList)
+    val resultList: List<PhotoEntity> = em.createQuery("SELECT ph FROM PhotoEntity ph WHERE ph.filename >= :filename ORDER BY ph.filename", PhotoEntity::class.java)
+    .setParameter("filename", firstPhotoFilename).setMaxResults(limit).resultList
+    return TreeSet(resultList)
     }
-    */
+     */
 
     /**
      * liefert ein umgekehrt sortiertes Set von Meldungen
@@ -100,8 +100,8 @@ class DatabaseRepo(jdbcUrl: String) {
             resultList = session.createQuery(jpql, NoticeEntity::class.java).resultList
             tx.commit()
         } finally {
-            if(tx.isActive) tx.rollback()
-            if(session.isOpen) session.close()
+            if (tx.isActive) tx.rollback()
+            if (session.isOpen) session.close()
         }
         log.debug("got result. size=${resultList?.size}")
         return resultList
@@ -119,8 +119,8 @@ class DatabaseRepo(jdbcUrl: String) {
             resultList = session.createQuery(jpql, Int::class.java).resultList
             tx.commit()
         } finally {
-            if(tx.isActive) tx.rollback()
-            if(session.isOpen) session.close()
+            if (tx.isActive) tx.rollback()
+            if (session.isOpen) session.close()
         }
         log.debug("got result. size=${resultList?.size}")
         return resultList
@@ -135,8 +135,8 @@ class DatabaseRepo(jdbcUrl: String) {
             session.persist(photoEntity)
             tx.commit()
         } finally {
-            if(tx.isActive) tx.rollback()
-            if(session.isOpen) session.close()
+            if (tx.isActive) tx.rollback()
+            if (session.isOpen) session.close()
         }
     }
 
@@ -148,11 +148,28 @@ class DatabaseRepo(jdbcUrl: String) {
         try {
             //todo Illegal attempt to associate a collection with two open sessions: Collection :
             // [de.heikozelt.wegefrei.entities.PhotoEntity.noticeEntities
+            noticeEntity.photoEntities.forEach { photo ->
+                photo.path?.let { path ->
+                    val photoDb = findPhotoByPath(path)
+                    if (photoDb == null) {
+                        session.persist(photo)
+                    }
+                }
+                /*
+                // primary key exists!
+                try {
+                    session.persist(photo)
+                } catch(ex: Exception) {
+                    log.debug("Can't save photo:", ex)
+                }
+
+                 */
+            }
             session.persist(noticeEntity)
             tx.commit()
         } finally {
-            if(tx.isActive) tx.rollback()
-            if(session.isOpen) session.close()
+            if (tx.isActive) tx.rollback()
+            if (session.isOpen) session.close()
         }
     }
 
@@ -165,8 +182,8 @@ class DatabaseRepo(jdbcUrl: String) {
             session.merge(noticeEntity)
             tx.commit()
         } finally {
-            if(tx.isActive) tx.rollback()
-            if(session.isOpen) session.close()
+            if (tx.isActive) tx.rollback()
+            if (session.isOpen) session.close()
         }
     }
 
@@ -175,26 +192,47 @@ class DatabaseRepo(jdbcUrl: String) {
      * foreign key violation!
      * solution: delete photos "manually", if they have no notices
      */
-    fun deleteNotice(noticeEntity: NoticeEntity) {
-        log.debug("deleteNotice(id=${noticeEntity.id})")
+    fun deleteNotice(noticeId: Int) {
+        log.debug("deleteNotice(id=${noticeId})")
         val session = sessionFactory.openSession()
         log.debug("session: $session")
         val tx = session.beginTransaction()
         try {
             //val mergedEntity = session.merge(noticeEntity)
             //session.remove(mergedEntity)
-            session.remove(if (session.contains(noticeEntity)) noticeEntity else session.merge(noticeEntity))
-            //session.remove(noticeEntity)
+
+            val notice = session.find(NoticeEntity::class.java, noticeId)
+            if (notice == null) {
+                log.warn("Can't delete notice because it is not found.")
+            } else {
+                log.debug("PHOTOS.SIZE=${notice.photoEntities.size}")
+                notice.photoEntities.forEach { it.noticeEntities.remove(notice) }
+                session.remove(notice)
+                //session.remove(noticeEntity)
+                notice.photoEntities.forEach { photo ->
+                    //val photo = session.find(PhotoEntity::class.java, p.path)
+                    //if(photo == null) {
+                    //    log.warn("Can't delete photo because it is not found.")
+                    //} else {
+                        log.debug("found photo. path=${photo.path}")
+                        if(photo.noticeEntities.size == 0) {
+                            log.debug("REMOVE ORPHANED PHOTO")
+                            log.debug("remove()")
+                            session.remove(photo)
+                        }
+                    //}
+                }
+            }
             tx.commit()
         } finally {
-            if(tx.isActive) tx.rollback()
-            if(session.isOpen) session.close()
+            if (tx.isActive) tx.rollback()
+            if (session.isOpen) session.close()
         }
 
     }
 
     fun close() {
-        if(em.isOpen) {
+        if (em.isOpen) {
             log.debug("closing entity manager")
             em.close()
             log.debug("entity manager closed")

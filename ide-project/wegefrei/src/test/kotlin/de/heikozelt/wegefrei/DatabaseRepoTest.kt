@@ -29,18 +29,30 @@ internal class DatabaseRepoTest {
         assertEquals(photo1?.path, photo2?.path)
     }
 
+    /**
+     * The notice with id 1 could be deleted by deleteNotice() test.
+     */
     @Test
     fun findAllNoticesIds() {
         val noticeIds = databaseRepo.findAllNoticesIdsDesc()
-        assertEquals(12, noticeIds?.size)
-        assertEquals(12, noticeIds?.get(0))
-        assertEquals(1, noticeIds?.get(11))
+        assertNotNull(noticeIds)
+        noticeIds?.let {
+            assertTrue(2 in it)
+            assertTrue(3 in it)
+            assertTrue(11 in it)
+            assertTrue(12 in it)
+            assertFalse(13 in it)
+        }
     }
 
     @Test
     fun deleteNotice() {
-        val notice = NoticeEntity(0)
-        databaseRepo.deleteNotice(notice)
+        databaseRepo.deleteNotice(1)
+
+        val photo0 = databaseRepo.findPhotoByPath("/tmp/2021-12-31_12-00-00.jpg")
+        val photo1 = databaseRepo.findPhotoByPath("/tmp/2021-12-31_12-01-00.jpg")
+        assertNotNull(photo0)
+        assertNull(photo1)
     }
 
     companion object {
@@ -79,8 +91,8 @@ internal class DatabaseRepoTest {
                 photoEntities.add(photo0a)
                 photoEntities.add(photo1)
             }
-            databaseRepo.insertPhoto(photo0a)
-            databaseRepo.insertPhoto(photo1)
+            //databaseRepo.insertPhoto(photo0a)
+            //databaseRepo.insertPhoto(photo1)
             databaseRepo.insertNotice(notice0)
 
             val photo0b = databaseRepo.findPhotoByPath("/tmp/2021-12-31_12-00-00.jpg")
@@ -103,7 +115,7 @@ internal class DatabaseRepoTest {
                     photoEntities.add(it)
                     photoEntities.add(photo2)
                 }
-                databaseRepo.insertPhoto(photo2)
+                //databaseRepo.insertPhoto(photo2)
                 databaseRepo.insertNotice(notice1)
             }
 
@@ -119,6 +131,7 @@ internal class DatabaseRepoTest {
                 }
                 databaseRepo.insertNotice(notice)
             }
+            databaseRepo.logStatistics()
         }
     }
 }

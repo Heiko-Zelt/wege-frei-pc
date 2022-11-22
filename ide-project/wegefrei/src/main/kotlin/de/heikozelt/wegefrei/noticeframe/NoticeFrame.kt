@@ -273,7 +273,7 @@ class NoticeFrame(
 
         //todo Prio 3: 2 Methoden für den gleichen Zweck, eine soll die andere Aufrufen
 
-        val photoPanel = MaxiSelectedPhotoPanel( this, miniSelectedPhotoPanel.getPhoto())
+        val photoPanel = MaxiSelectedPhotoPanel(this, miniSelectedPhotoPanel.getPhoto())
         setZoomComponent(photoPanel)
         EventQueue.invokeLater { photoPanel.fit() }
 
@@ -288,7 +288,7 @@ class NoticeFrame(
     private fun showSelectedPhoto(photo: Photo) {
         log.debug("show selected photo")
 
-        val photoPanel = MaxiSelectedPhotoPanel( this, photo)
+        val photoPanel = MaxiSelectedPhotoPanel(this, photo)
         setZoomComponent(photoPanel)
         EventQueue.invokeLater { photoPanel.fit() }
 
@@ -347,9 +347,11 @@ class NoticeFrame(
      */
     fun deleteNotice() {
         val dbRepo = app.getDatabaseRepo() ?: return
-        noticeEntity?.let {
-            dbRepo.deleteNotice(it)
-            app.noticeDeleted(it)
+        noticeEntity?.let { entity ->
+            entity.id?.let { id ->
+                dbRepo.deleteNotice(id)
+            }
+            app.noticeDeleted(entity)
         }
     }
 
@@ -466,7 +468,7 @@ class NoticeFrame(
     private fun getMaxiSelectedPhotoPanel(): MaxiSelectedPhotoPanel? {
         val zoomComp = getZoomComponent()
         if (zoomComp is MaxiSelectedPhotoPanel) {
-             return zoomComp
+            return zoomComp
         }
         return null
     }
