@@ -11,6 +11,7 @@ import javax.swing.ImageIcon
 import javax.swing.JLabel
 import javax.swing.SwingConstants
 
+
 /**
  * Part of MiniPhotoPanel.
  * It's only used temporarily for list cell rendering.
@@ -50,7 +51,20 @@ class ThumbnailLabel(thumbnailImage: BufferedImage?, active: Boolean, selected: 
 
     private fun gray(inputImage: Image): Image {
         val filter = GrayFilter(true, 50)
-        val producer = FilteredImageSource(inputImage?.source, filter)
+        val producer = FilteredImageSource(inputImage.source, filter)
         return Toolkit.getDefaultToolkit().createImage(producer)
     }
+
+    /*
+    private fun gray(inputImage: BufferedImage): Image {
+        val image = BufferedImage(
+            inputImage.width, inputImage.height,
+            BufferedImage.TYPE_BYTE_GRAY
+        )
+        val g = image.graphics
+        g.drawImage(inputImage, 0, 0, null)
+        g.dispose()
+        return image
+    }
+    */
 }

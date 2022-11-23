@@ -30,7 +30,7 @@ class BrowserListModel(
     private val cache: LeastRecentlyUsedCache<Path, Photo>,
     private val photoLoader: PhotoLoader,
     private val selectedPhotosListModel: SelectedPhotosListModel
-): AbstractListModel<Photo?>(), ListDataListener, PhotoLoaderObserver {
+) : AbstractListModel<Photo?>(), ListDataListener, PhotoLoaderObserver {
 
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
     private var directoryPath: Path? = null
@@ -66,23 +66,21 @@ class BrowserListModel(
      */
     override fun getElementAt(index: Int): Photo? {
         log.debug("getElementAt(index=$index)")
-        directoryPath?.let { dirPath ->
-            val filename = filenames[index]
-            val path = Paths.get(directoryPath.toString(), filename.toString())
-            val cachedElement = cache[path]
-            return if (cachedElement == null) {
-                //val filePath = Paths.get(dirPath.toString(), filenames[index].toString())
-                val photo = Photo(path)
-                cache[path] = photo
-                photoLoader.loadPhotoFile(photo)
-                photoLoader.loadPhotoEntity(photo)
-                //photoFile.loadPhotoData(executorService) { photoFile -> doneLoadingPhoto(photoFile) }
-                photo
-            } else {
-                cachedElement
-            }
+
+        val filename = filenames[index]
+        val path = Paths.get(directoryPath.toString(), filename.toString())
+        val cachedElement = cache[path]
+        return if (cachedElement == null) {
+            //val filePath = Paths.get(dirPath.toString(), filenames[index].toString())
+            val photo = Photo(path)
+            cache[path] = photo
+            photoLoader.loadPhotoFile(photo)
+            photoLoader.loadPhotoEntity(photo)
+            //photoFile.loadPhotoData(executorService) { photoFile -> doneLoadingPhoto(photoFile) }
+            photo
+        } else {
+            cachedElement
         }
-        return null
     }
 
     fun getDirectoryPath(): Path? {
@@ -98,19 +96,19 @@ class BrowserListModel(
         this.directoryPath = path
         readFilenames()
 
-        if(filenames.size != 0) {
+        if (filenames.size != 0) {
             fireContentsChanged(this, 0, min(filenames.size, oldSize) - 1)
         }
-        if(oldSize > filenames.size) {
+        if (oldSize > filenames.size) {
             fireIntervalRemoved(this, filenames.size, oldSize - 1)
         }
-        if(oldSize < filenames.size) {
+        if (oldSize < filenames.size) {
             fireIntervalAdded(this, oldSize, filenames.size - 1)
         }
     }
 
     private fun readFilenames() {
-        directoryPath?.let {p ->
+        directoryPath?.let { p ->
             val dir = File(p.toString())
             if (!dir.isDirectory) {
                 log.error("$p ist kein Verzeichnis.")
@@ -130,7 +128,7 @@ class BrowserListModel(
      */
     override fun intervalAdded(e: ListDataEvent?) {
         e?.let { event ->
-            for(selectedIndex in event.index0..event.index1) {
+            for (selectedIndex in event.index0..event.index1) {
                 val photo = selectedPhotosListModel.getElementAt(selectedIndex)
                 photo?.let { p ->
                     val browserIndex = filenames.indexOf(p.getPath())
@@ -152,10 +150,10 @@ class BrowserListModel(
      * show it colorful again
      */
     override fun intervalRemoved(e: ListDataEvent?) {
-        if(e is SelectedPhotosListDataEvent) {
-            for(photo in e.photos) {
+        if (e is SelectedPhotosListDataEvent) {
+            for (photo in e.photos) {
                 val index = filenames.indexOfFirst { it == photo.getPath() }
-                if(index >= 0) {
+                if (index >= 0) {
                     this.fireContentsChanged(this, index, index)
                 }
             }

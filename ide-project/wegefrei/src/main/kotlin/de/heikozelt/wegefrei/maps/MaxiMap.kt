@@ -47,7 +47,7 @@ class MaxiMap(
     fun enableOrDisableDragAndDrop() {
         getOffenseMarker()?.getLabel()?.let {
             val notice = noticeFrame.getNotice()
-            if(notice == null || notice.isSent()) {
+            if(notice.isSent()) {
                 log.debug("remove mouse listeners")
                 it.removeMouseListener(mickey)
                 it.removeMouseMotionListener(mickey)

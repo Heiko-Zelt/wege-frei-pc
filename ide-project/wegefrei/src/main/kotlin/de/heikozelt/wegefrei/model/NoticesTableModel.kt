@@ -114,8 +114,6 @@ class NoticesTableModel : AbstractTableModel() {
             cache.transformKeys { it + 1 }
             cache[0] = futureTask
             noticeIds.add(0, id)
-            log.debug("noticeIds[0]=${noticeIds[0]}")
-            log.debug("noticeIds[1]=${noticeIds[1]}")
             log.debug("fireTableRowsInserted(0, 0)")
             fireTableRowsInserted(0, 0)
         }

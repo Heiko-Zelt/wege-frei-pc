@@ -1,6 +1,7 @@
 plugins {
     id 'org.jetbrains.kotlin.jvm' version '1.7.20'
     id 'application'
+    //id 'org.graalvm.buildtools.native' version '0.9.18'
 }
 
 group = 'de.heikozelt'
@@ -59,3 +60,18 @@ task copyRuntimeLibs(type: Copy) {
     from configurations.compileClasspath
     into "$buildDir/runtime-libs"
 }
+
+// libXi.a, libXrender.a, libfreetype.a is missing -->
+// sudo apt-get install libxi-dev libxrender-dev libfreetype-dev
+/*
+graalvmNative {
+    binaries {
+        main {
+            buildArgs.add('-Djava.awt.headless=false')
+            buildArgs.add('--no-fallback')
+            buildArgs.add('--initialize-at-run-time=sun.awt')
+        }
+    }
+
+}
+*/
