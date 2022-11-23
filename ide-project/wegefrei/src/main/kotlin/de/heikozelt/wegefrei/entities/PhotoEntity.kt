@@ -4,7 +4,7 @@ import com.drew.imaging.ImageMetadataReader
 import com.drew.lang.GeoLocation
 import com.drew.metadata.exif.ExifSubIFDDirectory
 import com.drew.metadata.exif.GpsDirectory
-import de.heikozelt.wegefrei.Hash
+import de.heikozelt.wegefrei.hex
 import jakarta.persistence.*
 import org.jxmapviewer.viewer.GeoPosition
 import org.slf4j.LoggerFactory
@@ -128,7 +128,7 @@ class PhotoEntity(
 
     fun getHashHex(): String? {
         hash?.let {
-            return Hash.hex(it)
+            return hex(it)
         }
         return null
     }
@@ -152,6 +152,9 @@ class PhotoEntity(
             lines.add(getDateFormatted())
         }
         getGeoPositionFormatted()?.let {
+            lines.add(it)
+        }
+        getHashHex()?.let {
             lines.add(it)
         }
         val text = "<html>${lines.joinToString("<br>")}</html>"

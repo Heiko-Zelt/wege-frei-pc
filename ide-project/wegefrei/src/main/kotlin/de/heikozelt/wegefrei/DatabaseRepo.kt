@@ -158,8 +158,10 @@ class DatabaseRepo(jdbcUrl: String) {
     private fun insertMissingPhotos(session: Session, noticeEntity: NoticeEntity) {
         noticeEntity.photoEntities.forEach { photo ->
             photo.path?.let { path ->
-                val photoDb = findPhotoByPath(path)
+                val photoDb = session.find(PhotoEntity::class.java, photo.path)
                 if (photoDb == null) {
+                    log.debug("hash and persist photo")
+                    photo.hash = sha1(path)
                     session.persist(photo)
                 }
             }

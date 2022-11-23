@@ -8,14 +8,14 @@ class HashTest {
     @Test
     fun hex() {
         val bytes = "ABC".toByteArray()
-        val hex = Hash.hex(bytes)
-        assertEquals("414243", hex)
+        val hx = hex(bytes)
+        assertEquals("414243", hx)
     }
 
     @Test
     fun sha1() {
-        val bytes = Hash.sha1("src/test/resources/feuerwehrzufahrt.jpg")
-        val hex = Hash.hex(bytes)
+        val bytes = sha1("src/test/resources/feuerwehrzufahrt.jpg")
+        val hex = hex(bytes)
         assertEquals("8d0d656f3e383b5641e7e5f9c618520557c910ff", hex)
     }
 }

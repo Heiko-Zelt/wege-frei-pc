@@ -121,10 +121,10 @@ class Photo(private var path: Path): Comparable<Photo> {
     }
 
     fun getToolTipText(): String? {
-        photoFile?.let {
+        photoEntity?.let {
             return it.getToolTipText()
         }
-        photoEntity?.let {
+        photoFile?.let {
             return it.getToolTipText()
         }
         return null
