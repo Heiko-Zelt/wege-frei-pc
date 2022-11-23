@@ -4,10 +4,12 @@ import de.heikozelt.wegefrei.entities.NoticeEntity
 import de.heikozelt.wegefrei.entities.PhotoEntity
 import de.heikozelt.wegefrei.model.VehicleColor
 import de.heikozelt.wegefrei.model.VehicleMakesComboBoxModel
+import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
+import java.nio.file.Paths
 import java.time.ZoneId
 import java.time.ZonedDateTime
 
@@ -19,8 +21,8 @@ internal class DatabaseRepoTest {
      */
     @Test
     fun getPhotoByFilename() {
-        val photo1 = databaseRepo.findPhotoByPath("/tmp/2021-12-31_12-00-00.jpg")
-        val photo2 = databaseRepo.findPhotoByPath("/tmp/2021-12-31_12-00-00.jpg")
+        val photo1 = databaseRepo.findPhotoByPath(Paths.get(dir, filenames[0]))
+        val photo2 = databaseRepo.findPhotoByPath(Paths.get(dir, filenames[0]))
         log.debug("photo1: $photo1")
         log.debug("photo2: $photo2")
         assertNotNull(photo1)
@@ -62,8 +64,8 @@ internal class DatabaseRepoTest {
             }
             assertEquals(2, n.photoEntities.size)
             val paths = n.photoEntities.map { it.path }
-            assertTrue("/tmp/2021-12-31_12-03-00.jpg" in paths)
-            assertTrue("/tmp/2021-12-31_12-04-00.jpg" in paths)
+            assertTrue(Paths.get(dir, filenames[3]).toString() in paths)
+            assertTrue(Paths.get(dir, filenames[4]).toString() in paths)
         }
     }
 
@@ -84,19 +86,21 @@ internal class DatabaseRepoTest {
             }
             assertEquals(0, n.photoEntities.size)
         }
-        val orphan = databaseRepo.findPhotoByPath("/tmp/2021-12-31_12-05-00.jpg")
+        val orphan = databaseRepo.findPhotoByPath(Paths.get(dir, filenames[5]).toString())
         assertNull(orphan)
     }
 
     @Test
     fun deleteNotice() {
+
+
         databaseRepo.deleteNotice(1)
 
         val notice = databaseRepo.findNoticeById(1)
         assertNull(notice)
-        val photo0 = databaseRepo.findPhotoByPath("/tmp/2021-12-31_12-00-00.jpg")
+        val photo0 = databaseRepo.findPhotoByPath(Paths.get(dir, filenames[0]).toString())
         assertNotNull(photo0)
-        val orphan = databaseRepo.findPhotoByPath("/tmp/2021-12-31_12-01-00.jpg")
+        val orphan = databaseRepo.findPhotoByPath(Paths.get(dir, filenames[1]).toString())
         assertNull(orphan)
     }
 
@@ -106,19 +110,24 @@ internal class DatabaseRepoTest {
         private val databaseRepo = DatabaseRepo.fromMemory()
 
         val photos = mutableListOf<PhotoEntity>()
+        val filenames = arrayOf(
+            "dhl1.jpg", "dhl2.jpg", "dhl3.jpg", "dhl4.jpg",
+            "feuerwehrzufahrt1.jpg", "feuerwehrzufahrt2.jpg", "feuerwehrzufahrt3.jpg"
+        )
 
-        @BeforeAll
-        @JvmStatic
+        val dir = Paths.get("src/test/resources").toAbsolutePath().toString()
+
+        @BeforeAll @JvmStatic
         fun inserts() {
             LOG.debug("BeforeAll()")
 
-            for (i in 0 ..5) {
+            for (i in filenames.indices) {
                 val dateTime = ZonedDateTime.of(2021, 12, 31, 12, i, 0, 0, ZoneId.of("CET"))
                 val photo = PhotoEntity(
-                    "/tmp/2021-12-31_12-0$i-00.jpg",
-                    "0123456789ABCDEFGHIJ".toByteArray(),
-                    50.0f + i.toFloat() / 10,
-                    8.0f + i.toFloat() / 10,
+                    Paths.get(dir, filenames[i]).toString(),
+                    null,
+                    50.0 + i.toDouble() / 10,
+                    8.0 + i.toDouble() / 10,
                     dateTime
                 )
                 photos.add(photo)
@@ -130,8 +139,8 @@ internal class DatabaseRepoTest {
                 licensePlate = "DEL ET 0000"
                 vehicleMake = VehicleMakesComboBoxModel.VEHICLE_MAKES[1]
                 color = VehicleColor.COLORS[1].colorName
-                latitude = 50.1f
-                longitude = 8.1f
+                latitude = 50.1
+                longitude = 8.1
                 photoEntities.add(photos[0])
                 photoEntities.add(photos[1])
             }
@@ -143,8 +152,8 @@ internal class DatabaseRepoTest {
                 licensePlate = "KE EP 0001"
                 vehicleMake = VehicleMakesComboBoxModel.VEHICLE_MAKES[2]
                 color = VehicleColor.COLORS[2].colorName
-                latitude = 50.2f
-                longitude = 8.2f
+                latitude = 50.2
+                longitude = 8.2
                 photoEntities.add(photos[0])
                 photoEntities.add(photos[2])
             }
@@ -156,8 +165,8 @@ internal class DatabaseRepoTest {
                 licensePlate = "UPD AT 0002"
                 vehicleMake = VehicleMakesComboBoxModel.VEHICLE_MAKES[3]
                 color = VehicleColor.COLORS[3].colorName
-                latitude = 50.3f
-                longitude = 8.3f
+                latitude = 50.3
+                longitude = 8.3
                 photoEntities.add(photos[3])
             }
             databaseRepo.insertNotice(notice3)
@@ -168,8 +177,8 @@ internal class DatabaseRepoTest {
                 licensePlate = "UPD AT 0002"
                 vehicleMake = VehicleMakesComboBoxModel.VEHICLE_MAKES[3]
                 color = VehicleColor.COLORS[3].colorName
-                latitude = 50.4f
-                longitude = 8.4f
+                latitude = 50.4
+                longitude = 8.4
                 photoEntities.add(photos[5])
             }
             databaseRepo.insertNotice(notice4)
@@ -182,13 +191,18 @@ internal class DatabaseRepoTest {
                     vehicleMake =
                         VehicleMakesComboBoxModel.VEHICLE_MAKES[i % VehicleMakesComboBoxModel.VEHICLE_MAKES.size]
                     color = VehicleColor.COLORS[i % VehicleColor.COLORS.size].colorName
-                    latitude = 49 + i.toFloat() / 11
-                    longitude = 8 + i.toFloat() / 13
+                    latitude = 49 + i.toDouble() / 11
+                    longitude = 8 + i.toDouble() / 13
                 }
                 databaseRepo.insertNotice(notice)
             }
             databaseRepo.logStatistics()
 
+        }
+
+        @AfterAll @JvmStatic
+        fun close_db() {
+            databaseRepo.close()
         }
     }
 }

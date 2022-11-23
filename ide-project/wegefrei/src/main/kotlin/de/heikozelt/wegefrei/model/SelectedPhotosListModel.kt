@@ -114,8 +114,8 @@ class SelectedPhotosListModel(
      * Ein einzelner Ausreißer hat also weniger Gewicht.
      */
     fun getAveragePosition(): GeoPosition? {
-        val latitudes = mutableListOf<Float>()
-        val longitudes = mutableListOf<Float>()
+        val latitudes = mutableListOf<Double>()
+        val longitudes = mutableListOf<Double>()
         selectedPhotos.forEach { photo ->
             photo.getLatitude()?.let { lat ->
                 photo.getLongitude()?.let { lon ->

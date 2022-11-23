@@ -44,14 +44,14 @@ class PhotoEntity(
      * y-Achse, Richtung Norden, z.B. 50.08 für Wiesbaden
      */
     @Column // REAL = A single precision floating point number.
-    var latitude: Float? = null,
+    var latitude: Double? = null,
 
     /**
      * Längengrad der Foto-Metadaten
      * x-Achse, Richtung Osten, z.B. 8.24 für Wiesbaden
      */
     @Column // REAL = A single precision floating point number.
-    var longitude: Float? = null,
+    var longitude: Double? = null,
 
     /**
      * Datum und Uhrzeit in UTC
@@ -109,7 +109,7 @@ class PhotoEntity(
     fun getGeoPosition(): GeoPosition? {
         latitude?.let { lat ->
             longitude?.let { lon ->
-                return GeoPosition(lat.toDouble(), lon.toDouble())
+                return GeoPosition(lat, lon)
             }
 
         }
@@ -193,8 +193,8 @@ class PhotoEntity(
 
         private fun readPhotoMetadata(file: File): PhotoEntity {
             LOG.debug("readPhotoMetadata(file=${file.canonicalPath})")
-            var latitude: Float? = null
-            var longitude: Float? = null
+            var latitude: Double? = null
+            var longitude: Double? = null
             var date: Date? = null
             val metadata = ImageMetadataReader.readMetadata(file)
             LOG.debug("metadata: $metadata")
@@ -204,8 +204,8 @@ class PhotoEntity(
                 val geoLocation: GeoLocation? = gpsDir.geoLocation
                 if (geoLocation != null && !geoLocation.isZero) {
                     LOG.debug("latitude: ${geoLocation.latitude}, longitude: ${geoLocation.longitude}")
-                    latitude = geoLocation.latitude.toFloat()
-                    longitude = geoLocation.longitude.toFloat()
+                    latitude = geoLocation.latitude
+                    longitude = geoLocation.longitude
 
                 }
             }

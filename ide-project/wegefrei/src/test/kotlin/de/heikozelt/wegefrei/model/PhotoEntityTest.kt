@@ -2,6 +2,7 @@ package de.heikozelt.wegefrei.model
 
 import de.heikozelt.wegefrei.DatabaseRepo
 import de.heikozelt.wegefrei.entities.PhotoEntity
+import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.BeforeAll
@@ -65,7 +66,7 @@ class PhotoEntityTest {
             }
         }
 
-        val path = "src/test/resources/feuerwehrzufahrt.jpg"
+        val path = "src/test/resources/feuerwehrzufahrt1.jpg"
         val file = File(path)
         val absoluteStr = file.absolutePath
         val absolutePath = Paths.get(absoluteStr)
@@ -80,7 +81,7 @@ class PhotoEntityTest {
 
     companion object {
         private val dbRepo = DatabaseRepo.fromMemory()
-        private const val relativePath = "src/test/resources/feuerwehrzufahrt.jpg"
+        private const val relativePath = "src/test/resources/feuerwehrzufahrt4.jpg"
         private val file = File(relativePath)
         private val absoluteStr: String = file.absolutePath
         private val absolutePath = Paths.get(absoluteStr)
@@ -88,16 +89,21 @@ class PhotoEntityTest {
         @BeforeAll
         @JvmStatic
         fun initialize_in_memory_database() {
-            val dateTime = ZonedDateTime.of(2022,7,1,18,24,57,0, ZoneId.of("GMT"))
+            val dateTime = ZonedDateTime.of(2022,7,1,18,24,57,0, ZoneId.systemDefault())
             val photoEntity = PhotoEntity(
                 absoluteStr,
                 null,
-                50.07046f,
-                8.24489f,
+                50.07046,
+                8.24489,
                 dateTime,
                 hashSetOf()
             )
             dbRepo.insertPhoto(photoEntity)
+        }
+
+        @AfterAll @JvmStatic
+        fun close_db() {
+            dbRepo.close()
         }
     }
 }

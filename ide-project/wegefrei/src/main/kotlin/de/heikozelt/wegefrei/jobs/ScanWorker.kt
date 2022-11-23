@@ -97,8 +97,8 @@ class ScanWorker(
     }
 
     private fun readPhotoMetadata(file: File): PhotoEntity {
-        var latitude: Float? = null
-        var longitude: Float? = null
+        var latitude: Double? = null
+        var longitude: Double? = null
         var date: Date? = null
         val metadata = ImageMetadataReader.readMetadata(file)
         log.debug("metadata: $metadata")
@@ -108,8 +108,8 @@ class ScanWorker(
             val geoLocation: GeoLocation? = gpsDir.geoLocation
             if(geoLocation != null && !geoLocation.isZero) {
                 log.debug("latitude: ${geoLocation.latitude}, longitude: ${geoLocation.longitude}")
-                latitude = geoLocation.latitude.toFloat()
-                longitude = geoLocation.longitude.toFloat()
+                latitude = geoLocation.latitude
+                longitude = geoLocation.longitude
 
             }
         }

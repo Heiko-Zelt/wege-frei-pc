@@ -28,13 +28,13 @@ class PhotoFile(
      * Breitengrad der Foto-Metadaten
      * y-Achse, Richtung Norden, z.B. 50.08 für Wiesbaden
      */
-    var latitude: Float? = null,
+    var latitude: Double? = null,
 
     /**
      * Längengrad der Foto-Metadaten
      * x-Achse, Richtung Osten, z.B. 8.24 für Wiesbaden
      */
-    var longitude: Float? = null,
+    var longitude: Double? = null,
 
     /**
      * Datum und Uhrzeit in CET oder CEST

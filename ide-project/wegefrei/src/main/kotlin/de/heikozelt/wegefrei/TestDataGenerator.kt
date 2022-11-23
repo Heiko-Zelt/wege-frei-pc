@@ -183,8 +183,8 @@ class TestDataGenerator {
                     licensePlate = "AA XX 00$i"
                     vehicleMake = VEHICLE_MAKES[i % VEHICLE_MAKES.size]
                     color = COLORS[i % COLORS.size].colorName
-                    latitude = 49 + i.toFloat() / 11
-                    longitude = 8 + i.toFloat() / 13
+                    latitude = 49 + i.toDouble() / 11
+                    longitude = 8 + i.toDouble() / 13
                 }
                 repo.insertNotice(noticeEntity)
             }

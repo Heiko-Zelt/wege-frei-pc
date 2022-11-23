@@ -100,7 +100,7 @@ class Photo(private var path: Path): Comparable<Photo> {
         return null
     }
 
-    fun getLatitude(): Float? {
+    fun getLatitude(): Double? {
         photoEntity?.latitude?.let {
             return it
         }
@@ -110,7 +110,7 @@ class Photo(private var path: Path): Comparable<Photo> {
         return null
     }
 
-    fun getLongitude(): Float? {
+    fun getLongitude(): Double? {
         photoEntity?.longitude?.let {
             return it
         }

@@ -41,14 +41,14 @@ class NoticeEntity(
      * Sie sind aber zur eigenen Nutzung sehr sinnvoll.
      */
     @Column
-    var latitude: Float? = null,
+    var latitude: Double? = null,
 
     /**
      * Längengrad des Adress-Markers
      * X-Achse, Richtung Osten, , z.B. 8.24 für Wiesbaden
      */
     @Column
-    var longitude: Float? = null,
+    var longitude: Double? = null,
 
     @Column
     var street: String? = null,
@@ -197,8 +197,8 @@ class NoticeEntity(
     }
 
     fun setGeoPosition(position: GeoPosition?) {
-        latitude = position?.latitude?.toFloat()
-        longitude = position?.longitude?.toFloat()
+        latitude = position?.latitude
+        longitude = position?.longitude
     }
 
     fun getAddress(): String? {

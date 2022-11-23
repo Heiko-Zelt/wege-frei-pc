@@ -24,8 +24,8 @@ class LoadPhotoFileTask(private val photoLoader: PhotoLoader, private val photo:
         val path = photo.getPath()
         val file = File(path.toString())
 
-        var latitude: Float? = null
-        var longitude: Float? = null
+        var latitude: Double? = null
+        var longitude: Double? = null
         var date: Date? = null
         val metadata = ImageMetadataReader.readMetadata(file)
         log.debug("metadata: $metadata")
@@ -35,8 +35,8 @@ class LoadPhotoFileTask(private val photoLoader: PhotoLoader, private val photo:
             val geoLocation: GeoLocation? = gpsDir.geoLocation
             if (geoLocation != null && !geoLocation.isZero) {
                 log.debug("latitude: ${geoLocation.latitude}, longitude: ${geoLocation.longitude}")
-                latitude = geoLocation.latitude.toFloat()
-                longitude = geoLocation.longitude.toFloat()
+                latitude = geoLocation.latitude
+                longitude = geoLocation.longitude
 
             }
         }

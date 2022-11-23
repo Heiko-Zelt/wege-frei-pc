@@ -13,7 +13,7 @@ class PhotoFileTest {
 
     @Test
     fun photo_loading_file() {
-        val path = "src/test/resources/feuerwehrzufahrt.jpg"
+        val path = "src/test/resources/feuerwehrzufahrt1.jpg"
         val file = File(path)
         val absoluteStr = file.absolutePath
         val absolutePath = Paths.get(absoluteStr)
@@ -80,7 +80,7 @@ class PhotoFileTest {
             }
         }
 
-        val path = "src/test/resources/feuerwehrzufahrt.jpg"
+        val path = "src/test/resources/feuerwehrzufahrt1.jpg"
         val file = File(path)
         val absoluteStr = file.absolutePath
         val absolutePath = Paths.get(absoluteStr)

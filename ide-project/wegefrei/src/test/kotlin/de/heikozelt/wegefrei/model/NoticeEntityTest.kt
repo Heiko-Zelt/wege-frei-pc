@@ -31,7 +31,7 @@ class NoticeEntityTest {
             assertNull(vehicleInspectionMonth)
             assertFalse(vehicleAbandoned)
             assertEquals(0, photoEntities.size)
-            assertEquals("xx", getCreatedTimeFormatted())
+            assertEquals("", getCreatedTimeFormatted())
         }
     }
 
@@ -49,8 +49,8 @@ class NoticeEntityTest {
         val hash1 = "0123456789abcdefghij".toByteArray()
         val hash2 = "abcdefghij0123456789".toByteArray()
         val photoEntities = hashSetOf(
-            PhotoEntity("img1.jpeg", hash1,50.111f, 8.111f, photoTime1),
-            PhotoEntity("img2.jpeg", hash2,50.222f, 8.222f, photoTime2)
+            PhotoEntity("img1.jpeg", hash1,50.111, 8.111, photoTime1),
+            PhotoEntity("img2.jpeg", hash2,50.222, 8.222, photoTime2)
         )
 
         val n = NoticeEntity(
@@ -61,8 +61,8 @@ class NoticeEntityTest {
             "WI JA 233",
             "Honda",
             "rot",
-            50.123f,
-            8.123f,
+            50.123,
+            8.123,
             "Wilhelmstraße 13",
             "65193",
             "Wiesbaden",
@@ -86,8 +86,8 @@ class NoticeEntityTest {
             assertEquals("WI JA 233", licensePlate)
             assertEquals("Honda",vehicleMake)
             assertEquals("rot", color)
-            assertEquals(50.123f, latitude)
-            assertEquals(8.123f, longitude)
+            assertEquals(50.123, latitude)
+            assertEquals(8.123, longitude)
             assertEquals("Wilhelmstraße 13", street)
             assertEquals("65193", zipCode)
             assertEquals("Wiesbaden", town)
