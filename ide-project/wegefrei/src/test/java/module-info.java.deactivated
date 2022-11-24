@@ -1,4 +1,4 @@
-module de.heikozelt.wegefrei {
+module wegefrei.test {
     requires java.naming;
     requires kotlin.stdlib.jdk7;
     requires kotlin.stdlib;

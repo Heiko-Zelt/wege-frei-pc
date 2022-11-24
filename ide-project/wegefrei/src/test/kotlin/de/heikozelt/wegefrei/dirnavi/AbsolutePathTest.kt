@@ -12,8 +12,9 @@ class AbsolutePathTest {
         val absolutePath = relativePath.toAbsolutePath()
         val p = AbsolutePath.fromPath(absolutePath)
         val subDirs = p.subDirectories()
-        Assertions.assertEquals(2, subDirs.size)
-        Assertions.assertEquals("kotlin", subDirs[0])
-        Assertions.assertEquals("resources", subDirs[1])
+        Assertions.assertEquals(3, subDirs.size)
+        Assertions.assertEquals("java", subDirs[0])
+        Assertions.assertEquals("kotlin", subDirs[1])
+        Assertions.assertEquals("resources", subDirs[2])
     }
 }

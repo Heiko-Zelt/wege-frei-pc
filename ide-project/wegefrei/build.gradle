@@ -1,6 +1,7 @@
 plugins {
     id 'org.jetbrains.kotlin.jvm' version '1.7.20'
     id 'application'
+    //id 'de.jjohannes.extra-java-module-info' version '0.16'
     //id 'org.graalvm.buildtools.native' version '0.9.18'
 }
 
@@ -22,8 +23,8 @@ dependencies {
     implementation files('libs/jxmapviewer2-2.7-SNAPSHOT.jar')
 
     //implementation 'io.github.microutils:kotlin-logging:3.0.0' no module defined?
-    implementation 'org.slf4j:slf4j-api:2.0.3' // needed by kotlin-logging
-    implementation 'org.slf4j:slf4j-simple:2.0.3' // simple implementation of api
+    implementation 'org.slf4j:slf4j-api:2.0.4' // needed by kotlin-logging
+    implementation 'org.slf4j:slf4j-simple:2.0.4' // simple implementation of api
     implementation 'org.hibernate:hibernate-core:6.1.5.Final'
     implementation 'org.hibernate:hibernate-hikaricp:6.1.5.Final'
     implementation 'com.h2database:h2:2.1.214'
@@ -60,6 +61,40 @@ task copyRuntimeLibs(type: Copy) {
     from configurations.compileClasspath
     into "$buildDir/runtime-libs"
 }
+
+task customFatJar(type: Jar) {
+    description 'Creates one big .jar file with program and libraries, jdbc driver, etc...'
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    manifest {
+        attributes 'Main-Class': 'de.heikozelt.wegefrei.WegeFrei'
+    }
+    from {
+        //configurations.runtimeClasspath.findAll { it.name.endsWith('jar') }.collect { zipTree(it) }
+        configurations.runtimeClasspath.collect {it.isDirectory() ? it : zipTree(it) }
+    }
+    with jar
+}
+
+/*
+extraJavaModuleInfo {
+    module('klaxon-5.6.jar', 'com.beust', '5.6') { exports('com.beust.klaxon') }
+    //module('klaxon-5.6.jar') { exports('com.beust.klaxon') }
+    //automaticModule('klaxon-5.6.jar', 'com.beust')
+    module('commons-logging-1.2.jar', 'commons-logging', '1.2') { exports('commons-logging') }
+
+    //module('mail-1.4.7.jar', 'javax.mail', '1.4.7') { exports('mailx.mail') }
+    automaticModule('mail-1.4.7.jar', 'javax.mail')
+    automaticModule('jxmapviewer2-2.7-SNAPSHOT.jar', 'org.jxmapviewer.jxmapviewer2')
+    //module('metadata-extractor-2.18.0.jar', 'com.drew', '2.18.0') { exports('com.drew', 'com.drew.imaging', ....) }
+    automaticModule('metadata-extractor-2.18.0.jar', 'com.drew')
+    automaticModule('xmpcore-6.1.11.jar', 'com.adobe.xmp')
+    automaticModule('activation-1.1.jar', 'javax.activation')
+    automaticModule('kotlin-stdlib-common-1.7.20.jar', 'org.jetbrains.kotlin')
+    automaticModule('annotations-13.0.jar', 'org.jetbrains')
+    automaticModule('assertj-swing-junit-3.17.1.jar', 'org.assertj.swing')
+    //automaticModule('junit-4.12.jar', 'org.junit')
+}
+*/
 
 // libXi.a, libXrender.a, libfreetype.a is missing -->
 // sudo apt-get install libxi-dev libxrender-dev libfreetype-dev

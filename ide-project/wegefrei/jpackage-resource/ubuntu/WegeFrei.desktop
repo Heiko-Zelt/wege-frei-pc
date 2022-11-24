@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=WegeFrei
+Comment=blah, blah
+Exec=/opt/wegefrei/bin/WegeFrei
+Icon=/opt/wegefrei/lib/WegeFrei.png
+Terminal=false
+Type=Application
+Categories=Unknown
+MimeType=
