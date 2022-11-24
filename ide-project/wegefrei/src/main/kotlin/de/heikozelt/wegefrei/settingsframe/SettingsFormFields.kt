@@ -1,15 +1,15 @@
 package de.heikozelt.wegefrei.settingsframe
 
-import de.heikozelt.wegefrei.mua.EmailUserAgent
 import de.heikozelt.wegefrei.gui.CharPredicateDocFilter
 import de.heikozelt.wegefrei.gui.PatternVerifier
 import de.heikozelt.wegefrei.gui.Styles
 import de.heikozelt.wegefrei.gui.TrimmingTextField
-import de.heikozelt.wegefrei.mua.EmailServerConfig
 import de.heikozelt.wegefrei.json.Settings
 import de.heikozelt.wegefrei.json.Tls
 import de.heikozelt.wegefrei.mua.EmailAddressWithName
 import de.heikozelt.wegefrei.mua.EmailMessage
+import de.heikozelt.wegefrei.mua.EmailServerConfig
+import de.heikozelt.wegefrei.mua.EmailUserAgent
 import org.slf4j.LoggerFactory
 import java.awt.Dimension
 import java.util.*
@@ -20,6 +20,7 @@ import javax.swing.text.AbstractDocument
  * Teil von SettingsFrame.
  * Die vielen Formularfelder passen eventuell nicht alle in den JFrame,
  * deswegen Darstellung in einer ScrollPane.
+ * todo: Zeug_in: männlich/weiblich/divers oder keine Angabe
  */
 class SettingsFormFields : JPanel() {
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)

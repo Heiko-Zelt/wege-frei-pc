@@ -28,6 +28,7 @@ import javax.swing.JOptionPane
  * todo Prio 3: Einstellungen speichern nach erfolgreichem Test?
  * todo Prio 2: Passwort merken, aber wie jederzeit änderbar?
  * Sobald der E-Mail-Versand einmal gescheitert ist, Passwort wieder vergessen.
+ * todo Prio 2: Lesebstätigung (DSN) anfordern
  */
 class EmailUserAgent {
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)

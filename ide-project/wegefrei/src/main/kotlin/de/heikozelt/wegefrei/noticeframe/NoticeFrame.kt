@@ -54,6 +54,7 @@ import kotlin.math.sqrt
  *   <li>Aktivierung der Formularfelder (abhängig von den konkreten Daten)</li>
  * </ol>
  * todo Prio 2: Wenn Fenster geschlossen wird via Close-Button oder bei Änderung der Datenbank, fragen ob Daten gespeichert werden sollen (falls sie geändert wurden)
+ * todo Prio 1: Nur wenn E-Mail absenden bestätigt wurde und die E-Mail tatsächlich erfolgreich gesendet wurde, als gesendet markieren.
  */
 class NoticeFrame(
     private val app: WegeFrei,
@@ -674,7 +675,7 @@ class NoticeFrame(
                 val sb = StringBuilder()
                 sb.append("|  <h1>Anlagen</h1>\n")
                 sb.append("|  <ol>\n")
-                n.photoEntities.forEach { sb.append("|    <li>${it.path} (SHA1: ${it.getHashHex()})</li>\n") }
+                n.photoEntities.forEach { sb.append("|    <li>${it.getFilename()} (SHA1: ${it.getHashHex()})</li>\n") }
                 sb.append("|  </ol>\n")
             }
 

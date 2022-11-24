@@ -6,6 +6,9 @@ import org.slf4j.LoggerFactory
 import java.awt.Insets
 import javax.swing.*
 
+/**
+ * todo Prio 3: Foto-löschen-Button (z.B. unscharf oder Personen abgebildet)
+ */
 open class BasePhotoViewer(
     private val noticeFrame: NoticeFrame,
     private val photo: Photo
