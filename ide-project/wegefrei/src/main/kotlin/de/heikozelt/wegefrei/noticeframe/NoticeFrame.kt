@@ -11,7 +11,6 @@ import de.heikozelt.wegefrei.model.*
 import de.heikozelt.wegefrei.mua.EmailAddressWithName
 import de.heikozelt.wegefrei.mua.EmailAttachment
 import de.heikozelt.wegefrei.mua.EmailMessage
-import de.heikozelt.wegefrei.mua.EmailUserAgent
 import org.jxmapviewer.viewer.GeoPosition
 import org.slf4j.LoggerFactory
 import java.awt.Component
@@ -375,6 +374,7 @@ class NoticeFrame(
                 )
             } else {
                 sendEmail()
+                // todo Prio 1: nur wenn E-Mail tatsächlich erfolgreich gesendet wurde
                 it.sentTime = ZonedDateTime.now()
                 disableFormFields()
                 saveNotice()
@@ -416,9 +416,9 @@ class NoticeFrame(
 
                     // todo Prio 3: Nicht jedes Mal einen neuen User Agent instanziieren
 
-                    val agent = EmailUserAgent()
-                    agent.setEmailServerConfig(setti.emailServerConfig)
-                    agent.sendMailAfterConfirmation(message)
+                    val agent = app.getEmailUserAgent()
+                    //agent.setEmailServerConfig(setti.emailServerConfig)
+                    agent?.sendMailAfterConfirmation(message)
                 }
             }
         }

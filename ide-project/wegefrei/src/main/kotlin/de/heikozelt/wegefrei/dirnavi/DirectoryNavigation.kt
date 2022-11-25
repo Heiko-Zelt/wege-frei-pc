@@ -13,6 +13,7 @@ import javax.swing.border.EmptyBorder
  * todo Prio 1: Nicht im Einstellungen-Menü anzeigen
  * todo Prio 1: Beim allerersten Start (ist null) prüfen, ob USER_HOME/Pictures vorhanden ist, sonst USER_HOME setzen (nicht ~).
  * todo Prio 1: Beim Schließen des Frames/oder der Anwendung, Pfad-Änderungen in Einstellungen speichern
+ * todo Prio 3: Anzeigen, wenn Verzeichnis nicht gefunden wurde und wenn Verzeichnis keine Bilder enthält
  */
 class DirectoryNavigation(private val directoryChangedCallback: (AbsolutePath) -> Unit): JPanel() {
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)

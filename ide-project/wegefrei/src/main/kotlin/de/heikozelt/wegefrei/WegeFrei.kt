@@ -2,6 +2,7 @@ package de.heikozelt.wegefrei
 
 import de.heikozelt.wegefrei.entities.NoticeEntity
 import de.heikozelt.wegefrei.json.Settings
+import de.heikozelt.wegefrei.mua.EmailUserAgent
 import de.heikozelt.wegefrei.noticeframe.NoticeFrame
 import de.heikozelt.wegefrei.noticesframe.NoticesFrame
 import de.heikozelt.wegefrei.scanframe.ScanFrame
@@ -31,6 +32,8 @@ open class WegeFrei(private val settingsRepo: SettingsRepo = SettingsFileRepo())
 
     private var settings: Settings? = null
 
+    private var emailUserAgent: EmailUserAgent? = null
+
     /**
      * Übersichts-Fenster (falls geöffnet sonst null)
      */
@@ -49,9 +52,9 @@ open class WegeFrei(private val settingsRepo: SettingsRepo = SettingsFileRepo())
     init {
         log.debug("initializing")
         val settings = settingsRepo.load()
-
-        //val app = WegeFrei()
         setSettings(settings)
+        emailUserAgent = EmailUserAgent()
+        emailUserAgent?.setEmailServerConfig(settings.emailServerConfig)
     }
 
     /**
@@ -59,6 +62,10 @@ open class WegeFrei(private val settingsRepo: SettingsRepo = SettingsFileRepo())
      */
     fun getSettings(): Settings? {
         return settings
+    }
+
+    fun getEmailUserAgent(): EmailUserAgent? {
+        return emailUserAgent
     }
 
     /**

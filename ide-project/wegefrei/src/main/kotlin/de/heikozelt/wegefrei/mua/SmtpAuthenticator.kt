@@ -11,12 +11,25 @@ class SmtpAuthenticator: Authenticator() {
     private var userName: String? = null
     private var password: String? = null
 
+    /**
+     * remember if the password was accepted last time trying to send an email message
+     */
+    private var passwordAccepted = false
+
     public override fun getPasswordAuthentication(): PasswordAuthentication {
         return PasswordAuthentication(userName, password)
     }
 
     fun setUserName(userName: String) {
         this.userName = userName
+    }
+
+    fun maybeAskForPassword(): Boolean {
+        return if(passwordAccepted) {
+            true
+        } else {
+            askForPassword()
+        }
     }
 
     /**
@@ -36,4 +49,9 @@ class SmtpAuthenticator: Authenticator() {
         password = panel.getPassword()
         return true
     }
+
+    fun passwordFeedback(accepted: Boolean) {
+        passwordAccepted = accepted
+    }
+
 }
