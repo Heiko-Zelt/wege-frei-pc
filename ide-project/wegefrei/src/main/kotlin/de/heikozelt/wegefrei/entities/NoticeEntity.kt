@@ -140,6 +140,7 @@ class NoticeEntity(
     )
     var photoEntities: MutableSet<PhotoEntity> = mutableSetOf(),
 
+    // todo Prio 1: Value too long for column "NOTE CHARACTER VARYING(255)"
     @Column
     var note: String? = null
 ) {

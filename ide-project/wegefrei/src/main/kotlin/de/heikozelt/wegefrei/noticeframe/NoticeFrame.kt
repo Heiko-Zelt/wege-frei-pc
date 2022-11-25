@@ -660,12 +660,13 @@ class NoticeFrame(
             val offenseRow = tableRow("Verstoß", n.offense)
             val circumstancesRow = tableRowHtmlValue("Umstände", n.getCircumstancesHtml())
             val inspectionDateRow = tableRow("HU-Fälligkeit", n.getInspectionMonthYear())
+            // todo: Wochentag einfügen, wegen Werktags-Beschränkungen
             val observationTimeRow = tableRow("Beobachtungszeit", n.getObservationTimeFormatted())
             val observationDurationRow = tableRow("Beobachtungsdauer", n.getDurationFormatted())
             val noteRow = tableRow("Hinweis", n.note)
 
             val nameRow = tableRow("Name", w.getFullName())
-            val witnessAddressRow = tableRow("Name", w.getAddress())
+            val witnessAddressRow = tableRow("Adresse", w.getAddress())
             val witnessEmailRow = tableRow("E-Mail", w.emailAddress)
             val telephoneRow = tableRow("Telefon", w.telephoneNumber)
 
