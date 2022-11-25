@@ -6,7 +6,7 @@ import de.heikozelt.wegefrei.gui.Styles
 import de.heikozelt.wegefrei.gui.TrimmingTextField
 import de.heikozelt.wegefrei.json.Settings
 import de.heikozelt.wegefrei.json.Tls
-import de.heikozelt.wegefrei.mua.EmailAddressWithName
+import de.heikozelt.wegefrei.mua.EmailAddressEntity
 import de.heikozelt.wegefrei.mua.EmailMessage
 import de.heikozelt.wegefrei.mua.EmailServerConfig
 import de.heikozelt.wegefrei.mua.EmailUserAgent
@@ -292,8 +292,8 @@ class SettingsFormFields : JPanel() {
         val fullName = "${givenNameTextField.text.trim()} ${surnameTextField.text.trim()}"
         val senderName = fullName.ifBlank { TEST_DEFAULT_MAIL_FROM_NAME }
         val senderEmailAddress = emailAddressTextField.text.trim()
-        val from = EmailAddressWithName(senderEmailAddress, senderName)
-        val tos = TreeSet<EmailAddressWithName>()
+        val from = EmailAddressEntity(senderEmailAddress, senderName)
+        val tos = TreeSet<EmailAddressEntity>()
         tos.add(from)
 
         val emailServerConfig = EmailServerConfig(

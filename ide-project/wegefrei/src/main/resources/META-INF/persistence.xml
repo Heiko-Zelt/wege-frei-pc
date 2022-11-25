@@ -8,6 +8,7 @@
         <!-- Entity classes -->
         <class>de.heikozelt.wegefrei.entities.PhotoEntity</class>
         <class>de.heikozelt.wegefrei.entities.NoticeEntity</class>
+        <class>de.heikozelt.wegefrei.mua.EmailAddressEntity</class>
         <properties>
             <property name="jakarta.persistence.jdbc.driver" value="org.h2.Driver" />
             <!--property name="jakarta.persistence.jdbc.url" value="jdbc:h2:file:~/wege_frei_v1" /-->

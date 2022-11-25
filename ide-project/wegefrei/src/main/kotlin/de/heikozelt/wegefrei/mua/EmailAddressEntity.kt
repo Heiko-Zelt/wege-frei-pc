@@ -1,11 +1,22 @@
 package de.heikozelt.wegefrei.mua
 
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.Id
+import jakarta.persistence.Table
 import javax.mail.internet.InternetAddress
 
 /**
  * like javax.mail.internet.InternetAddress but less complicated
  */
-data class EmailAddressWithName(val address: String, val name: String? = null): Comparable<EmailAddressWithName> {
+@Entity
+@Table(name = "EMAIL_ADDRESSES")
+data class EmailAddressEntity(
+    @Id
+    val address: String = "",
+    @Column
+    val name: String? = null
+): Comparable<EmailAddressEntity> {
     fun asInternetAddress(): InternetAddress {
         return InternetAddress(address, name) // address, personal
     }
@@ -18,7 +29,7 @@ data class EmailAddressWithName(val address: String, val name: String? = null): 
         }
     }
 
-    override fun compareTo(other: EmailAddressWithName): Int {
+    override fun compareTo(other: EmailAddressEntity): Int {
         return asText().compareTo(other.asText())
     }
 }

@@ -8,10 +8,10 @@ import java.util.*
  * todo Prio 4: Sendezeitpunkt hinzufügen
  */
 data class EmailMessage(
-    val from: EmailAddressWithName,
-    val tos: TreeSet<EmailAddressWithName> = TreeSet<EmailAddressWithName>(),
+    val from: EmailAddressEntity,
+    val tos: TreeSet<EmailAddressEntity> = TreeSet<EmailAddressEntity>(),
     val subject: String,
     val coverLetter: String,
-    val ccs: TreeSet<EmailAddressWithName> = TreeSet<EmailAddressWithName>(),
+    val ccs: TreeSet<EmailAddressEntity> = TreeSet<EmailAddressEntity>(),
     val attachments: LinkedList<EmailAttachment> = LinkedList<EmailAttachment>()
 )
