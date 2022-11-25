@@ -9,6 +9,7 @@ import de.heikozelt.wegefrei.scanframe.ScanFrame
 import de.heikozelt.wegefrei.settingsframe.SettingsFrame
 import org.slf4j.LoggerFactory
 import java.awt.EventQueue
+import javax.swing.JFrame
 import javax.swing.SwingUtilities
 import javax.swing.UIManager
 
@@ -43,6 +44,11 @@ open class WegeFrei(private val settingsRepo: SettingsRepo = SettingsFileRepo())
      * reference to the Settings-Window, if the window is shown on screen otherwise null
      */
     private var settingsFrame: SettingsFrame? = null
+
+    /**
+     * reference to the address book window, if the window is shown on screen otherwise null
+     */
+    private var addressBookFrame: JFrame? = null
 
     /**
      * einzelne Meldungs-Fenster (neue oder bestehende Meldung bearbeiten)
@@ -164,6 +170,14 @@ open class WegeFrei(private val settingsRepo: SettingsRepo = SettingsFileRepo())
             settingsFrame?.setSettings(settings?.clone())
         } else {
             settingsFrame?.toFront()
+        }
+    }
+
+    fun openAddressBook() {
+        if(addressBookFrame == null) {
+            log.debug("open address book")
+        } else {
+            // todo bring to foreground
         }
     }
 

@@ -35,8 +35,8 @@ class NoticesFrame(private val app: WegeFrei) : JFrame("Meldungen - Wege frei!")
         val scrollPane = JScrollPane(noticesTable)
         val newButton = JButton("neue Meldung erfassen")
         newButton.addActionListener { app.openNoticeFrame() }
-        val scanButton = JButton("Scan")
-        scanButton.addActionListener { app.scanForNewPhotos() }
+        val addressBookButton = JButton("Adressbuch")
+        addressBookButton.addActionListener { app.openAddressBook() }
         val settingsButton = JButton("Einstellungen")
         settingsButton.addActionListener{ app.openSettingsFrame() }
         val helpButton = JButton("Hilfe")
@@ -58,7 +58,7 @@ class NoticesFrame(private val app: WegeFrei) : JFrame("Meldungen - Wege frei!")
                             Int.MAX_VALUE
                         )
                         .addComponent(newButton)
-                        .addComponent(scanButton)
+                        .addComponent(addressBookButton)
                         .addComponent(settingsButton)
                         .addComponent(helpButton)
                 )
@@ -70,7 +70,7 @@ class NoticesFrame(private val app: WegeFrei) : JFrame("Meldungen - Wege frei!")
                 .addGroup(
                     lay.createParallelGroup()
                         .addComponent(newButton)
-                        .addComponent(scanButton)
+                        .addComponent(addressBookButton)
                         .addComponent(settingsButton)
                         .addComponent(helpButton)
                 )
