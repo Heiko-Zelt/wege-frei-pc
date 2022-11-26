@@ -78,6 +78,7 @@ class NoticeEntityTest {
             12,
             false,
             "verwarngeldstelle@notice-j-unit-test.de",
+            "Verwarngeldstelle J-Unit-Test",
             photoEntities
         )
         n.apply {
@@ -98,7 +99,7 @@ class NoticeEntityTest {
             assertEquals(2010, vehicleInspectionYear)
             assertEquals(12, vehicleInspectionMonth)
             assertTrue(vehicleAbandoned)
-            assertEquals("verwarngeldstelle@notice-j-unit-test.de", recipient)
+            assertEquals("verwarngeldstelle@notice-j-unit-test.de", recipientEmailAddress)
             assertEquals(2, photoEntities.size)
         }
     }

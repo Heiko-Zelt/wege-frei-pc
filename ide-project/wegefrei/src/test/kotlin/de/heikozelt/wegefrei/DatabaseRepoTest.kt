@@ -92,8 +92,6 @@ internal class DatabaseRepoTest {
 
     @Test
     fun deleteNotice() {
-
-
         databaseRepo.deleteNotice(1)
 
         val notice = databaseRepo.findNoticeById(1)

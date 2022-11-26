@@ -9,7 +9,9 @@ import java.awt.event.KeyEvent
 import javax.swing.JComboBox
 import javax.swing.text.JTextComponent
 
-// todo Synonyme: D = BRD = Deutschland = Germany
+// todo Prio 4: Synonyme: D = BRD = Deutschland = Germany
+// todo Prio 2: maximal 3 Buchstaben bei der Eingabe erlauben (sonst meckert die Datenbank)
+// außerdem beugt es Verwechslungen mit Kfz-Kennzeichen vor
 class CountryComboBox: JComboBox<CountrySymbol?>() {
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
     private val mod = CountryComboBoxModel()

@@ -2,6 +2,7 @@ package de.heikozelt.wegefrei
 
 import de.heikozelt.wegefrei.entities.NoticeEntity
 import de.heikozelt.wegefrei.entities.PhotoEntity
+import de.heikozelt.wegefrei.mua.EmailAddressEntity
 import jakarta.persistence.EntityManager
 import jakarta.persistence.Persistence
 import org.hibernate.Session
@@ -89,7 +90,7 @@ class DatabaseRepo(jdbcUrl: String) {
      * neueste (mit der höchsten ID) zuerst
      */
     fun findAllNoticesDesc(): List<NoticeEntity>? {
-        log.debug("getAllNoticesDesc()")
+        log.debug("findAllNoticesDesc()")
         //Thread.sleep(5000) Simulation langsamer Datenbank
         val resultList: List<NoticeEntity>?
         val session = sessionFactory.openSession()
@@ -108,7 +109,7 @@ class DatabaseRepo(jdbcUrl: String) {
     }
 
     fun findAllNoticesIdsDesc(): List<Int>? {
-        log.debug("getAllNoticesIds()")
+        log.debug("findAllNoticesIdsDesc()")
         //Thread.sleep(5000) Simulation langsamer Datenbank
         val resultList: List<Int>?
         val session = sessionFactory.openSession()
@@ -124,6 +125,39 @@ class DatabaseRepo(jdbcUrl: String) {
         }
         log.debug("got result. size=${resultList?.size}")
         return resultList
+    }
+
+    fun findAllEmailAddresses(): List<EmailAddressEntity>? {
+        log.debug("findAllEmailAddresses()")
+        //Thread.sleep(5000) Simulation langsamer Datenbank
+        val resultList: List<EmailAddressEntity>?
+        val session = sessionFactory.openSession()
+        log.debug("session: $session")
+        val tx = session.beginTransaction()
+        try {
+            val jpql = "SELECT e FROM EmailAddressEntity e ORDER BY e.address"
+            resultList = session.createQuery(jpql, EmailAddressEntity::class.java).resultList
+            tx.commit()
+        } finally {
+            if (tx.isActive) tx.rollback()
+            if (session.isOpen) session.close()
+        }
+        log.debug("got result. size=${resultList?.size}")
+        return resultList
+    }
+
+    fun insertEmailAddress(emailAddressEntity: EmailAddressEntity) {
+        log.debug("insertEmailAddress(${emailAddressEntity.asText()})")
+        val session = sessionFactory.openSession()
+        log.debug("session: $session")
+        val tx = session.beginTransaction()
+        try {
+            session.persist(emailAddressEntity)
+            tx.commit()
+        } finally {
+            if (tx.isActive) tx.rollback()
+            if (session.isOpen) session.close()
+        }
     }
 
     fun insertPhoto(photoEntity: PhotoEntity) {

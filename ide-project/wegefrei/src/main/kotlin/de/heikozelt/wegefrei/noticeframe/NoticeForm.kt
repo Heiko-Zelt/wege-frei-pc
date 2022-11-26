@@ -1,5 +1,6 @@
 package de.heikozelt.wegefrei.noticeframe
 
+import de.heikozelt.wegefrei.DatabaseRepo
 import de.heikozelt.wegefrei.entities.NoticeEntity
 import de.heikozelt.wegefrei.model.SelectedPhotosListModel
 import org.slf4j.LoggerFactory
@@ -10,11 +11,12 @@ import javax.swing.*
  */
 class NoticeForm(
     private val noticeFrame: NoticeFrame,
-    selectedPhotosListModel: SelectedPhotosListModel
+    selectedPhotosListModel: SelectedPhotosListModel,
+    dbRepo: DatabaseRepo
 ) : JPanel() {
 
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
-    private val noticeFormFields = NoticeFormFields(noticeFrame, selectedPhotosListModel)
+    private val noticeFormFields = NoticeFormFields(noticeFrame, selectedPhotosListModel, dbRepo)
     private var noticeFormFieldsScrollPane = JScrollPane(noticeFormFields)
     private val deleteButton = JButton("Löschen")
 

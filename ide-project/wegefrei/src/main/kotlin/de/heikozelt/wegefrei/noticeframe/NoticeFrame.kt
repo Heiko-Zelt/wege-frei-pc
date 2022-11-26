@@ -80,7 +80,7 @@ class NoticeFrame(
     private val selectedPhotosListCellRenderer = SelectedPhotosListCellRenderer()
     private var selectedPhotosList = JList(selectedPhotosListModel)
     private var selectedPhotosScrollPane = JScrollPane(selectedPhotosList)
-    private var noticeForm = NoticeForm(this, selectedPhotosListModel)
+    private var noticeForm = NoticeForm(this, selectedPhotosListModel, dbRepo)
 
     // Split-Panes:
     private var topSplitPane = JSplitPane(JSplitPane.VERTICAL_SPLIT, browserPanel, selectedPhotosScrollPane)
@@ -365,7 +365,7 @@ class NoticeFrame(
     fun sendNotice() {
         noticeEntity = getNotice()
         noticeEntity?.let {
-            if (it.recipient == null) {
+            if (it.recipientEmailAddress == null) {
                 JOptionPane.showMessageDialog(
                     null,
                     "Kein Empfänger angegeben.",
@@ -395,7 +395,7 @@ class NoticeFrame(
 
         app.getSettings()?.let { setti ->
             noticeEntity?.let { n ->
-                n.recipient?.let { reci ->
+                n.recipientEmailAddress?.let { reci ->
                     val from = EmailAddressEntity(setti.witness.emailAddress, setti.witness.getFullName())
                     // todo Prio 3: mehrere Empfänger erlauben
                     val to = EmailAddressEntity(reci)

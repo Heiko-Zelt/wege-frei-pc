@@ -11,7 +11,7 @@ import javax.mail.internet.InternetAddress
  */
 @Entity
 @Table(name = "EMAIL_ADDRESSES")
-data class EmailAddressEntity(
+class EmailAddressEntity(
     @Id
     val address: String = "",
     @Column
@@ -21,11 +21,30 @@ data class EmailAddressEntity(
         return InternetAddress(address, name) // address, personal
     }
 
+    /**
+     * für RecipientComboBox-Editor
+     */
+    override fun toString(): String {
+        return asShortText()
+    }
+
     fun asText(): String {
-        return if(name.isNullOrBlank()) {
-            "<${address}>"
+        return if(address.isBlank()) {
+            return ""
         } else {
-            "${name} <${address}>"
+            if(name.isNullOrBlank()) {
+                "<${address}>"
+            } else {
+                "${name} <${address}>"
+            }
+        }
+    }
+
+    fun asShortText(): String {
+        return if(name.isNullOrBlank()) {
+             address
+        } else {
+             name
         }
     }
 

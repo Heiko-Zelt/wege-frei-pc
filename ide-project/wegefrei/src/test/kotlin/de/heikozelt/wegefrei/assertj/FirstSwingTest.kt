@@ -41,9 +41,9 @@ class FirstSwingTest {
     }
 
     @Test
-    fun click_on_scan_button_nothing_happens_in_gui() {
+    fun click_on_address_button_nothing_happens_in_gui() {
         assertNotNull(noticesWindow)
-        noticesWindow?.button(withText("Scan"))?.click()
+        noticesWindow?.button(withText("Adressbuch"))?.click()
     }
 
     @AfterEach

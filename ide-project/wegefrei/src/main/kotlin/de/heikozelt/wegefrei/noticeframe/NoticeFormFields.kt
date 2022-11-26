@@ -1,5 +1,6 @@
 package de.heikozelt.wegefrei.noticeframe
 
+import de.heikozelt.wegefrei.DatabaseRepo
 import de.heikozelt.wegefrei.entities.NoticeEntity
 import de.heikozelt.wegefrei.gui.*
 import de.heikozelt.wegefrei.maps.MiniMap
@@ -32,7 +33,8 @@ import javax.swing.text.AbstractDocument
  */
 class NoticeFormFields(
     private val noticeFrame: NoticeFrame,
-    private val selectedPhotosListModel: SelectedPhotosListModel
+    private val selectedPhotosListModel: SelectedPhotosListModel,
+    private val dbRepo: DatabaseRepo
 ) : JPanel(), ListDataListener /* SelectedPhotosObserver */ {
 
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
@@ -69,7 +71,7 @@ class NoticeFormFields(
     // Idealfall: Addresse wird automatisch eingetragen, Ausnahmefall Benutzer wählt aus Adressbuch
     // todo Prio 3: Auswahl des Empfängers aus Addressbuch (Button öffnet "AddressChooser")
     // todo Prio 3: eine Adresse aus der Datenbank anhand der GeoPosition vorschlagen
-    private val recipientTextField = TrimmingTextField(30)
+    private val recipientComboBox = RecipientComboBox(dbRepo)
     private val noteTextArea = JTextArea(2, 40)
 
     private var noticeEntity: NoticeEntity? = null
@@ -149,8 +151,8 @@ class NoticeFormFields(
         inspectionYearTextField.isVisible = false
 
         val recipientLabel = JLabel("<html>Empfänger:<sup>*</sup></html>")
-        recipientTextField.toolTipText = "z.B. verwarngeldstelle@wiesbaden.de"
-        recipientTextField.inputVerifier = PatternVerifier.eMailVerifier
+        recipientComboBox.toolTipText = "z.B. verwarngeldstelle@wiesbaden.de"
+        recipientComboBox.inputVerifier = PatternVerifier.eMailVerifier
         val noteLabel = JLabel("Hinweis:")
         noteTextArea.toolTipText = "z.B. Behinderung / Gefährdung beschreiben"
 
@@ -213,7 +215,7 @@ class NoticeFormFields(
                                         .addComponent(monthYearSeparatorLabel)
                                         .addComponent(inspectionYearTextField)
                                 )
-                                .addComponent(recipientTextField)
+                                .addComponent(recipientComboBox)
                                 .addComponent(noteTextArea)
                         )
                 )
@@ -295,7 +297,7 @@ class NoticeFormFields(
                 )
                 .addGroup(
                     lay.createParallelGroup(GroupLayout.Alignment.CENTER)
-                        .addComponent(recipientLabel).addComponent(recipientTextField)
+                        .addComponent(recipientLabel).addComponent(recipientComboBox)
                 )
                 .addGroup(
                     lay.createParallelGroup(GroupLayout.Alignment.CENTER)
@@ -350,7 +352,8 @@ class NoticeFormFields(
         inspectionMonthTextField.text = blankOrByteString(noticeEntity.vehicleInspectionMonth)
         abandonedCheckBox.isSelected = noticeEntity.vehicleAbandoned
         warningLightsCheckBox.isSelected = noticeEntity.warningLights
-        recipientTextField.text = noticeEntity.recipient
+        recipientComboBox.loadData()
+        recipientComboBox.setValue(noticeEntity.getRecipient())
         noteTextArea.text = noticeEntity.note
 
         enableOrDisableEditing()
@@ -421,7 +424,11 @@ class NoticeFormFields(
         }
         n.vehicleAbandoned = abandonedCheckBox.isSelected
         n.warningLights = warningLightsCheckBox.isSelected
-        n.recipient = trimmedOrNull(recipientTextField.text)
+
+        val recipient = recipientComboBox.getValue()
+        n.recipientEmailAddress = recipient?.address
+        n.recipientName = recipient?.name
+
         n.note = trimmedOrNull(noteTextArea.text)
         return n
     }
@@ -471,7 +478,7 @@ class NoticeFormFields(
         inspectionYearTextField.isEnabled = enab
         inspectionMonthTextField.isEnabled = enab
         abandonedCheckBox.isEnabled = enab
-        recipientTextField.isEnabled = enab
+        recipientComboBox.isEnabled = enab
         noteTextArea.isEnabled = enab
     }
 

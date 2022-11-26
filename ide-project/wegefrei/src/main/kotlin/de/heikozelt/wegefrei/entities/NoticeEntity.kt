@@ -2,6 +2,7 @@ package de.heikozelt.wegefrei.entities
 
 import de.heikozelt.wegefrei.model.CountrySymbol
 import de.heikozelt.wegefrei.model.NoticeState
+import de.heikozelt.wegefrei.mua.EmailAddressEntity
 import jakarta.persistence.*
 import org.jxmapviewer.viewer.GeoPosition
 import java.time.ZonedDateTime
@@ -130,7 +131,10 @@ class NoticeEntity(
     var environmentalStickerMissing: Boolean = false,
 
     @Column
-    var recipient: String? = null,
+    var recipientEmailAddress: String? = null,
+
+    @Column
+    var recipientName: String? = null,
 
     @ManyToMany //(cascade = [CascadeType.MERGE])
     @JoinTable(
@@ -251,6 +255,13 @@ class NoticeEntity(
         }
     }
 
+    fun getRecipient(): EmailAddressEntity {
+        recipientEmailAddress?.let {
+            return EmailAddressEntity(it, recipientName)
+        }
+        return EmailAddressEntity("", recipientName)
+    }
+
     /**
      * Sind alle Pflichtfelder ausgefüllt?
      * (Zwischenspeichern geht immer,
@@ -262,7 +273,7 @@ class NoticeEntity(
             else -> vehicleInspectionMonth != null && vehicleInspectionYear != null
         }
         return offense != null && isVehicleInspectionComplete && licensePlate != null && street != null
-                && zipCode != null && town != null && observationTime != null && recipient != null
+                && zipCode != null && town != null && observationTime != null && recipientEmailAddress != null
                 && photoEntities.isNotEmpty()
     }
 
