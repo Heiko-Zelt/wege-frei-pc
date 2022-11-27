@@ -1,15 +1,15 @@
 package de.heikozelt.wegefrei
 
+import de.heikozelt.wegefrei.email.addressbook.AddressBookFrame
+import de.heikozelt.wegefrei.email.useragent.EmailUserAgent
 import de.heikozelt.wegefrei.entities.NoticeEntity
 import de.heikozelt.wegefrei.json.Settings
-import de.heikozelt.wegefrei.mua.EmailUserAgent
 import de.heikozelt.wegefrei.noticeframe.NoticeFrame
 import de.heikozelt.wegefrei.noticesframe.NoticesFrame
 import de.heikozelt.wegefrei.scanframe.ScanFrame
 import de.heikozelt.wegefrei.settingsframe.SettingsFrame
 import org.slf4j.LoggerFactory
 import java.awt.EventQueue
-import javax.swing.JFrame
 import javax.swing.SwingUtilities
 import javax.swing.UIManager
 
@@ -48,7 +48,7 @@ open class WegeFrei(private val settingsRepo: SettingsRepo = SettingsFileRepo())
     /**
      * reference to the address book window, if the window is shown on screen otherwise null
      */
-    private var addressBookFrame: JFrame? = null
+    private var addressBookFrame: AddressBookFrame? = null
 
     /**
      * einzelne Meldungs-Fenster (neue oder bestehende Meldung bearbeiten)
@@ -176,8 +176,12 @@ open class WegeFrei(private val settingsRepo: SettingsRepo = SettingsFileRepo())
     fun openAddressBook() {
         if(addressBookFrame == null) {
             log.debug("open address book")
+            databaseRepo?.let {
+                addressBookFrame = AddressBookFrame(this, it)
+                addressBookFrame?.loadAddresses()
+            }
         } else {
-            // todo bring to foreground
+            addressBookFrame?.toFront()
         }
     }
 
@@ -186,6 +190,13 @@ open class WegeFrei(private val settingsRepo: SettingsRepo = SettingsFileRepo())
      */
     fun settingsFrameClosed() {
         this.settingsFrame = null
+    }
+
+    /**
+     * must be called, when address book frame is closed
+     */
+    fun addressBookFrameClosed() {
+        this.addressBookFrame = null
     }
 
     /**

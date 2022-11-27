@@ -1,4 +1,4 @@
-package de.heikozelt.wegefrei.mua
+package de.heikozelt.wegefrei.email.useragent
 
 import java.nio.file.Path
 import javax.activation.DataHandler

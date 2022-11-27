@@ -1,4 +1,4 @@
-package de.heikozelt.wegefrei.mua
+package de.heikozelt.wegefrei.email.useragent
 
 import de.heikozelt.wegefrei.json.Tls
 import org.slf4j.LoggerFactory

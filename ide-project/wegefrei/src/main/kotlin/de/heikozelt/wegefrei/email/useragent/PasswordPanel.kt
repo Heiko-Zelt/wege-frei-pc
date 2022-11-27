@@ -1,4 +1,4 @@
-package de.heikozelt.wegefrei.mua
+package de.heikozelt.wegefrei.email.useragent
 
 import javax.swing.JLabel
 import javax.swing.JPanel

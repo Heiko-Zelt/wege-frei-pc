@@ -1,4 +1,4 @@
-package de.heikozelt.wegefrei.mua
+package de.heikozelt.wegefrei.email
 
 import jakarta.persistence.Column
 import jakarta.persistence.Entity

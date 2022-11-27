@@ -1,6 +1,6 @@
 package de.heikozelt.wegefrei.json
 
-import de.heikozelt.wegefrei.mua.EmailServerConfig
+import de.heikozelt.wegefrei.email.useragent.EmailServerConfig
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 

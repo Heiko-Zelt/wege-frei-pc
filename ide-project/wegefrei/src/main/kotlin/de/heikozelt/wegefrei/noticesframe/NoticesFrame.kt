@@ -2,7 +2,6 @@ package de.heikozelt.wegefrei.noticesframe
 
 import de.heikozelt.wegefrei.WegeFrei
 import de.heikozelt.wegefrei.entities.NoticeEntity
-import de.heikozelt.wegefrei.model.NoticesTableModel
 import org.slf4j.LoggerFactory
 import java.awt.Dimension
 import javax.swing.*

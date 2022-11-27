@@ -1,9 +1,7 @@
-package de.heikozelt.wegefrei.noticeframe
+package de.heikozelt.wegefrei.email.combobox
 
 import de.heikozelt.wegefrei.DatabaseRepo
-import de.heikozelt.wegefrei.gui.RecipientListCellRenderer
-import de.heikozelt.wegefrei.model.RecipientComboBoxModel
-import de.heikozelt.wegefrei.mua.EmailAddressEntity
+import de.heikozelt.wegefrei.email.EmailAddressEntity
 import org.slf4j.LoggerFactory
 import java.awt.event.KeyAdapter
 import java.awt.event.KeyEvent

@@ -62,7 +62,11 @@ open class BaseMap(
         return Point(x, y)
     }
 
-    // instead of overlayPainter
+    /**
+     * todo Prio 1: fix bug NullPointerException
+     * 2022-11-26 20:46:38:670 [AWT-EventQueue-0] DEBUG de.heikozelt.wegefrei.maps.MiniMap - paint()
+     * Exception in thread "AWT-EventQueue-0" java.lang.NullPointerException: Cannot read field "next" because "this.next" is null
+     */
     override fun paint(g: Graphics) {
         log.debug("paint()")
         for (photoMarker in photoMarkers) {

@@ -8,9 +8,9 @@ import de.heikozelt.wegefrei.jobs.AddressWorker
 import de.heikozelt.wegefrei.json.Witness
 import de.heikozelt.wegefrei.maps.MaxiMapForm
 import de.heikozelt.wegefrei.model.*
-import de.heikozelt.wegefrei.mua.EmailAddressEntity
-import de.heikozelt.wegefrei.mua.EmailAttachment
-import de.heikozelt.wegefrei.mua.EmailMessage
+import de.heikozelt.wegefrei.email.EmailAddressEntity
+import de.heikozelt.wegefrei.email.useragent.EmailAttachment
+import de.heikozelt.wegefrei.email.useragent.EmailMessage
 import org.jxmapviewer.viewer.GeoPosition
 import org.slf4j.LoggerFactory
 import java.awt.Component
@@ -398,7 +398,7 @@ class NoticeFrame(
                 n.recipientEmailAddress?.let { reci ->
                     val from = EmailAddressEntity(setti.witness.emailAddress, setti.witness.getFullName())
                     // todo Prio 3: mehrere Empfänger erlauben
-                    val to = EmailAddressEntity(reci)
+                    val to = n.getRecipient()
                     val tos = TreeSet<EmailAddressEntity>()
                     tos.add(to)
                     var subject = "Anzeige"

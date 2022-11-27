@@ -1,4 +1,4 @@
-package de.heikozelt.wegefrei.mua
+package de.heikozelt.wegefrei.email.useragent
 
 import org.slf4j.LoggerFactory
 import java.awt.Dimension

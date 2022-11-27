@@ -2,7 +2,7 @@ package de.heikozelt.wegefrei
 
 import de.heikozelt.wegefrei.entities.NoticeEntity
 import de.heikozelt.wegefrei.entities.PhotoEntity
-import de.heikozelt.wegefrei.mua.EmailAddressEntity
+import de.heikozelt.wegefrei.email.EmailAddressEntity
 import jakarta.persistence.EntityManager
 import jakarta.persistence.Persistence
 import org.hibernate.Session

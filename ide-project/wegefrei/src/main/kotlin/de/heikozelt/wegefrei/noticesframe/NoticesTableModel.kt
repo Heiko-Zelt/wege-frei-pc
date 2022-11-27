@@ -1,7 +1,9 @@
-package de.heikozelt.wegefrei.model
+package de.heikozelt.wegefrei.noticesframe
 
 import de.heikozelt.wegefrei.DatabaseRepo
 import de.heikozelt.wegefrei.entities.NoticeEntity
+import de.heikozelt.wegefrei.model.LeastRecentlyUsedCache
+import de.heikozelt.wegefrei.model.VehicleColor
 import org.slf4j.LoggerFactory
 import java.awt.EventQueue
 import java.util.concurrent.Callable
@@ -155,7 +157,7 @@ class NoticesTableModel : AbstractTableModel() {
             6 -> notice.getObservationTimeFormatted()
             7 -> notice.photoEntities.size
             8 -> notice.getState()
-            else -> IndexOutOfBoundsException()
+            else -> throw IndexOutOfBoundsException()
         }
     }
 

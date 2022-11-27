@@ -1,7 +1,7 @@
-package de.heikozelt.wegefrei.model
+package de.heikozelt.wegefrei.email.combobox
 
 import de.heikozelt.wegefrei.DatabaseRepo
-import de.heikozelt.wegefrei.mua.EmailAddressEntity
+import de.heikozelt.wegefrei.email.EmailAddressEntity
 import org.slf4j.LoggerFactory
 import java.lang.Math.min
 import javax.swing.DefaultComboBoxModel

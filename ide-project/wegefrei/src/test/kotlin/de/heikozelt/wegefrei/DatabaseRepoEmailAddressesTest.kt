@@ -1,6 +1,6 @@
 package de.heikozelt.wegefrei
 
-import de.heikozelt.wegefrei.mua.EmailAddressEntity
+import de.heikozelt.wegefrei.email.EmailAddressEntity
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull

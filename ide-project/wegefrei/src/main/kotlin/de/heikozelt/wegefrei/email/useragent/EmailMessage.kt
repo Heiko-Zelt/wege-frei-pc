@@ -1,5 +1,6 @@
-package de.heikozelt.wegefrei.mua
+package de.heikozelt.wegefrei.email.useragent
 
+import de.heikozelt.wegefrei.email.EmailAddressEntity
 import java.util.*
 
 /**

@@ -1,7 +1,7 @@
 package de.heikozelt.wegefrei.json
 
 import com.beust.klaxon.Json
-import de.heikozelt.wegefrei.mua.EmailServerConfig
+import de.heikozelt.wegefrei.email.useragent.EmailServerConfig
 import org.slf4j.LoggerFactory
 import java.nio.file.Path
 import java.nio.file.Paths

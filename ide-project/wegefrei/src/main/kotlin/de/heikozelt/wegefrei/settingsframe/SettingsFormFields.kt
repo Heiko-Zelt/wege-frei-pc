@@ -6,10 +6,10 @@ import de.heikozelt.wegefrei.gui.Styles
 import de.heikozelt.wegefrei.gui.TrimmingTextField
 import de.heikozelt.wegefrei.json.Settings
 import de.heikozelt.wegefrei.json.Tls
-import de.heikozelt.wegefrei.mua.EmailAddressEntity
-import de.heikozelt.wegefrei.mua.EmailMessage
-import de.heikozelt.wegefrei.mua.EmailServerConfig
-import de.heikozelt.wegefrei.mua.EmailUserAgent
+import de.heikozelt.wegefrei.email.EmailAddressEntity
+import de.heikozelt.wegefrei.email.useragent.EmailMessage
+import de.heikozelt.wegefrei.email.useragent.EmailServerConfig
+import de.heikozelt.wegefrei.email.useragent.EmailUserAgent
 import org.slf4j.LoggerFactory
 import java.awt.Dimension
 import java.util.*

@@ -1,6 +1,6 @@
-package de.heikozelt.wegefrei.gui
+package de.heikozelt.wegefrei.email.combobox
 
-import de.heikozelt.wegefrei.mua.EmailAddressEntity
+import de.heikozelt.wegefrei.email.EmailAddressEntity
 import org.slf4j.LoggerFactory
 import java.awt.Component
 import javax.swing.JLabel

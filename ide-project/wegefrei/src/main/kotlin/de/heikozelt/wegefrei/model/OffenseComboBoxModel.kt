@@ -66,7 +66,7 @@ class OffenseComboBoxModel: DefaultComboBoxModel<String>() {
             "Halten/Parken in Fußgängerzone",
             "Halten/Parken weniger als 5 Meter vor Fußgängerüberweg (Zebrastreifen)",
             "Halten/Parken weniger als 8 Meter vor Kreuzung/Einmündung, obwohl rechts neben der Fahrbahn ein Radweg baulich angelegt ist",
-            "Halten/Parken weniger als 5 Meter vor/hinter Kreuzung/Einmündung",
+            "Parken weniger als 5 Meter vor/hinter Kreuzung/Einmündung",
             "Halten/Parken im absoluten Haltverbot",
             "Parken im eingeschränkten Haltverbot",
             "Halten/Parken auf Sperrfläche",
