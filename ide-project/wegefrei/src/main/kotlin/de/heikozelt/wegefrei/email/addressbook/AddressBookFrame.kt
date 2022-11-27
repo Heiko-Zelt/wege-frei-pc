@@ -19,6 +19,9 @@ class AddressBookFrame(private val app: WegeFrei, private val databaseRepo: Data
 
         val scrollPane = JScrollPane(addressesTable)
         val newButton = JButton("neue Addresse erfassen")
+        newButton.addActionListener {
+            AddressFrame()
+        }
 
         // layout:
         val lay = GroupLayout(contentPane)
@@ -51,7 +54,6 @@ class AddressBookFrame(private val app: WegeFrei, private val databaseRepo: Data
 
         minimumSize = Dimension(250, 250)
         setSize(600, 600)
-        //defaultCloseOperation = EXIT_ON_CLOSE
         isVisible = true
 
         defaultCloseOperation = WindowConstants.DO_NOTHING_ON_CLOSE
