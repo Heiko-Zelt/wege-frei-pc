@@ -2,6 +2,7 @@ package de.heikozelt.wegefrei.email.addressbook
 
 import de.heikozelt.wegefrei.DatabaseRepo
 import de.heikozelt.wegefrei.WegeFrei
+import de.heikozelt.wegefrei.email.EmailAddressEntity
 import org.slf4j.LoggerFactory
 import java.awt.Dimension
 import java.awt.event.WindowAdapter
@@ -20,7 +21,7 @@ class AddressBookFrame(private val app: WegeFrei, private val databaseRepo: Data
         val scrollPane = JScrollPane(addressesTable)
         val newButton = JButton("neue Addresse erfassen")
         newButton.addActionListener {
-            AddressFrame()
+            AddressFrame(this, databaseRepo)
         }
 
         // layout:
@@ -68,5 +69,9 @@ class AddressBookFrame(private val app: WegeFrei, private val databaseRepo: Data
 
     fun loadAddresses() {
         tableModel.loadAddresses(databaseRepo)
+    }
+
+    fun addAddress(newAddressEntity: EmailAddressEntity) {
+        tableModel.addAddress(newAddressEntity)
     }
 }

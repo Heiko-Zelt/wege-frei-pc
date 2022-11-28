@@ -16,6 +16,12 @@ class AddressBookTableModel(): AbstractTableModel() {
         }
     }
 
+    fun addAddress(newAddressEntity: EmailAddressEntity) {
+        val index = addresses.size
+        addresses.add(newAddressEntity)
+        fireTableRowsInserted(index, index)
+    }
+
     override fun getRowCount(): Int {
         return addresses.size
     }

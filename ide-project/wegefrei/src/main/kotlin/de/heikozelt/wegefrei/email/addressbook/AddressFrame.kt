@@ -1,12 +1,17 @@
 package de.heikozelt.wegefrei.email.addressbook
 
+import de.heikozelt.wegefrei.DatabaseRepo
 import de.heikozelt.wegefrei.email.EmailAddressEntity
 import de.heikozelt.wegefrei.gui.Styles
 import org.slf4j.LoggerFactory
 import java.awt.Dimension
 import javax.swing.*
 
-class AddressFrame(private val addressEntity: EmailAddressEntity = EmailAddressEntity()): JFrame() {
+class AddressFrame(
+    private val addressBookFrame: AddressBookFrame,
+    private val dbRepo: DatabaseRepo,
+    private val originalAddressEntity: EmailAddressEntity? = null
+): JFrame() {
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
 
     private val addressTextField = JTextField()
@@ -17,6 +22,19 @@ class AddressFrame(private val addressEntity: EmailAddressEntity = EmailAddressE
         log.debug("init")
         val addressLabel = JLabel("E-Mail-Adresse:")
         val nameLabel = JLabel("Name:")
+
+        okButton.addActionListener {
+            val address = addressTextField.text
+            val name = nameTextField.text
+            if(originalAddressEntity == null) {
+                val newAddressEntity = EmailAddressEntity(address, name)
+                dbRepo.insertEmailAddress(newAddressEntity)
+                addressBookFrame.addAddress(newAddressEntity)
+            }
+            isVisible = false
+            dispose()
+        }
+
         val cancelButton = JButton("Abbrechen")
         cancelButton.addActionListener {
             isVisible = false
