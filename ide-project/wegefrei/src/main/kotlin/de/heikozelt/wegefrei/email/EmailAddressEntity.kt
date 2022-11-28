@@ -15,7 +15,7 @@ class EmailAddressEntity(
     @Id
     val address: String = "",
     @Column
-    val name: String? = null
+    var name: String? = null
 ): Comparable<EmailAddressEntity> {
     fun asInternetAddress(): InternetAddress {
         return InternetAddress(address, name) // address, personal
@@ -41,11 +41,7 @@ class EmailAddressEntity(
     }
 
     fun asShortText(): String {
-        return if(name.isNullOrBlank()) {
-             address
-        } else {
-             name
-        }
+        return name?:address
     }
 
     override fun compareTo(other: EmailAddressEntity): Int {

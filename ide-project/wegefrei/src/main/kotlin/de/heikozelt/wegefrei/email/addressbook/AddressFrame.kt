@@ -20,16 +20,34 @@ class AddressFrame(
 
     init {
         log.debug("init")
+        title = if(originalAddressEntity == null) {
+            "Neue Adresse"
+        } else {
+            "Adresse bearbeiten"
+        }
+        originalAddressEntity?.let {
+            addressTextField.text = it.address
+            nameTextField.text = it.name
+        }
+
         val addressLabel = JLabel("E-Mail-Adresse:")
         val nameLabel = JLabel("Name:")
 
         okButton.addActionListener {
             val address = addressTextField.text
             val name = nameTextField.text
+            val newAddressEntity = EmailAddressEntity(address, name)
             if(originalAddressEntity == null) {
-                val newAddressEntity = EmailAddressEntity(address, name)
                 dbRepo.insertEmailAddress(newAddressEntity)
                 addressBookFrame.addAddress(newAddressEntity)
+            } else {
+                if(address == originalAddressEntity.address) {
+                    dbRepo.updateEmailAddress(newAddressEntity)
+                    addressBookFrame.updateAddress(newAddressEntity)
+                } else {
+                    dbRepo.replaceEmailAddress(originalAddressEntity.address, newAddressEntity)
+                    addressBookFrame.replaceAddress(originalAddressEntity.address, newAddressEntity)
+                }
             }
             isVisible = false
             dispose()

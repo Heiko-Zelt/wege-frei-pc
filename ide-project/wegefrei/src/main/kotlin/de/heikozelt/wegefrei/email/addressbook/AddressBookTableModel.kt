@@ -52,6 +52,22 @@ class AddressBookTableModel(): AbstractTableModel() {
         return addresses[rowIndex]
     }
 
+    private fun indexOf(address: String): Int {
+        return addresses.indexOfFirst { it.address == address }
+    }
+
+    fun updateAddress(newAddressEntity: EmailAddressEntity) {
+        val rowIndex = indexOf(newAddressEntity.address)
+        addresses[rowIndex].name = newAddressEntity.name
+        fireTableRowsUpdated(rowIndex, rowIndex)
+    }
+
+    fun replaceAddress(oldAddress: String, newAddressEntity: EmailAddressEntity) {
+        val rowIndex = indexOf(oldAddress)
+        addresses[rowIndex] = newAddressEntity
+        fireTableRowsUpdated(rowIndex, rowIndex)
+    }
+
     companion object {
         val COLUMN_NAMES = arrayOf("E-Mail-Adresse", "Name")
     }

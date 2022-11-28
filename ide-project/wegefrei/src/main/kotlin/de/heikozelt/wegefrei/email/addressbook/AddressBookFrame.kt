@@ -39,6 +39,11 @@ class AddressBookFrame(private val app: WegeFrei, private val databaseRepo: Data
         newButton.addActionListener {
             AddressFrame(this, databaseRepo)
         }
+        editButton.addActionListener {
+            val index = addressesTable.selectedRow
+            val addressEntity = tableModel.getAddressAt(index)
+            AddressFrame(this, databaseRepo, addressEntity)
+        }
         deleteButton.addActionListener {
             val index = addressesTable.selectionModel.leadSelectionIndex
             val address = tableModel.getAddressAt(index).address
@@ -101,5 +106,13 @@ class AddressBookFrame(private val app: WegeFrei, private val databaseRepo: Data
         val index = tableModel.rowCount
         tableModel.addAddress(newAddressEntity)
         addressesTable.changeSelection(index, index, false, false)
+    }
+
+    fun updateAddress(newAddressEntity: EmailAddressEntity) {
+        tableModel.updateAddress(newAddressEntity)
+    }
+
+    fun replaceAddress(oldAddress: String, newAddressEntity: EmailAddressEntity) {
+        tableModel.replaceAddress(oldAddress, newAddressEntity)
     }
 }

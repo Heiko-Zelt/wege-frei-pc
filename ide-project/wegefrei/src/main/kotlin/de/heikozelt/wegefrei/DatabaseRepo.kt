@@ -214,17 +214,6 @@ class DatabaseRepo(jdbcUrl: String) {
     }
     */
 
-    private fun deleteOrphanedPhotos(session: Session) {
-        val select = "SELECT p FROM PhotoEntity p WHERE p NOT IN (SELECT n.photoEntities FROM NoticeEntity n)"
-        //val jpql = "SELECT p FROM PhotoEntity p WHERE NOT EXITS (SELECT n FROM NoticeEntity n WHERE p MEMBER OF n.photoEntities)"
-        //val jpql = "SELECT p FROM PhotoEntity p WHERE COUNT(p.noticeEntities) = 0"
-        val result = session.createQuery(select, PhotoEntity::class.java).resultList
-        result?.forEach {
-            log.info("found orphaned photo: path=${it.path}, deleting it")
-            session.remove(it)
-        }
-    }
-
     fun updateNotice(noticeEntity: NoticeEntity) {
         log.debug("updateNotice(id=${noticeEntity.id})")
         val session = sessionFactory.openSession()
@@ -238,6 +227,53 @@ class DatabaseRepo(jdbcUrl: String) {
         } finally {
             if (tx.isActive) tx.rollback()
             if (session.isOpen) session.close()
+        }
+    }
+
+    fun updateEmailAddress(emailAddressEntity: EmailAddressEntity) {
+        log.debug("updateEmailAddress(address=${emailAddressEntity.address})")
+        val session = sessionFactory.openSession()
+        log.debug("session: $session")
+        val tx = session.beginTransaction()
+        try {
+            session.merge(emailAddressEntity)
+            tx.commit()
+        } finally {
+            if (tx.isActive) tx.rollback()
+            if (session.isOpen) session.close()
+        }
+    }
+
+    /**
+     * If the primary key changes, merge/update is not possible with JPA.
+     */
+    fun replaceEmailAddress(oldAddress: String, newEmailAddressEntity: EmailAddressEntity) {
+        log.debug("replaceEmailAddress(oldAddress=$oldAddress, newAddress=${newEmailAddressEntity.address})")
+        val session = sessionFactory.openSession()
+        val tx = session.beginTransaction()
+        try {
+            val emailAddress = session.find(EmailAddressEntity::class.java, oldAddress)
+            if (emailAddress == null) {
+                log.warn("Can't delete email address because it was not found in the database.")
+            } else {
+                session.remove(emailAddress)
+                session.persist(newEmailAddressEntity)
+            }
+            tx.commit()
+        } finally {
+            if (tx.isActive) tx.rollback()
+            if (session.isOpen) session.close()
+        }
+    }
+
+    private fun deleteOrphanedPhotos(session: Session) {
+        val select = "SELECT p FROM PhotoEntity p WHERE p NOT IN (SELECT n.photoEntities FROM NoticeEntity n)"
+        //val jpql = "SELECT p FROM PhotoEntity p WHERE NOT EXITS (SELECT n FROM NoticeEntity n WHERE p MEMBER OF n.photoEntities)"
+        //val jpql = "SELECT p FROM PhotoEntity p WHERE COUNT(p.noticeEntities) = 0"
+        val result = session.createQuery(select, PhotoEntity::class.java).resultList
+        result?.forEach {
+            log.info("found orphaned photo: path=${it.path}, deleting it")
+            session.remove(it)
         }
     }
 
