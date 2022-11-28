@@ -28,6 +28,7 @@ class NoticesFrame(private val app: WegeFrei) : JFrame("Meldungen - Wege frei!")
 
         // GUI components
         val noticesTable = JTable(noticesTableModel)
+        noticesTable.selectionModel.selectionMode = ListSelectionModel.SINGLE_SELECTION
         noticesTable.addMouseListener(NoticesTableMouseListener(app))
         noticesTable.getColumn("Farbe").cellRenderer = NoticesTableColorCellRenderer()
         noticesTable.getColumn("Status").cellRenderer = NoticesTableStateCellRenderer()

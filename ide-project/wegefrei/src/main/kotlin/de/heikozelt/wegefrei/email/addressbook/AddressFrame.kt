@@ -42,9 +42,11 @@ class AddressFrame(
                 addressBookFrame.addAddress(newAddressEntity)
             } else {
                 if(address == originalAddressEntity.address) {
+                    // todo unique key exception, display verification error at form fields
                     dbRepo.updateEmailAddress(newAddressEntity)
                     addressBookFrame.updateAddress(newAddressEntity)
                 } else {
+                    // todo unique key exception, display verification error at form fields
                     dbRepo.replaceEmailAddress(originalAddressEntity.address, newAddressEntity)
                     addressBookFrame.replaceAddress(originalAddressEntity.address, newAddressEntity)
                 }

@@ -14,7 +14,11 @@ import javax.mail.internet.InternetAddress
 class EmailAddressEntity(
     @Id
     val address: String = "",
-    @Column
+
+    /**
+     * Two email addresses having the same name, would be confusing. So define it unique.
+     */
+    @Column(unique = true)
     var name: String? = null
 ): Comparable<EmailAddressEntity> {
     fun asInternetAddress(): InternetAddress {
