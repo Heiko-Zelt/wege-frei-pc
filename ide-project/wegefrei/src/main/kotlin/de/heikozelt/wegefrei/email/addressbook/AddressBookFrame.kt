@@ -8,20 +8,42 @@ import java.awt.Dimension
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 import javax.swing.*
+import javax.swing.ListSelectionModel.SINGLE_SELECTION
 
 class AddressBookFrame(private val app: WegeFrei, private val databaseRepo: DatabaseRepo): JFrame("Adressbuch - Wege frei!") {
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
     private val tableModel = AddressBookTableModel()
+    private val addressesTable = JTable(tableModel)
 
     init {
         log.debug("init")
 
-        val addressesTable = JTable(tableModel)
+        val editButton = JButton("Bearbeiten")
+        editButton.isEnabled = false
+        val deleteButton = JButton("Löschen")
+        deleteButton.isEnabled = false
+
+
+        // Es kann nur eine Adresse bearbeitet werden.
+        // Beim Löschen wäre Mehrfachauswahl sinnvoll, aber zusätzlicher Programmieraufwand.
+        addressesTable.selectionModel.selectionMode = SINGLE_SELECTION
+        addressesTable.selectionModel.addListSelectionListener {
+            val isSelected = addressesTable.selectedRow != -1
+            log.debug("selectedRow: ${addressesTable.selectedRow}")
+            editButton.isEnabled = isSelected
+            deleteButton.isEnabled = isSelected
+        }
 
         val scrollPane = JScrollPane(addressesTable)
-        val newButton = JButton("neue Addresse erfassen")
+        val newButton = JButton("Neue Addresse erfassen")
         newButton.addActionListener {
             AddressFrame(this, databaseRepo)
+        }
+        deleteButton.addActionListener {
+            val index = addressesTable.selectionModel.leadSelectionIndex
+            val address = tableModel.getAddressAt(index).address
+            databaseRepo.deleteEmailAddress(address)
+            tableModel.removeAt(index)
         }
 
         // layout:
@@ -40,6 +62,8 @@ class AddressBookFrame(private val app: WegeFrei, private val databaseRepo: Data
                             Int.MAX_VALUE
                         )
                         .addComponent(newButton)
+                        .addComponent(editButton)
+                        .addComponent(deleteButton)
                 )
         )
         // top to bottom
@@ -49,6 +73,8 @@ class AddressBookFrame(private val app: WegeFrei, private val databaseRepo: Data
                 .addGroup(
                     lay.createParallelGroup()
                         .addComponent(newButton)
+                        .addComponent(editButton)
+                        .addComponent(deleteButton)
                 )
         )
         layout = lay
@@ -72,6 +98,8 @@ class AddressBookFrame(private val app: WegeFrei, private val databaseRepo: Data
     }
 
     fun addAddress(newAddressEntity: EmailAddressEntity) {
+        val index = tableModel.rowCount
         tableModel.addAddress(newAddressEntity)
+        addressesTable.changeSelection(index, index, false, false)
     }
 }

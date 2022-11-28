@@ -22,6 +22,11 @@ class AddressBookTableModel(): AbstractTableModel() {
         fireTableRowsInserted(index, index)
     }
 
+    fun removeAt(index: Int) {
+        addresses.removeAt(index)
+        fireTableRowsDeleted(index, index)
+    }
+
     override fun getRowCount(): Int {
         return addresses.size
     }
@@ -41,6 +46,10 @@ class AddressBookTableModel(): AbstractTableModel() {
             1 -> entity.name
             else -> throw IndexOutOfBoundsException()
         }
+    }
+
+    fun getAddressAt(rowIndex: Int): EmailAddressEntity {
+        return addresses[rowIndex]
     }
 
     companion object {

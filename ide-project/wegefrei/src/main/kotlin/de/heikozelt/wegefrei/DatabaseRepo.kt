@@ -1,8 +1,8 @@
 package de.heikozelt.wegefrei
 
+import de.heikozelt.wegefrei.email.EmailAddressEntity
 import de.heikozelt.wegefrei.entities.NoticeEntity
 import de.heikozelt.wegefrei.entities.PhotoEntity
-import de.heikozelt.wegefrei.email.EmailAddressEntity
 import jakarta.persistence.EntityManager
 import jakarta.persistence.Persistence
 import org.hibernate.Session
@@ -260,6 +260,30 @@ class DatabaseRepo(jdbcUrl: String) {
                 notice.photoEntities.forEach { it.noticeEntities.remove(notice) }
                 session.remove(notice)
                 deleteOrphanedPhotos(session)
+            }
+            tx.commit()
+        } finally {
+            if (tx.isActive) tx.rollback()
+            if (session.isOpen) session.close()
+        }
+    }
+
+    /**
+     * todo Prio 1: bug: notice can't be removed, if a photo is part of another notice
+     * foreign key violation!
+     * solution: delete photos "manually", if they have no notices
+     */
+    fun deleteEmailAddress(address: String) {
+        log.debug("deleteEmailAddress(address=$address)")
+        val session = sessionFactory.openSession()
+        log.debug("session: $session")
+        val tx = session.beginTransaction()
+        try {
+            val emailAddress = session.find(EmailAddressEntity::class.java, address)
+            if (emailAddress == null) {
+                log.warn("Can't delete email address because it was not found in the database.")
+            } else {
+                session.remove(emailAddress)
             }
             tx.commit()
         } finally {
