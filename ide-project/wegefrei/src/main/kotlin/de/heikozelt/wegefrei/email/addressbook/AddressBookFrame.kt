@@ -5,6 +5,8 @@ import de.heikozelt.wegefrei.WegeFrei
 import de.heikozelt.wegefrei.email.EmailAddressEntity
 import org.slf4j.LoggerFactory
 import java.awt.Dimension
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 import javax.swing.*
@@ -23,6 +25,15 @@ class AddressBookFrame(private val app: WegeFrei, private val databaseRepo: Data
         val deleteButton = JButton("Löschen")
         deleteButton.isEnabled = false
 
+        val tabMouseListener = object: MouseAdapter() {
+            override fun mouseClicked(me: MouseEvent) {
+                if (me.clickCount == 2) { // double click
+                    val rowIndex = addressesTable.selectedRow
+                    val emailAddressEntity = tableModel.getAddressAt(rowIndex)
+                    openAddressFrame(emailAddressEntity)
+                }
+            }
+        }
 
         // Es kann nur eine Adresse bearbeitet werden.
         // Beim Löschen wäre Mehrfachauswahl sinnvoll, aber zusätzlicher Programmieraufwand.
@@ -33,6 +44,7 @@ class AddressBookFrame(private val app: WegeFrei, private val databaseRepo: Data
             editButton.isEnabled = isSelected
             deleteButton.isEnabled = isSelected
         }
+        addressesTable.addMouseListener (tabMouseListener)
 
         val scrollPane = JScrollPane(addressesTable)
         val newButton = JButton("Neue Addresse erfassen")
@@ -42,7 +54,7 @@ class AddressBookFrame(private val app: WegeFrei, private val databaseRepo: Data
         editButton.addActionListener {
             val index = addressesTable.selectedRow
             val addressEntity = tableModel.getAddressAt(index)
-            AddressFrame(this, databaseRepo, addressEntity)
+            openAddressFrame(addressEntity)
         }
         deleteButton.addActionListener {
             val index = addressesTable.selectionModel.leadSelectionIndex
@@ -100,6 +112,10 @@ class AddressBookFrame(private val app: WegeFrei, private val databaseRepo: Data
 
     fun loadAddresses() {
         tableModel.loadAddresses(databaseRepo)
+    }
+
+    fun openAddressFrame(address: EmailAddressEntity) {
+        AddressFrame(this, databaseRepo, address)
     }
 
     fun addAddress(newAddressEntity: EmailAddressEntity) {
