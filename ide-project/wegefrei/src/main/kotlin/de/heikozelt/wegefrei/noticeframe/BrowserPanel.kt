@@ -50,7 +50,7 @@ class BrowserPanel(
         browserList.visibleRowCount = 1
         browserList.layoutOrientation = JList.HORIZONTAL_WRAP
         browserList.cellRenderer = browserListCellRenderer
-        scrollPane.minimumSize = Dimension(Styles.THUMBNAIL_SIZE / 2, Styles.THUMBNAIL_SIZE / 2)
+        scrollPane.minimumSize = Dimension(Styles.THUMBNAIL_SIZE + 4, Styles.THUMBNAIL_SIZE + 4)
 
         /*
         todo zur viele Aufrufe von getElementAt() bei Maus-Bewegungen

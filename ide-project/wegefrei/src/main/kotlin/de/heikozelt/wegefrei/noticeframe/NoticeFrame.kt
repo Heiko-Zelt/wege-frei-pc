@@ -2,15 +2,15 @@ package de.heikozelt.wegefrei.noticeframe
 
 import de.heikozelt.wegefrei.DatabaseRepo
 import de.heikozelt.wegefrei.WegeFrei
+import de.heikozelt.wegefrei.email.EmailAddressEntity
+import de.heikozelt.wegefrei.email.useragent.EmailAttachment
+import de.heikozelt.wegefrei.email.useragent.EmailMessage
 import de.heikozelt.wegefrei.entities.NoticeEntity
 import de.heikozelt.wegefrei.gui.Styles
 import de.heikozelt.wegefrei.jobs.AddressWorker
 import de.heikozelt.wegefrei.json.Witness
 import de.heikozelt.wegefrei.maps.MaxiMapForm
 import de.heikozelt.wegefrei.model.*
-import de.heikozelt.wegefrei.email.EmailAddressEntity
-import de.heikozelt.wegefrei.email.useragent.EmailAttachment
-import de.heikozelt.wegefrei.email.useragent.EmailMessage
 import org.jxmapviewer.viewer.GeoPosition
 import org.slf4j.LoggerFactory
 import java.awt.Component
@@ -91,7 +91,8 @@ class NoticeFrame(
         log.debug("init")
         title = "Meldung - Wege frei!"
         //background = FRAME_BACKGROUND
-        selectedPhotosScrollPane.minimumSize = Dimension(Styles.THUMBNAIL_SIZE / 2, Styles.THUMBNAIL_SIZE / 2)
+
+        selectedPhotosScrollPane.minimumSize = Dimension(Styles.THUMBNAIL_SIZE + 4, Styles.THUMBNAIL_SIZE + 4)
         selectedPhotosList.cellRenderer = selectedPhotosListCellRenderer
         selectedPhotosList.fixedCellWidth = Styles.THUMBNAIL_SIZE
         selectedPhotosList.fixedCellHeight = Styles.THUMBNAIL_SIZE
@@ -127,16 +128,19 @@ class NoticeFrame(
         topSplitPane.apply {
             isOneTouchExpandable = true
             setDividerLocation(0.5)
+            //resizeWeight = 1.0
         }
 
         bottomSplitPane.apply {
             isOneTouchExpandable = true
             setDividerLocation(0.5)
+            //resizeWeight = 1.0
         }
 
         mainSplitPane.apply {
             isOneTouchExpandable = true
             setDividerLocation(0.4)
+            //resizeWeight = 1.0
         }
         add(mainSplitPane)
 
