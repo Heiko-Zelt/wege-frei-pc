@@ -480,6 +480,7 @@ class NoticeFormFields(
         inspectionMonthTextField.isEnabled = enab
         abandonedCheckBox.isEnabled = enab
         recipientComboBox.isEnabled = enab
+        warningLightsCheckBox.isEnabled = enab
         noteTextArea.isEnabled = enab
     }
 
