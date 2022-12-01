@@ -75,7 +75,7 @@ class OffenseComboBoxModel: DefaultComboBoxModel<String>() {
             "Halten/Parken in zweiter Reihe",
             "Halten/Parken näher als 10 Meter vor einem Lichtzeichen",
             "Halten/Parken vor oder in amtlich gekennzeichneter Feuerwehrzufahrt",
-            "Parken verbotswidrig im Bereich eines Taxenstandes",
+            "Halten/Parken verbotswidrig im Bereich eines Taxenstandes",
             "Parken verbotswidrig und verhinderte dadurch die Benutzung gekennzeichneter Parkflächen",
             "Parken im Bereich einer Grundstücksein/ausfahrt",
             "Parken auf einer schmalen Fahrbahn gegenüber einer Grundstücksein/ausfahrt",
