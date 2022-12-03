@@ -10,6 +10,9 @@ import de.heikozelt.wegefrei.scanframe.ScanFrame
 import de.heikozelt.wegefrei.settingsframe.SettingsFrame
 import org.slf4j.LoggerFactory
 import java.awt.EventQueue
+import javax.swing.JOptionPane
+import javax.swing.JOptionPane.QUESTION_MESSAGE
+import javax.swing.JOptionPane.YES_NO_OPTION
 import javax.swing.SwingUtilities
 import javax.swing.UIManager
 
@@ -61,6 +64,43 @@ open class WegeFrei(private val settingsRepo: SettingsRepo = SettingsFileRepo())
         setSettings(settings)
         emailUserAgent = EmailUserAgent()
         emailUserAgent?.setEmailServerConfig(settings.emailServerConfig)
+    }
+
+    fun getStarted() {
+        settings?.let { setti ->
+            if (setti.privacyConsent == 1) {
+                openNoticesFrame()
+            } else {
+                val text = """
+                    |<html>
+                    |  <p>Diese Software verwendet Web-Services/APIs.</p>
+                    |  <p>Bei der Benutzung wird Deine IP-Adresse daher an folgende Websites übermittelt:</p>
+                    |  <ul>
+                    |    <li>https://tile.openstreetmap.org/<br>
+                    |      für die Kartendarstellung (Download von Kachel-Bildern)</li>
+                    |    <li>https://nominatim.openstreetmap.org/<br>
+                    |      für die Suche nach Postanschriften/Adressen von Tatorten</li> 
+                    |  </ul>
+                    |</html>""".trimMargin().replace("\n", "")
+                log.debug(text)
+                val result = JOptionPane.showOptionDialog(
+                    null,
+                    text,
+                    "Datenschutzvereinbarung",
+                    YES_NO_OPTION,
+                    QUESTION_MESSAGE,
+                    null,
+                    arrayOf("Zustimmen", "Ablehnen"),
+                    null
+                )
+                // todo save result
+                log.info("result = $result")
+                // result ist array index oder -1
+                if (result == 0) {
+                    openNoticesFrame()
+                }
+            }
+        }
     }
 
     /**
@@ -174,7 +214,7 @@ open class WegeFrei(private val settingsRepo: SettingsRepo = SettingsFileRepo())
     }
 
     fun openAddressBook() {
-        if(addressBookFrame == null) {
+        if (addressBookFrame == null) {
             log.debug("open address book")
             databaseRepo?.let {
                 addressBookFrame = AddressBookFrame(this, it)
@@ -289,7 +329,7 @@ open class WegeFrei(private val settingsRepo: SettingsRepo = SettingsFileRepo())
 
             EventQueue.invokeLater {
                 val app = WegeFrei()
-                app.openNoticesFrame()
+                app.getStarted()
             }
 
             LOG.debug("de.heikozelt.wegefrei.Main.main()-method finished")

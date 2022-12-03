@@ -14,6 +14,12 @@ import javax.swing.UIManager
 data class Settings (
     var witness: Witness = Witness(),
 
+    /**
+     * Version number of privacy agreement user consented
+     */
+    @Json(name = "privacy_consent")
+    var privacyConsent: Int = 0,
+
     @Json(name = "email_server")
     var emailServerConfig: EmailServerConfig = EmailServerConfig(),
 
@@ -48,6 +54,7 @@ data class Settings (
     public override fun clone(): Settings {
         return Settings(
             witness.clone(),
+            privacyConsent,
             emailServerConfig.clone(),
             lookAndFeel,
             photosDirectory,
