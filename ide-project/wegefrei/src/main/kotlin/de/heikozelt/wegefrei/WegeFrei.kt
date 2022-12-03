@@ -68,7 +68,7 @@ open class WegeFrei(private val settingsRepo: SettingsRepo = SettingsFileRepo())
 
     fun getStarted() {
         settings?.let { setti ->
-            if (setti.privacyConsent == 1) {
+            if (setti.privacyConsent == PRIVACY_CONSENT_VERSION) {
                 openNoticesFrame()
             } else {
                 val text = """
@@ -95,9 +95,11 @@ open class WegeFrei(private val settingsRepo: SettingsRepo = SettingsFileRepo())
                 )
                 // todo save result
                 log.info("result = $result")
-                // result ist array index oder -1
+                // result is array index or -1
                 if (result == 0) {
                     openNoticesFrame()
+                    setti.privacyConsent = PRIVACY_CONSENT_VERSION
+                    settingsRepo.save(setti)
                 }
             }
         }
@@ -318,6 +320,8 @@ open class WegeFrei(private val settingsRepo: SettingsRepo = SettingsFileRepo())
      */
     companion object {
         private val LOG = LoggerFactory.getLogger(this::class.java.canonicalName)
+
+        private const val PRIVACY_CONSENT_VERSION = 1
 
         @JvmStatic
         fun main(args: Array<String>) {
