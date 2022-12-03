@@ -209,7 +209,9 @@ open class WegeFrei(private val settingsRepo: SettingsRepo = SettingsFileRepo())
             // The Application needs to remember its original settings.
             // settingsFrame is not allowed to change them directly.
             // so the object must be cloned.
-            settingsFrame?.setSettings(settings?.clone())
+            settings?.let { setti ->
+               settingsFrame?.setSettings(setti.clone())
+            }
         } else {
             settingsFrame?.toFront()
         }

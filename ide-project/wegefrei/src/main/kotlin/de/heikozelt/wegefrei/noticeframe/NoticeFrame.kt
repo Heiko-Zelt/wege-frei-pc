@@ -680,7 +680,7 @@ class NoticeFrame(
                 val sb = StringBuilder()
                 sb.append("|  <h1>Anlagen</h1>\n")
                 sb.append("|  <ol>\n")
-                n.photoEntities.forEach { sb.append("|    <li>${it.getFilename()} (SHA1: ${it.getHashHex()})</li>\n") }
+                n.getPhotoEntitiesSorted().forEach { sb.append("|    <li>${it.getFilename()} (SHA1: ${it.getHashHex()})</li>\n") }
                 sb.append("|  </ol>\n")
             }
 

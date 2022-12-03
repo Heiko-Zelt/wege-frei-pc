@@ -1,15 +1,15 @@
 package de.heikozelt.wegefrei.settingsframe
 
+import de.heikozelt.wegefrei.email.EmailAddressEntity
+import de.heikozelt.wegefrei.email.useragent.EmailMessage
+import de.heikozelt.wegefrei.email.useragent.EmailServerConfig
+import de.heikozelt.wegefrei.email.useragent.EmailUserAgent
 import de.heikozelt.wegefrei.gui.CharPredicateDocFilter
 import de.heikozelt.wegefrei.gui.PatternVerifier
 import de.heikozelt.wegefrei.gui.Styles
 import de.heikozelt.wegefrei.gui.TrimmingTextField
 import de.heikozelt.wegefrei.json.Settings
 import de.heikozelt.wegefrei.json.Tls
-import de.heikozelt.wegefrei.email.EmailAddressEntity
-import de.heikozelt.wegefrei.email.useragent.EmailMessage
-import de.heikozelt.wegefrei.email.useragent.EmailServerConfig
-import de.heikozelt.wegefrei.email.useragent.EmailUserAgent
 import org.slf4j.LoggerFactory
 import java.awt.Dimension
 import java.util.*
@@ -233,7 +233,7 @@ class SettingsFormFields : JPanel() {
     /**
      * Mapping von Settings-Objekt auf Werte der Formular-Felder
      */
-    fun load(settings: Settings) {
+    fun setSettings(settings: Settings) {
         emailAddressTextField.text = settings.witness.emailAddress
         givenNameTextField.text = settings.witness.givenName
         surnameTextField.text = settings.witness.surname
@@ -256,8 +256,7 @@ class SettingsFormFields : JPanel() {
     /**
      * Mapping von Werten der Formular-Felder auf Settings-Objekt
      */
-    fun save(settings: Settings) {
-
+    fun updateSettings(settings: Settings) {
         settings.witness.emailAddress = emailAddressTextField.text.trim()
         settings.witness.givenName = givenNameTextField.text.trim()
         settings.witness.surname = surnameTextField.text.trim()

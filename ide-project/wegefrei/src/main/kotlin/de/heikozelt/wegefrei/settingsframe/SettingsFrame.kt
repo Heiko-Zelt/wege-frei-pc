@@ -16,7 +16,6 @@ class SettingsFrame(private val app: WegeFrei) : JFrame() {
 
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
     private var originalSettings: Settings? = null
-    private var settings: Settings? = null
     private val settingsFormFields = SettingsFormFields()
     private var settingsFormFieldsScrollPane = JScrollPane(settingsFormFields)
 
@@ -80,12 +79,10 @@ class SettingsFrame(private val app: WegeFrei) : JFrame() {
     /**
      * Settings-Objekt auf Formular-Felder abbilden
      */
-    fun setSettings(settings: Settings?) {
+    fun setSettings(settings: Settings) {
         log.debug("setSettings()")
         originalSettings = settings
-        originalSettings?.let {
-            settingsFormFields.load(it)
-        }
+        settingsFormFields.setSettings(settings)
     }
 
     /**
@@ -95,17 +92,13 @@ class SettingsFrame(private val app: WegeFrei) : JFrame() {
      */
     fun saveAndClose() {
         log.debug("saveAndClose()")
-        if (settings == null) {
-            settings = Settings()
-        }
-
+        val settings = originalSettings?:Settings()
         isVisible = false
         dispose()
         app.settingsFrameClosed()
-
-        settings?.let {
-            settingsFormFields.save(it)
-            app.settingsChanged(it)
+        settingsFormFields.updateSettings(settings)
+        if(settings != originalSettings) {
+            app.settingsChanged(settings)
         }
     }
 
@@ -122,19 +115,13 @@ class SettingsFrame(private val app: WegeFrei) : JFrame() {
     fun mayAskMayClose() {
         log.debug("mayAskMayClose()")
 
-        if (settings == null) {
-            settings = Settings()
-        }
-        settings?.let {
-            settingsFormFields.save(it)
-        }
+        val settings = originalSettings?:Settings()
+        settingsFormFields.updateSettings(settings)
 
-        settings?.let {
-            if (it == originalSettings) {
-                discardChangesAndClose()
-            } else {
-                askAndMayClose()
-            }
+        if (settings == originalSettings) {
+             discardChangesAndClose()
+        } else {
+             askAndMayClose()
         }
     }
 

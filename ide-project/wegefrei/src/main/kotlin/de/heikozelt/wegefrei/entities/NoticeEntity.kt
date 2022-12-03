@@ -1,12 +1,13 @@
 package de.heikozelt.wegefrei.entities
 
+import de.heikozelt.wegefrei.email.EmailAddressEntity
 import de.heikozelt.wegefrei.model.CountrySymbol
 import de.heikozelt.wegefrei.model.NoticeState
-import de.heikozelt.wegefrei.email.EmailAddressEntity
 import jakarta.persistence.*
 import org.jxmapviewer.viewer.GeoPosition
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
+import java.util.*
 
 @Entity
 @Table(name = "NOTICES")
@@ -296,6 +297,12 @@ class NoticeEntity(
         } else {
             NoticeState.INCOMPLETE
         }
+    }
+
+    fun getPhotoEntitiesSorted(): TreeSet<PhotoEntity> {
+        val sortedSet = TreeSet<PhotoEntity>()
+        sortedSet.addAll(photoEntities)
+        return sortedSet
     }
 
     companion object {

@@ -98,7 +98,8 @@ class OffenseComboBoxModel: DefaultComboBoxModel<String>() {
             "Parken auf gekennzeichnetem Behindertenparkplatz",
             "Parken mit Verbrenner vor Elektroladesäule",
             "Halten/Parken auf Grünfläche",
-            "Halten/Parken auf einer Autobahn/Schnellstraße"
+            "Halten/Parken auf einer Autobahn/Schnellstraße",
+            "Parken auf Gehweg mit zulässigem Gesamtgewicht über 2,8 t"
         )
     }
 }
