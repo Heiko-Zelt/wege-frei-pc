@@ -84,6 +84,8 @@ class EmailUserAgent {
                 val msg = MimeMessage(session)
                 msg.addHeader("User-Agent", MAIL_USER_AGENT)
                 msg.setFrom(emailMessage.from.asInternetAddress())
+                //msg.addHeader("Return-Receipt-To", emailMessage.from.address)
+                //msg.addHeader("Disposition-Notification-To", emailMessage.from.address)
                 emailMessage.tos.forEach { msg.addRecipient(Message.RecipientType.TO, it.asInternetAddress()) }
                 emailMessage.ccs.forEach { msg.addRecipient(Message.RecipientType.CC, it.asInternetAddress()) }
                 msg.setSubject(emailMessage.subject, "UTF-8")

@@ -40,13 +40,13 @@ class SettingsFileRepo: SettingsRepo {
             val parseResult = Klaxon().parse<Settings>(text)
             if (parseResult == null) {
                 log.error("Settings file could not be parsed. Using default settings.")
-                Settings()
+                defaultSettings()
             } else {
                 parseResult
             }
         } catch (ex: FileNotFoundException) {
             log.info("Settings file not found. Using default settings.")
-            Settings()
+            defaultSettings()
         }
     }
 
@@ -60,5 +60,21 @@ class SettingsFileRepo: SettingsRepo {
         val file = File(settingsPath.toString())
         file.createNewFile() // if file already exists will do nothing
         file.writeText(text)
+    }
+
+    companion object {
+        fun defaultSettings(): Settings {
+            val s = Settings()
+            val userHome = System.getProperty("user.home")
+            val picturesPath = Path(userHome, "Pictures")
+            val picturesDir = File(picturesPath.toString())
+            s.photosDirectory = if(picturesDir.isDirectory) {
+                picturesPath.toString()
+            } else {
+                userHome
+            }
+            s.databaseDirectory = userHome
+            return s
+        }
     }
 }

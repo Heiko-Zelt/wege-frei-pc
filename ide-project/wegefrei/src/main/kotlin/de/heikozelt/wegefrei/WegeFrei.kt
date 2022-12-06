@@ -139,14 +139,14 @@ open class WegeFrei(private val settingsRepo: SettingsRepo = SettingsFileRepo())
             changeLookAndFeel()
         }
 
-        if (dbDirChanged) {
-            closeNoticesFrame()
-
-            databaseRepo?.close()
-            databaseRepo = DatabaseRepo.fromDirectory(settings.databaseDirectory)
-
-            if (isNoticesFrameOpen) {
-                openNoticesFrame()
+        settings.databaseDirectory?.let {
+            if (dbDirChanged) {
+                closeNoticesFrame()
+                databaseRepo?.close()
+                databaseRepo = DatabaseRepo.fromDirectory(it)
+                if (isNoticesFrameOpen) {
+                    openNoticesFrame()
+                }
             }
         }
     }

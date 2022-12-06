@@ -63,6 +63,10 @@ class DirectoryNavigation(private val directoryChangedCallback: (AbsolutePath) -
         updateLayout()
     }
 
+    fun getDirectory(): AbsolutePath? {
+        return path
+    }
+
     private fun addButtons() {
         for((level, but) in buttons.withIndex()) {
             add(but)

@@ -18,6 +18,7 @@ class SettingsTest {
                 "Frankfurt",
                 "+49 0123/4567-89"
             ),
+            1,
             EmailServerConfig(
                 "smtp.ori.ginal",
                 25,
@@ -56,6 +57,7 @@ class SettingsTest {
                 "Frankfurt",
                 "+49 0123/4567-89"
             ),
+            1,
             EmailServerConfig(
                 "smtp.ori.ginal",
                 25,
@@ -76,6 +78,7 @@ class SettingsTest {
                 "Frankfurt",
                 "+49 0123/4567-89"
             ),
+            1,
             EmailServerConfig(
                 "smtp.ori.ginal",
                 25,

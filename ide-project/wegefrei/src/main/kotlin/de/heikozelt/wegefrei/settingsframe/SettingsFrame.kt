@@ -92,7 +92,7 @@ class SettingsFrame(private val app: WegeFrei) : JFrame() {
      */
     fun saveAndClose() {
         log.debug("saveAndClose()")
-        val settings = originalSettings?:Settings()
+        val settings = (originalSettings?.clone())?:Settings()
         isVisible = false
         dispose()
         app.settingsFrameClosed()

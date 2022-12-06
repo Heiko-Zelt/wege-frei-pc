@@ -22,12 +22,12 @@ class NoticesFrame(private val app: WegeFrei) : JFrame("Meldungen - Wege frei!")
 
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
     private val noticesTableModel = NoticesTableModel()
+    private val noticesTable = JTable(noticesTableModel)
 
     init {
         log.debug("init")
 
-        // GUI components
-        val noticesTable = JTable(noticesTableModel)
+        // more GUI components
         noticesTable.selectionModel.selectionMode = ListSelectionModel.SINGLE_SELECTION
         noticesTable.addMouseListener(NoticesTableMouseListener(app))
         noticesTable.getColumn("Farbe").cellRenderer = NoticesTableColorCellRenderer()
@@ -111,6 +111,7 @@ class NoticesFrame(private val app: WegeFrei) : JFrame("Meldungen - Wege frei!")
     fun noticeAdded(noticeEntity: NoticeEntity) {
         log.debug("noticeAdded(id=${noticeEntity.id})")
         noticesTableModel.addNotice(noticeEntity)
+        noticesTable.changeSelection(0, 0, false, false)
     }
 
     fun noticeUpdated(noticeEntity: NoticeEntity) {

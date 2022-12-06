@@ -40,7 +40,7 @@ class BrowserPanel(
     private val browserList = JList(browserListModel)
     private val scrollPane = JScrollPane(browserList)
     private val directoryNavigation = DirectoryNavigation { browserListModel.setDirectory(it.asPath()) }
-    private var photosDir: Path? = null
+    //private var photosDir: Path? = null
 
     init {
 
@@ -107,9 +107,9 @@ class BrowserPanel(
     /**
      * load photos from filesystem as background job
      */
-    fun loadData(photosDir: Path) {
+    fun setPhotosDirectory(photosDir: Path) {
         directoryNavigation.setDirectory(AbsolutePath.fromPath(photosDir))
-        this.photosDir = photosDir
+        //this.photosDir = photosDir
         browserListModel.setDirectory(photosDir)
         log.debug("photosDir: $photosDir")
         /*
@@ -118,6 +118,10 @@ class BrowserPanel(
         worker.execute()
          */
 
+    }
+
+    fun getPhotosDirectory(): Path? {
+        return directoryNavigation.getDirectory()?.asPath()
     }
 
     fun setSelectedPhotos(selectedPhotosListModel: SelectedPhotosListModel) {

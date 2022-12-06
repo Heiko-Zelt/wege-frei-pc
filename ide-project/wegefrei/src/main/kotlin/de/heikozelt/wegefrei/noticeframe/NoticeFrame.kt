@@ -193,8 +193,8 @@ class NoticeFrame(
             "Meldung #${noticeEntity.id} - Wege frei!"
         }
 
-        app.getSettings()?.let {
-            browserPanel.loadData(it.getPhotosPath())
+        app.getSettings()?.let {s ->
+            browserPanel.setPhotosDirectory(s.getPhotosPath())
             noticeForm.setNotice(noticeEntity)
         }
         noticeEntity.id?.let {
@@ -521,6 +521,12 @@ class NoticeFrame(
         isVisible = false
         dispose()
         app.noticeFrameClosed(this)
+        app.getSettings()?.let {s ->
+            val dir = browserPanel.getPhotosDirectory().toString()
+            log.debug("browserPanel.dir = $dir")
+            s.photosDirectory = dir
+            app.getSettingsRepo().save(s)
+        }
     }
 
     fun deleteAndClose() {

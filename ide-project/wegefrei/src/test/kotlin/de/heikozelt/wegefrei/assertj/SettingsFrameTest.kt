@@ -52,7 +52,9 @@ class SettingsFrameTest {
         //-Dassertj.swing.keyboard.locale=en
         window!!.target().inputContext.selectInputMethod(Locale("de", "DE"))
         window?.show()
-        settingsFrame?.setSettings(settings)
+        settings?.let {
+            settingsFrame?.setSettings(it)
+        }
     }
 
     @Test

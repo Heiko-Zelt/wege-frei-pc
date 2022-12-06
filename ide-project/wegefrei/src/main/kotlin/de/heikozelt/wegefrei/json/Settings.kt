@@ -27,10 +27,10 @@ data class Settings (
     var lookAndFeel: String = "",
 
     @Json(name = "photos_directory")
-    var photosDirectory: String = "~",
+    var photosDirectory: String? = null,
 
     @Json(name = "database_directory")
-    var databaseDirectory: String = "~"
+    var databaseDirectory: String? = null
 ): Cloneable {
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
 
