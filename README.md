@@ -10,15 +10,33 @@ Alle Daten (Beweisfotos und Meldungen) werden auf dem eigenen PC gespeichert. De
 
 ## Typischer Ablauf
 
- 1. Falsch parkende Fahrzeuge fotografiern. Es können mehrere Fotos mit Kfz-Kennzeichen, Verkehrszeichen, HU- & Umwelt-Plakette, Anfang und Ende der Beoabachtung, etc... gemacht werden.
- 1. Fotos (z.B. via USB-Kabel) vom Smartphone in ein spezielles Verzeichnis auf den PC kopieren.
- 1. Fotos nach Metadaten (GPS-Geo-Position, Datum und Uhrzeit) scannen.
- 1. Meldungen erfassen. Einige Daten wie Tat-Datum, -Uhrzeit, -Dauer, -Ort und Adresse werden automatisch im Formular eingetragen. Kontrolle der Fotos durch integrierten Bildbetrachter und des Tatorts durch Kartenanzeige.
- 1. Meldungen über das eigene E-Mail-Postfach an das Ordnungsamt senden.
+ 1. Falsch parkende Fahrzeuge fotografieren. Es können mehrere Fotos mit Kfz-Kennzeichen, Verkehrszeichen, HU- & Umwelt-Plakette, Anfang und Ende der Beoabachtung, etc... gemacht werden.
+ 1. Fotos (z.B. via USB-Kabel) vom Smartphone in einen Ordner auf den PC kopieren.
+ 1. Meldungen erfassen. Einige Daten wie Tat-Datum, -Uhrzeit, -Dauer und Adresse werden automatisch im Formular eingetragen. Kontrolle der Fotos durch integrierten Bildbetrachter und Adresse des Tatorts durch integrierte Kartenanzeige.
+ 1. Meldungen über integrierten E-mail-Client über das eigene E-Mail-Postfach an das zuständige Ordnungsamt senden.
+ 
+## Downloads
+
+ * Software-Paket für Windows:<br />
+   https://www.heikozelt.de/wegefrei/download/WegeFrei-1.0.msi
+ * Software-Paket für Ubuntu-Linux:<br />
+   https://www.heikozelt.de/wegefrei/download/wegefrei-1.0-1_amd64.deb
+ * Betriebssystem-unabhängig als .jar-Datei. Es wird zusätzlich Java 17 benötigt. Start mit `java -jar wegefrei-1.0-SNAPSHOT.jar`<br />
+   https://www.heikozelt.de/wegefrei/download/wegefrei-1.0-SNAPSHOT.jar
  
 ## Installation
 
-Installationsdateien werden in Kürze zur Verfügung gestellt. Für technisch begabte Anwender_innen, bitte das GIT-Repo clonen und mit Gradle eine .jar-Datei bauen.
+Am einfachsten ist die Verwendung eines Software-Paketes, abhängig vom Betriebssystem.
+Sollte es (noch) kein Paket für Dein Betriebssystem geben, schreibe mich bitte an oder verwende die plattformunabhängige .jar-Datei.
+Zur Ausführung der .jar-Datei, welche Java Byte Code enthält wird zusätzlich eine Java Virtual Machine ab Version 17 benötigt.
+
+## Deinstallation
+
+Die Software kann über den Betriebssystem-spezifischen Paket-Manager wieder deinstalliert werden.
+Die Konfigurationsdatei `.wege_frei_v1.settings.json` und die Datenbankdateien `wege_frei_v1.mv.db` & `wege_frei_v1.trace.db`,
+welche standardmäßig im Benutzer-Home-Verzeichnis liegen, müssen manuell gelöscht werden.
+
+## Konfiguration
 
 Nach der Installation kannst du direkt Meldungen erfassen. Wenn du die Beweiss-Fotos von deinen Urlaubsfotos, etc... trennen möchtest, kannst du unter Einstellungen einen anderen Ordner angeben. Bevor Du Meldungen an das Ordnungsamt übertragen kannst, musst du deine Zeugen-Daten angeben. Annonyme Anzeigen werden nicht akzeptiert. Außerdem werden die Konfigurations-Daten eines Postausgangs-Servers (SMTP) benötigt.
 
