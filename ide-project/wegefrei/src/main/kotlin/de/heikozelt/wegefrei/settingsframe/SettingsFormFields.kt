@@ -43,8 +43,8 @@ class SettingsFormFields : JPanel() {
 
     private val lookAndFeelNames = Settings.lookAndFeelNames().toTypedArray()
     private val lookAndFeelComboBox = JComboBox(lookAndFeelNames)
-    private val photosDirField = JLabel()
-    private val photosDirButton = JButton("Ordner auswählen")
+    //private val photosDirField = JLabel()
+    //private val photosDirButton = JButton("Ordner auswählen")
     private val databaseDirField = JLabel()
     private val databaseDirButton = JButton("Ordner auswählen")
 
@@ -97,8 +97,8 @@ class SettingsFormFields : JPanel() {
 
         val technicalHeading = Heading("Sonstiges")
         val lookAndFeelLabel = JLabel("Look and Feel:")
-        val photosDirLabel = JLabel("Fotos-Ordner:")
-        photosDirButton.addActionListener { DirectoryChooser(photosDirField, "Fotos-Ordner") }
+        //val photosDirLabel = JLabel("Fotos-Ordner:")
+        //photosDirButton.addActionListener { DirectoryChooser(photosDirField, "Fotos-Ordner") }
         val databaseDirLabel = JLabel("Datenbank-Ordner:")
         databaseDirButton.addActionListener { DirectoryChooser(databaseDirField, "Datenbank-Ordner") }
 
@@ -126,7 +126,7 @@ class SettingsFormFields : JPanel() {
                                 .addComponent(smtpUserNameLabel)
                                 .addComponent(encryptionLabel)
                                 .addComponent(lookAndFeelLabel)
-                                .addComponent(photosDirLabel)
+                                //.addComponent(photosDirLabel)
                                 .addComponent(databaseDirLabel)
                         )
                         .addGroup( // form fields
@@ -144,8 +144,8 @@ class SettingsFormFields : JPanel() {
                                 .addComponent(encryptionComboBox)
                                 .addComponent(sendTestMailButton)
                                 .addComponent(lookAndFeelComboBox)
-                                .addComponent(photosDirField)
-                                .addComponent(photosDirButton)
+                                //.addComponent(photosDirField)
+                                //.addComponent(photosDirButton)
                                 .addComponent(databaseDirField)
                                 .addComponent(databaseDirButton)
                         )
@@ -210,11 +210,13 @@ class SettingsFormFields : JPanel() {
                     lay.createParallelGroup(GroupLayout.Alignment.CENTER)
                         .addComponent(lookAndFeelLabel).addComponent(lookAndFeelComboBox)
                 )
+                /*
                 .addGroup(
                     lay.createParallelGroup(GroupLayout.Alignment.CENTER)
                         .addComponent(photosDirLabel).addComponent(photosDirField)
                 )
                 .addComponent(photosDirButton)
+                */
                 .addGroup(
                     lay.createParallelGroup(GroupLayout.Alignment.CENTER)
                         .addComponent(databaseDirLabel).addComponent(databaseDirField)
@@ -249,7 +251,7 @@ class SettingsFormFields : JPanel() {
         encryptionComboBox.selectedItem = tlsValues[tlsIndex]
 
         lookAndFeelComboBox.selectedItem = lookAndFeelNames.find { it == settings.lookAndFeel }
-        photosDirField.text = settings.photosDirectory
+        //photosDirField.text = settings.photosDirectory
         databaseDirField.text = settings.databaseDirectory
     }
 
@@ -277,7 +279,7 @@ class SettingsFormFields : JPanel() {
             log.warn("No String selected as look and feel.")
             ""
         }
-        settings.photosDirectory = photosDirField.text
+        //settings.photosDirectory = photosDirField.text
         settings.databaseDirectory = databaseDirField.text
     }
 
