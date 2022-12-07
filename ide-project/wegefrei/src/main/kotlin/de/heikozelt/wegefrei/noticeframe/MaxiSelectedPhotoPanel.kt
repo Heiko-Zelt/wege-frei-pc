@@ -15,5 +15,6 @@ class MaxiSelectedPhotoPanel(
         actionButton.addActionListener {
             noticeFrame.unselectPhoto(photo)
         }
+        deleteButton.isVisible = false
     }
 }

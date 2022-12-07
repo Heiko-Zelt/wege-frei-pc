@@ -15,5 +15,8 @@ class MaxiPhotoPanel(
             log.debug("addActionListener(photo: pos.latitude=${photo.getGeoPosition()?.latitude})")
             noticeFrame.selectPhoto(photo)
         }
+        photo.getPhotoEntity()?.let {p ->
+            deleteButton.isVisible = p.noticeEntities.isNotEmpty()
+        }
     }
 }

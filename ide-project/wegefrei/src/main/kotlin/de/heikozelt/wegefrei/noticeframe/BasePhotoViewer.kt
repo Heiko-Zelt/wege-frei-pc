@@ -22,6 +22,7 @@ open class BasePhotoViewer(
 
     private val zoomInButton = JButton("+")
     private val zoomOutButton = JButton("-")
+    protected val deleteButton = JButton("Foto löschen")
 
     init {
         log.debug("init(photo: pos.latitude=${photo.getGeoPosition()?.latitude})")
@@ -51,6 +52,7 @@ open class BasePhotoViewer(
                         )
                         .addComponent(zoomInButton)
                         .addComponent(zoomOutButton)
+                        .addComponent(deleteButton)
                         .addComponent(actionButton)
                 )
         )
@@ -62,6 +64,7 @@ open class BasePhotoViewer(
                     lay.createParallelGroup()
                         .addComponent(zoomInButton)
                         .addComponent(zoomOutButton)
+                        .addComponent(deleteButton)
                         .addComponent(actionButton)
                 )
         )
