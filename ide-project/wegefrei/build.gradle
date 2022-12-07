@@ -31,6 +31,7 @@ dependencies {
     implementation 'com.drewnoakes:metadata-extractor:2.18.0'
     implementation 'com.beust:klaxon:5.6'
     implementation 'javax.mail:mail:1.4.7'
+    implementation 'net.java.dev.jna:jna-platform:5.12.1'
     // todo maybe exchange H2-Database and Hibernate with Couchbase document store to increase performance
     //implementation 'com.couchbase.lite:couchbase-lite-java:3.0.5'
     testImplementation 'org.jetbrains.kotlin:kotlin-test'
