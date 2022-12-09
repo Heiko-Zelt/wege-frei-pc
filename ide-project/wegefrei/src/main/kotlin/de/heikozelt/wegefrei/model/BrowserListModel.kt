@@ -34,6 +34,10 @@ class BrowserListModel(
 
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
     private var directoryPath: Path? = null
+
+    /**
+     * nur Dateinamen, also relative Pfade
+     */
     private val filenames = mutableListOf<Path>()
 
     init {
@@ -167,5 +171,13 @@ class BrowserListModel(
      */
     override fun contentsChanged(e: ListDataEvent?) {
         // ignore
+    }
+
+    fun deletePhoto(photo: Photo) {
+        if(directoryPath.toString() == photo.getPath().parent.toString()) {
+            val index = filenames.indexOf(photo.getPath().fileName)
+            filenames.removeAt(index)
+            fireIntervalRemoved(this, index, index)
+        }
     }
 }

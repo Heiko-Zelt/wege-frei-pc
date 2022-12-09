@@ -4,6 +4,8 @@ import de.heikozelt.wegefrei.gui.Styles.Companion.NO_BORDER
 import de.heikozelt.wegefrei.model.Photo
 import org.slf4j.LoggerFactory
 import java.awt.Insets
+import java.awt.event.ComponentAdapter
+import java.awt.event.ComponentEvent
 import javax.swing.*
 
 /**
@@ -72,6 +74,15 @@ open class BasePhotoViewer(
         zoomInButton.margin = Insets(m.top,10, m.bottom, 10)
         lay.linkSize(SwingConstants.HORIZONTAL, zoomInButton, zoomOutButton)
         layout = lay
+
+        scrollPane.addComponentListener(object: ComponentAdapter() {
+            override fun componentResized(e: ComponentEvent) {
+                log.debug("scrollPane resized")
+                label.calculateFitFactor()
+                label.calculateScaleFactor()
+                label.scaleIfNeeded()
+            }
+        })
     }
 
     fun getPhoto(): Photo {

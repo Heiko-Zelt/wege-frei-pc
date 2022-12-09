@@ -3,10 +3,12 @@ package de.heikozelt.wegefrei.noticeframe
 import de.heikozelt.wegefrei.DatabaseRepo
 import de.heikozelt.wegefrei.dirnavi.AbsolutePath
 import de.heikozelt.wegefrei.dirnavi.DirectoryNavigation
+import de.heikozelt.wegefrei.fileutils.getFileUtilsInstance
 import de.heikozelt.wegefrei.gui.Styles
 import de.heikozelt.wegefrei.model.*
 import org.slf4j.LoggerFactory
 import java.awt.Dimension
+import java.io.File
 import java.nio.file.Path
 import javax.swing.GroupLayout
 import javax.swing.JList
@@ -34,6 +36,7 @@ class BrowserPanel(
 ) : JPanel() /*SelectedPhotosObserver*/ {
 
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
+
     //private val selectedPhotos = noticeFrame.getSelectedPhotos()
     private val browserListModel = BrowserListModel(cache, photoLoader, selectedPhotosListModel)
     private val browserListCellRenderer = BrowserListCellRenderer()
@@ -172,37 +175,20 @@ class BrowserPanel(
 
     fun setSelectedValue(photo: Photo) {
         val path = photo.getPath()
-        if(path.fileName in browserListModel.getFilenames() && path.parent == browserListModel.getDirectoryPath()) {
+        if (path.fileName in browserListModel.getFilenames() && path.parent == browserListModel.getDirectoryPath()) {
             browserList.setSelectedValue(photo, true)
         }
     }
-}
 
-/*
- * Observer-Methode
-override fun selectedPhoto(index: Int, photo: Photo) {
-    log.debug("selectedPhoto(index = $index)")
-    hideBorder()
-}
-
- * Observer-Methode
-override fun unselectedPhoto(index: Int, photo: Photo) {
-    log.debug("unselectedPhoto(index = $index)")
-    browserListModel.unselectedPhoto(photo)
-}
-
- * all selected photos have been replaced
- * active or deactivate panels
-override fun replacedPhotoSelection(photo: TreeSet<Photo>) {
-    log.debug("replacedPhotoSelection()")
-    for(panel in miniPhotoPanels) {
-        val photo = panel.getPhoto()
-        if(photo in photos && panel.isActive()) {
-            panel.deactivate()
-        }
-        if(photo !in photos && !panel.isActive()) {
-            panel.activate()
+    // Exception in thread "AWT-EventQueue-0" java.io.IOException:
+    // No trash location found (define fileutils.trash to be the path to the trash)
+    fun deletePhoto(photo: Photo) {
+        val path = photo.getPath()
+        log.debug("move photo file $path to trash bin")
+        val fileUtils = getFileUtilsInstance()
+        if (fileUtils != null) {
+            fileUtils?.moveToTrash(File(path.toString()))
+            browserListModel.deletePhoto(photo)
         }
     }
 }
-*/

@@ -8,14 +8,18 @@ import java.awt.Image
 import java.lang.Math.min
 import javax.swing.ImageIcon
 import javax.swing.JLabel
+import kotlin.math.abs
 import kotlin.math.pow
 
 class MaxiPhotoLabel(private val parentContainer: Container, private val photo: Photo): JLabel() {
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
 
-    private var fitFactor = 0.0
-    private var scaledImg: Image? = null
     private var zoomLevel: Short = 0
+    private var fitFactor = 0.0
+    private var zoomFactor = 0.0
+    private var scaleFactor = 0.0
+    private var oldScaleFactor = 0.0
+    private var scaledImg: Image? = null
 
     init {
         toolTipText = photo.getToolTipText()
@@ -32,10 +36,27 @@ class MaxiPhotoLabel(private val parentContainer: Container, private val photo: 
         }
     }
 
-    fun scale() {
+    fun calculateZoomFactor() {
+        zoomFactor = ZOOM_BASE.pow(zoomLevel.toDouble())
+    }
+
+    fun calculateScaleFactor() {
+        scaleFactor = fitFactor * zoomFactor
+    }
+
+    fun scaleIfNeeded() {
+        log.debug("old scale factor: $oldScaleFactor")
+        log.debug("new scale factor: $scaleFactor")
+        if(abs(1 - (oldScaleFactor / scaleFactor)) > SCALE_TOLERANCE) {
+            scale()
+        }
+    }
+
+    private fun scale() {
+        log.debug("scale to scale factor: $scaleFactor")
         photo.getPhotoFile()?.image?.let {
-            val newWidth = (it.width * fitFactor * BASE.pow(zoomLevel.toDouble())).toInt()
-            val newHeight = (it.height * fitFactor * BASE.pow(zoomLevel.toDouble())).toInt()
+            val newWidth = (it.width * scaleFactor).toInt()
+            val newHeight = (it.height * scaleFactor).toInt()
             if(newWidth != 0 && newHeight != 0) {
                 scaledImg = photo.getPhotoFile()?.image?.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH)
             }
@@ -47,16 +68,20 @@ class MaxiPhotoLabel(private val parentContainer: Container, private val photo: 
             text = null
             icon = ImageIcon(scaledImg)
         }
+        oldScaleFactor = scaleFactor
     }
 
     fun zoomTo(level: Short) {
         zoomLevel = level
         log.debug("zoomTo(level=$level)")
         calculateFitFactor()
-        scale()
+        calculateZoomFactor()
+        calculateScaleFactor()
+        scaleIfNeeded()
     }
 
     companion object {
-        const val BASE = 1.3
+        const val ZOOM_BASE = 1.3
+        const val SCALE_TOLERANCE = 0.03
     }
 }

@@ -1,5 +1,6 @@
 package de.heikozelt.wegefrei.noticeframe
 
+import com.sun.jna.platform.FileUtils
 import de.heikozelt.wegefrei.DatabaseRepo
 import de.heikozelt.wegefrei.WegeFrei
 import de.heikozelt.wegefrei.email.EmailAddressEntity
@@ -18,6 +19,7 @@ import java.awt.Dimension
 import java.awt.EventQueue
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
+import java.io.File
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.time.ZonedDateTime
@@ -584,6 +586,11 @@ class NoticeFrame(
 
     override fun contentsChanged(e: ListDataEvent?) {
         // ignore
+    }
+
+    fun deletePhoto(photo: Photo) {
+        browserPanel.deletePhoto(photo)
+        setZoomComponent(JPanel())
     }
 
     companion object {
