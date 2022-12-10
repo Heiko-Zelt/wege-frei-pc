@@ -3,6 +3,9 @@ package de.heikozelt.wegefrei.noticeframe
 import de.heikozelt.wegefrei.model.Photo
 import org.slf4j.LoggerFactory
 
+/**
+ * zeigt ein ausgewähltes Foto an
+ */
 class MaxiSelectedPhotoPanel(
     noticeFrame: NoticeFrame,
     photo: Photo

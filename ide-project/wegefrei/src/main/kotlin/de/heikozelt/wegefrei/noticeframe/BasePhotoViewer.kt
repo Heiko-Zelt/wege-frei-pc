@@ -9,7 +9,8 @@ import java.awt.event.ComponentEvent
 import javax.swing.*
 
 /**
- * todo Prio 3: Foto-löschen-Button (z.B. unscharf oder Personen abgebildet)
+ * Basis-Klasse für ein Panel, welches ein großes Foto anzeigt
+ * inklusive Zoom-Buttons, etc...
  */
 open class BasePhotoViewer(
     private val noticeFrame: NoticeFrame,

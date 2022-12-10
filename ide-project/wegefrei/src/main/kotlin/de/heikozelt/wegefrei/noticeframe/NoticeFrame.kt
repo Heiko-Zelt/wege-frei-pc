@@ -1,6 +1,5 @@
 package de.heikozelt.wegefrei.noticeframe
 
-import com.sun.jna.platform.FileUtils
 import de.heikozelt.wegefrei.DatabaseRepo
 import de.heikozelt.wegefrei.WegeFrei
 import de.heikozelt.wegefrei.email.EmailAddressEntity
@@ -19,7 +18,6 @@ import java.awt.Dimension
 import java.awt.EventQueue
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
-import java.io.File
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.time.ZonedDateTime
@@ -100,9 +98,11 @@ class NoticeFrame(
         selectedPhotosList.fixedCellHeight = Styles.THUMBNAIL_SIZE
         selectedPhotosList.visibleRowCount = 1
         selectedPhotosList.layoutOrientation = JList.HORIZONTAL_WRAP
-        selectedPhotosList.addListSelectionListener {
-            selectedPhotosList.selectedValue?.let { photo ->
-                this.showSelectedPhoto(photo)
+        selectedPhotosList.addListSelectionListener { e ->
+            if(!e.valueIsAdjusting) {
+                selectedPhotosList.selectedValue?.let { photo ->
+                    this.showSelectedPhoto(photo)
+                }
             }
         }
 
@@ -240,7 +240,7 @@ class NoticeFrame(
      * zeigt im Zoom-Bereich eine große Landkarte an
      */
     fun showMaxiMap() {
-        log.debug("show maxi map")
+        log.debug("showMaxiMap()")
         // todo Prio 4: do nothing if it is already shown
         val maxiMapForm = MaxiMapForm(this, selectedPhotosListModel)
         selectedPhotosListModel.addListDataListener(maxiMapForm.getMaxiMap())
@@ -261,7 +261,7 @@ class NoticeFrame(
      * zeigt im Zoom-Bereich ein großes Foto an
      */
     fun showPhoto(photo: Photo) {
-        log.debug("show photo")
+        log.debug("showPhoto(photo.path=${photo.getPath()})")
 
         val photoPanel = MaxiPhotoPanel(this, photo)
         setZoomComponent(photoPanel)
@@ -275,7 +275,7 @@ class NoticeFrame(
      * zeigt im Zoom-Bereich ein großes bereits ausgewähltes Foto an
      */
     fun showSelectedPhoto(miniSelectedPhotoPanel: MiniSelectedPhotoPanel) {
-        log.debug("show selected photo")
+        log.debug("showSelectedPhoto(miniSelectedPhotoPanel)")
 
         //todo Prio 3: 2 Methoden für den gleichen Zweck, eine soll die andere Aufrufen
 
@@ -292,7 +292,7 @@ class NoticeFrame(
      * zeigt im Zoom-Bereich ein großes bereits ausgewähltes Foto an
      */
     private fun showSelectedPhoto(photo: Photo) {
-        log.debug("show selected photo")
+        log.debug("showSelectedPhoto(photo)")
 
         val photoPanel = MaxiSelectedPhotoPanel(this, photo)
         setZoomComponent(photoPanel)
@@ -435,6 +435,7 @@ class NoticeFrame(
     }
 
     private fun setZoomComponent(comp: Component) {
+        log.debug("setZoomComponent(comp=${comp::class})")
         // ggf. Observer entfernen, wichtig zur Vermeidung eines Memory-Leaks
         val oldComp = getZoomComponent()
         if (oldComp is MaxiMapForm) {
