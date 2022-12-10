@@ -3,6 +3,7 @@ package de.heikozelt.wegefrei.noticeframe
 import de.heikozelt.wegefrei.model.Photo
 import org.slf4j.LoggerFactory
 
+// todo prio 2: fix bug: constructor is always called twice
 class MaxiPhotoPanel(
     noticeFrame: NoticeFrame,
     photo: Photo

@@ -82,11 +82,11 @@ class BrowserPanel(
         )
          */
         browserList.selectionModel = BrowserListSelectionModel(selectedPhotosListModel, browserListModel)
-        browserList.addListSelectionListener {
-            browserList.selectedValue?.let { photo ->
-                //if(photo.getPhotoEntity() !in selectedPhotos.getPhotos()) {
-                noticeFrame.showPhoto(photo)
-                //}
+        browserList.addListSelectionListener { e ->
+            if(!e.valueIsAdjusting) {
+                browserList.selectedValue?.let { photo ->
+                    noticeFrame.showPhoto(photo)
+                }
             }
         }
 
