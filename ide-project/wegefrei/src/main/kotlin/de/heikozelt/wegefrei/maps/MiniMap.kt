@@ -4,6 +4,7 @@ import de.heikozelt.wegefrei.gui.Styles.Companion.HIGHLIGHT_BORDER
 import de.heikozelt.wegefrei.gui.Styles.Companion.NORMAL_BORDER
 import de.heikozelt.wegefrei.model.SelectedPhotosListModel
 import de.heikozelt.wegefrei.noticeframe.NoticeFrame
+import org.jxmapviewer.viewer.TileFactory
 import org.slf4j.LoggerFactory
 import java.awt.Dimension
 
@@ -15,8 +16,9 @@ import java.awt.Dimension
  */
 class MiniMap(
     private val noticeFrame: NoticeFrame,
-    selectedPhotosListModel: SelectedPhotosListModel
-) : BaseMap(noticeFrame, selectedPhotosListModel) {
+    selectedPhotosListModel: SelectedPhotosListModel,
+    tileFactory: TileFactory
+) : BaseMap(noticeFrame, selectedPhotosListModel, tileFactory) {
 
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
     private var borderVisible = false

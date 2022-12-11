@@ -4,6 +4,7 @@ import de.heikozelt.wegefrei.model.Photo
 import de.heikozelt.wegefrei.model.SelectedPhotosListModel
 import de.heikozelt.wegefrei.noticeframe.NoticeFrame
 import org.jxmapviewer.viewer.GeoPosition
+import org.jxmapviewer.viewer.TileFactory
 import org.slf4j.LoggerFactory
 import java.awt.Insets
 import java.util.*
@@ -15,11 +16,12 @@ import javax.swing.*
  */
 class MaxiMapForm(
     private val noticeFrame: NoticeFrame,
-    selectedPhotosListModel: SelectedPhotosListModel
+    selectedPhotosListModel: SelectedPhotosListModel,
+    tileFactory: TileFactory
 ) : JPanel() {
 
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
-    private val maxiMap = MaxiMap(noticeFrame, selectedPhotosListModel)
+    private val maxiMap = MaxiMap(noticeFrame, selectedPhotosListModel, tileFactory)
     //private val maxiMapButtonsBar = MaxiMapButtonsBar(noticeFrame, this)
 
     private val zoomInButton = JButton("+")

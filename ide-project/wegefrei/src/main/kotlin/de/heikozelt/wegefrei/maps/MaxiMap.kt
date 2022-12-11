@@ -6,6 +6,7 @@ import de.heikozelt.wegefrei.noticeframe.NoticeFrame
 import org.jxmapviewer.input.PanMouseInputListener
 import org.jxmapviewer.input.ZoomMouseWheelListenerCenter
 import org.jxmapviewer.viewer.GeoPosition
+import org.jxmapviewer.viewer.TileFactory
 import org.slf4j.LoggerFactory
 
 /**
@@ -16,8 +17,9 @@ import org.slf4j.LoggerFactory
  */
 class MaxiMap(
     private val noticeFrame: NoticeFrame,
-    selectedPhotosListModel: SelectedPhotosListModel
-): BaseMap(noticeFrame, selectedPhotosListModel) {
+    selectedPhotosListModel: SelectedPhotosListModel,
+    tileFactory: TileFactory
+): BaseMap(noticeFrame, selectedPhotosListModel, tileFactory) {
 
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
 

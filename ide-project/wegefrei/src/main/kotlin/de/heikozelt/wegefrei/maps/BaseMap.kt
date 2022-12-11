@@ -5,9 +5,8 @@ import de.heikozelt.wegefrei.model.SelectedPhotosListDataEvent
 import de.heikozelt.wegefrei.model.SelectedPhotosListModel
 import de.heikozelt.wegefrei.noticeframe.NoticeFrame
 import org.jxmapviewer.JXMapViewer
-import org.jxmapviewer.OSMTileFactoryInfo
-import org.jxmapviewer.viewer.DefaultTileFactory
 import org.jxmapviewer.viewer.GeoPosition
+import org.jxmapviewer.viewer.TileFactory
 import org.slf4j.LoggerFactory
 import java.awt.Graphics
 import java.awt.Point
@@ -32,7 +31,8 @@ import javax.swing.event.ListDataListener
  */
 open class BaseMap(
     private val noticeFrame: NoticeFrame,
-    private val selectedPhotosListModel: SelectedPhotosListModel
+    private val selectedPhotosListModel: SelectedPhotosListModel,
+    tileFactory: TileFactory
 ) : JXMapViewer(), ListDataListener {
 
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
@@ -42,8 +42,7 @@ open class BaseMap(
 
     init {
         log.debug("init")
-        val info = OSMTileFactoryInfo()
-        tileFactory = DefaultTileFactory(info)
+        this.tileFactory = tileFactory
         log.debug("minimum zoom level: " + tileFactory.info.minimumZoomLevel)
         log.debug("maximum zoom level: " + tileFactory.info.maximumZoomLevel)
     }

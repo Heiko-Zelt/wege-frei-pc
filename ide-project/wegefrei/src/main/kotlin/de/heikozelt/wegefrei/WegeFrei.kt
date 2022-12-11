@@ -8,6 +8,8 @@ import de.heikozelt.wegefrei.noticeframe.NoticeFrame
 import de.heikozelt.wegefrei.noticesframe.NoticesFrame
 import de.heikozelt.wegefrei.scanframe.ScanFrame
 import de.heikozelt.wegefrei.settingsframe.SettingsFrame
+import org.jxmapviewer.OSMTileFactoryInfo
+import org.jxmapviewer.viewer.DefaultTileFactory
 import org.slf4j.LoggerFactory
 import java.awt.EventQueue
 import javax.swing.JOptionPane
@@ -57,6 +59,12 @@ open class WegeFrei(private val settingsRepo: SettingsRepo = SettingsFileRepo())
      * einzelne Meldungs-Fenster (neue oder bestehende Meldung bearbeiten)
      */
     private val noticeFrames = mutableListOf<NoticeFrame>()
+
+    /**
+     * Singleton used by multiple JxMapViewer instances
+     */
+    private val tileFactoryInfo = OSMTileFactoryInfo()
+    private val tileFactory = DefaultTileFactory(tileFactoryInfo)
 
     init {
         log.debug("initializing")
@@ -183,7 +191,7 @@ open class WegeFrei(private val settingsRepo: SettingsRepo = SettingsFileRepo())
     fun openNoticeFrame(noticeEntity: NoticeEntity = NoticeEntity.createdNow()) {
         log.debug("Anzahl NoticeFrames: " + noticeFrames.size)
         databaseRepo?.let { dbRepo ->
-            val noticeFrame = NoticeFrame(this, dbRepo)
+            val noticeFrame = NoticeFrame(this, dbRepo, tileFactory)
             noticeFrames.add(noticeFrame)
             EventQueue.invokeLater {
                 // Thread.sleep(5000) // simulate slowness

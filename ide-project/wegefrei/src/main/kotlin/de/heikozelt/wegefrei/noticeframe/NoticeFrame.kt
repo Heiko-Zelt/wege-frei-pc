@@ -12,6 +12,7 @@ import de.heikozelt.wegefrei.json.Witness
 import de.heikozelt.wegefrei.maps.MaxiMapForm
 import de.heikozelt.wegefrei.model.*
 import org.jxmapviewer.viewer.GeoPosition
+import org.jxmapviewer.viewer.TileFactory
 import org.slf4j.LoggerFactory
 import java.awt.Component
 import java.awt.Dimension
@@ -57,7 +58,8 @@ import kotlin.math.sqrt
  */
 class NoticeFrame(
     private val app: WegeFrei,
-    private val dbRepo: DatabaseRepo
+    private val dbRepo: DatabaseRepo,
+    private val tileFactory: TileFactory
 ) : JFrame(), ListDataListener /*, SelectedPhotosObserver */ {
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
 
@@ -80,7 +82,7 @@ class NoticeFrame(
     private val selectedPhotosListCellRenderer = SelectedPhotosListCellRenderer()
     private var selectedPhotosList = JList(selectedPhotosListModel)
     private var selectedPhotosScrollPane = JScrollPane(selectedPhotosList)
-    private var noticeForm = NoticeForm(this, selectedPhotosListModel, dbRepo)
+    private var noticeForm = NoticeForm(this, selectedPhotosListModel, dbRepo, tileFactory)
 
     // Split-Panes:
     private var topSplitPane = JSplitPane(JSplitPane.VERTICAL_SPLIT, browserPanel, selectedPhotosScrollPane)
@@ -242,7 +244,7 @@ class NoticeFrame(
     fun showMaxiMap() {
         log.debug("showMaxiMap()")
         // todo Prio 4: do nothing if it is already shown
-        val maxiMapForm = MaxiMapForm(this, selectedPhotosListModel)
+        val maxiMapForm = MaxiMapForm(this, selectedPhotosListModel, tileFactory)
         selectedPhotosListModel.addListDataListener(maxiMapForm.getMaxiMap())
         setZoomComponent(maxiMapForm)
         maxiMapForm.setOffenseMarker(offensePosition)

@@ -187,7 +187,7 @@ class BrowserPanel(
         log.debug("move photo file $path to trash bin")
         val fileUtils = getFileUtilsInstance()
         if (fileUtils != null) {
-            fileUtils?.moveToTrash(File(path.toString()))
+            fileUtils.moveToTrash(File(path.toString()))
             browserListModel.deletePhoto(photo)
         }
     }

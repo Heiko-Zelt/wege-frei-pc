@@ -9,6 +9,7 @@ import de.heikozelt.wegefrei.model.Photo
 import de.heikozelt.wegefrei.model.SelectedPhotosListDataEvent
 import de.heikozelt.wegefrei.model.SelectedPhotosListModel
 import de.heikozelt.wegefrei.model.VehicleColor
+import org.jxmapviewer.viewer.TileFactory
 import org.slf4j.LoggerFactory
 import java.time.LocalDate
 import java.time.LocalTime
@@ -35,7 +36,8 @@ import javax.swing.text.AbstractDocument
 class NoticeFormFields(
     private val noticeFrame: NoticeFrame,
     private val selectedPhotosListModel: SelectedPhotosListModel,
-    private val dbRepo: DatabaseRepo
+    private val dbRepo: DatabaseRepo,
+    private val tileFactory: TileFactory
 ) : JPanel(), ListDataListener /* SelectedPhotosObserver */ {
 
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
@@ -47,7 +49,7 @@ class NoticeFormFields(
     //private val vehicleMakeComboBox = JComboBox(ListVehicleMakes.VEHICLE_MAKES)
     private val vehicleMakeComboBox = VehicleMakeComboBox()
     private val colorComboBox = JComboBox(VehicleColor.COLORS)
-    private val miniMap = MiniMap(noticeFrame, selectedPhotosListModel)
+    private val miniMap = MiniMap(noticeFrame, selectedPhotosListModel, tileFactory)
     private var streetTextField = TrimmingTextField(30)
     private var zipCodeTextField = TrimmingTextField(5)
     private var townTextField = TrimmingTextField(30)
