@@ -26,7 +26,7 @@ open class PatternVerifier(patternStr: String) : InputVerifier() {
         /**
          * "01.01.2021" oder "1.1.2021" oder Leerstring
          */
-        val dateVerifier = PatternVerifier("^(([012]?\\d|3[01])\\.(0?[1-9]|1[012])\\.(20\\d\\d))?$")
+        val dateVerifier = PatternVerifier("^((0?[1-9]|[12]\\d|3[01])\\.(0?[1-9]|1[012])\\.(20\\d\\d))?$")
 
         /**
          * "01:01" oder "1:1" oder Leerstring

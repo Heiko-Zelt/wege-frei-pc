@@ -62,4 +62,16 @@ class DateVerifierTest {
         source.text = "0112.2021"
         assertFalse(verifier.shouldYieldFocus(source, target))
     }
+
+    @Test
+    fun verify_wrong_date5() {
+        source.text = "0.1.2021"
+        assertFalse(verifier.shouldYieldFocus(source, target))
+    }
+
+    @Test
+    fun verify_wrong_date6() {
+        source.text = "00.01.2021"
+        assertFalse(verifier.shouldYieldFocus(source, target))
+    }
 }
