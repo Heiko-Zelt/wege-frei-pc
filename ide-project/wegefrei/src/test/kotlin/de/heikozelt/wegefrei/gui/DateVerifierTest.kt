@@ -30,6 +30,15 @@ class DateVerifierTest {
         assertTrue(verifier.shouldYieldFocus(source, target))
     }
 
+    /**
+     * fixed bug: 10.12.2022 was not recognized as date
+     */
+    @Test
+    fun verify_correct_date4() {
+        source.text = "10.12.2022"
+        assertTrue(verifier.shouldYieldFocus(source, target))
+    }
+
     @Test
     fun verify_wrong_date1() {
         source.text = "32.02.2021"
@@ -53,6 +62,4 @@ class DateVerifierTest {
         source.text = "0112.2021"
         assertFalse(verifier.shouldYieldFocus(source, target))
     }
-
-
 }
