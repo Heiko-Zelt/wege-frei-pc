@@ -4,6 +4,9 @@ import de.heikozelt.wegefrei.email.addressbook.AddressBookFrame
 import de.heikozelt.wegefrei.email.useragent.EmailUserAgent
 import de.heikozelt.wegefrei.entities.NoticeEntity
 import de.heikozelt.wegefrei.json.Settings
+import de.heikozelt.wegefrei.model.LeastRecentlyUsedCache
+import de.heikozelt.wegefrei.model.Photo
+import de.heikozelt.wegefrei.model.PhotoLoader
 import de.heikozelt.wegefrei.noticeframe.NoticeFrame
 import de.heikozelt.wegefrei.noticesframe.NoticesFrame
 import de.heikozelt.wegefrei.scanframe.ScanFrame
@@ -12,6 +15,7 @@ import org.jxmapviewer.OSMTileFactoryInfo
 import org.jxmapviewer.viewer.DefaultTileFactory
 import org.slf4j.LoggerFactory
 import java.awt.EventQueue
+import java.nio.file.Path
 import javax.swing.JOptionPane
 import javax.swing.JOptionPane.QUESTION_MESSAGE
 import javax.swing.JOptionPane.YES_NO_OPTION
@@ -65,6 +69,9 @@ open class WegeFrei(private val settingsRepo: SettingsRepo = SettingsFileRepo())
      */
     private val tileFactoryInfo = OSMTileFactoryInfo()
     private val tileFactory = DefaultTileFactory(tileFactoryInfo)
+
+    private var photoCache = LeastRecentlyUsedCache<Path, Photo>(128)
+    private var photoLoader: PhotoLoader? = null
 
     init {
         log.debug("initializing")
@@ -152,6 +159,9 @@ open class WegeFrei(private val settingsRepo: SettingsRepo = SettingsFileRepo())
                 closeNoticesFrame()
                 databaseRepo?.close()
                 databaseRepo = DatabaseRepo.fromDirectory(it)
+                databaseRepo?.let {
+                    photoLoader = PhotoLoader(it)
+                }
                 if (isNoticesFrameOpen) {
                     openNoticesFrame()
                 }
@@ -191,11 +201,13 @@ open class WegeFrei(private val settingsRepo: SettingsRepo = SettingsFileRepo())
     fun openNoticeFrame(noticeEntity: NoticeEntity = NoticeEntity.createdNow()) {
         log.debug("Anzahl NoticeFrames: " + noticeFrames.size)
         databaseRepo?.let { dbRepo ->
-            val noticeFrame = NoticeFrame(this, dbRepo, tileFactory)
-            noticeFrames.add(noticeFrame)
-            EventQueue.invokeLater {
-                // Thread.sleep(5000) // simulate slowness
-                noticeFrame.setNotice(noticeEntity)
+            photoLoader?.let { pLoader ->
+                val noticeFrame = NoticeFrame(this, dbRepo, tileFactory, photoCache, pLoader)
+                noticeFrames.add(noticeFrame)
+                EventQueue.invokeLater {
+                    // Thread.sleep(5000) // simulate slowness
+                    noticeFrame.setNotice(noticeEntity)
+                }
             }
         }
     }

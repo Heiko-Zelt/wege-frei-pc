@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit
  */
 class PhotoLoader(private val databaseRepo: DatabaseRepo) {
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
-    private val executorService = Executors.newFixedThreadPool(4)
+    private val executorService = Executors.newFixedThreadPool(5)
     private val observers = HashSet<PhotoLoaderObserver>()
 
     fun loadPhotoFile(photo: Photo) {

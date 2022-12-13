@@ -59,7 +59,9 @@ import kotlin.math.sqrt
 class NoticeFrame(
     private val app: WegeFrei,
     private val dbRepo: DatabaseRepo,
-    private val tileFactory: TileFactory
+    private val tileFactory: TileFactory,
+    private val photoCache: LeastRecentlyUsedCache<Path, Photo>,
+    private val photoLoader: PhotoLoader
 ) : JFrame(), ListDataListener /*, SelectedPhotosObserver */ {
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
 
@@ -73,12 +75,10 @@ class NoticeFrame(
      * last offense position, for which an address was searched for
      */
     private var searchedAddressForPosition: GeoPosition? = null
-    private var cache = LeastRecentlyUsedCache<Path, Photo>(128)
-    private val photoLoader = PhotoLoader(dbRepo)
 
     // GUI-Komponenten:
     private var selectedPhotosListModel = SelectedPhotosListModel(photoLoader)
-    private var browserPanel = BrowserPanel(this, dbRepo, cache, photoLoader, selectedPhotosListModel)
+    private var browserPanel = BrowserPanel(this, dbRepo, photoCache, photoLoader, selectedPhotosListModel)
     private val selectedPhotosListCellRenderer = SelectedPhotosListCellRenderer()
     private var selectedPhotosList = JList(selectedPhotosListModel)
     private var selectedPhotosScrollPane = JScrollPane(selectedPhotosList)
@@ -175,7 +175,7 @@ class NoticeFrame(
                 log.debug("photoEntity.path: $pathStr")
                 val path = Paths.get(pathStr)
                 //photo.setPhotoEntity(photoEntity)
-                var photo = cache[path]
+                var photo = photoCache[path]
                 if (photo == null) {
                     log.debug("not yet in cache")
                     photo = Photo(path)
@@ -403,7 +403,7 @@ class NoticeFrame(
 
         app.getSettings()?.let { setti ->
             noticeEntity?.let { n ->
-                n.recipientEmailAddress?.let { reci ->
+                n.recipientEmailAddress?.let { _ ->
                     val from = EmailAddressEntity(setti.witness.emailAddress, setti.witness.getFullName())
                     // todo Prio 3: mehrere Empfänger erlauben
                     val to = n.getRecipient()
