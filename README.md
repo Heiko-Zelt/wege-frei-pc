@@ -17,16 +17,16 @@ Alle Daten (Beweisfotos und Meldungen) werden auf dem eigenen PC gespeichert. De
  
 ## Downloads
 
- * Software-Paket für Windows:<br />
-   https://www.heikozelt.de/wegefrei/download/WegeFrei-1.0.msi
- * Software-Paket für Ubuntu-Linux:<br />
-   https://www.heikozelt.de/wegefrei/download/wegefrei-1.0-1_amd64.deb
- * Betriebssystem-unabhängig als .jar-Datei. Es wird zusätzlich Java 17 benötigt. Start mit `java -jar wegefrei-1.0-SNAPSHOT.jar`<br />
-   https://www.heikozelt.de/wegefrei/download/wegefrei-1.0-SNAPSHOT.jar
+ * Software-Paket für Windows/x86:<br />
+   https://www.heikozelt.de/wegefrei/download/WegeFrei-1.0.1.msi
+ * Software-Paket für Ubuntu-Linux/x86:<br />
+   https://www.heikozelt.de/wegefrei/download/wegefrei-1.0.1-1_amd64.deb
+ * Betriebssystem- & Prozessor-unabhängig als .jar-Datei. Es wird zusätzlich Java 17 benötigt. Start mit `java -jar wegefrei-1.0.1.jar`<br />
+   https://www.heikozelt.de/wegefrei/download/wegefrei-1.0.1-SNAPSHOT.jar
  
 ## Installation
 
-Am einfachsten ist die Verwendung eines Software-Paketes, abhängig vom Betriebssystem.
+Am einfachsten ist die Verwendung eines Software-Paketes, abhängig vom Betriebssystem und Prozessor/CPU-Familie.
 Sollte es (noch) kein Paket für Dein Betriebssystem geben, schreibe mich bitte an oder verwende die plattformunabhängige .jar-Datei.
 Zur Ausführung der .jar-Datei, welche Java Byte Code enthält wird zusätzlich eine Java Virtual Machine ab Version 17 benötigt.
 
