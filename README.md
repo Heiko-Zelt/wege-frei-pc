@@ -21,6 +21,8 @@ Alle Daten (Beweisfotos und Meldungen) werden auf dem eigenen PC gespeichert. De
    https://www.heikozelt.de/wegefrei/download/WegeFrei-1.0.1.msi
  * vollständiges Software-Paket für Ubuntu-Linux/x86:<br />
    https://www.heikozelt.de/wegefrei/download/wegefrei_1.0.1-1_amd64.deb
+ * vollständiges Software-Paket für Apple Mac/x86:<br />
+   https://www.heikozelt.de/wegefrei/download/WegeFrei-1.0.1.dmg
  * Betriebssystem- & Prozessor-unabhängig als .jar-Datei. Es wird zusätzlich Java 17 benötigt. Start mit `java -jar wegefrei-1.0.1.jar`<br />
    https://www.heikozelt.de/wegefrei/download/wegefrei-1.0.1.jar
  
