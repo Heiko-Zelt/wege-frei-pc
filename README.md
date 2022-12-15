@@ -29,7 +29,7 @@ Alle Daten (Beweisfotos und Meldungen) werden auf dem eigenen PC gespeichert. De
 ## Installation
 
 Am einfachsten ist die Verwendung eines Software-Paketes, abhängig vom Betriebssystem und Prozessor/CPU-Familie.
-Sollte es (noch) kein Paket für Dein Betriebssystem geben, schreibe mich bitte an oder verwende die plattformunabhängige .jar-Datei.
+Sollte es (noch) kein Paket für Deine Plattform (Betriebssystem & CPU) geben, schreibe mich bitte an oder verwende die plattformunabhängige .jar-Datei.
 Zur Ausführung der .jar-Datei, welche Java Byte Code enthält wird zusätzlich eine Java Virtual Machine ab Version 17 benötigt.
 
 ## Deinstallation
