@@ -3,10 +3,10 @@ package de.heikozelt.wegefrei.email.useragent
 import de.heikozelt.wegefrei.json.Tls
 import org.slf4j.LoggerFactory
 import java.util.*
-import javax.mail.*
-import javax.mail.internet.MimeBodyPart
-import javax.mail.internet.MimeMessage
-import javax.mail.internet.MimeMultipart
+import javax.mail.AuthenticationFailedException
+import javax.mail.MessagingException
+import javax.mail.Session
+import javax.mail.Transport
 import javax.swing.JOptionPane
 
 /**
@@ -81,6 +81,8 @@ class EmailUserAgent {
                 val session = Session.getInstance(props, authenticator)
                 log.debug("session: $session")
 
+                val msg = emailMessage.asMimeMessage(session)
+                /*
                 val msg = MimeMessage(session)
                 msg.addHeader("User-Agent", MAIL_USER_AGENT)
                 msg.setFrom(emailMessage.from.asInternetAddress())
@@ -89,17 +91,15 @@ class EmailUserAgent {
                 emailMessage.tos.forEach { msg.addRecipient(Message.RecipientType.TO, it.asInternetAddress()) }
                 emailMessage.ccs.forEach { msg.addRecipient(Message.RecipientType.CC, it.asInternetAddress()) }
                 msg.setSubject(emailMessage.subject, "UTF-8")
-
                 val multipart = MimeMultipart()
                 val mainPart = MimeBodyPart()
                 mainPart.setText(emailMessage.coverLetter, "utf-8", "html")
                 multipart.addBodyPart(mainPart)
-
                 emailMessage.attachments.forEach {
                     multipart.addBodyPart(it.asMimeBodyPart())
                 }
-
                 msg.setContent(multipart)
+                 */
 
                 try {
                     // "Note that send is a static method that creates and manages its own connection."

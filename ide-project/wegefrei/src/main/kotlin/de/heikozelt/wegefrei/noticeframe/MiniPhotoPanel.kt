@@ -42,6 +42,7 @@ class MiniPhotoPanel(
         }
 
         // lazy loading database access? in EDT?
+        // todo: bug: fremde Foto IDs werden nicht immer angezeigt.
         val noticeIds = photo?.getPhotoEntity()?.noticeEntities?.map { it.id }?.filter { it != noticeId }?.sortedBy{it}
         log.debug("noticeIds: $noticeIds")
         noticeIds?.let { ids ->

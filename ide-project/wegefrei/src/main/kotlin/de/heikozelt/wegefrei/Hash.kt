@@ -44,7 +44,8 @@ private fun updateDigest(digest: MessageDigest, input: InputStream) {
 }
 
 /**
- * konvertiert 20 Bytes binär in einen 40 Zeichen langen hexadezimal codierten String
+ * Konvertiert einen binären Byte-Array in einen hexadezimal codierten String.
+ * 20 Bytes binär ergeben z.B. einen 40 Zeichen langen hexadezimal codierten String.
  */
 fun hex(bytes: ByteArray): String {
     return bytes.joinToString(separator = "") { byte -> "%02x".format(byte) }
