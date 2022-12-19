@@ -80,27 +80,7 @@ class EmailUserAgent {
                 // todo close session, finally or try with?
                 val session = Session.getInstance(props, authenticator)
                 log.debug("session: $session")
-
                 val msg = emailMessage.asMimeMessage(session)
-                /*
-                val msg = MimeMessage(session)
-                msg.addHeader("User-Agent", MAIL_USER_AGENT)
-                msg.setFrom(emailMessage.from.asInternetAddress())
-                //msg.addHeader("Return-Receipt-To", emailMessage.from.address)
-                //msg.addHeader("Disposition-Notification-To", emailMessage.from.address)
-                emailMessage.tos.forEach { msg.addRecipient(Message.RecipientType.TO, it.asInternetAddress()) }
-                emailMessage.ccs.forEach { msg.addRecipient(Message.RecipientType.CC, it.asInternetAddress()) }
-                msg.setSubject(emailMessage.subject, "UTF-8")
-                val multipart = MimeMultipart()
-                val mainPart = MimeBodyPart()
-                mainPart.setText(emailMessage.coverLetter, "utf-8", "html")
-                multipart.addBodyPart(mainPart)
-                emailMessage.attachments.forEach {
-                    multipart.addBodyPart(it.asMimeBodyPart())
-                }
-                msg.setContent(multipart)
-                 */
-
                 try {
                     // "Note that send is a static method that creates and manages its own connection."
                     Transport.send(msg)

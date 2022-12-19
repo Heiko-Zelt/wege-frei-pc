@@ -330,21 +330,24 @@ class NoticeFrame(
      */
     fun saveNotice() {
         log.debug("saveNotice()")
-        // todo Prio 1: bug: Fotos, die noch nicht in der Datenbank sind, werden nicht gespeichert.
         noticeEntity = noticeForm.getNoticeFormFields().getNotice()
         val dbRepo = app.getDatabaseRepo() ?: return
-        noticeEntity?.let {
-            it.setGeoPosition(offensePosition)
-            it.photoEntities = selectedPhotosListModel.getPhotoEntities()
-            log.debug("noticeEntity.id = ${it.id}")
-            if (it.id == null) {
-                dbRepo.insertNotice(it)
+        noticeEntity?.let { ne ->
+            ne.setGeoPosition(offensePosition)
+            ne.photoEntities = selectedPhotosListModel.getPhotoEntities()
+            // remember which notices belong to the photos in cache
+            ne.photoEntities.forEach{ pe ->
+                pe.noticeEntities.add(ne)
+            }
+            log.debug("noticeEntity.id = ${ne.id}")
+            if (ne.id == null) {
+                dbRepo.insertNotice(ne)
                 log.debug("added")
-                app.noticeAdded(it)
+                app.noticeAdded(ne)
             } else {
-                dbRepo.updateNotice(it)
+                dbRepo.updateNotice(ne)
                 log.debug("updated")
-                app.noticeUpdated(it)
+                app.noticeUpdated(ne)
             }
         }
     }
