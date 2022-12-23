@@ -93,7 +93,7 @@ class OffenseComboBoxModel: DefaultComboBoxModel<String>() {
             "Parken innerhalb eines Kreisverkehrs",
             "Parken in einem Abstand von weniger als 15 m von einem Haltestellenschild",
             "Parken auf Grenzmarkierung für ein Parkverbot",
-            "Halten/Parken bei zulässigem Gehwegparken nicht auf dem Gehweg",
+            "Halten/Parken bei angeordnetem Gehwegparken nicht auf dem Gehweg",
             "Halten/Parken auf Sonderfahrstreifen für Omnibusse des Linienverkehrs",
             "Parken auf gekennzeichnetem Behindertenparkplatz",
             "Parken mit Verbrenner vor Elektroladesäule",
