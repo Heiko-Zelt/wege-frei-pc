@@ -22,6 +22,7 @@ import java.awt.event.WindowEvent
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 import java.util.*
 import javax.swing.*
 import javax.swing.event.ListDataEvent
@@ -30,6 +31,7 @@ import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.sqrt
+
 
 /**
  * Haupt-Fenster zum Bearbeiten einer Meldung
@@ -402,6 +404,19 @@ class NoticeFrame(
     /**
      */
     private fun sendEmail() {
+        fun buildSubject(n: NoticeEntity): String {
+            var subject = "Anzeige"
+            n.observationTime?.let {
+                val formatter = DateTimeFormatter.ofPattern("d. MMM, HH:mm")
+                val formatted = it.format(formatter)
+                subject += " $formatted"
+            }
+            n.licensePlate?.let { lic ->
+                subject += ", $lic"
+            }
+            return subject
+        }
+
         log.debug("sendEmail()")
 
         app.getSettings()?.let { setti ->
@@ -412,10 +427,7 @@ class NoticeFrame(
                     val to = n.getRecipient()
                     val tos = TreeSet<EmailAddressEntity>()
                     tos.add(to)
-                    var subject = "Anzeige"
-                    n.licensePlate?.let { lic ->
-                        subject += " $lic"
-                    }
+                    val subject = buildSubject(n)
                     val content = buildMailContent(n, setti.witness)
                     val message = EmailMessage(from, tos, subject, content)
                     if (from.address != to.address) message.ccs.add(from)
@@ -428,7 +440,6 @@ class NoticeFrame(
                     // todo Prio 3: Nicht jedes Mal einen neuen User Agent instanziieren
 
                     val agent = app.getEmailUserAgent()
-                    //agent.setEmailServerConfig(setti.emailServerConfig)
                     agent?.sendMailAfterConfirmation(message)
                 }
             }
