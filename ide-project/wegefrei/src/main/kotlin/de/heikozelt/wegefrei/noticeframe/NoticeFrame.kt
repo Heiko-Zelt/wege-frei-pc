@@ -24,6 +24,7 @@ import java.nio.file.Paths
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
+import java.util.Locale.GERMAN
 import javax.swing.*
 import javax.swing.event.ListDataEvent
 import javax.swing.event.ListDataListener
@@ -407,7 +408,7 @@ class NoticeFrame(
         fun buildSubject(n: NoticeEntity): String {
             var subject = "Anzeige"
             n.observationTime?.let {
-                val formatter = DateTimeFormatter.ofPattern("d. MMM, HH:mm")
+                val formatter = DateTimeFormatter.ofPattern("d. MMM, HH:mm").withLocale(GERMAN)
                 val formatted = it.format(formatter)
                 subject += " $formatted"
             }
