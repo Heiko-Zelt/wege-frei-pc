@@ -1,15 +1,17 @@
+set WEGE_FREI_VERSION=1.0.2
+
 set JAVA_HOME=C:\Users\Hi\.jdks\temurin-17.0.5
 set WIX_HOME=C:\Program Files (x86)\WiX Toolset v3.11
 set PATH=%JAVA_HOME%\bin;%WIX_HOME%\bin;%PATH%
 
 jpackage ^
   --name WegeFrei ^
-  --app-version 1.0.1 ^
+  --app-version %WEGE_FREI_VERSION% ^
   --description "Wege frei! Falschparker fotografieren, Formular ausfüllen und absenden!" ^
   --vendor "Heiko Zelt" ^
   --about-url https://github.com/Heiko-Zelt/wege-frei-pc ^
   --input build\libs ^
-  --main-jar wegefrei-1.0.1.jar ^
+  --main-jar wegefrei-%WEGE_FREI_VERSION%.jar ^
   --main-class de.heikozelt.wegefrei.WegeFrei ^
   --dest build\jpackage ^
   --type msi ^
