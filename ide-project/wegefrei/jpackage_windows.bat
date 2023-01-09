@@ -4,6 +4,9 @@ set JAVA_HOME=C:\Users\Hi\.jdks\temurin-17.0.5
 set WIX_HOME=C:\Program Files (x86)\WiX Toolset v3.11
 set PATH=%JAVA_HOME%\bin;%WIX_HOME%\bin;%PATH%
 
+rem Change code page to UTF-8
+chcp 65001
+
 jpackage ^
   --name WegeFrei ^
   --app-version %WEGE_FREI_VERSION% ^
