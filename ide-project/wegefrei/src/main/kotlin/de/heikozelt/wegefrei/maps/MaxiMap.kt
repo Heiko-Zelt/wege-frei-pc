@@ -47,16 +47,18 @@ class MaxiMap(
      * could as well be solved with a factory method and polymorphism
      */
     fun enableOrDisableDragAndDrop() {
-        getOffenseMarker()?.getLabel()?.let {
+        getOffenseMarker()?.getLabel()?.let { label ->
             val notice = noticeFrame.getNotice()
-            if(notice.isSent()) {
-                log.debug("remove mouse listeners")
-                it.removeMouseListener(mickey)
-                it.removeMouseMotionListener(mickey)
-            } else {
-                log.debug("add mouse listeners")
-                it.addMouseListener(mickey)
-                it.addMouseMotionListener(mickey)
+            notice?.let { ne ->
+                if (ne.isFinalized()) {
+                    log.debug("remove mouse listeners")
+                    label.removeMouseListener(mickey)
+                    label.removeMouseMotionListener(mickey)
+                } else {
+                    log.debug("add mouse listeners")
+                    label.addMouseListener(mickey)
+                    label.addMouseMotionListener(mickey)
+                }
             }
         }
     }

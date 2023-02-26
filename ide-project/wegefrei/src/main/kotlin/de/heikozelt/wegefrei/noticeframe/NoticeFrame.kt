@@ -2,13 +2,10 @@ package de.heikozelt.wegefrei.noticeframe
 
 import de.heikozelt.wegefrei.DatabaseRepo
 import de.heikozelt.wegefrei.WegeFrei
-import de.heikozelt.wegefrei.email.EmailAddressEntity
-import de.heikozelt.wegefrei.email.useragent.EmailAttachment
-import de.heikozelt.wegefrei.email.useragent.EmailMessage
+import de.heikozelt.wegefrei.email.useragent.EmailMessageDialog
 import de.heikozelt.wegefrei.entities.NoticeEntity
 import de.heikozelt.wegefrei.gui.Styles
 import de.heikozelt.wegefrei.jobs.AddressWorker
-import de.heikozelt.wegefrei.json.Witness
 import de.heikozelt.wegefrei.maps.MaxiMapForm
 import de.heikozelt.wegefrei.model.*
 import org.jxmapviewer.viewer.GeoPosition
@@ -22,9 +19,7 @@ import java.awt.event.WindowEvent
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter
 import java.util.*
-import java.util.Locale.GERMAN
 import javax.swing.*
 import javax.swing.event.ListDataEvent
 import javax.swing.event.ListDataListener
@@ -68,8 +63,16 @@ class NoticeFrame(
 ) : JFrame(), ListDataListener /*, SelectedPhotosObserver */ {
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
 
-    // Daten-Modell:
-    private var noticeEntity: NoticeEntity? = null // wozu brauche ich dieses Feld, wenn getNotice() delegiert
+    /**
+     * Daten-Modell:
+     * todo Problem: Eine Nachricht besteht aus einfachen Benutzereingaben und generierten Status/Protokoll-Daten
+     * Lösung:
+     * <ul>
+     *   <li>NoticeFrame.noticeEntity enthält Status-Daten</li>
+     *   <li>NoticeFrame.noticeForm enthält Eingabefelder</li>
+     * </ul>
+     */
+    private var noticeEntity: NoticeEntity? = null
 
     //private var selectedPhotos: SelectedPhotos = SelectedPhotos() // Achtung: Redundanz
     private var offensePosition: GeoPosition? = null // Achtung: Redundanz
@@ -104,7 +107,7 @@ class NoticeFrame(
         selectedPhotosList.visibleRowCount = 1
         selectedPhotosList.layoutOrientation = JList.HORIZONTAL_WRAP
         selectedPhotosList.addListSelectionListener { e ->
-            if(!e.valueIsAdjusting) {
+            if (!e.valueIsAdjusting) {
                 selectedPhotosList.selectedValue?.let { photo ->
                     this.showSelectedPhoto(photo)
                 }
@@ -124,7 +127,7 @@ class NoticeFrame(
         addWindowListener(object : WindowAdapter() {
             override fun windowClosing(e: WindowEvent?) {
                 e?.window?.let {
-                    if (it is NoticeFrame) it.saveAndClose()
+                    if (it is NoticeFrame) it.saveButtonClicked()
                 }
             }
         })
@@ -200,7 +203,7 @@ class NoticeFrame(
             "Meldung #${noticeEntity.id} - Wege frei!"
         }
 
-        app.getSettings()?.let {s ->
+        app.getSettings()?.let { s ->
             browserPanel.setPhotosDirectory(s.getPhotosPath())
             noticeForm.setNotice(noticeEntity)
         }
@@ -212,11 +215,10 @@ class NoticeFrame(
         offensePosition = noticeEntity.getGeoPosition()
     }
 
-    /**
-     * delegiert nur
-     */
-    fun getNotice(): NoticeEntity {
-        return noticeForm.getNotice()
+
+
+    fun getNotice(): NoticeEntity? {
+       return noticeEntity
     }
 
     /**
@@ -327,124 +329,10 @@ class NoticeFrame(
         }
     }
 
-    /**
-     * Die Methode wird vom OK-Button aufgerufen.
-     * Speichert die Meldung in der Datenbank.
-     */
-    fun saveNotice() {
-        log.debug("saveNotice()")
-        noticeEntity = noticeForm.getNoticeFormFields().getNotice()
-        val dbRepo = app.getDatabaseRepo() ?: return
-        noticeEntity?.let { ne ->
-            ne.setGeoPosition(offensePosition)
-            ne.photoEntities = selectedPhotosListModel.getPhotoEntities()
-            // remember which notices belong to the photos in cache
-            ne.photoEntities.forEach{ pe ->
-                pe.noticeEntities.add(ne)
-            }
-            log.debug("noticeEntity.id = ${ne.id}")
-            if (ne.id == null) {
-                dbRepo.insertNotice(ne)
-                log.debug("added")
-                app.noticeAdded(ne)
-            } else {
-                dbRepo.updateNotice(ne)
-                log.debug("updated")
-                app.noticeUpdated(ne)
-            }
-        }
-    }
-
-    /**
-     * Die Methode wird vom Löschen-Button aufgerufen.
-     * Löscht die Meldung aus der Datenbank.
-     */
-    fun deleteNotice() {
-        val dbRepo = app.getDatabaseRepo() ?: return
-        noticeEntity?.let { entity ->
-            entity.id?.let { id ->
-                dbRepo.deleteNotice(id)
-            }
-            app.noticeDeleted(entity)
-        }
-    }
-
-    /**
-     * Die Methode wird vom E-Mail-absenden-Button aufgerufen.
-     * todo Prio 3: asynchroner E-Mail-Versand. Vierten Status einführen, Meldung ist im Postausgang, aber noch nicht gesendet.
-     * todo weitere Validierung, nicht nur prüfen, ob Empfänger-E-Mail-Adresse angegeben ist.
-     * todo Detaillierte Rückmeldung über den Grund, warum die Validierung fehlgeschlagen ist
-     * todo Bei Validierung: Differenzierung zwischen Warnung und Fehler
-     */
-    fun sendNotice() {
-        noticeEntity = getNotice()
-        noticeEntity?.let {
-            if (it.recipientEmailAddress == null) {
-                JOptionPane.showMessageDialog(
-                    null,
-                    "Kein Empfänger angegeben.",
-                    "Validierungsfehler",
-                    JOptionPane.INFORMATION_MESSAGE
-                )
-            } else {
-                sendEmail()
-                // todo Prio 1: nur wenn E-Mail tatsächlich erfolgreich gesendet wurde
-                it.sentTime = ZonedDateTime.now()
-                disableFormFields()
-                saveNotice()
-            }
-        }
-    }
-
     private fun disableFormFields() {
         // todo Prio 2 ALLE Eingabefelder deaktivieren (auch Foto-Panels)
-        noticeForm.enableOrDisableEditing()
+        noticeForm.enableOrDisableEditing(false)
         getMaxiMapForm()?.enableOrDisableEditing()
-    }
-
-    /**
-     */
-    private fun sendEmail() {
-        fun buildSubject(n: NoticeEntity): String {
-            var subject = "Anzeige"
-            n.observationTime?.let {
-                val formatter = DateTimeFormatter.ofPattern("d. MMM, HH:mm").withLocale(GERMAN)
-                val formatted = it.format(formatter)
-                subject += " $formatted"
-            }
-            n.licensePlate?.let { lic ->
-                subject += ", $lic"
-            }
-            return subject
-        }
-
-        log.debug("sendEmail()")
-
-        app.getSettings()?.let { setti ->
-            noticeEntity?.let { n ->
-                n.recipientEmailAddress?.let { _ ->
-                    val from = EmailAddressEntity(setti.witness.emailAddress, setti.witness.getFullName())
-                    // todo Prio 3: mehrere Empfänger erlauben
-                    val to = n.getRecipient()
-                    val tos = TreeSet<EmailAddressEntity>()
-                    tos.add(to)
-                    val subject = buildSubject(n)
-                    val content = buildMailContent(n, setti.witness)
-                    val message = EmailMessage(from, tos, subject, content)
-                    if (from.address != to.address) message.ccs.add(from)
-
-                    selectedPhotosListModel.getSelectedPhotos().forEach {
-                        val attachment = EmailAttachment(it.getPath())
-                        message.attachments.add(attachment)
-                    }
-
-                    // todo Prio 3: Nicht jedes Mal einen neuen User Agent instanziieren
-
-                    val agent = app.getEmailUserAgent()
-                    agent?.sendMailAfterConfirmation(message)
-                }
-            }
-        }
     }
 
     fun getZoomComponent(): Component {
@@ -530,18 +418,190 @@ class NoticeFrame(
         maybeFindAddress()
     }
 
-    fun cancelAndClose() {
-        isVisible = false
-        dispose()
-        app.noticeFrameClosed(this)
+
+/////////////////////////////////////////////
+
+    /**
+     * Anwenderin hat auf den Abbrechen-Button geklickt.
+     * <ol>
+     *   <li>Fenster schließen</li>
+     *   <li>andere Fenster/GUI-Komponenten benachrichtigen</li>
+     * </ol>
+     */
+    fun cancelButtonClicked() {
+        closeWindow()
     }
 
-    fun saveAndClose() {
+    /**
+     * Anwenderin hat auf den Löschen-Button geklickt.
+     * <ol>
+     *   <li>Meldung löschen</li>
+     *   <li>Fenster schließen</li>
+     *   <li>andere Fenster/GUI-Komponenten benachrichtigen</li>
+     * </ol>
+     */
+    fun deleteButtonClicked() {
+        deleteNotice()
+        closeWindow()
+    }
+
+    /**
+     * Anwenderin hat auf den Ok/Speichern-Button geklickt.
+     * <ol>
+     *   <li>Formular-Eingaben auf Meldung abbilden und validieren (NoticeFormFields.validateAndMap(ne))</li>
+     *   <li>ggf. abbrechen</li>
+     *   <li>Meldung speichern</li>
+     *   <li>Fenster schließen</li>
+     *   <li>andere Fenster/GUI-Komponenten benachrichtigen</li>
+     * </ol>
+     */
+    fun saveButtonClicked() {
+        val errors = validateAndMap()
+        if (errors.isNotEmpty()) {
+            showValidationErrors(errors)
+            return
+        }
         saveNotice()
-        isVisible = false
-        dispose()
-        app.noticeFrameClosed(this)
-        app.getSettings()?.let {s ->
+        updatePhotosDir()
+        closeWindow()
+    }
+
+    /**
+     * Anwenderin hat auf den E-Mail-absenden-Button geklickt.
+     * <ol>
+     *   <li>Formular-Eingaben auf Meldung abbilden und validieren.
+     *     NoticeFrame.validateAndMap() -> NoticeFormFields.validateAndMap(ne)</li>
+     *   <li>Vollständigkeit/Pflichtfelder prüfen.
+     *     NoticeEntity.isComplete()</li>
+     *   <li>ggf. abbrechen</li>
+     *   <li>E-Mail-Nachricht generieren</li>
+     *   <li>E-Mail-Nachricht anzeigen</li>
+     *   <li>Wenn Benutzerin bestätigt</li>
+     *   <li>Meldung finalisieren</li>
+     *   <li>Meldung speichern</li>
+     *   <li>Fenster schließen</li>
+     *   <li>Sende-Thread starten, falls er nicht läuft</li>
+     *   <li>andere Fenster/GUI-Komponenten benachrichtigen</li>
+     * </ol>
+     * todo Prio 3: asynchroner E-Mail-Versand. Vierten Status einführen, Meldung ist im Postausgang, aber noch nicht gesendet.
+     * todo weitere Validierung, nicht nur prüfen, ob Empfänger-E-Mail-Adresse angegeben ist.
+     * todo Detaillierte Rückmeldung über den Grund, warum die Validierung fehlgeschlagen ist
+     * todo Bei Validierung: Differenzierung zwischen Warnung und Fehler
+     */
+    fun sendButtonClicked() {
+        var errors = validateAndMap()
+        if (errors.isNotEmpty()) {
+            showValidationErrors(errors)
+            return
+        }
+        noticeEntity?.let { ne ->
+            errors = ne.isComplete()
+            if (errors.isNotEmpty()) {
+                showValidationErrors(errors)
+                return
+            }
+            sendEmail()
+        }
+    }
+
+
+
+    /////////////////////////////////////////////
+
+    fun validateAndMap(): List<String> {
+        log.debug("validateAndMap()")
+        var errors = listOf<String>()
+        if (noticeEntity == null) {
+            noticeEntity = NoticeEntity.createdNow()
+        }
+        noticeEntity?.let { ne ->
+            errors = noticeForm.getNoticeFormFields().validateAndMap(ne)
+            ne.setGeoPosition(offensePosition)
+            ne.photoEntities = selectedPhotosListModel.getPhotoEntities()
+            // remember which notices belong to the photos in cache
+            ne.photoEntities.forEach { pe ->
+                pe.noticeEntities.add(ne)
+            }
+        }
+        return errors
+    }
+
+    fun showValidationErrors(errors: List<String>) {
+        val message = errors.joinToString("<br>", "<html>", "</html>")
+        JOptionPane.showMessageDialog(
+            null,
+            message,
+            "Validierungsfehler",
+            JOptionPane.INFORMATION_MESSAGE
+        )
+    }
+
+    /**
+     * Sammelt die Daten einer Meldung ein und
+     * speichert die Meldung in der Datenbank.
+     */
+    fun saveNotice() {
+        val dbRepo = app.getDatabaseRepo() ?: return
+        noticeEntity?.let { ne ->
+            log.debug("noticeEntity.id = ${ne.id}")
+            if (ne.id == null) {
+                dbRepo.insertNotice(ne)
+                log.debug("added")
+                app.noticeAdded(ne)
+            } else {
+                dbRepo.updateNotice(ne)
+                log.debug("updated")
+                app.noticeUpdated(ne)
+            }
+        }
+    }
+
+    /**
+     * Die Methode wird vom Löschen-Button aufgerufen.
+     * Löscht die Meldung aus der Datenbank.
+     */
+    fun deleteNotice() {
+        val dbRepo = app.getDatabaseRepo() ?: return
+        noticeEntity?.let { entity ->
+            entity.id?.let { id ->
+                dbRepo.deleteNotice(id)
+            }
+            app.noticeDeleted(entity)
+        }
+    }
+
+    /**
+     * Wird aufgerufen, nachdem Formulareingaben auf Vollständigkeit geprüft wurden.
+     * Baut aus der Meldung eine E-Mail-Nachricht
+     * und zeigt den Bestätigungs-Dialog an.
+     */
+    private fun sendEmail() {
+        noticeEntity?.let { ne ->
+            val outbox = app.getNoticesOutbox()
+            val message = outbox.buildEmailMessage(ne)
+            message?.let { me ->
+                val dialog = EmailMessageDialog { sendEmailConfirmed() }
+                dialog.setEmailMessage(me)
+            }
+        }
+    }
+
+    /**
+     * wird aufgerufen, wenn die Anwenderin das Senden einer E-Mail-Nachricht bestätigt hat.
+     */
+    fun sendEmailConfirmed() {
+        log.debug("send email confirmed")
+        // todo in Notices-Tabelle eintragen
+        noticeEntity?.let { ne ->
+            ne.finalizedTime = ZonedDateTime.now()
+            saveNotice()
+            updatePhotosDir()
+            closeWindow()
+        }
+    }
+
+    fun updatePhotosDir() {
+        app.getSettings()?.let { s ->
             val dir = browserPanel.getPhotosDirectory().toString()
             log.debug("browserPanel.dir = $dir")
             s.photosDirectory = dir
@@ -549,12 +609,14 @@ class NoticeFrame(
         }
     }
 
-    fun deleteAndClose() {
-        deleteNotice()
+    fun closeWindow() {
         isVisible = false
         dispose()
         app.noticeFrameClosed(this)
     }
+
+///////////////////////////////////////////////////
+
 
     /**
      * tausche nicht ausgewähltes durch ausgewähltes Foto,
@@ -656,95 +718,6 @@ class NoticeFrame(
             val distanceText = "%.10f".format(distance)
             LOG.debug("in meters: dx: $dxText, dy: $dyText, distance: $distanceText")
             return distance
-        }
-
-        fun buildMailContent(n: NoticeEntity, w: Witness): String {
-            fun htmlEncode(str: String?): String {
-                str?.let {
-                    return it
-                        .replace("&", "&amp;")
-                        .replace("<", "&lt;")
-                        .replace(">", "&gt;")
-                }
-                return ""
-            }
-
-            fun tableRow(label: String, value: String?): String {
-                return if (value.isNullOrBlank()) {
-                    ""
-                } else {
-                    "|    <tr><td>$label:</td><td>${htmlEncode(value)}</td></tr>\n"
-                }
-            }
-
-            fun tableRowHtmlValue(label: String, value: String?): String {
-                return if (value.isNullOrBlank()) {
-                    ""
-                } else {
-                    "|    <tr><td>$label:</td><td>$value</td></tr>\n"
-                }
-            }
-
-            val countryRow = tableRow("Landeskennzeichen", n.getCountryFormatted())
-            val licensePlateRow = tableRow("Kennzeichen", n.licensePlate)
-            val makeRow = tableRow("Marke", n.vehicleMake)
-            val colorRow = tableRow("Farbe", n.color)
-            val offenseAddressRow = tableRow("Tatortadresse", n.getAddress())
-            val locationDescriptionRow = tableRow("Tatortbeschreibung", n.locationDescription)
-            val positionRow = tableRow("Geoposition", n.getGeoPositionFormatted())
-            val offenseRow = tableRow("Verstoß", n.offense)
-            val circumstancesRow = tableRowHtmlValue("Umstände", n.getCircumstancesHtml())
-            val inspectionDateRow = tableRow("HU-Fälligkeit", n.getInspectionMonthYear())
-            // todo: Wochentag einfügen, wegen Werktags-Beschränkungen
-            val observationTimeRow = tableRow("Beobachtungszeit", n.getObservationTimeFormatted())
-            val observationDurationRow = tableRow("Beobachtungsdauer", n.getDurationFormatted())
-            val noteRow = tableRow("Hinweis", n.note)
-
-            val nameRow = tableRow("Name", w.getFullName())
-            val witnessAddressRow = tableRow("Adresse", w.getAddress())
-            val witnessEmailRow = tableRow("E-Mail", w.emailAddress)
-            val telephoneRow = tableRow("Telefon", w.telephoneNumber)
-
-            val attachmentsSection = if (n.photoEntities.isEmpty()) {
-                ""
-            } else {
-                val sb = StringBuilder()
-                sb.append("|  <h1>Anlagen</h1>\n")
-                sb.append("|  <ol>\n")
-                n.getPhotoEntitiesSorted().forEach { sb.append("|    <li>${it.getFilename()} (SHA1: ${it.getHashHex()})</li>\n") }
-                sb.append("|  </ol>\n")
-            }
-
-            val content = """
-              |<html>
-              |  <p>Sehr geehrte Damen und Herren,</p>
-              |  <p>hiermit zeige ich, mit der Bitte um Weiterverfolgung, folgende Verkehrsordnungswidrigkeit an:</p>
-              |  <h1>Falldaten</h1>
-              |  <table>
-              $countryRow$licensePlateRow$makeRow$colorRow$offenseAddressRow$locationDescriptionRow$positionRow$offenseRow$circumstancesRow$inspectionDateRow$observationTimeRow$observationDurationRow$noteRow
-              |  </table>  
-              |  <h1>Zeuge</h1>
-              |  <table>
-              $nameRow$witnessAddressRow$witnessEmailRow$telephoneRow  
-              |  </table>
-              $attachmentsSection
-              |  <h1>Erklärung</h1>
-              |  <p>Hiermit bestätige ich, dass ich die Datenschutzerklärung zur Kenntnis genommen habe und ihr zustimme.
-              |    Meine oben gemachten Angaben einschließlich meiner Personalien sind zutreffend und vollständig.
-              |    Als Zeuge bin ich zur wahrheitsgemäßen Aussage und auch zu einem möglichen Erscheinen vor Gericht verpflichtet.
-              |    Vorsätzlich falsche Angaben zu angeblichen Ordnungswidrigkeiten können eine Straftat darstellen.
-              |    Ich weiß, dass mir die Kosten des Verfahrens und die Auslagen des Betroffenen auferlegt werden,
-              |    wenn ich vorsätzlich oder leichtfertig eine unwahre Anzeige erstatte.</p>
-              |  <p>Beweisfotos, aus denen Kennzeichen und Tatvorwurf erkennbar hervorgehen, befinden sich im Anhang.
-              |    Bitte prüfen Sie den Sachverhalt auch auf etwaige andere Verstöße, die aus den Beweisfotos zu ersehen sind.</p>
-              |  <p>Bitte bestätigen Sie Ihre Zuständigkeit und den Erhalt dieser Anzeige mit der Zusendung des Aktenzeichens an hz@heikozelt.de.
-              |    Falls Sie nicht zuständig sein sollten, leiten Sie bitte meine Anzeige weiter und informieren Sie mich darüber.
-              |    Sie dürfen meine persönlichen Daten auch weiterleiten und diese für die Dauer des Verfahrens speichern.</p>                                  
-              |  <p>Mit freundlichen Grüßen</p>
-              |  <p>${w.getFullName()}</p>
-              |</html>""".trimMargin()
-            LOG.debug("html content:\n$content")
-            return content
         }
 
         private const val EARTH_CIRCUMFERENCE = 40_075_000.0 // at the equator in meters (not at the poles)

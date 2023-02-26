@@ -9,6 +9,7 @@ import org.hibernate.Session
 import org.hibernate.SessionFactory
 import org.slf4j.LoggerFactory
 import java.nio.file.Path
+import java.time.ZonedDateTime
 
 
 class DatabaseRepo(jdbcUrl: String) {
@@ -75,6 +76,52 @@ class DatabaseRepo(jdbcUrl: String) {
         }
         return noticeEntity
     }
+
+    /**
+     * Liefert die nächste Nachricht, welche gesendet werden soll,
+     * oder null, wenn es nichts (mehr) zu senden gibt.
+     * Ermittelt wird aus allen zu sendenden Nachrichten,
+     * die mit den (bis jetzt) wenigsten Sendefehlern.
+     *
+     * Blöder Algorithmus: Es könnte bedeuten,
+     * dass versucht wird, dieselbe Nachricht direkt wieder zu senden,
+     * obwohl noch andere warten.
+     * todo Prio 3: besseren Algorithmus finden. Merken, bei welchen Nachrichten im aktuellen Lauf, das Senden fehl schlug.
+     */
+    fun findNextNoticeToSend(): NoticeEntity? {
+        log.debug("findNextNoticeToSend()")
+        val noticeEntity: NoticeEntity?
+        val session = sessionFactory.openSession()
+        val tx = session.beginTransaction()
+        try {
+            val jpql = """
+                SELECT n FROM NoticeEntity n LEFT JOIN FETCH n.photoEntities
+                WHERE n.finalizedTime <> null
+                AND n.sentTime == null
+                ORDER BY n.sendFailures, n.finalizedTime""".trimIndent()
+            val qry = session.createQuery(jpql, NoticeEntity::class.java)
+
+            /*
+            throws exception
+            noticeEntity = qry.setMaxResults(1).singleResult
+            */
+
+            val list: List<NoticeEntity>  = qry.setMaxResults(1).resultList
+            noticeEntity = list.firstOrNull()
+            tx.commit()
+        } finally {
+            if (tx.isActive) tx.rollback()
+            if (session.isOpen) session.close()
+        }
+        return noticeEntity
+    }
+
+    /**
+     * markiert eine Meldung/Nachricht als erfolgreich gesendet.
+    fun updateNoticeSent(noticeId: Integer, sentTime: ZonedDateTime, messageId: ) {
+
+    }
+     */
 
     /**
      * liefert ein sortiertes Set von Fotos
@@ -227,6 +274,36 @@ class DatabaseRepo(jdbcUrl: String) {
         } finally {
             if (tx.isActive) tx.rollback()
             if (session.isOpen) session.close()
+        }
+    }
+
+    /**
+     * changes fields, which represent state change after an email message was sent.
+     * These are sentTime and messageId.
+     * Problem #1: Mapping from Message to Notice
+     * Possible solutions:
+     * <ol>
+     *     <li>my solution: add notice/external id to EmailMessage</li>
+     *     <li>other solution: generate message id and assign it to the notice entity when finalizing message
+     *       (but the message id is usually generated later, when an email message ist sent)</li>
+     * </ol>
+     * Problem #2: saving sentTime
+     * my solution:
+     * set sent time on client side in class EmailMessage/MimeMessage, when starting to send the message and log this time.
+     */
+    fun updateNoticeSent(noticeID: Int, sentTime: ZonedDateTime, messageID: ByteArray) {
+        log.debug("updateNoticeSent(id=${noticeID})")
+        val session = sessionFactory.openSession()
+        log.debug("session: $session")
+        val tx = session.beginTransaction()
+        try {
+            var existing = session.find(NoticeEntity::class.java, noticeID);
+            existing.sentTime = sentTime;
+            existing.messageId = messageID;
+            session.merge(existing);
+        } finally {
+          if (tx.isActive) tx.rollback()
+          if (session.isOpen) session.close()
         }
     }
 

@@ -5,6 +5,7 @@ import de.heikozelt.wegefrei.email.useragent.EmailUserAgent
 import de.heikozelt.wegefrei.entities.NoticeEntity
 import de.heikozelt.wegefrei.json.Settings
 import de.heikozelt.wegefrei.model.LeastRecentlyUsedCache
+import de.heikozelt.wegefrei.model.NoticesOutbox
 import de.heikozelt.wegefrei.model.Photo
 import de.heikozelt.wegefrei.model.PhotoLoader
 import de.heikozelt.wegefrei.noticeframe.NoticeFrame
@@ -42,7 +43,7 @@ open class WegeFrei(private val settingsRepo: SettingsRepo = SettingsFileRepo())
 
     private var settings: Settings? = null
 
-    private var emailUserAgent: EmailUserAgent? = null
+    private var emailUserAgent: EmailUserAgent = EmailUserAgent()
 
     /**
      * Übersichts-Fenster (falls geöffnet sonst null)
@@ -73,11 +74,12 @@ open class WegeFrei(private val settingsRepo: SettingsRepo = SettingsFileRepo())
     private var photoCache = LeastRecentlyUsedCache<Path, Photo>(128)
     private var photoLoader: PhotoLoader? = null
 
+    private val noticesOutbox = NoticesOutbox()
+
     init {
         log.debug("initializing")
         val settings = settingsRepo.load()
         setSettings(settings)
-        emailUserAgent = EmailUserAgent()
         emailUserAgent?.setEmailServerConfig(settings.emailServerConfig)
     }
 
@@ -127,15 +129,13 @@ open class WegeFrei(private val settingsRepo: SettingsRepo = SettingsFileRepo())
         return settings
     }
 
-    fun getEmailUserAgent(): EmailUserAgent? {
-        return emailUserAgent
-    }
-
     /**
      * set settings (without saving to file)
      */
     private fun setSettings(settings: Settings) {
         log.debug("setSettings()")
+
+        // initial ist this.settings == null. dbDirChanged also true
         val dbDirChanged = settings.databaseDirectory != this.settings?.databaseDirectory
         log.debug("dbDirChanged: $dbDirChanged")
         val photosDirChanged = settings.photosDirectory != this.settings?.photosDirectory
@@ -159,14 +159,26 @@ open class WegeFrei(private val settingsRepo: SettingsRepo = SettingsFileRepo())
                 closeNoticesFrame()
                 databaseRepo?.close()
                 databaseRepo = DatabaseRepo.fromDirectory(it)
-                databaseRepo?.let {
-                    photoLoader = PhotoLoader(it)
+                databaseRepo?.let {dbRe ->
+                    photoLoader = PhotoLoader(dbRe)
+                    noticesOutbox.setDatabaseRepo(dbRe)
                 }
+
                 if (isNoticesFrameOpen) {
                     openNoticesFrame()
                 }
             }
         }
+
+        noticesOutbox.setSettings(settings)
+    }
+
+    fun getEmailUserAgent(): EmailUserAgent? {
+        return emailUserAgent
+    }
+
+    fun getNoticesOutbox(): NoticesOutbox {
+        return noticesOutbox
     }
 
     /**

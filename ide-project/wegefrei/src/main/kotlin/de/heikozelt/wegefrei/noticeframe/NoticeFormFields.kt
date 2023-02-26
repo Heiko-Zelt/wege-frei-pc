@@ -16,6 +16,7 @@ import java.time.LocalTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeParseException
 import java.util.*
 import javax.swing.*
 import javax.swing.event.ListDataEvent
@@ -77,13 +78,13 @@ class NoticeFormFields(
     private val recipientComboBox = RecipientComboBox(dbRepo)
     private val noteTextArea = JTextArea(2, 40)
 
-    private var noticeEntity: NoticeEntity? = null
+    //private var noticeEntity: NoticeEntity? = null
 
     init {
         log.debug("init")
 
         // GUI components
-        val licensePlateLabel = JLabel("<html>Landes- & Kfz-Kennzeichen<sup>*</sup>:</html>")
+        val licensePlateLabel = JLabel("<html>Landes- & Kfz-Kennzeichen:</html>")
         //countryComboBox.renderer = CountrySymbolListCellRenderer()
         val licensePlateDoc = licensePlateTextField.document
         if (licensePlateDoc is AbstractDocument) {
@@ -97,11 +98,11 @@ class NoticeFormFields(
         colorComboBox.maximumRowCount = VehicleColor.COLORS.size
         miniMap.toolTipText = "Bitte positionieren Sie den roten Pin."
         val coordinatesLabel = JLabel("Koordinaten:")
-        val streetLabel = JLabel("<html>Straße & Hausnummer:<sup>*</sup></html>")
+        val streetLabel = JLabel("<html>Straße & Hausnummer:<sup>(*)</sup></html>")
         streetTextField.toolTipText = "z.B. Taunusstraße 7"
-        val zipCodeTownLabel = JLabel("<html>PLZ:<sup>*</sup>, Ort:<sup>*</sup></html>")
+        val zipCodeTownLabel = JLabel("<html>PLZ:<sup>(*)</sup>, Ort:<sup>(*)</sup></html>")
         zipCodeTextField.toolTipText = "z.B. 65183"
-        val locationDescriptionLabel = JLabel("Tatort:")
+        val locationDescriptionLabel = JLabel("<html>Tatort <sup>(*):</sup></html>")
         townTextField.toolTipText = "z.B. Wiesbaden"
         locationDescriptionTextField.toolTipText = "z.B. Bushaltestelle Kochbrunnen"
 
@@ -319,15 +320,15 @@ class NoticeFormFields(
         Styles.restrictSize(inspectionYearTextField)
         Styles.restrictSize(inspectionMonthTextField)
 
-        enableOrDisableEditing()
+        enableOrDisableEditing(false)
     }
 
     /**
      * Initialisieren der einzelnen Eingabe-Felder
      * Mapping von Notice zu GUI-Components
      */
-    fun setNotice(noticeEntity: NoticeEntity) {
-        this.noticeEntity = noticeEntity
+    fun initWithNotice(noticeEntity: NoticeEntity) {
+        //this.noticeEntity = noticeEntity
 
         noticeEntity.getGeoPosition()?.let {
             miniMap.setOffensePosition(it)
@@ -359,17 +360,23 @@ class NoticeFormFields(
         recipientComboBox.setValue(noticeEntity.getRecipient())
         noteTextArea.text = noticeEntity.note
 
-        enableOrDisableEditing()
+        val enab = !(noticeEntity.isFinalized())
+        log.debug("enable? $enab")
+        enableOrDisableEditing(enab)
     }
 
     /**
-     * Mapping der Werte der GUI-Komponenten zu Notice
+     * Mapping der Werte der GUI-Komponenten zu Meldung und Validierung der Eingaben.
+     * Es wird nicht geprüft, ob Pflichtfelder ausgefüllt sind,
+     * sondern nur ob ausgefüllte Felder im Format korrekt sind/geparst werden können/auf Datenbankfelder abgebildet werden können.
+     * @return Liste mit Validierungsfehlern oder leere Liste, wenn Felder leer oder korrekt ausgefüllt sind.
      */
-    // todo Prio 1: form validation, Validierungsfehler bei Eingabefeldern anzeigen
-    fun getNotice(): NoticeEntity {
+    fun validateAndMap(n: NoticeEntity): List<String> {
         // Normalerweise sollte vorher setNotice() aufgerufen worden sein.
         // Aber falls nicht, wird ein neues Notice-Objekt instanziiert.
-        val n = noticeEntity ?: NoticeEntity.createdNow()
+        //val n = noticeEntity ?: NoticeEntity.createdNow()
+
+        val errors = mutableListOf<String>()
 
         n.countrySymbol = countryComboBox.getValue()
         n.licensePlate = trimmedOrNull(licensePlateTextField.text)
@@ -390,23 +397,40 @@ class NoticeFormFields(
         n.locationDescription = trimmedOrNull(locationDescriptionTextField.text)
         n.offense = offenseComboBox.getValue()
 
+        // todo: Prio 1: Validieren ob Datum und Uhrzeit zusammen angeben wurden.
+        // Problem: 2 Eingabefelder für Datum und Uhrzeit, aber nur ein Datenbankfeld
+        // Lösung: Beide müssen ausgefüllt sein oder keins. Nur zusammen speichern oder gar nicht.
+        // Ähnlich wie Längengrad und Breitengrad. Diese müssen auch zusammen oder gar nicht gespeichert werden.
+
         val format = DateTimeFormatter.ofPattern("d.M.yyyy")
         val obsDateTxt = observationDateTextField.text
-        n.observationTime = if (obsDateTxt.isBlank()) {
+        val obsTimeTxt = observationTimeTextField.text
+        if(obsTimeTxt.isBlank() && obsDateTxt.isNotBlank()) {
+            errors.add("Beobachtungsdatum angegeben, aber keine Uhrzeit.")
+        }
+        if(obsTimeTxt.isNotBlank() && obsDateTxt.isBlank()) {
+            errors.add("Uhrzeit angegeben, aber kein Beobachtungsdatum.")
+        }
+        var dat: LocalDate? = null
+        if(obsDateTxt.isNotBlank()) {
+            try {
+                dat = LocalDate.parse(obsDateTxt, format)
+            } catch (ex: DateTimeParseException) {
+                errors.add("Beobachtungsdatum muss im Format Tag.Monat.Jahr angegeben sein.")
+            }
+        }
+        var tim: LocalTime? = null
+        if(obsTimeTxt.isNotBlank()) {
+            try {
+                val tFormat = DateTimeFormatter.ofPattern("H:m")
+                tim = LocalTime.parse(obsTimeTxt, tFormat)
+            } catch (ex: DateTimeParseException) {
+                errors.add("Uhrzeit muss im Format Stunde:Minute angegeben sein.")
+            }
+        }
+        n.observationTime = if(dat == null || tim == null) {
             null
         } else {
-            val dat: LocalDate = LocalDate.parse(obsDateTxt, format)
-            // todo Prio 2: Validierung, ob Format von Datum und Uhrzeit korrekt sind. Fehlermeldung anzeigen.
-            // todo Prio 3: Problem lösen: Sommer- oder Winterzeit, eine Stunde im Jahr ist zweideutig
-            // todo Prio 3: Datum/Uhrzeit darf nicht in der Zukunft liegen
-            val obsTimeTxt = observationTimeTextField.text
-            val tim = if (obsTimeTxt.isBlank()) {
-                LocalTime.parse("00:00")
-            } else {
-                val tFormat = DateTimeFormatter.ofPattern("H:m")
-                LocalTime.parse(obsTimeTxt, tFormat)
-                //LocalTime.parse(obsTimeTxt)
-            }
             ZonedDateTime.of(dat, tim, ZoneId.systemDefault())
         }
 
@@ -433,7 +457,7 @@ class NoticeFormFields(
         n.recipientName = recipient?.name
 
         n.note = trimmedOrNull(noteTextArea.text)
-        return n
+        return errors
     }
 
     fun getMiniMap(): MiniMap {
@@ -456,11 +480,13 @@ class NoticeFormFields(
      * keine weitere Bearbeitung mehr zulassen,
      * wenn die Meldung bereits versendet wurde.
      */
-    fun enableOrDisableEditing() {
+    fun enableOrDisableEditing(enab: Boolean) {
+        /*
         var enab = false
         noticeEntity?.let {
             enab = !it.isSent()
         }
+         */
         //val enab = (notice != null) && !notice.isSent()
         countryComboBox.isEnabled = enab
         licensePlateTextField.isEnabled = enab

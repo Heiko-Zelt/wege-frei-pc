@@ -24,13 +24,13 @@ class NoticeForm(
 
     init {
         val okButton = JButton("Ok")
-        okButton.addActionListener { noticeFrame.saveAndClose() }
+        okButton.addActionListener { noticeFrame.saveButtonClicked() }
         val cancelButton = JButton("Abbrechen")
-        cancelButton.addActionListener { noticeFrame.cancelAndClose() }
+        cancelButton.addActionListener { noticeFrame.cancelButtonClicked() }
         deleteButton.isVisible = false
-        deleteButton.addActionListener { noticeFrame.deleteAndClose() }
+        deleteButton.addActionListener { noticeFrame.deleteButtonClicked() }
         val sendButton = JButton("E-Mail absenden")
-        sendButton.addActionListener { noticeFrame.sendNotice() }
+        sendButton.addActionListener { noticeFrame.sendButtonClicked() }
 
         val lay = GroupLayout(this)
         lay.autoCreateGaps = false
@@ -71,7 +71,7 @@ class NoticeForm(
      * delegiert und aktualisiert die Buttons-Leiste
      */
     fun setNotice(noticeEntity: NoticeEntity) {
-        noticeFormFields.setNotice(noticeEntity)
+        noticeFormFields.initWithNotice(noticeEntity)
 
         // Nur beim Bearbeiten einer bereits existierenden Meldung einen Löschen-Button anzeigen.
         if(noticeEntity.id != null) {
@@ -83,16 +83,16 @@ class NoticeForm(
 
     /**
      * delegiert nur
-     */
     fun getNotice(): NoticeEntity {
-        return noticeFormFields.getNotice()
+        return noticeFormFields.validateAndMap()
     }
+     */
 
     fun getNoticeFormFields(): NoticeFormFields {
         return noticeFormFields
     }
 
-    fun enableOrDisableEditing() {
-        noticeFormFields.enableOrDisableEditing()
+    fun enableOrDisableEditing(enab: Boolean) {
+        noticeFormFields.enableOrDisableEditing(enab)
     }
 }

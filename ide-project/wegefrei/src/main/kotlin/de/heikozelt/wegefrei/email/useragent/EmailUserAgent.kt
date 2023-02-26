@@ -7,7 +7,6 @@ import javax.mail.AuthenticationFailedException
 import javax.mail.MessagingException
 import javax.mail.Session
 import javax.mail.Transport
-import javax.swing.JOptionPane
 
 /**
  * A simple mail user agent (MUA)
@@ -39,24 +38,16 @@ class EmailUserAgent {
     }
 
     /**
-     * Erst die E-Mail-Nachricht anzeigen und Anwender fragen.
-     */
-    fun sendMailAfterConfirmation(emailMessage: EmailMessage) {
-        val emailMessageDialog = EmailMessageDialog(this)
-        emailMessageDialog.setEmailMessage(emailMessage)
-    }
-
-    /**
      * Jetzt aber wirklich absenden (und eventuell nach Passwort fragen).
-     * todo: Anlagen
+     * Warum callback statt Rückgabewert?
+     * @return true, bedeutet erfolgreich gesendet, false bedeutet Fehler oder Benutzer hat abgebrochen
      */
-    fun sendMailDirectly(emailMessage: EmailMessage, doneCallback: (Boolean) -> Unit) {
+    fun sendMailDirectly(emailMessage: EmailMessage): Boolean {
         emailServerConfig?.let { serverConfig ->
             authenticator?.let { auth ->
                 val passwordEntered = auth.maybeAskForPassword()
                 if (!passwordEntered) {
-                    doneCallback(false)
-                    return
+                    return false
                 }
                 log.debug("auth: ${auth.passwordAuthentication}")
                 log.debug("userName: ${auth.passwordAuthentication.userName}")
@@ -84,14 +75,16 @@ class EmailUserAgent {
                 try {
                     // "Note that send is a static method that creates and manages its own connection."
                     Transport.send(msg)
-                    doneCallback(true)
                     auth.passwordFeedback(true)
+                    return true
+                    /*
                     JOptionPane.showMessageDialog(
                         null,
                         "Die E-Mail-Nachricht wurde erfolgreich versendet.",
                         "E-Mail abgeschickt",
                         JOptionPane.INFORMATION_MESSAGE
                     )
+                     */
                 } catch (ex: MessagingException) {
                     log.debug("exception while sending message", ex)
                     log.debug("exception: ${ex.message}")
@@ -99,12 +92,13 @@ class EmailUserAgent {
                         log.debug("cause: ${it.message}")
                     }
 
-                    doneCallback(false)
+
                     // javax.mail.AuthenticationFailedException: 535 5.7.8 Authentication failed: wrong user/password
                     if(ex is AuthenticationFailedException) {
                         auth.passwordFeedback(false)
                     }
-
+                    return false
+/*
                     var errorMessage = "Es ist ein Fehler aufgetreten:\n\n${ex.message}"
                     ex.cause?.let {
                         errorMessage += "\n\n{$ex.cause.message}"
@@ -115,11 +109,13 @@ class EmailUserAgent {
                         "E-Mail senden",
                         JOptionPane.ERROR_MESSAGE
                     )
+ */
                 }
             }
         }?: run {
             log.error("emailServerConfig is null")
         }
+        return false
     }
 
     companion object {

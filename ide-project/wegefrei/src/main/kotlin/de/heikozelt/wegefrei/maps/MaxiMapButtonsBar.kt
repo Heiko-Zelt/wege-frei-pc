@@ -52,9 +52,11 @@ class MaxiMapButtonsBar(private val noticeFrame: NoticeFrame, private val maxiMa
 
     fun enableOrDisableOffenseMarkerButton() {
         val notice = noticeFrame.getNotice()
-        val enab = !notice.isSent()
-        addButton.isEnabled = enab
-        removeButton.isEnabled = enab
+        notice?.let { ne ->
+            val enab = !ne.isFinalized()
+            addButton.isEnabled = enab
+            removeButton.isEnabled = enab
+        }
     }
 
     fun setAddressPosition(addressLocation: GeoPosition?) {

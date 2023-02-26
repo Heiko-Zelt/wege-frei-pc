@@ -71,10 +71,13 @@ class NoticesTableStateCellRenderer : JLabel(), TableCellRenderer {
         super.setOpaque(true)
 
         // todo icon & Farbe
+        // todo Anzahl fehlgeschlagener Sendeversuche anzeigen
+        // todo Anzeigen, wenn eine Nachricht jetzt gerade gesendet wird "wird gesendet".
         text = if (value is NoticeState) {
             when(value) {
                 NoticeState.INCOMPLETE -> "unvollständig"
                 NoticeState.COMPLETE -> "offen"
+                NoticeState.FINALIZED -> "im Postausgang"
                 NoticeState.SENT -> "gemeldet"
             }
         } else {

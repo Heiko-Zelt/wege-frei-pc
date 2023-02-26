@@ -3,7 +3,6 @@ package de.heikozelt.wegefrei.settingsframe
 import de.heikozelt.wegefrei.email.EmailAddressEntity
 import de.heikozelt.wegefrei.email.useragent.EmailMessage
 import de.heikozelt.wegefrei.email.useragent.EmailServerConfig
-import de.heikozelt.wegefrei.email.useragent.EmailUserAgent
 import de.heikozelt.wegefrei.gui.CharPredicateDocFilter
 import de.heikozelt.wegefrei.gui.PatternVerifier
 import de.heikozelt.wegefrei.gui.Styles
@@ -310,9 +309,13 @@ class SettingsFormFields : JPanel() {
             TEST_MAIL_SUBJECT,
             TEST_MAIL_CONTENT
         )
+
+        /*
+        todo: anpassen an neues Verfahren
         val emailUserAgent = EmailUserAgent()
         emailUserAgent.setEmailServerConfig(emailServerConfig)
         emailUserAgent.sendMailAfterConfirmation(eMessage)
+        */
     }
 
     companion object {

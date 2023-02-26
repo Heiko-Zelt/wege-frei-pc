@@ -12,6 +12,11 @@ import java.util.*
 @Entity
 @Table(name = "NOTICES")
 // todo Prio 3: two constructors instead of default values
+// todo Prio 3: weitere Umstände: Kfz-Kennzeichen fehlt, HU-Plakette fehlt
+/**
+ * Eine Nachricht besteht aus Benutzereingaben und generierten Status/Protokoll-Daten.
+ * Statusfelder sind: id, createdTime, finalizedTime, sendFailures, sentTime, messageId
+ */
 class NoticeEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -145,10 +150,28 @@ class NoticeEntity(
     )
     var photoEntities: MutableSet<PhotoEntity> = mutableSetOf(),
 
-    // threw exception: Value too long for column "NOTE CHARACTER VARYING(255)"
-    // adding length = 1000 solved it. :-)
+    /**
+     * threw exception: Value too long for column "NOTE CHARACTER VARYING(255)"
+     * adding length = 1000 solved it. :-)
+     */
     @Column(length = 1000)
-    var note: String? = null
+    var note: String? = null,
+
+    /**
+     * Zeitpunkt, wann die Benutzerin die Nachricht finalisiert also in den Postausgang gelegt hat.
+     * null bedeutet, die Nachricht ist noch offen/nicht fertig bearbeitet.
+     */
+    var finalizedTime: ZonedDateTime? = null,
+
+    /**
+     * binary 20 bytes, hex 40 characters
+     */
+    var messageId: ByteArray? = null,
+
+    /**
+     * How often has sending the email message failed?
+     */
+    var sendFailures: Int = 0
 ) {
 
     @Column
@@ -267,15 +290,32 @@ class NoticeEntity(
      * Sind alle Pflichtfelder ausgefüllt?
      * (Zwischenspeichern geht immer,
      * aber zum Absenden einer E-Mail müssen bestimmte Felder ausgefüllt sein. )
+     * todo: Rüchgabewert: Liste mit Fehlermeldungen oder leere Liste, wenn Pflichtfelder ausgefüllt sind.
      */
-    fun isComplete(): Boolean {
-        val isVehicleInspectionComplete = when (vehicleInspectionExpired) {
-            false -> true
-            else -> vehicleInspectionMonth != null && vehicleInspectionYear != null
+    fun isComplete(): List<String> {
+        val errors = mutableListOf<String>()
+        if(vehicleInspectionExpired) {
+            if(vehicleInspectionMonth == null) {
+                errors.add("HU-Plakette abgelaufen, aber kein Monat angegeben.")
+            }
+            if(vehicleInspectionYear == null) {
+                errors.add("HU-Plakette abgelaufen, aber kein Jahr angegeben.")
+            }
         }
-        return offense != null && isVehicleInspectionComplete && licensePlate != null && street != null
-                && zipCode != null && town != null && observationTime != null && recipientEmailAddress != null
-                && photoEntities.isNotEmpty()
+        if(offense == null) {
+            errors.add("Ein Verstoß muss angeben sein.")
+        }
+        val addressComplete = (street != null) && (zipCode != null) && (town != null)
+        if(!addressComplete && getGeoPosition() == null && locationDescription == null) {
+            errors.add("Eine Tatortangabe fehlt. Es muss eine Adresse, Geo-Position und/oder Tatort-Beschreibung angegeben sein.")
+        }
+        if(observationTime == null) {
+            errors.add("Es muss ein Beobachtungsdatum und eine Uhrzeit angegeben sein.")
+        }
+        if(recipientEmailAddress == null) {
+            errors.add("Es muss eine Empfänger-E-Mail-Adresse angegeben sein.")
+        }
+        return errors
     }
 
     /**
@@ -289,10 +329,20 @@ class NoticeEntity(
         return sentTime != null
     }
 
+    /**
+     * Liegt/lag die Meldung/E-Mail-Nachricht im Postausgang
+     * @return liefert wahr, wenn die Meldung im Postausgang liegt oder bereits gesendet wurde.
+     */
+    fun isFinalized(): Boolean {
+        return finalizedTime != null
+    }
+
     fun getState(): NoticeState {
         return if (isSent()) {
             NoticeState.SENT
-        } else if (isComplete()) {
+        } else if (isFinalized()) {
+            NoticeState.FINALIZED
+        } else if (isComplete().isEmpty()) {
             NoticeState.COMPLETE
         } else {
             NoticeState.INCOMPLETE

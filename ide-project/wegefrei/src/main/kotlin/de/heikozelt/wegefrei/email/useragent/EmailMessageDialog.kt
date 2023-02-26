@@ -15,28 +15,23 @@ import javax.swing.*
  * | subject: ---
  * | ------------
  * | ------------
- * Status: nichts oder "Wird gesendet..." oder "Wurde gesendet."
- * Buttons: (Senden) (Abbrechen) oder (Ok)
+ * Buttons: (Senden) (Abbrechen)
  * </pre>
- * todo Prio 3: Ergebnis des Test-E-Mail-Versands durch einen Punkt anzeigen
- * grün = erfolgreich, rot = Fehler, gelb = Benutzer hat abgebrochen/kein Passwort angegeben
- * siehe: https://www.compart.com/en/unicode/U+2B24
  */
-class EmailMessageDialog(private val emailUserAgent: EmailUserAgent) : JFrame() {
+class EmailMessageDialog(confirmedCallback: () -> Unit) : JFrame() {
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
     private val emailMessagePanel = EmailMessagePanel()
-    private val statusLabel = JLabel()
     private var emailMessage: EmailMessage? = null
     private val sendButton = JButton("Senden")
     private val cancelButton = JButton("Abbrechen")
-    private val okButton = JButton("Ok")
 
     init {
         val scrollPane = JScrollPane(emailMessagePanel)
-        sendButton.addActionListener { send() }
+        sendButton.addActionListener {
+            confirmedCallback()
+            this.dispose()
+        }
         cancelButton.addActionListener { this.dispose() }
-        okButton.isVisible = false
-        okButton.addActionListener { this.dispose() }
 
         title = "E-Mail-Nachricht"
         defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
@@ -47,30 +42,22 @@ class EmailMessageDialog(private val emailUserAgent: EmailUserAgent) : JFrame() 
         lay.setHorizontalGroup(
             lay.createParallelGroup(GroupLayout.Alignment.LEADING)
                 .addComponent(scrollPane)
-                .addGroup(
-                    lay.createSequentialGroup()
-                        .addGap(4)
-                        .addComponent(statusLabel)
-                )
-
+                .addGap(4)
                 .addGroup(
                     lay.createSequentialGroup()
                         .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.PREFERRED_SIZE, Int.MAX_VALUE)
                         .addComponent(sendButton)
                         .addComponent(cancelButton)
-                        .addComponent(okButton)
                 )
         )
         // top to bottom
         lay.setVerticalGroup(
             lay.createSequentialGroup()
                 .addComponent(scrollPane)
-                .addComponent(statusLabel)
                 .addGroup(
                     lay.createParallelGroup(GroupLayout.Alignment.LEADING)
                         .addComponent(sendButton)
                         .addComponent(cancelButton)
-                        .addComponent(okButton)
                 )
         )
         lay.linkSize(SwingConstants.HORIZONTAL, sendButton, cancelButton)
@@ -84,27 +71,5 @@ class EmailMessageDialog(private val emailUserAgent: EmailUserAgent) : JFrame() 
         log.debug("setEmailMessage(subject=${emailMessage.subject})")
         this.emailMessage = emailMessage
         emailMessagePanel.setEmailMessage(emailMessage)
-    }
-
-    private fun send() {
-        log.debug("send()")
-        emailMessage?.let { eMessage ->
-            statusLabel.text = "wird gesendet..."
-            log.debug("subject=${eMessage.subject} wird gesendet")
-            sendButton.isEnabled = false
-            emailUserAgent.sendMailDirectly(eMessage) { success -> done(success) }
-        }
-    }
-
-    private fun done(success: Boolean) {
-        if(success) {
-            statusLabel.text = "Erfolgreich gesendet."
-            okButton.isVisible = true
-            sendButton.isVisible = false
-            cancelButton.isVisible = false
-        } else {
-            statusLabel.text = "Beim Senden ist ein Fehler aufgetreten."
-            sendButton.isEnabled = true
-        }
     }
 }

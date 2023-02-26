@@ -165,9 +165,11 @@ class MaxiMapForm(
 
     private fun enableOrDisableOffenseMarkerButton() {
         val notice = noticeFrame.getNotice()
-        val enab = !notice.isSent()
-        addButton.isEnabled = enab
-        removeButton.isEnabled = enab
+        notice?.let { ne ->
+            val enab = !ne.isSent()
+            addButton.isEnabled = enab
+            removeButton.isEnabled = enab
+        }
     }
 
     companion object {
