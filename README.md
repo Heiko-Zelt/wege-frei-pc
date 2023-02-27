@@ -17,12 +17,9 @@ Alle Daten (Beweisfotos und Meldungen) werden auf dem eigenen PC gespeichert. De
  
 ## Downloads
 
- * Windows/x86-64, vollständiges Software-Paket:<br />
-   [WegeFrei-1.0.2.msi](https://www.heikozelt.de/wegefrei/download/WegeFrei-1.0.2.msi)
- * Ubuntu-Linux/x86-64, vollständiges Software-Paket:<br />
-   [wegefrei_1.0.2-1_amd64.deb](https://www.heikozelt.de/wegefrei/download/wegefrei_1.0.2-1_amd64.deb)
- * Apple MacOS/x86-64, vollständiges Software-Paket:<br />
-   [WegeFrei-1.0.2.dmg](https://www.heikozelt.de/wegefrei/download/WegeFrei-1.0.2.dmg)
+ * Windows/x86-64: [WegeFrei-1.0.2.msi](https://www.heikozelt.de/wegefrei/download/WegeFrei-1.0.2.msi)
+ * Ubuntu-Linux/x86-64: [wegefrei_1.0.2-1_amd64.deb](https://www.heikozelt.de/wegefrei/download/wegefrei_1.0.2-1_amd64.deb)
+ * Apple MacOS/x86-64, [WegeFrei-1.0.2.dmg](https://www.heikozelt.de/wegefrei/download/WegeFrei-1.0.2.dmg)
  * Betriebssystem- & Prozessor-unabhängig. Es wird zusätzlich Java 17 benötigt. Start mit `java -jar wegefrei-1.0.2.jar`<br />
    [wegefrei-1.0.2.jar](https://www.heikozelt.de/wegefrei/download/wegefrei-1.0.2.jar)
    
