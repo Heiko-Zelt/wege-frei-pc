@@ -96,9 +96,9 @@ class DatabaseRepo(jdbcUrl: String) {
         try {
             val jpql = """
                 SELECT n FROM NoticeEntity n LEFT JOIN FETCH n.photoEntities
-                WHERE n.finalizedTime <> null
-                AND n.sentTime == null
-                ORDER BY n.sendFailures, n.finalizedTime""".trimIndent()
+                  WHERE n.finalizedTime <> null
+                  AND n.sentTime = null
+                  ORDER BY n.sendFailures, n.finalizedTime""".trimIndent()
             val qry = session.createQuery(jpql, NoticeEntity::class.java)
 
             /*
