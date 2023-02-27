@@ -19,7 +19,7 @@ import java.util.*
  * Each message/notice has a counter, which stores the number of failed sent attempts.
  * Notices with lower sent failures are sent first.
  */
-class NoticesOutbox : Outbox {
+class NoticesOutbox : Outbox<Int> {
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
 
     /**
@@ -46,7 +46,7 @@ class NoticesOutbox : Outbox {
         this.settings = settings
     }
 
-    override fun next(): EmailMessage? {
+    override fun next(): EmailMessage<Int>? {
         return if (cancel) {
             null
         } else {
@@ -61,48 +61,52 @@ class NoticesOutbox : Outbox {
 
     /**
      * is called by EmailSender after a message was sent or an error occurred
+     *
+     * todo: Problem: Zuordnung von EmailMessage zu NoticeEntity
+     * gewählte Lösung: EmailMessage wird um externe (geheime/private) ID/Notice-ID erweitert.
+     * alternative Lösung 1: Vor jedem Sendeversuch wird die Message-ID in der Datenbank eingetragen (performt schlecht). MessageID kann nicht Sendezeitpunkt enthalten. :-(
+     * alternative Lösung 2: Outbox merkt sich, welche Meldung (Email-Nachricht) dran war.
      */
-    override fun sendCallback(sendSuccess: Boolean) {
+    override fun sendCallback(emailMessage: EmailMessage<Int>, sendSuccess: Boolean) {
         if (sendSuccess) {
-           /*
-            * todo: Problem: Zuordnung von EmailMessage zu NoticeEntity
-            * gewählte Lösung: Outbox merkt sich, welche Meldung (Email-Nachricht) dran war.
-            * alternative Lösung 2: Vor jedem Sendeversuch wird die Message-ID in der Datenbank eingetragen (perfomt schlecht).
-            * alternative Lösung 3: EmailMessage wird um externe (geheime/private) ID/Notice-ID erweitert.
-            * updateNotice statt dessen verwenden
-            */
-            dbRepo?.updateNoticeSent(message)
-            // todo Email als gesendet in der Datenbank markieren
+            emailMessage.sentTime?.let { sTime ->
+                emailMessage.messageID?.let { mID ->
+                    // Email als gesendet in der Datenbank markieren
+                    dbRepo?.updateNoticeSent(emailMessage.externalID, sTime, mID)
+                }
+            }
         } else { // wenn Senden nicht erfolgreich:
             // Abbruchkriterium? Ask user: retry/continue Erneut versuchen/weiter senden? or Cancel/Abbrechen?
         }
     }
 
-    fun buildEmailMessage(noticeEntity: NoticeEntity): EmailMessage? {
+    fun buildEmailMessage(noticeEntity: NoticeEntity): EmailMessage<Int>? {
         log.debug("sendEmail()")
         settings?.let { setti ->
-            val from = EmailAddressEntity(setti.witness.emailAddress, setti.witness.getFullName())
-            // todo Prio 3: mehrere Empfänger erlauben
-            val to = noticeEntity.getRecipient()
-            val tos = TreeSet<EmailAddressEntity>()
-            tos.add(to)
-            val subject = buildSubject(noticeEntity)
-            val content = buildMailContent(noticeEntity, setti.witness)
-            val message = EmailMessage(from, tos, subject, content)
-            if (from.address != to.address) {
-                message.ccs.add(from)
-            }
-
-            /*
-            selectedPhotosListModel.getSelectedPhotos()
-            */
-            noticeEntity.photoEntities.forEach { pe ->
-                pe.path?.let { pa ->
-                    val attachment = EmailAttachment(Paths.get(pa))
-                    message.attachments.add(attachment)
+            noticeEntity.id?.let { noticeID ->
+                val from = EmailAddressEntity(setti.witness.emailAddress, setti.witness.getFullName())
+                // todo Prio 3: mehrere Empfänger erlauben
+                val to = noticeEntity.getRecipient()
+                val tos = TreeSet<EmailAddressEntity>()
+                tos.add(to)
+                val subject = buildSubject(noticeEntity)
+                val content = buildMailContent(noticeEntity, setti.witness)
+                val message = EmailMessage<Int>(noticeID, from, tos, subject, content)
+                if (from.address != to.address) {
+                    message.ccs.add(from)
                 }
+
+                /*
+                selectedPhotosListModel.getSelectedPhotos()
+                */
+                noticeEntity.photoEntities.forEach { pe ->
+                    pe.path?.let { pa ->
+                        val attachment = EmailAttachment(Paths.get(pa))
+                        message.attachments.add(attachment)
+                    }
+                }
+                return message
             }
-            return message
         }
         return null
     }

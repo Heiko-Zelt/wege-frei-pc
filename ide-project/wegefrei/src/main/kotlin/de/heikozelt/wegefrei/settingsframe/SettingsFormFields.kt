@@ -304,6 +304,7 @@ class SettingsFormFields : JPanel() {
         )
 
         val eMessage = EmailMessage(
+            0,
             from,
             tos,
             TEST_MAIL_SUBJECT,

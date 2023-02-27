@@ -116,12 +116,7 @@ class DatabaseRepo(jdbcUrl: String) {
         return noticeEntity
     }
 
-    /**
-     * markiert eine Meldung/Nachricht als erfolgreich gesendet.
-    fun updateNoticeSent(noticeId: Integer, sentTime: ZonedDateTime, messageId: ) {
 
-    }
-     */
 
     /**
      * liefert ein sortiertes Set von Fotos
@@ -278,6 +273,7 @@ class DatabaseRepo(jdbcUrl: String) {
     }
 
     /**
+     * markiert eine Meldung/Nachricht als erfolgreich gesendet. /
      * changes fields, which represent state change after an email message was sent.
      * These are sentTime and messageId.
      * Problem #1: Mapping from Message to Notice
@@ -301,6 +297,7 @@ class DatabaseRepo(jdbcUrl: String) {
             existing.sentTime = sentTime;
             existing.messageId = messageID;
             session.merge(existing);
+            tx.commit()
         } finally {
           if (tx.isActive) tx.rollback()
           if (session.isOpen) session.close()

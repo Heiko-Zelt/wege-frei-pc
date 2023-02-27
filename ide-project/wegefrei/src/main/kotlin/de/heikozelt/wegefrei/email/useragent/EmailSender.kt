@@ -14,7 +14,7 @@ import java.awt.EventQueue
  *   <li>Thread erneut starten</li>
  * </ol>
  */
-class EmailSender(private val outbox: Outbox, private val agent: EmailUserAgent): Thread("EmailSender") {
+class EmailSender(private val outbox: Outbox<Int>, private val agent: EmailUserAgent): Thread("EmailSender") {
 
     /**
      * wahr, wenn der Thread gerade läuft oder Popup mit Fehlermeldung angezeigt wird

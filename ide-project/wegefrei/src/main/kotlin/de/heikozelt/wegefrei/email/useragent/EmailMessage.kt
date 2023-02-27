@@ -24,17 +24,17 @@ import javax.mail.internet.MimeMultipart
  * If sending fails generate a new message id or reuse existing one???
  * Die message id ist nur für die Protokollierung relevant.
  */
-data class EmailMessage(
+data class EmailMessage<T>(
+    val externalID: T, // notice id
     val from: EmailAddressEntity,
     val tos: TreeSet<EmailAddressEntity> = TreeSet<EmailAddressEntity>(),
-    val subject: String,
-    val coverLetter: String,
+    val subject: String = "",
+    val coverLetter: String = "",
     val ccs: TreeSet<EmailAddressEntity> = TreeSet<EmailAddressEntity>(),
     val attachments: LinkedList<EmailAttachment> = LinkedList<EmailAttachment>(),
-    val externalID: Any // notice id
-    var messageID: ByteArray? = null,
-    val sentTime: ZonedDateTime,
 ) {
+    var messageID: ByteArray? = null
+    val sentTime: ZonedDateTime? = null
 
     /**
      * side effect: generates a new message id

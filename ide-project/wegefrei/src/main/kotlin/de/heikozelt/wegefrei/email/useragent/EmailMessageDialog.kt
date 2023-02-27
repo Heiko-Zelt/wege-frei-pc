@@ -21,7 +21,7 @@ import javax.swing.*
 class EmailMessageDialog(confirmedCallback: () -> Unit) : JFrame() {
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
     private val emailMessagePanel = EmailMessagePanel()
-    private var emailMessage: EmailMessage? = null
+    private var emailMessage: EmailMessage<Int>? = null
     private val sendButton = JButton("Senden")
     private val cancelButton = JButton("Abbrechen")
 
@@ -67,7 +67,7 @@ class EmailMessageDialog(confirmedCallback: () -> Unit) : JFrame() {
         isVisible = true
     }
 
-    fun setEmailMessage(emailMessage: EmailMessage) {
+    fun setEmailMessage(emailMessage: EmailMessage<Int>) {
         log.debug("setEmailMessage(subject=${emailMessage.subject})")
         this.emailMessage = emailMessage
         emailMessagePanel.setEmailMessage(emailMessage)

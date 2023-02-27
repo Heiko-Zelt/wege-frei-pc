@@ -15,8 +15,9 @@ import javax.swing.JPanel
  * subject: ---
  * ------------
  * </pre>
+ * todo Prio 3: Der Typ der externen Message ID ist hier egal. Kein Generic verwenden.
  */
-class EmailMessagePanel : JPanel() {
+class EmailMessagePanel: JPanel() {
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
 
     // GUI components
@@ -102,7 +103,7 @@ class EmailMessagePanel : JPanel() {
     /**
      * maps the fields of an emailMessage object to GUI components
      */
-    fun setEmailMessage(emailMessage: EmailMessage) {
+    fun setEmailMessage(emailMessage: EmailMessage<Int>) {
         fromField.text = emailMessage.from.asText()
         // todo Prio 3: ggf. mehrere Empfänger und CC anzeigen
         tosField.text = emailMessage.tos.first().asText()

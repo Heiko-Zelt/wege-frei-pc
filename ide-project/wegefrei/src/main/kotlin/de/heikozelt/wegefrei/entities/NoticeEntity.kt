@@ -1,10 +1,12 @@
 package de.heikozelt.wegefrei.entities
 
 import de.heikozelt.wegefrei.email.EmailAddressEntity
+import de.heikozelt.wegefrei.hex
 import de.heikozelt.wegefrei.model.CountrySymbol
 import de.heikozelt.wegefrei.model.NoticeState
 import jakarta.persistence.*
 import org.jxmapviewer.viewer.GeoPosition
+import org.slf4j.Logger
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -353,6 +355,23 @@ class NoticeEntity(
         val sortedSet = TreeSet<PhotoEntity>()
         sortedSet.addAll(photoEntities)
         return sortedSet
+    }
+
+    fun dump(log: Logger) {
+        log.debug("NoticeEntity:")
+        log.debug("  id: $id")
+        log.debug("  country symbol: $countrySymbol")
+        log.debug("  license plate: $licensePlate")
+        val oTime = observationTime?.let {observationTime.toString() } ?: "null"
+        log.debug("  observation time: $oTime")
+        val cTime = createdTime?.let {createdTime.toString() } ?: "null"
+        log.debug("  created time: $cTime")
+        val fTime = finalizedTime?.let {finalizedTime.toString() } ?: "null"
+        log.debug("  finalized time: $fTime")
+        val sTime = sentTime?.let {sentTime.toString() } ?: "null"
+        log.debug("  sent time: $sTime")
+        val mid = messageId?.let { hex(it) } ?: "null"
+        log.debug("  message id: $mid")
     }
 
     companion object {

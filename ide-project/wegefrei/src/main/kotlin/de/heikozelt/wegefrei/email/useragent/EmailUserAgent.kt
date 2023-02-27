@@ -42,7 +42,7 @@ class EmailUserAgent {
      * Warum callback statt Rückgabewert?
      * @return true, bedeutet erfolgreich gesendet, false bedeutet Fehler oder Benutzer hat abgebrochen
      */
-    fun sendMailDirectly(emailMessage: EmailMessage): Boolean {
+    fun sendMailDirectly(emailMessage: EmailMessage<Int>): Boolean {
         emailServerConfig?.let { serverConfig ->
             authenticator?.let { auth ->
                 val passwordEntered = auth.maybeAskForPassword()
