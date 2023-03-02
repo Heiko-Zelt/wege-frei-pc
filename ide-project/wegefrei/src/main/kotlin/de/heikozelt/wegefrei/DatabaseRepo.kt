@@ -131,7 +131,7 @@ class DatabaseRepo(jdbcUrl: String) {
      * liefert ein umgekehrt sortiertes Set von Meldungen
      * neueste (mit der höchsten ID) zuerst
      */
-    fun findAllNoticesDesc(): List<NoticeEntity>? {
+    fun findAllNoticesDesc(): List<NoticeEntity> {
         log.debug("findAllNoticesDesc()")
         //Thread.sleep(5000) Simulation langsamer Datenbank
         val resultList: List<NoticeEntity>?
@@ -147,10 +147,10 @@ class DatabaseRepo(jdbcUrl: String) {
             if (session.isOpen) session.close()
         }
         log.debug("got result. size=${resultList?.size}")
-        return resultList
+        return resultList?:emptyList()
     }
 
-    fun findAllNoticesIdsDesc(): List<Int>? {
+    fun findAllNoticesIdsDesc(): List<Int> {
         log.debug("findAllNoticesIdsDesc()")
         //Thread.sleep(5000) Simulation langsamer Datenbank
         val resultList: List<Int>?
@@ -166,7 +166,7 @@ class DatabaseRepo(jdbcUrl: String) {
             if (session.isOpen) session.close()
         }
         log.debug("got result. size=${resultList?.size}")
-        return resultList
+        return resultList ?: emptyList()
     }
 
     fun findAllEmailAddresses(): List<EmailAddressEntity>? {
@@ -293,16 +293,33 @@ class DatabaseRepo(jdbcUrl: String) {
         log.debug("session: $session")
         val tx = session.beginTransaction()
         try {
-            var existing = session.find(NoticeEntity::class.java, noticeID);
-            existing.sentTime = sentTime;
-            existing.messageId = messageID;
-            session.merge(existing);
+            val existing = session.find(NoticeEntity::class.java, noticeID)
+            existing.sentTime = sentTime
+            existing.messageId = messageID
+            session.merge(existing)
             tx.commit()
         } finally {
           if (tx.isActive) tx.rollback()
           if (session.isOpen) session.close()
         }
     }
+
+    fun updateNoticeSendFailed(noticeID: Int) {
+        log.debug("updateNoticeSendFailed(id=${noticeID})")
+        val session = sessionFactory.openSession()
+        log.debug("session: $session")
+        val tx = session.beginTransaction()
+        try {
+            val existing = session.find(NoticeEntity::class.java, noticeID);
+            existing.sendFailures++
+            session.merge(existing)
+            tx.commit()
+        } finally {
+            if (tx.isActive) tx.rollback()
+            if (session.isOpen) session.close()
+        }
+    }
+
 
     fun updateEmailAddress(emailAddressEntity: EmailAddressEntity) {
         log.debug("updateEmailAddress(address=${emailAddressEntity.address})")

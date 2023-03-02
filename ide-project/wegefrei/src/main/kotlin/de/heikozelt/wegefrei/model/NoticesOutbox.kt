@@ -67,16 +67,17 @@ class NoticesOutbox : Outbox<Int> {
      * alternative Lösung 1: Vor jedem Sendeversuch wird die Message-ID in der Datenbank eingetragen (performt schlecht). MessageID kann nicht Sendezeitpunkt enthalten. :-(
      * alternative Lösung 2: Outbox merkt sich, welche Meldung (Email-Nachricht) dran war.
      */
-    override fun sendCallback(emailMessage: EmailMessage<Int>, sendSuccess: Boolean) {
+    override fun sendCallback(message: EmailMessage<Int>, sendSuccess: Boolean) {
         if (sendSuccess) {
-            emailMessage.sentTime?.let { sTime ->
-                emailMessage.messageID?.let { mID ->
+            message.sentTime?.let { sTime ->
+                message.messageID?.let { mID ->
                     // Email als gesendet in der Datenbank markieren
-                    dbRepo?.updateNoticeSent(emailMessage.externalID, sTime, mID)
+                    dbRepo?.updateNoticeSent(message.externalID, sTime, mID)
                 }
             }
         } else { // wenn Senden nicht erfolgreich:
-            // Abbruchkriterium? Ask user: retry/continue Erneut versuchen/weiter senden? or Cancel/Abbrechen?
+            dbRepo?.updateNoticeSendFailed(message.externalID)
+            // todo: Abbruchkriterium? Ask user: retry/continue Erneut versuchen/weiter senden? or Cancel/Abbrechen?
         }
     }
 

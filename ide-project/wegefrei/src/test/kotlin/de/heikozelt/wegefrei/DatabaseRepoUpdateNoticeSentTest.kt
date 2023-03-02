@@ -43,7 +43,7 @@ internal class DatabaseRepoUpdateNoticeSentTest {
 
         private val databaseRepo = DatabaseRepo.fromMemory()
 
-        val filename = "dhl1.jpg"
+        const val filename = "dhl1.jpg"
         val dir = Paths.get("src/test/resources").toAbsolutePath().toString()
 
         @BeforeAll

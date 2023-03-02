@@ -34,7 +34,7 @@ data class EmailMessage<T>(
     val attachments: LinkedList<EmailAttachment> = LinkedList<EmailAttachment>(),
 ) {
     var messageID: ByteArray? = null
-    val sentTime: ZonedDateTime? = null
+    var sentTime: ZonedDateTime? = null
 
     /**
      * side effect: generates a new message id
