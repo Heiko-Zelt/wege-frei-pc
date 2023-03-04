@@ -156,6 +156,10 @@ class NoticesOutbox : Outbox<Int> {
                 }
             }
 
+            val validationErrors = w.validate()
+            validationErrors.addAll(n.isComplete())
+            if(validationErrors.isNotEmpty()) throw ValidationException(validationErrors)
+
             val countryRow = tableRow("Landeskennzeichen", n.getCountryFormatted())
             val licensePlateRow = tableRow("Kennzeichen", n.licensePlate)
             val makeRow = tableRow("Marke", n.vehicleMake)
@@ -166,7 +170,7 @@ class NoticesOutbox : Outbox<Int> {
             val offenseRow = tableRow("Verstoß", n.offense)
             val circumstancesRow = tableRowHtmlValue("Umstände", n.getCircumstancesHtml())
             val inspectionDateRow = tableRow("HU-Fälligkeit", n.getInspectionMonthYear())
-            // todo: Wochentag einfügen, wegen Werktags-Beschränkungen
+            // todo Prio 3: Wochentag einfügen, wegen Werktags-Beschränkungen
             val observationTimeRow = tableRow("Beobachtungszeit", n.getObservationTimeFormatted())
             val observationDurationRow = tableRow("Beobachtungsdauer", n.getDurationFormatted())
             val noteRow = tableRow("Hinweis", n.note)

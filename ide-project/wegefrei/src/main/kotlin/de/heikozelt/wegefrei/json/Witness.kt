@@ -26,6 +26,24 @@ data class Witness (
     var telephoneNumber: String = ""
 ): Cloneable {
 
+    /**
+     * Liefert eine Liste mit Validierungs-Fehlermeldungen oder eine leere Liste, wenn alles ok.
+     */
+    fun validate(): MutableList<String>{
+        val validationErrors = mutableListOf<String>()
+        if (givenName.isBlank()) validationErrors.add("Dein Vorname als Zeug_in fehlt.")
+        if (surname.isBlank()) validationErrors.add("Dein Nachname als Zeug_in fehlt.")
+        if (emailAddress.isBlank()) validationErrors.add("Deine E-Mail-Adresse als Zeug_in fehlt.")
+        if (street.isBlank()) validationErrors.add("Bei deiner Anschrift als Zeug_in fehlt die Straße und Hausnummer.")
+        if (zipCode.isBlank()) validationErrors.add("Bei deiner Anschrift als Zeug_in fehlt die Postleitzahl (PLZ).")
+        if (town.isBlank()) validationErrors.add("Dein Wohnort als Zeug_in fehlt.")
+        if(validationErrors.size == 6) { // gar keine persönlichen Zeugen-Daten angegeben
+            validationErrors.clear()
+            validationErrors.add("Bitte gib Deine Zeugen-Daten an.")
+        }
+        return validationErrors
+    }
+
     fun getFullName(): String {
         return "$givenName $surname"
     }
