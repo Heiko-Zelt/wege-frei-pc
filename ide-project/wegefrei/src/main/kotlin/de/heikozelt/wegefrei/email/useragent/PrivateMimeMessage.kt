@@ -26,12 +26,16 @@ class PrivateMimeMessage(session: Session): MimeMessage(session) {
         return binaryMessageId
     }
 
-    override fun updateMessageID() {
+    public override fun updateMessageID() {
         binaryMessageId = ByteArray(20) { 0 }
         SecureRandom.getInstanceStrong().nextBytes(binaryMessageId)
         binaryMessageId?.let {
             setHeader("Message-ID", "<" + hex(it) + "@localhost>")
         }
     }
+
+    // todo: analysieren, ob updateHeaders() aufgerufen wird und ob Date geändert wird.
+    // Called by the saveChanges method... sets the ... the Date header (if not already set)
+    // protected void updateHeaders()
 
 }

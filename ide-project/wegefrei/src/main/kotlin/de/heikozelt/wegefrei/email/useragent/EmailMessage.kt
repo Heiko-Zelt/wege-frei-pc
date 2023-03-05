@@ -2,6 +2,7 @@ package de.heikozelt.wegefrei.email.useragent
 
 import de.heikozelt.wegefrei.decodeHex
 import de.heikozelt.wegefrei.email.EmailAddressEntity
+import java.time.ZonedDateTime
 import java.util.*
 import javax.mail.Message
 import javax.mail.Session
@@ -51,7 +52,8 @@ data class EmailMessage<T>(
     }
 
     /**
-     * side effect: generates a new messageID and sets sentTime
+     * side effect: sets sentTime
+     * (but messageID is generated later on Transport.send(mimeMessage)
      */
     fun buildMimeMessage(session: Session) {
         val msg = PrivateMimeMessage(session)
@@ -74,5 +76,19 @@ data class EmailMessage<T>(
         msg.setContent(multipart)
         msg.sentDate = Date()
         mimeMsg = msg
+    }
+
+    /**
+     * only for JUnit tests, but how to generate a mimeMessage without session???
+     */
+    fun sentTime(sentTime: ZonedDateTime) {
+        mimeMsg?.sentDate = Date.from(sentTime.toInstant())
+    }
+
+    /**
+     * only for JUnit tests, but how to generate a mimeMessage without session???
+     */
+    fun updateMessageID() {
+        mimeMsg?.updateMessageID()
     }
 }

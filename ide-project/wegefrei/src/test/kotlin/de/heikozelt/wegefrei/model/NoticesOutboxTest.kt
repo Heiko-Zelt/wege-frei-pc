@@ -45,41 +45,68 @@ class NoticesOutboxTest {
         log.debug(content)
         val expected = """
         <html>
-          <p>Sehr geehrte Damen und Herren,</p>
-          <p>hiermit zeige ich, mit der Bitte um Weiterverfolgung, folgende Verkehrsordnungswidrigkeit an:</p>
-          
-          <h1>Falldaten</h1>
-          <table>
-            <tr><td>Kennzeichen:</td><td>K OT 1234</td></tr>
-            <tr><td>Marke:</td><td>AMG</td></tr>
-            <tr><td>Farbe:</td><td>Weiß</td></tr>
-            <tr><td>Tatortbeschreibung:</td><td>Köln Hauptbahnhof</td></tr>
-            <tr><td>Verstoß:</td><td>Parken am Taxenstand</td></tr>
-            <tr><td>Umstände:</td><td>Das Fahrzeug war verlassen<br>mit Gefährdung</td></tr>
-            <tr><td>Beobachtungszeit:</td><td>01.01.2022, 12:01 CET</td></tr>
-          </table>
-          
-          <h1>Zeuge</h1>
-          <table>
-            <tr><td>Name:</td><td>Heiko Zelt</td></tr>
-            <tr><td>Adresse:</td><td>Bahnhofstraße 1, 12345 Köln</td></tr>
-            <tr><td>E-Mail:</td><td>hz@heikozelt.de</td></tr>
-          </table>
-          
-          <h1>Erklärung</h1>
-          <p>Hiermit bestätige ich, dass ich die Datenschutzerklärung zur Kenntnis genommen habe und ihr zustimme.
-            Meine oben gemachten Angaben einschließlich meiner Personalien sind zutreffend und vollständig.
-            Als Zeuge bin ich zur wahrheitsgemäßen Aussage und auch zu einem möglichen Erscheinen vor Gericht verpflichtet.
-            Vorsätzlich falsche Angaben zu angeblichen Ordnungswidrigkeiten können eine Straftat darstellen.
-            Ich weiß, dass mir die Kosten des Verfahrens und die Auslagen des Betroffenen auferlegt werden,
-            wenn ich vorsätzlich oder leichtfertig eine unwahre Anzeige erstatte.</p>
-          <p>Beweisfotos, aus denen Kennzeichen und Tatvorwurf erkennbar hervorgehen, befinden sich im Anhang.
-            Bitte prüfen Sie den Sachverhalt auch auf etwaige andere Verstöße, die aus den Beweisfotos zu ersehen sind.</p>
-          <p>Bitte bestätigen Sie Ihre Zuständigkeit und den Erhalt dieser Anzeige mit der Zusendung des Aktenzeichens an hz@heikozelt.de.
-            Falls Sie nicht zuständig sein sollten, leiten Sie bitte meine Anzeige weiter und informieren Sie mich darüber.
-            Sie dürfen meine persönlichen Daten auch weiterleiten und diese für die Dauer des Verfahrens speichern.</p>
-          <p>Mit freundlichen Grüßen</p>
-          <p>Heiko Zelt</p>
+          <head></head>
+          <body>
+            <p>Sehr geehrte Damen und Herren,</p>
+            <p>hiermit zeige ich, mit der Bitte um Weiterverfolgung, folgende Verkehrsordnungswidrigkeit an:</p>
+            <h1>Falldaten</h1>
+            <table>
+              <tbody>
+                <tr>
+                  <td>Kennzeichen:</td>
+                  <td>K OT 1234</td>
+                </tr>
+                <tr>
+                  <td>Marke:</td>
+                  <td>AMG</td>
+                </tr>
+                <tr>
+                  <td>Farbe:</td>
+                  <td>Weiß</td>
+                </tr>
+                <tr>
+                  <td>Tatortbeschreibung:</td>
+                  <td>Köln Hauptbahnhof</td>
+                </tr>
+                <tr>
+                  <td>Verstoß:</td>
+                  <td>Parken am Taxenstand</td>
+                </tr>
+                <tr>
+                  <td>Umstände:</td>
+                  <td>Das Fahrzeug war verlassen<br>
+                    mit Gefährdung</td>
+                </tr>
+                <tr>
+                  <td>Beobachtungszeit:</td>
+                  <td>01.01.2022, 12:01 CET</td>
+                </tr>
+              </tbody>
+            </table>
+            <h1>Zeuge</h1>
+            <table>
+              <tbody>
+                <tr>
+                  <td>Name:</td>
+                  <td>Heiko Zelt</td>
+                </tr>
+                <tr>
+                  <td>Adresse:</td>
+                  <td>Bahnhofstraße 1, 12345 Köln</td>
+                </tr>
+                <tr>
+                  <td>E-Mail:</td>
+                  <td>hz@heikozelt.de</td>
+                </tr>
+              </tbody>
+            </table>
+            <h1>Erklärung</h1>
+            <p>Hiermit bestätige ich, dass ich die Datenschutzerklärung zur Kenntnis genommen habe und ihr zustimme. Meine oben gemachten Angaben einschließlich meiner Personalien sind zutreffend und vollständig. Als Zeuge bin ich zur wahrheitsgemäßen Aussage und auch zu einem möglichen Erscheinen vor Gericht verpflichtet. Vorsätzlich falsche Angaben zu angeblichen Ordnungswidrigkeiten können eine Straftat darstellen. Ich weiß, dass mir die Kosten des Verfahrens und die Auslagen des Betroffenen auferlegt werden, wenn ich vorsätzlich oder leichtfertig eine unwahre Anzeige erstatte.</p>
+            <p>Beweisfotos, aus denen Kennzeichen und Tatvorwurf erkennbar hervorgehen, befinden sich im Anhang. Bitte prüfen Sie den Sachverhalt auch auf etwaige andere Verstöße, die aus den Beweisfotos zu ersehen sind.</p>
+            <p>Bitte bestätigen Sie Ihre Zuständigkeit und den Erhalt dieser Anzeige mit der Zusendung des Aktenzeichens an hz@heikozelt.de. Falls Sie nicht zuständig sein sollten, leiten Sie bitte meine Anzeige weiter und informieren Sie mich darüber. Sie dürfen meine persönlichen Daten auch weiterleiten und diese für die Dauer des Verfahrens speichern.</p>
+            <p>Mit freundlichen Grüßen</p>
+            <p>Heiko Zelt</p>
+          </body>
         </html>""".trimIndent()
         assertEquals(expected, content)
     }
@@ -217,14 +244,18 @@ class NoticesOutboxTest {
         // todo more assertions
 
         message1?.let {
-            it.sentTime = sentTime
-            it.messageID = mID
+            //it.buildMimeMessage()
+            it.sentTime(sentTime) // not working without a session
+            it.updateMessageID() // not working without a session
             outbox.sendCallback(it, true)
         }
-
+        // todo create EMailMessage interface with 2 implementations MimeEmailMessage & EmailMessageMock:
+/*
         val message2 = outbox.next()
         assertNull(message2)
         dbRepo.close()
+
+ */
     }
 
     @Test

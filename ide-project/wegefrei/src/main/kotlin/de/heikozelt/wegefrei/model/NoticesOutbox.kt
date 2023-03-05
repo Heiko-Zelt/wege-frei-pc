@@ -1,7 +1,6 @@
 package de.heikozelt.wegefrei.model
 
 import de.heikozelt.wegefrei.DatabaseRepo
-import de.heikozelt.wegefrei.decodeHex
 import de.heikozelt.wegefrei.email.EmailAddressEntity
 import de.heikozelt.wegefrei.email.useragent.EmailAttachment
 import de.heikozelt.wegefrei.email.useragent.EmailMessage
@@ -9,6 +8,7 @@ import de.heikozelt.wegefrei.email.useragent.Outbox
 import de.heikozelt.wegefrei.entities.NoticeEntity
 import de.heikozelt.wegefrei.json.Settings
 import de.heikozelt.wegefrei.json.Witness
+import org.jsoup.Jsoup
 import org.slf4j.LoggerFactory
 import java.nio.file.Paths
 import java.time.ZoneId
@@ -146,13 +146,13 @@ class NoticesOutbox : Outbox<Int> {
 
             fun appendTableRow(tableRows: MutableList<String>, label: String, value: String?) {
                 if (!value.isNullOrBlank()) {
-                    tableRows.add("|    <tr><td>$label:</td><td>${htmlEncode(value)}</td></tr>")
+                    tableRows.add("<tr><td>$label:</td><td>${htmlEncode(value)}</td></tr>")
                 }
             }
 
             fun appendTableRowHtmlValue(tableRows: MutableList<String>, label: String, value: String?) {
                 if (!value.isNullOrBlank()) {
-                    tableRows.add("|    <tr><td>$label:</td><td>$value</td></tr>")
+                    tableRows.add("<tr><td>$label:</td><td>$value</td></tr>")
                 }
             }
 
@@ -188,46 +188,50 @@ class NoticesOutbox : Outbox<Int> {
                 ""
             } else {
                 val sb = StringBuilder()
-                sb.append("|  ")
-                sb.append("|  <h1>Anlagen</h1>\n")
-                sb.append("|  <ol>\n")
+                sb.append("<h1>Anlagen</h1>")
+                sb.append("<ol>")
                 n.getPhotoEntitiesSorted()
-                    .forEach { sb.append("|    <li>${it.getFilename()} (SHA1: ${it.getHashHex()})</li>\n") }
-                sb.append("|  </ol>")
+                    .forEach { sb.append("<li>${it.getFilename()} (SHA1: ${it.getHashHex()})</li>") }
+                sb.append("</ol>")
             }
 
             val content = """
-              |<html>
-              |  <p>Sehr geehrte Damen und Herren,</p>
-              |  <p>hiermit zeige ich, mit der Bitte um Weiterverfolgung, folgende Verkehrsordnungswidrigkeit an:</p>
-              |  
-              |  <h1>Falldaten</h1>
-              |  <table>
-              $caseTableRows
-              |  </table>
-              |  
-              |  <h1>Zeuge</h1>
-              |  <table>
-              $witnessTableRows
-              |  </table>
-              $attachmentsSection|  
-              |  <h1>Erklärung</h1>
-              |  <p>Hiermit bestätige ich, dass ich die Datenschutzerklärung zur Kenntnis genommen habe und ihr zustimme.
-              |    Meine oben gemachten Angaben einschließlich meiner Personalien sind zutreffend und vollständig.
-              |    Als Zeuge bin ich zur wahrheitsgemäßen Aussage und auch zu einem möglichen Erscheinen vor Gericht verpflichtet.
-              |    Vorsätzlich falsche Angaben zu angeblichen Ordnungswidrigkeiten können eine Straftat darstellen.
-              |    Ich weiß, dass mir die Kosten des Verfahrens und die Auslagen des Betroffenen auferlegt werden,
-              |    wenn ich vorsätzlich oder leichtfertig eine unwahre Anzeige erstatte.</p>
-              |  <p>Beweisfotos, aus denen Kennzeichen und Tatvorwurf erkennbar hervorgehen, befinden sich im Anhang.
-              |    Bitte prüfen Sie den Sachverhalt auch auf etwaige andere Verstöße, die aus den Beweisfotos zu ersehen sind.</p>
-              |  <p>Bitte bestätigen Sie Ihre Zuständigkeit und den Erhalt dieser Anzeige mit der Zusendung des Aktenzeichens an hz@heikozelt.de.
-              |    Falls Sie nicht zuständig sein sollten, leiten Sie bitte meine Anzeige weiter und informieren Sie mich darüber.
-              |    Sie dürfen meine persönlichen Daten auch weiterleiten und diese für die Dauer des Verfahrens speichern.</p>
-              |  <p>Mit freundlichen Grüßen</p>
-              |  <p>${w.getFullName()}</p>
-              |</html>""".trimMargin()
-            LOG.debug("html content:\n$content")
-            return content
+              <html>
+                <p>Sehr geehrte Damen und Herren,</p>
+                <p>hiermit zeige ich, mit der Bitte um Weiterverfolgung, folgende Verkehrsordnungswidrigkeit an:</p>
+                
+                <h1>Falldaten</h1>
+                <table>
+                $caseTableRows
+                </table>
+                
+                <h1>Zeuge</h1>
+                <table>
+                $witnessTableRows
+                </table>
+                
+                $attachmentsSection
+                  
+                <h1>Erklärung</h1>
+                <p>Hiermit bestätige ich, dass ich die Datenschutzerklärung zur Kenntnis genommen habe und ihr zustimme.
+                  Meine oben gemachten Angaben einschließlich meiner Personalien sind zutreffend und vollständig.
+                  Als Zeuge bin ich zur wahrheitsgemäßen Aussage und auch zu einem möglichen Erscheinen vor Gericht verpflichtet.
+                  Vorsätzlich falsche Angaben zu angeblichen Ordnungswidrigkeiten können eine Straftat darstellen.
+                  Ich weiß, dass mir die Kosten des Verfahrens und die Auslagen des Betroffenen auferlegt werden,
+                  wenn ich vorsätzlich oder leichtfertig eine unwahre Anzeige erstatte.</p>
+                <p>Beweisfotos, aus denen Kennzeichen und Tatvorwurf erkennbar hervorgehen, befinden sich im Anhang.
+                  Bitte prüfen Sie den Sachverhalt auch auf etwaige andere Verstöße, die aus den Beweisfotos zu ersehen sind.</p>
+                <p>Bitte bestätigen Sie Ihre Zuständigkeit und den Erhalt dieser Anzeige mit der Zusendung des Aktenzeichens an hz@heikozelt.de.
+                  Falls Sie nicht zuständig sein sollten, leiten Sie bitte meine Anzeige weiter und informieren Sie mich darüber.
+                  Sie dürfen meine persönlichen Daten auch weiterleiten und diese für die Dauer des Verfahrens speichern.</p>
+                <p>Mit freundlichen Grüßen</p>
+                <p>${w.getFullName()}</p>
+              </html>""".trimIndent()
+            val doc = Jsoup.parse(content)
+            doc.outputSettings().indentAmount(2)
+            val pretty = doc.toString()
+            LOG.debug("html content:\n$pretty")
+            return pretty
         }
     }
 }

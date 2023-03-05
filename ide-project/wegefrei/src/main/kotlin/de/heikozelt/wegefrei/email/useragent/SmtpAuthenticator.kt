@@ -38,18 +38,23 @@ class SmtpAuthenticator: Authenticator() {
      */
     fun askForPassword(): Boolean {
         val panel = PasswordPanel()
-        val options = arrayOf("OK", "Abbrechen")
+        val options = arrayOf("Abbrechen", "OK")
         val result = JOptionPane.showOptionDialog(null, panel, "SMTP-Server-Authentifizierung",
             JOptionPane.NO_OPTION, JOptionPane.PLAIN_MESSAGE,
             null, options, options[1]);
         when(result) {
-            0 -> log.debug("password entered")
+            1 -> log.debug("password entered")
             else -> return false
         }
         password = panel.getPassword()
         return true
     }
 
+    /**
+     * gives feedback, if the password was accepted by the SMTP server.
+     * If it was accepted, don't aks for it again.
+     * If it was not accepted, ask again next time.
+     */
     fun passwordFeedback(accepted: Boolean) {
         passwordAccepted = accepted
     }

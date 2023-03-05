@@ -32,7 +32,8 @@ import javax.swing.UIManager
  * NoticeFrame (neue oder bestehende Meldung bearbeiten) & SettingsFrame,
  * sowie die Einstellungen (Settings) und die Datenbank-Verbindung (DatabaseService).
  * @param settingsRepo constructor injection (enables unit tests with test settings)
- * todo Prio 3 Logo/Icon für die Anwendung
+ * todo Prio 3: Logo/Icon für die Anwendung
+ * todo Prio 1: update notice in NoticesFrame after it was sent
  */
 open class WegeFrei(private val settingsRepo: SettingsRepo = SettingsFileRepo()) {
 
