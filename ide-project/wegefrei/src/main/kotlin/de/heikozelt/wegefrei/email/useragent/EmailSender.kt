@@ -1,5 +1,6 @@
 package de.heikozelt.wegefrei.email.useragent
 
+import org.slf4j.LoggerFactory
 import java.awt.EventQueue
 
 /**
@@ -16,27 +17,28 @@ import java.awt.EventQueue
  */
 class EmailSender(private val outbox: Outbox<Int>, private val agent: EmailUserAgent): Thread("EmailSender") {
 
-    /**
-     * wahr, wenn der Thread gerade läuft oder Popup mit Fehlermeldung angezeigt wird
-     */
-    private var isSending = false
+    private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
 
     override fun run() {
-        isSending = true
+        log.debug("run()")
         while(true) {
-            val message = outbox.next() ?: break
             try {
-              val success = agent.sendMailDirectly(message)
-              outbox.sendCallback(message, success)
+              val message = outbox.next() ?: break
+              agent.sendMail(message)
+              log.debug("send successful. sentTime: ${message.getSentTime()}, messageID: ${message.getMessageID()}")
+              outbox.sendCallback(message, true)
+              sleep(5000)
             } catch (ex: Exception) {
+                log.debug("sending email failed: ", ex)
                 EventQueue.invokeLater {
                     // todo Popup mit Fehlermeldung und Button Fortfahren/Weiter versuchen
+                    log.debug("ask user, if she want's to try again or cancel")
                 }
                 // Thread beenden und auf Benutzereingabe warten
-                return
+                log.debug("exit send loop because an exception occurred")
+                break
             }
         }
-        // erfolgreich beendet
-        isSending = false
+        log.debug("run() finished")
     }
 }

@@ -14,6 +14,8 @@ class NoticesOutboxTest {
 
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
 
+    // todo Prio 1: running one_next_success() & one_next_send_failed() together fails. One test has side effects on other test.
+
     @Test
     fun buildMailContent_ok() {
         val noticeEntity = NoticeEntity()
@@ -157,6 +159,7 @@ class NoticesOutboxTest {
         outbox.setDatabaseRepo(dbRepo)
         val message = outbox.next()
         assertNull(message)
+        dbRepo.close()
     }
 
     @Test
@@ -190,6 +193,8 @@ class NoticesOutboxTest {
             color = VehicleColor.COLORS[1].colorName
             latitude = 50.1
             longitude = 8.1
+            offense = "Parken im Rhein"
+            recipientEmailAddress = "hz@heikozelt.de"
             finalizedTime = finalTime
         }
         dbRepo.insertNotice(notice1)
@@ -208,6 +213,7 @@ class NoticesOutboxTest {
 
         val message1 = outbox.next()
         assertNotNull(message1)
+        assertEquals(1, message1?.externalID)
         // todo more assertions
 
         message1?.let {
@@ -215,8 +221,10 @@ class NoticesOutboxTest {
             it.messageID = mID
             outbox.sendCallback(it, true)
         }
+
         val message2 = outbox.next()
         assertNull(message2)
+        dbRepo.close()
     }
 
     @Test
@@ -264,6 +272,7 @@ class NoticesOutboxTest {
         }
         assertEquals(1, exception.validationErrors.size)
         assertEquals(exception.validationErrors[0], "Bitte gib Deine Zeugen-Daten an.")
+        dbRepo.close()
     }
 
     @Test
@@ -321,6 +330,7 @@ class NoticesOutboxTest {
         val message2 = outbox.next()
         assertNotNull(message2)
         assertEquals(1, message2?.externalID)
+        dbRepo.close()
     }
 
     @Test

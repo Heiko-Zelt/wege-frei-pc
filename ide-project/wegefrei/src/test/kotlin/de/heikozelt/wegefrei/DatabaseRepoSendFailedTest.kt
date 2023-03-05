@@ -1,13 +1,11 @@
 package de.heikozelt.wegefrei
 
-import de.heikozelt.wegefrei.email.EmailAddressEntity
 import de.heikozelt.wegefrei.entities.NoticeEntity
 import de.heikozelt.wegefrei.entities.PhotoEntity
 import de.heikozelt.wegefrei.model.VehicleColor
 import de.heikozelt.wegefrei.model.VehicleMakesComboBoxModel
 import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
 import java.nio.file.Paths
@@ -51,13 +49,13 @@ internal class DatabaseRepoSendFailedTest {
 
         // now there is a notice waiting to be sent
         val something = databaseRepo.findNextNoticeToSend()
+        assertEquals(1, something?.id)
         assertEquals(0, something?.sendFailures)
-        assertNotNull(something?.id)
         something?.id?.let {
             databaseRepo.updateNoticeSendFailed(it)
         }
-
         val updated = databaseRepo.findNextNoticeToSend()
+        assertEquals(1, something?.id)
         assertEquals(1, updated?.sendFailures)
     }
 

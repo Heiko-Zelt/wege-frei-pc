@@ -1,12 +1,11 @@
 package de.heikozelt.wegefrei.email.useragent
 
+import de.heikozelt.wegefrei.decodeHex
 import de.heikozelt.wegefrei.email.EmailAddressEntity
-import java.time.ZonedDateTime
 import java.util.*
 import javax.mail.Message
 import javax.mail.Session
 import javax.mail.internet.MimeBodyPart
-import javax.mail.internet.MimeMessage
 import javax.mail.internet.MimeMultipart
 
 /**
@@ -33,13 +32,28 @@ data class EmailMessage<T>(
     val ccs: TreeSet<EmailAddressEntity> = TreeSet<EmailAddressEntity>(),
     val attachments: LinkedList<EmailAttachment> = LinkedList<EmailAttachment>(),
 ) {
-    var messageID: ByteArray? = null
-    var sentTime: ZonedDateTime? = null
+    private var mimeMsg: PrivateMimeMessage? = null
+
+    fun getMimeMessage(): PrivateMimeMessage? {
+        return mimeMsg
+    }
 
     /**
-     * side effect: generates a new message id
+     * Does not return a String like "<e044fd259bdb4ddb9ee9424fbc8a309965e17442@localhost>", but an ByteArray of size 20
      */
-    fun asMimeMessage(session: Session): MimeMessage {
+    fun getMessageID(): ByteArray? {
+        val hexStr = mimeMsg?.messageID?.substring(1, 21)
+        return if(hexStr == null) null else decodeHex(hexStr)
+    }
+
+    fun getSentTime(): Date? {
+        return mimeMsg?.sentDate
+    }
+
+    /**
+     * side effect: generates a new messageID and sets sentTime
+     */
+    fun buildMimeMessage(session: Session) {
         val msg = PrivateMimeMessage(session)
         msg.addHeader("User-Agent", EmailUserAgent.MAIL_USER_AGENT)
         msg.setFrom(from.asInternetAddress())
@@ -57,8 +71,8 @@ data class EmailMessage<T>(
         attachments.forEach {
             multipart.addBodyPart(it.asMimeBodyPart())
         }
-
         msg.setContent(multipart)
-        return msg
+        msg.sentDate = Date()
+        mimeMsg = msg
     }
 }

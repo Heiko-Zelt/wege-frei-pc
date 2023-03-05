@@ -50,3 +50,12 @@ private fun updateDigest(digest: MessageDigest, input: InputStream) {
 fun hex(bytes: ByteArray): String {
     return bytes.joinToString(separator = "") { byte -> "%02x".format(byte) }
 }
+
+/**
+ * Wandelt einen Hexadezimal-codierten String in einen ByteArray.
+ */
+fun decodeHex(hexStr: String): ByteArray {
+    return hexStr.chunked(2)
+        .map { it.toInt(16).toByte() }
+        .toByteArray()
+}

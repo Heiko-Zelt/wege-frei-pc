@@ -576,10 +576,12 @@ class NoticeFrame(
      * und zeigt den Bestätigungs-Dialog an.
      */
     private fun sendEmail() {
+        log.debug("sendEmail()")
         noticeEntity?.let { ne ->
             val outbox = app.getNoticesOutbox()
             val message = outbox.buildEmailMessage(ne)
             message?.let { me ->
+                log.debug("show email message dialog")
                 val dialog = EmailMessageDialog { sendEmailConfirmed() }
                 dialog.setEmailMessage(me)
             }
@@ -590,13 +592,14 @@ class NoticeFrame(
      * wird aufgerufen, wenn die Anwenderin das Senden einer E-Mail-Nachricht bestätigt hat.
      */
     fun sendEmailConfirmed() {
-        log.debug("send email confirmed")
+        log.debug("sendEmailConfirmed()")
         // todo in Notices-Tabelle eintragen
         noticeEntity?.let { ne ->
             ne.finalizedTime = ZonedDateTime.now()
             saveNotice()
             updatePhotosDir()
             closeWindow()
+            app.startSendingEmails()
         }
     }
 

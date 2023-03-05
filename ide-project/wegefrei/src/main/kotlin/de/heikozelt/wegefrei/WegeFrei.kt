@@ -1,6 +1,7 @@
 package de.heikozelt.wegefrei
 
 import de.heikozelt.wegefrei.email.addressbook.AddressBookFrame
+import de.heikozelt.wegefrei.email.useragent.EmailSender
 import de.heikozelt.wegefrei.email.useragent.EmailUserAgent
 import de.heikozelt.wegefrei.entities.NoticeEntity
 import de.heikozelt.wegefrei.json.Settings
@@ -75,6 +76,7 @@ open class WegeFrei(private val settingsRepo: SettingsRepo = SettingsFileRepo())
     private var photoLoader: PhotoLoader? = null
 
     private val noticesOutbox = NoticesOutbox()
+    private val emailSender = EmailSender(noticesOutbox, emailUserAgent)
 
     init {
         log.debug("initializing")
@@ -117,6 +119,10 @@ open class WegeFrei(private val settingsRepo: SettingsRepo = SettingsFileRepo())
                     openNoticesFrame()
                     setti.privacyConsent = PRIVACY_CONSENT_VERSION
                     settingsRepo.save(setti)
+                    databaseRepo?.let {
+                      noticesOutbox.setDatabaseRepo(it)
+                    }
+                    noticesOutbox.setSettings(setti)
                 }
             }
         }
@@ -179,6 +185,12 @@ open class WegeFrei(private val settingsRepo: SettingsRepo = SettingsFileRepo())
 
     fun getNoticesOutbox(): NoticesOutbox {
         return noticesOutbox
+    }
+
+    fun startSendingEmails() {
+        if(!emailSender.isAlive) {
+            emailSender.start()
+        }
     }
 
     /**

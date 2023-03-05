@@ -1,6 +1,7 @@
 package de.heikozelt.wegefrei.model
 
 import de.heikozelt.wegefrei.DatabaseRepo
+import de.heikozelt.wegefrei.decodeHex
 import de.heikozelt.wegefrei.email.EmailAddressEntity
 import de.heikozelt.wegefrei.email.useragent.EmailAttachment
 import de.heikozelt.wegefrei.email.useragent.EmailMessage
@@ -10,6 +11,7 @@ import de.heikozelt.wegefrei.json.Settings
 import de.heikozelt.wegefrei.json.Witness
 import org.slf4j.LoggerFactory
 import java.nio.file.Paths
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.*
 
@@ -47,6 +49,7 @@ class NoticesOutbox : Outbox<Int> {
     }
 
     override fun next(): EmailMessage<Int>? {
+        log.debug("next()")
         return if (cancel) {
             null
         } else {
@@ -68,11 +71,12 @@ class NoticesOutbox : Outbox<Int> {
      * alternative Lösung 2: Outbox merkt sich, welche Meldung (Email-Nachricht) dran war.
      */
     override fun sendCallback(message: EmailMessage<Int>, sendSuccess: Boolean) {
+        log.debug("sendCallback(message.externalID=${message.externalID}, sendSuccess=$sendSuccess)")
         if (sendSuccess) {
-            message.sentTime?.let { sTime ->
-                message.messageID?.let { mID ->
+            message.getSentTime()?.let { sTime ->
+                message.getMessageID()?.let { mID ->
                     // Email als gesendet in der Datenbank markieren
-                    dbRepo?.updateNoticeSent(message.externalID, sTime, mID)
+                    dbRepo?.updateNoticeSent(message.externalID, sTime.toInstant().atZone(ZoneId.systemDefault()), mID)
                 }
             }
         } else { // wenn Senden nicht erfolgreich:
@@ -82,7 +86,7 @@ class NoticesOutbox : Outbox<Int> {
     }
 
     fun buildEmailMessage(noticeEntity: NoticeEntity): EmailMessage<Int>? {
-        log.debug("sendEmail()")
+        log.debug("buildEmailMessage()")
         settings?.let { setti ->
             noticeEntity.id?.let { noticeID ->
                 val from = EmailAddressEntity(setti.witness.emailAddress, setti.witness.getFullName())

@@ -39,15 +39,15 @@ class EmailUserAgent {
 
     /**
      * Jetzt aber wirklich absenden (und eventuell nach Passwort fragen).
-     * Warum callback statt Rückgabewert?
-     * @return true, bedeutet erfolgreich gesendet, false bedeutet Fehler oder Benutzer hat abgebrochen
+     * Bei Fehler: Exception (z.B. Netzwerkverbindung oder Benutzer hat abgebrochen)
      */
-    fun sendMailDirectly(emailMessage: EmailMessage<Int>): Boolean {
+    fun sendMail(emailMessage: EmailMessage<Int>) {
+        log.debug("sendMailDirectly()")
         emailServerConfig?.let { serverConfig ->
             authenticator?.let { auth ->
                 val passwordEntered = auth.maybeAskForPassword()
                 if (!passwordEntered) {
-                    return false
+                    throw NoPasswordException()
                 }
                 log.debug("auth: ${auth.passwordAuthentication}")
                 log.debug("userName: ${auth.passwordAuthentication.userName}")
@@ -71,12 +71,13 @@ class EmailUserAgent {
                 // todo close session, finally or try with?
                 val session = Session.getInstance(props, authenticator)
                 log.debug("session: $session")
-                val msg = emailMessage.asMimeMessage(session)
+                emailMessage.buildMimeMessage(session)
+                val msg = emailMessage.getMimeMessage()
                 try {
                     // "Note that send is a static method that creates and manages its own connection."
                     Transport.send(msg)
                     auth.passwordFeedback(true)
-                    return true
+                    return // successful
                     /*
                     JOptionPane.showMessageDialog(
                         null,
@@ -96,8 +97,8 @@ class EmailUserAgent {
                     // javax.mail.AuthenticationFailedException: 535 5.7.8 Authentication failed: wrong user/password
                     if(ex is AuthenticationFailedException) {
                         auth.passwordFeedback(false)
+                        throw ex
                     }
-                    return false
 /*
                     var errorMessage = "Es ist ein Fehler aufgetreten:\n\n${ex.message}"
                     ex.cause?.let {
@@ -115,7 +116,6 @@ class EmailUserAgent {
         }?: run {
             log.error("emailServerConfig is null")
         }
-        return false
     }
 
     companion object {
