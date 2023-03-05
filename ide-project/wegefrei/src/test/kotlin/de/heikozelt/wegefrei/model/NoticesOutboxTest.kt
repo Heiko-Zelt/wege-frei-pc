@@ -40,10 +40,46 @@ class NoticesOutboxTest {
             town = "Köln"
         }
         val content = NoticesOutbox.buildMailContent(noticeEntity, witness)
-        print(content)
-        assertTrue(content.contains("<html>"))
-        assertTrue(content.contains("Sehr geehrte Damen und Herren"))
-        // todo: weitere asserts
+        log.debug(content)
+        val expected = """
+        <html>
+          <p>Sehr geehrte Damen und Herren,</p>
+          <p>hiermit zeige ich, mit der Bitte um Weiterverfolgung, folgende Verkehrsordnungswidrigkeit an:</p>
+          
+          <h1>Falldaten</h1>
+          <table>
+            <tr><td>Kennzeichen:</td><td>K OT 1234</td></tr>
+            <tr><td>Marke:</td><td>AMG</td></tr>
+            <tr><td>Farbe:</td><td>Weiß</td></tr>
+            <tr><td>Tatortbeschreibung:</td><td>Köln Hauptbahnhof</td></tr>
+            <tr><td>Verstoß:</td><td>Parken am Taxenstand</td></tr>
+            <tr><td>Umstände:</td><td>Das Fahrzeug war verlassen<br>mit Gefährdung</td></tr>
+            <tr><td>Beobachtungszeit:</td><td>01.01.2022, 12:01 CET</td></tr>
+          </table>
+          
+          <h1>Zeuge</h1>
+          <table>
+            <tr><td>Name:</td><td>Heiko Zelt</td></tr>
+            <tr><td>Adresse:</td><td>Bahnhofstraße 1, 12345 Köln</td></tr>
+            <tr><td>E-Mail:</td><td>hz@heikozelt.de</td></tr>
+          </table>
+          
+          <h1>Erklärung</h1>
+          <p>Hiermit bestätige ich, dass ich die Datenschutzerklärung zur Kenntnis genommen habe und ihr zustimme.
+            Meine oben gemachten Angaben einschließlich meiner Personalien sind zutreffend und vollständig.
+            Als Zeuge bin ich zur wahrheitsgemäßen Aussage und auch zu einem möglichen Erscheinen vor Gericht verpflichtet.
+            Vorsätzlich falsche Angaben zu angeblichen Ordnungswidrigkeiten können eine Straftat darstellen.
+            Ich weiß, dass mir die Kosten des Verfahrens und die Auslagen des Betroffenen auferlegt werden,
+            wenn ich vorsätzlich oder leichtfertig eine unwahre Anzeige erstatte.</p>
+          <p>Beweisfotos, aus denen Kennzeichen und Tatvorwurf erkennbar hervorgehen, befinden sich im Anhang.
+            Bitte prüfen Sie den Sachverhalt auch auf etwaige andere Verstöße, die aus den Beweisfotos zu ersehen sind.</p>
+          <p>Bitte bestätigen Sie Ihre Zuständigkeit und den Erhalt dieser Anzeige mit der Zusendung des Aktenzeichens an hz@heikozelt.de.
+            Falls Sie nicht zuständig sein sollten, leiten Sie bitte meine Anzeige weiter und informieren Sie mich darüber.
+            Sie dürfen meine persönlichen Daten auch weiterleiten und diese für die Dauer des Verfahrens speichern.</p>
+          <p>Mit freundlichen Grüßen</p>
+          <p>Heiko Zelt</p>
+        </html>""".trimIndent()
+        assertEquals(expected, content)
     }
 
     @Test
@@ -119,6 +155,13 @@ class NoticesOutboxTest {
         val dbRepo = DatabaseRepo.fromMemory()
         val outbox = NoticesOutbox()
         outbox.setDatabaseRepo(dbRepo)
+        val message = outbox.next()
+        assertNull(message)
+    }
+
+    @Test
+    fun zero_next_dbRepo_missing() {
+        val outbox = NoticesOutbox()
         val message = outbox.next()
         assertNull(message)
     }
@@ -224,8 +267,60 @@ class NoticesOutboxTest {
     }
 
     @Test
-    fun one_next_failed() {
-        // todo: Test schreiben
+    fun one_next_send_failed() {
+        val dbRepo = DatabaseRepo.fromMemory()
+        val settings = Settings()
+        settings.witness = Witness("Heiko", "Zelt", "hz@heikozelt.de", "Bahnhofstraße 1", "12345", "Köln")
+        val outbox = NoticesOutbox()
+        outbox.setDatabaseRepo(dbRepo)
+        outbox.setSettings(settings)
+
+        val obsTime = ZonedDateTime.of(2022, 1, 1, 2, 58, 0, 0, ZoneId.of("Europe/Berlin"))
+        val createTime = ZonedDateTime.of(2022, 1, 1, 23, 0, 0, 0, ZoneId.of("Europe/Berlin"))
+        val finalTime = ZonedDateTime.of(2022, 1, 1, 23, 59, 34, 0, ZoneId.of("Europe/Berlin"))
+
+        val notice1 = NoticeEntity()
+        notice1.apply {
+            observationTime = obsTime
+            createdTime = createTime
+            licensePlate = "SE NT 0001"
+            vehicleMake = VehicleMakesComboBoxModel.VEHICLE_MAKES[1]
+            color = VehicleColor.COLORS[1].colorName
+            latitude = 50.1
+            longitude = 8.1
+            offense = "Parken auf Grünfläche"
+            recipientEmailAddress = "hz@heikozelt.de"
+            finalizedTime = finalTime
+        }
+        dbRepo.insertNotice(notice1)
+
+        val ids = dbRepo.findAllNoticesIdsDesc()
+        log.debug("number of ids: ${ids.size}")
+        log.debug("first id: ${ids[0]}")
+
+        val message1 = outbox.next()
+        assertNotNull(message1)
+        assertEquals(1, message1?.externalID)
+        // todo more assertions
+
+        message1?.let {
+            outbox.sendCallback(it, false)
+        }
+
+        val notices = dbRepo.findAllNoticesDesc()
+        log.debug("number of notices: ${notices.size}")
+        val n = notices[0];
+        log.debug("id: ${n.id}")
+        log.debug("observation time: ${n.observationTime}")
+        log.debug("created time: ${n.createdTime}")
+        log.debug("finalized time: ${n.finalizedTime}")
+
+        assertNull(n.sentTime)
+        assertEquals(1, n.sendFailures)
+
+        val message2 = outbox.next()
+        assertNotNull(message2)
+        assertEquals(1, message2?.externalID)
     }
 
     @Test

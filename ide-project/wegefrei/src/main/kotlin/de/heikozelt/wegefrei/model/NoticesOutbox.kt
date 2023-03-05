@@ -140,19 +140,15 @@ class NoticesOutbox : Outbox<Int> {
                 return ""
             }
 
-            fun tableRow(label: String, value: String?): String {
-                return if (value.isNullOrBlank()) {
-                    ""
-                } else {
-                    "|    <tr><td>$label:</td><td>${htmlEncode(value)}</td></tr>\n"
+            fun appendTableRow(tableRows: MutableList<String>, label: String, value: String?) {
+                if (!value.isNullOrBlank()) {
+                    tableRows.add("|    <tr><td>$label:</td><td>${htmlEncode(value)}</td></tr>")
                 }
             }
 
-            fun tableRowHtmlValue(label: String, value: String?): String {
-                return if (value.isNullOrBlank()) {
-                    ""
-                } else {
-                    "|    <tr><td>$label:</td><td>$value</td></tr>\n"
+            fun appendTableRowHtmlValue(tableRows: MutableList<String>, label: String, value: String?) {
+                if (!value.isNullOrBlank()) {
+                    tableRows.add("|    <tr><td>$label:</td><td>$value</td></tr>")
                 }
             }
 
@@ -160,50 +156,57 @@ class NoticesOutbox : Outbox<Int> {
             validationErrors.addAll(n.isComplete())
             if(validationErrors.isNotEmpty()) throw ValidationException(validationErrors)
 
-            val countryRow = tableRow("Landeskennzeichen", n.getCountryFormatted())
-            val licensePlateRow = tableRow("Kennzeichen", n.licensePlate)
-            val makeRow = tableRow("Marke", n.vehicleMake)
-            val colorRow = tableRow("Farbe", n.color)
-            val offenseAddressRow = tableRow("Tatortadresse", n.getAddress())
-            val locationDescriptionRow = tableRow("Tatortbeschreibung", n.locationDescription)
-            val positionRow = tableRow("Geoposition", n.getGeoPositionFormatted())
-            val offenseRow = tableRow("Verstoß", n.offense)
-            val circumstancesRow = tableRowHtmlValue("Umstände", n.getCircumstancesHtml())
-            val inspectionDateRow = tableRow("HU-Fälligkeit", n.getInspectionMonthYear())
+            val caseRows = mutableListOf<String>()
+            appendTableRow(caseRows, "Landeskennzeichen", n.getCountryFormatted())
+            appendTableRow(caseRows,"Kennzeichen", n.licensePlate)
+            appendTableRow(caseRows,"Marke", n.vehicleMake)
+            appendTableRow(caseRows,"Farbe", n.color)
+            appendTableRow(caseRows,"Tatortadresse", n.getAddress())
+            appendTableRow(caseRows,"Tatortbeschreibung", n.locationDescription)
+            appendTableRow(caseRows,"Geoposition", n.getGeoPositionFormatted())
+            appendTableRow(caseRows,"Verstoß", n.offense)
+            appendTableRowHtmlValue(caseRows,"Umstände", n.getCircumstancesHtml())
+            appendTableRow(caseRows,"HU-Fälligkeit", n.getInspectionMonthYear())
             // todo Prio 3: Wochentag einfügen, wegen Werktags-Beschränkungen
-            val observationTimeRow = tableRow("Beobachtungszeit", n.getObservationTimeFormatted())
-            val observationDurationRow = tableRow("Beobachtungsdauer", n.getDurationFormatted())
-            val noteRow = tableRow("Hinweis", n.note)
+            appendTableRow(caseRows,"Beobachtungszeit", n.getObservationTimeFormatted())
+            appendTableRow(caseRows,"Beobachtungsdauer", n.getDurationFormatted())
+            appendTableRow(caseRows,"Hinweis", n.note)
+            val caseTableRows = caseRows.joinToString("\n")
 
-            val nameRow = tableRow("Name", w.getFullName())
-            val witnessAddressRow = tableRow("Adresse", w.getAddress())
-            val witnessEmailRow = tableRow("E-Mail", w.emailAddress)
-            val telephoneRow = tableRow("Telefon", w.telephoneNumber)
+            val witnessRows = mutableListOf<String>()
+            appendTableRow(witnessRows,"Name", w.getFullName())
+            appendTableRow(witnessRows,"Adresse", w.getAddress())
+            appendTableRow(witnessRows,"E-Mail", w.emailAddress)
+            appendTableRow(witnessRows,"Telefon", w.telephoneNumber)
+            val witnessTableRows = witnessRows.joinToString("\n")
 
             val attachmentsSection = if (n.photoEntities.isEmpty()) {
                 ""
             } else {
                 val sb = StringBuilder()
+                sb.append("|  ")
                 sb.append("|  <h1>Anlagen</h1>\n")
                 sb.append("|  <ol>\n")
                 n.getPhotoEntitiesSorted()
                     .forEach { sb.append("|    <li>${it.getFilename()} (SHA1: ${it.getHashHex()})</li>\n") }
-                sb.append("|  </ol>\n")
+                sb.append("|  </ol>")
             }
 
             val content = """
               |<html>
               |  <p>Sehr geehrte Damen und Herren,</p>
               |  <p>hiermit zeige ich, mit der Bitte um Weiterverfolgung, folgende Verkehrsordnungswidrigkeit an:</p>
+              |  
               |  <h1>Falldaten</h1>
               |  <table>
-              $countryRow$licensePlateRow$makeRow$colorRow$offenseAddressRow$locationDescriptionRow$positionRow$offenseRow$circumstancesRow$inspectionDateRow$observationTimeRow$observationDurationRow$noteRow
-              |  </table>  
+              $caseTableRows
+              |  </table>
+              |  
               |  <h1>Zeuge</h1>
               |  <table>
-              $nameRow$witnessAddressRow$witnessEmailRow$telephoneRow  
+              $witnessTableRows
               |  </table>
-              $attachmentsSection
+              $attachmentsSection|  
               |  <h1>Erklärung</h1>
               |  <p>Hiermit bestätige ich, dass ich die Datenschutzerklärung zur Kenntnis genommen habe und ihr zustimme.
               |    Meine oben gemachten Angaben einschließlich meiner Personalien sind zutreffend und vollständig.
@@ -215,7 +218,7 @@ class NoticesOutbox : Outbox<Int> {
               |    Bitte prüfen Sie den Sachverhalt auch auf etwaige andere Verstöße, die aus den Beweisfotos zu ersehen sind.</p>
               |  <p>Bitte bestätigen Sie Ihre Zuständigkeit und den Erhalt dieser Anzeige mit der Zusendung des Aktenzeichens an hz@heikozelt.de.
               |    Falls Sie nicht zuständig sein sollten, leiten Sie bitte meine Anzeige weiter und informieren Sie mich darüber.
-              |    Sie dürfen meine persönlichen Daten auch weiterleiten und diese für die Dauer des Verfahrens speichern.</p>                                  
+              |    Sie dürfen meine persönlichen Daten auch weiterleiten und diese für die Dauer des Verfahrens speichern.</p>
               |  <p>Mit freundlichen Grüßen</p>
               |  <p>${w.getFullName()}</p>
               |</html>""".trimMargin()
