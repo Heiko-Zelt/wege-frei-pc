@@ -32,7 +32,8 @@ import javax.swing.text.AbstractDocument
  * [] Fahrzeug war verlassen        [] mit Behinderung [] Umweltplakette fehlt/ungültig
  * [] Warnblinkanlage eingeschaltet [] mit Gefährdung  [] HU-Plakette abgelaufen
  * </pre>
- * todo Prio 4: Rechtschreibprüfung insbesondere für Hinweis-Textarea
+ * todo Prio 4: Feature: Rechtschreibprüfung insbesondere für Hinweis-Textarea
+ * todo Prio 1: Bug: HU-Fälligkeit wird nicht mehr angezeigt, wenn Nachricht gesendet und wieder geöffnet wird.
  */
 class NoticeFormFields(
     private val noticeFrame: NoticeFrame,
@@ -67,7 +68,7 @@ class NoticeFormFields(
     private val environmentalStickerCheckBox = JCheckBox("Umweltplakette fehlt/ungültig")
     private val vehicleInspectionStickerCheckBox = JCheckBox("HU-Plakette abgelaufen")
     private val warningLightsCheckBox = JCheckBox("Warnblinkanlage eingeschaltet")
-    private val inspectionMonthYearLabel = JLabel("HU-Fälligkeit Jahr:")
+    private val inspectionMonthYearLabel = JLabel("HU-Fälligkeit Monat/Jahr:")
     private val inspectionMonthTextField = JTextField(2)
     private val monthYearSeparatorLabel = JLabel("/")
     private val inspectionYearTextField = JTextField(4)
