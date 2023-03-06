@@ -21,6 +21,8 @@ import javax.swing.table.AbstractTableModel
  * Es werden aber nicht alle Funktionen benötigt. Es sind also weniger Methoden implementiert.
  *
  * Aus dem AbstractTableModel wird z.B. die Funktionalität der Event-Benachrichtigung an die View JTable übernommen.
+ * todo Prio 3: angezeigte Spalte konfigurierbar
+ * todo Prio 3: Sortierung konfigurierbar
  */
 
 class NoticesTableModel : AbstractTableModel() {
@@ -157,6 +159,7 @@ class NoticesTableModel : AbstractTableModel() {
             6 -> notice.getObservationTimeFormatted()
             7 -> notice.photoEntities.size
             8 -> notice.getState()
+            9 -> notice.getSentTimeFormatted()
             else -> throw IndexOutOfBoundsException()
         }
     }
@@ -168,7 +171,7 @@ class NoticesTableModel : AbstractTableModel() {
 
     companion object {
         val COLUMN_NAMES = arrayOf(
-            "#", "Land", "Kennzeichen", "Marke", "Farbe", "Erstellt", "Beobachtet", "Fotos", "Status"
+            "#", "Land", "Kennzeichen", "Marke", "Farbe", "Erstellt", "Beobachtet", "Fotos", "Status", "gesendet"
         )
     }
 

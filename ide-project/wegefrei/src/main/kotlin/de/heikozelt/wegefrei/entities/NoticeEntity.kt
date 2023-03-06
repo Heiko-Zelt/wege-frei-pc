@@ -188,6 +188,15 @@ class NoticeEntity(
         }
     }
 
+    fun getSentTimeFormatted(): String {
+        val d = sentTime
+        return if (d == null) {
+            ""
+        } else {
+            d.format(dateTimeFormat)
+        }
+    }
+
     fun setCreatedTimeNow() {
         createdTime = ZonedDateTime.now()
     }
