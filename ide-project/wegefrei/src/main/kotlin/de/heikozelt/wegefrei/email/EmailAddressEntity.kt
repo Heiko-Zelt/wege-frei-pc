@@ -48,6 +48,13 @@ class EmailAddressEntity(
         return name?:address
     }
 
+    override fun equals(other: Any?): Boolean {
+        if(other !is EmailAddressEntity) return false
+        return if(address != other.address) {
+            false
+        } else name == other.name
+    }
+
     override fun compareTo(other: EmailAddressEntity): Int {
         return asText().compareTo(other.asText())
     }

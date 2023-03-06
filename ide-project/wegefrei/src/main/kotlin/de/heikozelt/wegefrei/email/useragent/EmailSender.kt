@@ -15,21 +15,29 @@ import java.awt.EventQueue
  *   <li>Thread erneut starten</li>
  * </ol>
  */
-class EmailSender(private val outbox: Outbox<Int>, private val agent: EmailUserAgent): Thread("EmailSender") {
+class EmailSender(private val outbox: Outbox<Int>, private val agent: EmailUserAgent) : Thread("EmailSender") {
 
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
 
     override fun run() {
         log.debug("run()")
-        while(true) {
+        while (true) {
+            var message: EmailMessage<Int>? = null
             try {
-              val message = outbox.next() ?: break
-              agent.sendMail(message)
-              log.debug("send successful. sentTime: ${message.getSentTime()}, messageID: ${message.getMessageID()}")
-              outbox.sendCallback(message, true)
-              sleep(5000)
+                message = outbox.next() ?: break
+                agent.sendMail(message)
+                log.debug("send successful. sentTime: ${message.getSentTime()}, messageID: ${message.getMessageID()}")
+                message.getSentTime()?.let { sTime ->
+                    message.getMessageID()?.let { mID ->
+                        outbox.sentSuccessfulCallback(message.externalID, sTime, mID)
+                    }
+                }
+                sleep(5000)
             } catch (ex: Exception) {
                 log.debug("sending email failed: ", ex)
+                message?.let {
+                    outbox.sendFailedCallback(it.externalID)
+                }
                 EventQueue.invokeLater {
                     // todo Popup mit Fehlermeldung und Button Fortfahren/Weiter versuchen
                     log.debug("ask user, if she want's to try again or cancel")

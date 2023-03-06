@@ -1,5 +1,7 @@
 package de.heikozelt.wegefrei.email.useragent
 
+import java.time.ZonedDateTime
+
 /**
  * Represents an email outbox / producer
  */
@@ -13,7 +15,12 @@ interface Outbox<T> {
     fun next(): EmailMessage<T>?
 
     /**
-     * @param sendSuccess true if sending was successful
+     * mark message as being sent
      */
-    fun sendCallback(message: EmailMessage<T>, sendSuccess: Boolean)
+    fun sentSuccessfulCallback(externalID: T, sentTime: ZonedDateTime, messageID: ByteArray)
+
+    /**
+     * log failure
+     */
+    fun sendFailedCallback(externalID: T)
 }

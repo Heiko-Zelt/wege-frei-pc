@@ -11,7 +11,7 @@ import de.heikozelt.wegefrei.json.Witness
 import org.jsoup.Jsoup
 import org.slf4j.LoggerFactory
 import java.nio.file.Paths
-import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
 
@@ -70,19 +70,14 @@ class NoticesOutbox : Outbox<Int> {
      * alternative Lösung 1: Vor jedem Sendeversuch wird die Message-ID in der Datenbank eingetragen (performt schlecht). MessageID kann nicht Sendezeitpunkt enthalten. :-(
      * alternative Lösung 2: Outbox merkt sich, welche Meldung (Email-Nachricht) dran war.
      */
-    override fun sendCallback(message: EmailMessage<Int>, sendSuccess: Boolean) {
-        log.debug("sendCallback(message.externalID=${message.externalID}, sendSuccess=$sendSuccess)")
-        if (sendSuccess) {
-            message.getSentTime()?.let { sTime ->
-                message.getMessageID()?.let { mID ->
-                    // Email als gesendet in der Datenbank markieren
-                    dbRepo?.updateNoticeSent(message.externalID, sTime.toInstant().atZone(ZoneId.systemDefault()), mID)
-                }
-            }
-        } else { // wenn Senden nicht erfolgreich:
-            dbRepo?.updateNoticeSendFailed(message.externalID)
-            // todo: Abbruchkriterium? Ask user: retry/continue Erneut versuchen/weiter senden? or Cancel/Abbrechen?
-        }
+    override fun sentSuccessfulCallback(externalID: Int, sentTime: ZonedDateTime, messageID: ByteArray) {
+        log.debug("sentSucessfulCallback(externalID=${externalID}, ...)")
+        dbRepo?.updateNoticeSent(externalID, sentTime, messageID)
+    }
+
+    override fun sendFailedCallback(externalID: Int) {
+        log.debug("sendFailedCallback(externalID=${externalID}, ...)")
+        dbRepo?.updateNoticeSendFailed(externalID)
     }
 
     fun buildEmailMessage(noticeEntity: NoticeEntity): EmailMessage<Int>? {

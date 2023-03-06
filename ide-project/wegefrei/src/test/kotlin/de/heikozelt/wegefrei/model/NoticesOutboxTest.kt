@@ -1,6 +1,7 @@
 package de.heikozelt.wegefrei.model
 
 import de.heikozelt.wegefrei.DatabaseRepo
+import de.heikozelt.wegefrei.email.EmailAddressEntity
 import de.heikozelt.wegefrei.entities.NoticeEntity
 import de.heikozelt.wegefrei.json.Settings
 import de.heikozelt.wegefrei.json.Witness
@@ -221,7 +222,7 @@ class NoticesOutboxTest {
             latitude = 50.1
             longitude = 8.1
             offense = "Parken im Rhein"
-            recipientEmailAddress = "hz@heikozelt.de"
+            recipientEmailAddress = "ordnungsamt@junit-test-gemeinde.de"
             finalizedTime = finalTime
         }
         dbRepo.insertNotice(notice1)
@@ -241,21 +242,18 @@ class NoticesOutboxTest {
         val message1 = outbox.next()
         assertNotNull(message1)
         assertEquals(1, message1?.externalID)
+        assertEquals(1, message1?.tos?.size)
+        assertEquals(EmailAddressEntity("ordnungsamt@junit-test-gemeinde.de"), message1?.tos?.first())
         // todo more assertions
 
         message1?.let {
-            //it.buildMimeMessage()
-            it.sentTime(sentTime) // not working without a session
-            it.updateMessageID() // not working without a session
-            outbox.sendCallback(it, true)
+            outbox.sentSuccessfulCallback(message1.externalID, sentTime, mID)
         }
         // todo create EMailMessage interface with 2 implementations MimeEmailMessage & EmailMessageMock:
-/*
+
         val message2 = outbox.next()
         assertNull(message2)
         dbRepo.close()
-
- */
     }
 
     @Test
@@ -280,7 +278,7 @@ class NoticesOutboxTest {
             latitude = 50.1
             longitude = 8.1
             offense = "Parken auf Motorradparkplatz. Ich konnte mein Krad dort nicht abstellen."
-            recipientEmailAddress = "hz@heikozelt.de"
+            recipientEmailAddress = "ordnungsamt@junit-test-gemeinde.de"
             finalizedTime = finalTime
         }
         dbRepo.insertNotice(notice1)
@@ -329,7 +327,7 @@ class NoticesOutboxTest {
             latitude = 50.1
             longitude = 8.1
             offense = "Parken auf Grünfläche"
-            recipientEmailAddress = "hz@heikozelt.de"
+            recipientEmailAddress = "ordnungsamt@junit-test-gemeinde.de"
             finalizedTime = finalTime
         }
         dbRepo.insertNotice(notice1)
@@ -341,10 +339,12 @@ class NoticesOutboxTest {
         val message1 = outbox.next()
         assertNotNull(message1)
         assertEquals(1, message1?.externalID)
+        assertEquals(1, message1?.tos?.size)
+        assertEquals(EmailAddressEntity("ordnungsamt@junit-test-gemeinde.de"), message1?.tos?.first())
         // todo more assertions
 
         message1?.let {
-            outbox.sendCallback(it, false)
+            outbox.sendFailedCallback(it.externalID)
         }
 
         val notices = dbRepo.findAllNoticesDesc()

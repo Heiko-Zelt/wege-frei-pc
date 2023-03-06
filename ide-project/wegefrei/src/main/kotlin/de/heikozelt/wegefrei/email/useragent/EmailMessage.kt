@@ -2,6 +2,7 @@ package de.heikozelt.wegefrei.email.useragent
 
 import de.heikozelt.wegefrei.decodeHex
 import de.heikozelt.wegefrei.email.EmailAddressEntity
+import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.*
 import javax.mail.Message
@@ -47,8 +48,11 @@ data class EmailMessage<T>(
         return if(hexStr == null) null else decodeHex(hexStr)
     }
 
-    fun getSentTime(): Date? {
-        return mimeMsg?.sentDate
+    /**
+     * get sent date + time but as ZonedDateTime instead of Date.
+     */
+    fun getSentTime(): ZonedDateTime? {
+        return mimeMsg?.sentDate?.toInstant()?.atZone(ZoneId.systemDefault())
     }
 
     /**
