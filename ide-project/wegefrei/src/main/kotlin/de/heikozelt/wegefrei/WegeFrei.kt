@@ -36,7 +36,7 @@ import javax.swing.UIManager
  * todo Prio 3: Logo/Icon für die Anwendung
  * todo Prio 3: Export data from database as CSV tables and JSON document collections
  */
-open class WegeFrei(private val settingsRepo: SettingsRepo = SettingsFileRepo()) {
+class WegeFrei(private val settingsRepo: SettingsRepo = SettingsFileRepo()) {
 
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
     //kotlin-logging: private val log = KotlinLogging.logger {}
@@ -77,8 +77,8 @@ open class WegeFrei(private val settingsRepo: SettingsRepo = SettingsFileRepo())
     private var photoCache = LeastRecentlyUsedCache<Path, Photo>(128)
     private var photoLoader: PhotoLoader? = null
 
-    private val noticesOutbox = NoticesOutbox()
-    private val emailSender = EmailSender(noticesOutbox, emailUserAgent)
+    private val noticesOutbox = NoticesOutbox(this)
+    private var emailSender: EmailSender? = null
 
     init {
         log.debug("initializing")
@@ -190,9 +190,13 @@ open class WegeFrei(private val settingsRepo: SettingsRepo = SettingsFileRepo())
     }
 
     fun startSendingEmails() {
-        if(!emailSender.isAlive) {
-            emailSender.start()
+        // Problem: When a Thread finishes its run method then it's dead and can't be restarted.
+        // Solution: always create a new Thread (but not if it is still running)
+        emailSender?.let {
+            if(it.isAlive) return
         }
+        emailSender = EmailSender(noticesOutbox, emailUserAgent)
+        emailSender?.start()
     }
 
     /**

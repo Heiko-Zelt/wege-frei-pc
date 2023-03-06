@@ -1,6 +1,7 @@
 package de.heikozelt.wegefrei.model
 
 import de.heikozelt.wegefrei.DatabaseRepo
+import de.heikozelt.wegefrei.WegeFrei
 import de.heikozelt.wegefrei.email.EmailAddressEntity
 import de.heikozelt.wegefrei.email.useragent.EmailAttachment
 import de.heikozelt.wegefrei.email.useragent.EmailMessage
@@ -22,8 +23,10 @@ import javax.swing.JOptionPane
  * the notices table is filtered for notices, which are ready to be sent.
  * Each message/notice has a counter, which stores the number of failed sent attempts.
  * Notices with lower sent failures are sent first.
+ * @param app reference is needed to restart thread and to update notices table
+ * (and maybe update notice frame, but notice can't be edited anyway if it is finalized/in outbox or sent)
  */
-class NoticesOutbox : Outbox<Int> {
+class NoticesOutbox(private val app: WegeFrei) : Outbox<Int> {
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
 
     /**
@@ -92,7 +95,10 @@ class NoticesOutbox : Outbox<Int> {
           when(result) {
             // Problem: restart Thread. Has the Thread finished yet?
             // usually the background thread should be faster than the GUI showing a window, user reading an error message and clicking a button.
-            1 -> log.debug("user pressed continue")
+            1 -> {
+                log.debug("user pressed continue")
+                app.startSendingEmails()
+            }
             else -> log.debug("user pressed cancel")
           }
         }
