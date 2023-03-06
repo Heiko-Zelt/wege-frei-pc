@@ -35,9 +35,7 @@ class EmailSender(private val outbox: Outbox<Int>, private val agent: EmailUserA
                 sleep(5000)
             } catch (ex: Exception) {
                 log.debug("sending email failed: ", ex)
-                message?.let {
-                    outbox.sendFailedCallback(it.externalID)
-                }
+                outbox.sendFailedCallback(message?.externalID, ex)
                 EventQueue.invokeLater {
                     // todo Popup mit Fehlermeldung und Button Fortfahren/Weiter versuchen
                     log.debug("ask user, if she want's to try again or cancel")

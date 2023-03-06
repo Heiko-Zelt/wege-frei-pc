@@ -1,6 +1,7 @@
 package de.heikozelt.wegefrei.model
 
 import de.heikozelt.wegefrei.DatabaseRepo
+import de.heikozelt.wegefrei.OptionFrame
 import de.heikozelt.wegefrei.email.EmailAddressEntity
 import de.heikozelt.wegefrei.email.useragent.EmailAttachment
 import de.heikozelt.wegefrei.email.useragent.EmailMessage
@@ -65,19 +66,45 @@ class NoticesOutbox : Outbox<Int> {
     /**
      * is called by EmailSender after a message was sent or an error occurred
      *
-     * todo: Problem: Zuordnung von EmailMessage zu NoticeEntity
-     * gewählte Lösung: EmailMessage wird um externe (geheime/private) ID/Notice-ID erweitert.
-     * alternative Lösung 1: Vor jedem Sendeversuch wird die Message-ID in der Datenbank eingetragen (performt schlecht). MessageID kann nicht Sendezeitpunkt enthalten. :-(
-     * alternative Lösung 2: Outbox merkt sich, welche Meldung (Email-Nachricht) dran war.
+     * Problem: Zuordnung von EmailMessage zu NoticeEntity
+     * <ul>
+     *   <li>gewählte Lösung: EmailMessage wird um externe (geheime/private) ID/Notice-ID erweitert.</li>
+     *   <li>alternative Lösung 1: Vor jedem Sendeversuch wird die Message-ID in der Datenbank eingetragen (performt schlecht).
+     *     MessageID kann nicht Sendezeitpunkt enthalten. :-(</li>
+     *   <li>alternative Lösung 2: Outbox merkt sich, welche Meldung (Email-Nachricht) dran war. auch gut.</li>
+     * </ul>
      */
     override fun sentSuccessfulCallback(externalID: Int, sentTime: ZonedDateTime, messageID: ByteArray) {
         log.debug("sentSucessfulCallback(externalID=${externalID}, ...)")
         dbRepo?.updateNoticeSent(externalID, sentTime, messageID)
+        // todo Prio 1: In NoticesFrame die Meldung im Cache invalidieren/in der Tabelle aktualisieren
     }
 
-    override fun sendFailedCallback(externalID: Int) {
+    override fun sendFailedCallback(externalID: Int?, exception: Throwable) {
+
         log.debug("sendFailedCallback(externalID=${externalID}, ...)")
-        dbRepo?.updateNoticeSendFailed(externalID)
+        /*
+        val options = arrayOf("Abbrechen", "Fortfahren/Erneut versuchen")
+        val result = JOptionPane.showOptionDialog(null, exception.message, "Fehler beim E-Mail senden",
+            JOptionPane.NO_OPTION, JOptionPane.PLAIN_MESSAGE,
+            null, options, options[1]);
+        when(result) {
+            Problem: restart Thread, but Thread hasn't finished yet
+            1 -> log.debug("user pressed continue")
+            else -> log.debug("user pressed cancel")
+        }
+        */
+        val msg = exception.message ?: "unbekannter Fehler"
+        val optionFrame = OptionFrame("Fehler beim E-Mail senden", msg)
+        optionFrame.addOption("Abbrechen") { log.debug("user canceled") }
+        optionFrame.addOption("Fortfahren/erneut versuchen") {
+            log.debug("user wants to try again")
+            // todo restart Thread
+        }
+        optionFrame.isVisible = true
+        externalID?.let {
+            dbRepo?.updateNoticeSendFailed(it)
+        }
     }
 
     fun buildEmailMessage(noticeEntity: NoticeEntity): EmailMessage<Int>? {

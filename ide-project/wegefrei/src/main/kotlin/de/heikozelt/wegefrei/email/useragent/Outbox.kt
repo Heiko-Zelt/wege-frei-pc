@@ -20,7 +20,8 @@ interface Outbox<T> {
     fun sentSuccessfulCallback(externalID: T, sentTime: ZonedDateTime, messageID: ByteArray)
 
     /**
-     * log failure
+     * log failure and inform user
+     * @param externalID NoticeID or null if next() didn't return an EmailMessage
      */
-    fun sendFailedCallback(externalID: T)
+    fun sendFailedCallback(externalID: T?, exception: Throwable)
 }
