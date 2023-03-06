@@ -1,7 +1,6 @@
 package de.heikozelt.wegefrei.model
 
 import de.heikozelt.wegefrei.DatabaseRepo
-import de.heikozelt.wegefrei.OptionFrame
 import de.heikozelt.wegefrei.email.EmailAddressEntity
 import de.heikozelt.wegefrei.email.useragent.EmailAttachment
 import de.heikozelt.wegefrei.email.useragent.EmailMessage
@@ -11,10 +10,12 @@ import de.heikozelt.wegefrei.json.Settings
 import de.heikozelt.wegefrei.json.Witness
 import org.jsoup.Jsoup
 import org.slf4j.LoggerFactory
+import java.awt.EventQueue
 import java.nio.file.Paths
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
+import javax.swing.JOptionPane
 
 /**
  * Instead of using a dedicated outbox table/collection,
@@ -83,17 +84,21 @@ class NoticesOutbox : Outbox<Int> {
     override fun sendFailedCallback(externalID: Int?, exception: Throwable) {
 
         log.debug("sendFailedCallback(externalID=${externalID}, ...)")
-        /*
-        val options = arrayOf("Abbrechen", "Fortfahren/Erneut versuchen")
-        val result = JOptionPane.showOptionDialog(null, exception.message, "Fehler beim E-Mail senden",
+        EventQueue.invokeLater {
+          val options = arrayOf("Abbrechen", "Fortfahren/Erneut versuchen")
+          val result = JOptionPane.showOptionDialog(null, exception.message, "Fehler beim E-Mail senden",
             JOptionPane.NO_OPTION, JOptionPane.PLAIN_MESSAGE,
             null, options, options[1]);
-        when(result) {
-            Problem: restart Thread, but Thread hasn't finished yet
+          when(result) {
+            // Problem: restart Thread. Has the Thread finished yet?
+            // usually the background thread should be faster than the GUI showing a window, user reading an error message and clicking a button.
             1 -> log.debug("user pressed continue")
             else -> log.debug("user pressed cancel")
+          }
         }
-        */
+
+        /*
+        todo analyze if optionFrame is executed in UI thread or SenderThread
         val msg = exception.message ?: "unbekannter Fehler"
         val optionFrame = OptionFrame("Fehler beim E-Mail senden", msg)
         optionFrame.addOption("Abbrechen") { log.debug("user canceled") }
@@ -105,6 +110,7 @@ class NoticesOutbox : Outbox<Int> {
         externalID?.let {
             dbRepo?.updateNoticeSendFailed(it)
         }
+        */
     }
 
     fun buildEmailMessage(noticeEntity: NoticeEntity): EmailMessage<Int>? {
