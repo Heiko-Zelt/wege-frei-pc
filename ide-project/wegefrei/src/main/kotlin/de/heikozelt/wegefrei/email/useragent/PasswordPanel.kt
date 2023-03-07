@@ -16,6 +16,9 @@ class PasswordPanel: JPanel() {
         add(passwordField)
     }
 
+    /**
+     * @return the password, if provided by the user without leading or following whitespaces
+     */
     fun getPassword(): String {
         // JPasswordField.getPassword() returns an array of characters instead of a string.
         return String(passwordField.password).trim()

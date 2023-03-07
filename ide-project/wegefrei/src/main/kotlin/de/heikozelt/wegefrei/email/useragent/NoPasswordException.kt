@@ -1,4 +1,4 @@
 package de.heikozelt.wegefrei.email.useragent
 
-class NoPasswordException: Throwable() {
+class NoPasswordException: Exception("Kein Passwort angegeben.") {
 }

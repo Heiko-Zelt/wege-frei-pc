@@ -1,7 +1,6 @@
 package de.heikozelt.wegefrei.email.useragent
 
 import org.slf4j.LoggerFactory
-import java.awt.EventQueue
 
 /**
  * This thread sends email messages as long as there are message in the outbox.
@@ -36,10 +35,6 @@ class EmailSender(private val outbox: Outbox<Int>, private val agent: EmailUserA
             } catch (ex: Exception) {
                 log.debug("sending email failed: ", ex)
                 outbox.sendFailedCallback(message?.externalID, ex)
-                EventQueue.invokeLater {
-                    // todo Popup mit Fehlermeldung und Button Fortfahren/Weiter versuchen
-                    log.debug("ask user, if she want's to try again or cancel")
-                }
                 // Thread beenden und auf Benutzereingabe warten
                 log.debug("exit send loop because an exception occurred")
                 break

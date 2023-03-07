@@ -33,7 +33,13 @@ class SmtpAuthenticator: Authenticator() {
     }
 
     /**
-     * asks for a password and remembers it.
+     * Asks for a password and remembers it.
+     * 3 Cases:
+     * <ul>
+     *   <li>Perfect: User enters a password and clicks on ok button -> true</li>
+     *   <li>User clicks on close or cancel -> false</li>
+     *   <li>User doesn't enter password, but clicks ok -> false</li>
+     * </ul>
      * @return true, if user provided a password
      */
     fun askForPassword(): Boolean {
@@ -42,12 +48,20 @@ class SmtpAuthenticator: Authenticator() {
         val result = JOptionPane.showOptionDialog(null, panel, "SMTP-Server-Authentifizierung",
             JOptionPane.NO_OPTION, JOptionPane.PLAIN_MESSAGE,
             null, options, options[1]);
-        when(result) {
-            1 -> log.debug("password entered")
-            else -> return false
+        return if(result == 1) {
+            val pw = panel.getPassword()
+            if(pw.isEmpty()) {
+                log.debug("empty password given")
+                false
+            } else {
+                log.debug("password entered")
+                password = pw
+                true
+            }
+        } else {
+          log.debug("user canceled password input")
+          false
         }
-        password = panel.getPassword()
-        return true
     }
 
     /**
