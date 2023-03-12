@@ -81,11 +81,11 @@ class NoticesOutbox(private val app: WegeFrei) : Outbox<Int> {
     override fun sentSuccessfulCallback(externalID: Int, sentTime: ZonedDateTime, messageID: ByteArray) {
         log.debug("sentSucessfulCallback(externalID=${externalID}, ...)")
         dbRepo?.updateNoticeSent(externalID, sentTime, messageID)
-        // todo Prio 1: In NoticesFrame die Meldung im Cache invalidieren/in der Tabelle aktualisieren
+        // todo Prio 1: In NoticesFrame die Meldung im Cache invalidieren/in der Tabelle aktualisieren!!!
+        app.updateNoticeSend(externalID, sentTime)
     }
 
     override fun sendFailedCallback(externalID: Int?, exception: Throwable) {
-
         log.debug("sendFailedCallback(externalID=${externalID}, ...)")
         EventQueue.invokeLater {
           val options = arrayOf("Abbrechen", "Fortfahren/Erneut versuchen")
@@ -104,13 +104,11 @@ class NoticesOutbox(private val app: WegeFrei) : Outbox<Int> {
         }
 
         /*
-        todo analyze if optionFrame is executed in UI thread or SenderThread
         val msg = exception.message ?: "unbekannter Fehler"
         val optionFrame = OptionFrame("Fehler beim E-Mail senden", msg)
         optionFrame.addOption("Abbrechen") { log.debug("user canceled") }
         optionFrame.addOption("Fortfahren/erneut versuchen") {
             log.debug("user wants to try again")
-            // todo restart Thread
         }
         optionFrame.isVisible = true
         externalID?.let {

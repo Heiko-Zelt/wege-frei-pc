@@ -18,6 +18,7 @@ import org.jxmapviewer.viewer.DefaultTileFactory
 import org.slf4j.LoggerFactory
 import java.awt.EventQueue
 import java.nio.file.Path
+import java.time.ZonedDateTime
 import javax.swing.JOptionPane
 import javax.swing.JOptionPane.QUESTION_MESSAGE
 import javax.swing.JOptionPane.YES_NO_OPTION
@@ -321,6 +322,14 @@ class WegeFrei(private val settingsRepo: SettingsRepo = SettingsFileRepo()) {
     fun noticeUpdated(noticeEntity: NoticeEntity) {
         log.debug("noticeUpdated(id=${noticeEntity.id})")
         noticesFrame?.noticeUpdated(noticeEntity)
+    }
+
+    /**
+     * called after a notice was sent
+     */
+    fun updateNoticeSend(noticeID: Int, sentTime: ZonedDateTime) {
+        log.debug("noticeSent(id=${noticeID})")
+        noticesFrame?.noticeUpdatedSent(noticeID, sentTime)
     }
 
     /**

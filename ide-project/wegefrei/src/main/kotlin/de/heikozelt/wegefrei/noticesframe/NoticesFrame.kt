@@ -4,6 +4,7 @@ import de.heikozelt.wegefrei.WegeFrei
 import de.heikozelt.wegefrei.entities.NoticeEntity
 import org.slf4j.LoggerFactory
 import java.awt.Dimension
+import java.time.ZonedDateTime
 import javax.swing.*
 
 /**
@@ -116,6 +117,11 @@ class NoticesFrame(private val app: WegeFrei) : JFrame("Meldungen - Wege frei!")
 
     fun noticeUpdated(noticeEntity: NoticeEntity) {
         noticesTableModel.updateNotice(noticeEntity)
+    }
+
+    fun noticeUpdatedSent(noticeID: Int, sentTime: ZonedDateTime) {
+        log.debug("noticeSent(id=${noticeID})")
+        noticesTableModel.updateNoticeSent(noticeID, sentTime)
     }
 
     fun noticeDeleted(noticeEntity: NoticeEntity) {

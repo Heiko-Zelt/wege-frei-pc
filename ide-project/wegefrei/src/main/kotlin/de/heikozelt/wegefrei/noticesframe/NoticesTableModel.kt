@@ -6,6 +6,7 @@ import de.heikozelt.wegefrei.model.LeastRecentlyUsedCache
 import de.heikozelt.wegefrei.model.VehicleColor
 import org.slf4j.LoggerFactory
 import java.awt.EventQueue
+import java.time.ZonedDateTime
 import java.util.concurrent.Callable
 import java.util.concurrent.Executors
 import java.util.concurrent.Future
@@ -98,21 +99,22 @@ class NoticesTableModel : AbstractTableModel() {
                 }
             }
         }
-        val n = NoticeEntity()
+        val n = NoticeEntity() // empty notice
         n.id = noticeIds[rowIndex]
         return n
     }
 
     /**
      * fügt eine Meldung am Anfang der Tabelle hinzu,
-     * und aktualisiert die View(s)
+     * und aktualisiert die View(s).
+     * Man könnte statt add/update/delete auch jedes Mal die ganze Tabelle neu aufbauen.
      */
     fun addNotice(noticeEntity: NoticeEntity) {
         log.debug("addNotice(${noticeEntity.id})")
         noticeEntity.id?.let { id ->
             log.debug("add notice #${noticeEntity.id}")
             //noticeEntities.add(0, noticeEntity)
-            val callable = Callable { noticeEntity }
+            val callable = Callable { noticeEntity } // tut nichts
             val futureTask = FutureTask(callable)
             executor.execute(futureTask)
             cache.transformKeys { it + 1 }
@@ -125,10 +127,18 @@ class NoticesTableModel : AbstractTableModel() {
 
     /**
      * aktualisiert die View(s) nach Änderungen
+     * todo: eigentlich wird nur die id benötigt, nicht das ganze Objekt
      */
     fun updateNotice(noticeEntity: NoticeEntity) {
         log.debug("update notice #${noticeEntity.id}")
         val rowIndex = noticeIds.indexOf(noticeEntity.id)
+        fireTableRowsUpdated(rowIndex, rowIndex)
+    }
+
+    fun updateNoticeSent(noticeID: Int, sentTime: ZonedDateTime) {
+        log.debug("updateNotice(${noticeID})")
+        val rowIndex = noticeIds.indexOf(noticeID)
+        cache[rowIndex]?.get()?.sentTime = sentTime
         fireTableRowsUpdated(rowIndex, rowIndex)
     }
 

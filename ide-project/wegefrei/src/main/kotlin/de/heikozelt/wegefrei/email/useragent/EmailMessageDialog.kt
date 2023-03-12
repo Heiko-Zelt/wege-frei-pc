@@ -63,7 +63,7 @@ class EmailMessageDialog(confirmedCallback: () -> Unit) : JFrame() {
         lay.linkSize(SwingConstants.HORIZONTAL, sendButton, cancelButton)
         layout = lay
         minimumSize = Dimension(250, 250)
-        size = Dimension(400, 300)
+        size = Dimension(600, 750)
         isVisible = true
     }
 
