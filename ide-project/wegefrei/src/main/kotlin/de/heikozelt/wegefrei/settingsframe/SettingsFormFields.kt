@@ -3,6 +3,7 @@ package de.heikozelt.wegefrei.settingsframe
 import de.heikozelt.wegefrei.email.EmailAddressEntity
 import de.heikozelt.wegefrei.email.useragent.EmailMessage
 import de.heikozelt.wegefrei.email.useragent.EmailServerConfig
+import de.heikozelt.wegefrei.email.useragent.EmailUserAgent
 import de.heikozelt.wegefrei.gui.CharPredicateDocFilter
 import de.heikozelt.wegefrei.gui.PatternVerifier
 import de.heikozelt.wegefrei.gui.Styles
@@ -21,7 +22,7 @@ import javax.swing.text.AbstractDocument
  * deswegen Darstellung in einer ScrollPane.
  * todo: Zeug_in: männlich/weiblich/divers oder keine Angabe
  */
-class SettingsFormFields : JPanel() {
+class SettingsFormFields() : JPanel() {
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
 
     // GUI components
@@ -42,8 +43,6 @@ class SettingsFormFields : JPanel() {
 
     private val lookAndFeelNames = Settings.lookAndFeelNames().toTypedArray()
     private val lookAndFeelComboBox = JComboBox(lookAndFeelNames)
-    //private val photosDirField = JLabel()
-    //private val photosDirButton = JButton("Ordner auswählen")
     private val databaseDirField = JLabel()
     private val databaseDirButton = JButton("Ordner auswählen")
 
@@ -285,6 +284,7 @@ class SettingsFormFields : JPanel() {
     /**
      * Erst mal die Test-E-Mail anzeigen.
      * Nur wenn die Anwender_in auf Ok klickt, wirklich absenden.
+     * Eigene UserAgent-Instanz, denn die Einstellungen sollen noch nicht gespeichert werden.
      */
     private fun sendTestEmail() {
         log.debug("sendTestEmail()")
@@ -311,12 +311,9 @@ class SettingsFormFields : JPanel() {
             TEST_MAIL_CONTENT
         )
 
-        /*
-        todo: anpassen an neues Verfahren
         val emailUserAgent = EmailUserAgent()
         emailUserAgent.setEmailServerConfig(emailServerConfig)
         emailUserAgent.sendMailAfterConfirmation(eMessage)
-        */
     }
 
     companion object {

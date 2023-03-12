@@ -7,6 +7,7 @@ import javax.mail.AuthenticationFailedException
 import javax.mail.MessagingException
 import javax.mail.Session
 import javax.mail.Transport
+import javax.swing.JOptionPane
 
 /**
  * A simple mail user agent (MUA)
@@ -38,8 +39,39 @@ class EmailUserAgent {
     }
 
     /**
+     * first ask for email to be really send.
+     * then send email.
+     */
+    fun sendMailAfterConfirmation(emailMessage: EmailMessage<Int>) {
+        val dialog = EmailMessageDialog {
+            try {
+                sendMail(emailMessage)
+                JOptionPane.showMessageDialog(
+                    null,
+                    "Die E-Mail-Nachricht wurde erfolgreich versendet.",
+                    "E-Mail abgeschickt",
+                    JOptionPane.INFORMATION_MESSAGE
+                )
+            } catch(ex: Exception) {
+                var errorMessage = "Es ist ein Fehler aufgetreten:\n\n${ex.message}"
+                ex.cause?.let {
+                    errorMessage += "\n\n{$ex.cause.message}"
+                }
+                JOptionPane.showMessageDialog(
+                    null,
+                    errorMessage,
+                    "E-Mail senden",
+                    JOptionPane.ERROR_MESSAGE
+                )
+            }
+        }
+        dialog.setEmailMessage(emailMessage)
+    }
+
+    /**
      * Jetzt aber wirklich absenden (und eventuell nach Passwort fragen).
      * Bei Fehler: Exception (z.B. Netzwerkverbindung oder Benutzer hat abgebrochen)
+     * todo: Int should be generic.
      */
     fun sendMail(emailMessage: EmailMessage<Int>) {
         log.debug("sendMailDirectly()")
@@ -93,12 +125,12 @@ class EmailUserAgent {
                         log.debug("cause: ${it.message}")
                     }
 
-
                     // javax.mail.AuthenticationFailedException: 535 5.7.8 Authentication failed: wrong user/password
                     if(ex is AuthenticationFailedException) {
                         auth.passwordFeedback(false)
-                        throw ex
+
                     }
+                    throw ex
 /*
                     var errorMessage = "Es ist ein Fehler aufgetreten:\n\n${ex.message}"
                     ex.cause?.let {

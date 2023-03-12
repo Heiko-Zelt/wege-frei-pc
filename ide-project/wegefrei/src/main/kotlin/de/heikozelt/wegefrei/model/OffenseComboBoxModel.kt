@@ -54,8 +54,7 @@ class OffenseComboBoxModel: DefaultComboBoxModel<String>() {
          */
         val OFFENSES = arrayOf(
             "",
-            "Sonstiges Vergehen (siehe Hinweis)",
-            "Halten/Parken auf unbeschilderten Radweg",
+            "Halten/Parken auf unbeschildertem Radweg",
             "Halten/Parken auf Fußgängerüberweg",
             "Halten/Parken auf beschilderten Radweg",
             "Halten/Parken auf gemeinsamen Geh- und Radweg",
