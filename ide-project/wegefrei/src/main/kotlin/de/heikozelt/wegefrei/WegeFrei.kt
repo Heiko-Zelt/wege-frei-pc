@@ -78,7 +78,7 @@ class WegeFrei(private val settingsRepo: SettingsRepo = SettingsFileRepo()) {
     private var photoCache = LeastRecentlyUsedCache<Path, Photo>(128)
     private var photoLoader: PhotoLoader? = null
 
-    private val noticesOutbox = NoticesOutbox(this)
+    private val noticesOutbox = NoticesOutbox()
     private var emailSender: EmailSender? = null
 
     init {
@@ -86,6 +86,9 @@ class WegeFrei(private val settingsRepo: SettingsRepo = SettingsFileRepo()) {
         val settings = settingsRepo.load()
         setSettings(settings)
         emailUserAgent?.setEmailServerConfig(settings.emailServerConfig)
+        //noticesOutbox.setRestartListener { startSendingEmails() }
+        noticesOutbox.setRestartListener ( ::startSendingEmails )
+        noticesOutbox.setSuccessfulSentListener ( ::updateNoticeSent )
     }
 
     fun getStarted() {
@@ -180,10 +183,6 @@ class WegeFrei(private val settingsRepo: SettingsRepo = SettingsFileRepo()) {
         }
 
         noticesOutbox.setSettings(settings)
-    }
-
-    fun getEmailUserAgent(): EmailUserAgent? {
-        return emailUserAgent
     }
 
     fun getNoticesOutbox(): NoticesOutbox {
@@ -327,7 +326,7 @@ class WegeFrei(private val settingsRepo: SettingsRepo = SettingsFileRepo()) {
     /**
      * called after a notice was sent
      */
-    fun updateNoticeSend(noticeID: Int, sentTime: ZonedDateTime) {
+    fun updateNoticeSent(noticeID: Int, sentTime: ZonedDateTime) {
         log.debug("noticeSent(id=${noticeID})")
         noticesFrame?.noticeUpdatedSent(noticeID, sentTime)
     }

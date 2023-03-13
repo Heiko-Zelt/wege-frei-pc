@@ -23,5 +23,5 @@ interface Outbox<T> {
      * log failure and inform user
      * @param externalID NoticeID or null if next() didn't return an EmailMessage
      */
-    fun sendFailedCallback(externalID: T?, exception: Throwable)
+    fun sendFailedCallback(externalID: T, exception: Throwable)
 }

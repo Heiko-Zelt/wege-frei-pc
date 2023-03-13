@@ -34,7 +34,9 @@ class EmailSender(private val outbox: Outbox<Int>, private val agent: EmailUserA
                 sleep(5000)
             } catch (ex: Exception) {
                 log.debug("sending email failed: ", ex)
-                outbox.sendFailedCallback(message?.externalID, ex)
+                message?.externalID?.let {
+                    outbox.sendFailedCallback(it, ex)
+                }
                 // Thread beenden und auf Benutzereingabe warten
                 log.debug("exit send loop because an exception occurred")
                 break

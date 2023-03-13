@@ -1,7 +1,6 @@
 package de.heikozelt.wegefrei.model
 
 import de.heikozelt.wegefrei.DatabaseRepo
-import de.heikozelt.wegefrei.WegeFrei
 import de.heikozelt.wegefrei.email.EmailAddressEntity
 import de.heikozelt.wegefrei.email.useragent.EmailAttachment
 import de.heikozelt.wegefrei.email.useragent.EmailMessage
@@ -25,8 +24,10 @@ import javax.swing.JOptionPane
  * Notices with lower sent failures are sent first.
  * @param app reference is needed to restart thread and to update notices table
  * (and maybe update notice frame, but notice can't be edited anyway if it is finalized/in outbox or sent)
+ * todo: Prio 1 for testability change callbacks to app: WegeFrei
+ * replace class app with interface or add listeners
  */
-class NoticesOutbox(private val app: WegeFrei) : Outbox<Int> {
+class NoticesOutbox(/*private val app: WegeFrei*/) : Outbox<Int> {
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
 
     /**
@@ -42,8 +43,24 @@ class NoticesOutbox(private val app: WegeFrei) : Outbox<Int> {
     /**
      * remember, which notice is currently being sent.
      * to be able to update status in database as sent or increment failure counter
+     * private var current: NoticeEntity? = null
      */
-    private var current: NoticeEntity? = null
+
+    /**
+     * callbacks
+     */
+    private var successfulSentListener: ((Int, ZonedDateTime) -> Unit)? = null
+
+    private var restartListener: (() -> Unit)? = null
+
+    fun setSuccessfulSentListener(listener: (Int, ZonedDateTime) -> Unit) {
+        successfulSentListener = listener
+    }
+
+    fun setRestartListener(listener: () -> Unit) {
+        restartListener = listener
+    }
+
 
     fun setDatabaseRepo(dbRepo: DatabaseRepo) {
         this.dbRepo = dbRepo
@@ -82,11 +99,14 @@ class NoticesOutbox(private val app: WegeFrei) : Outbox<Int> {
         log.debug("sentSucessfulCallback(externalID=${externalID}, ...)")
         dbRepo?.updateNoticeSent(externalID, sentTime, messageID)
         // todo Prio 1: In NoticesFrame die Meldung im Cache invalidieren/in der Tabelle aktualisieren!!!
-        app.updateNoticeSend(externalID, sentTime)
+        // todo Prio 1: replace with listener pattern
+        //app.updateNoticeSend(externalID, sentTime)
+        successfulSentListener?.let { it(externalID, sentTime) }
     }
 
-    override fun sendFailedCallback(externalID: Int?, exception: Throwable) {
+    override fun sendFailedCallback(externalID: Int, exception: Throwable) {
         log.debug("sendFailedCallback(externalID=${externalID}, ...)")
+        dbRepo?.updateNoticeSendFailed(externalID)
         EventQueue.invokeLater {
           val options = arrayOf("Abbrechen", "Fortfahren/Erneut versuchen")
           val result = JOptionPane.showOptionDialog(null, exception.message, "Fehler beim E-Mail senden",
@@ -97,7 +117,9 @@ class NoticesOutbox(private val app: WegeFrei) : Outbox<Int> {
             // usually the background thread should be faster than the GUI showing a window, user reading an error message and clicking a button.
             1 -> {
                 log.debug("user pressed continue")
-                app.startSendingEmails()
+                // todo Prio 1: replace with listener pattern
+                //app.startSendingEmails()
+                restartListener?.let { it() }
             }
             else -> log.debug("user pressed cancel")
           }

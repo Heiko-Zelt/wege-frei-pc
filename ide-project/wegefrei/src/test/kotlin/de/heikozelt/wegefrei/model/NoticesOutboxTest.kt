@@ -344,7 +344,7 @@ class NoticesOutboxTest {
         // todo more assertions
 
         message1?.let {
-            outbox.sendFailedCallback(it.externalID)
+            outbox.sendFailedCallback(it.externalID, Exception("what ever went wrong"))
         }
 
         val notices = dbRepo.findAllNoticesDesc()
