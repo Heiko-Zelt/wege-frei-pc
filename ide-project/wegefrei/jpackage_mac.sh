@@ -1,5 +1,5 @@
 WEGE_FREI_VERSION=1.0.3
-export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk-17.0.6.jdk/Contents/Home
+export JAVA_HOME=/Library/Java/JavaVirtualMachines/amazon-corretto-17.jdk/Contents/Home
 
 unset CLASSPATH
 export PATH=$JAVA_HOME/bin:$PATH
