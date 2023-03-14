@@ -7,14 +7,14 @@ Wege-frei! PC ist ein Programm für den PC/Mac/Raspberry Pi/Desktop/Laptop, um F
 ## Besonderheit
 
 Alle Daten (Beweisfotos und Meldungen) werden auf dem eigenen PC gespeichert. Der Versand erfolgt über das persönliche E-Mail-Postfach direkt an das zuständige Ordnungsamt. Hierdurch ergibt sich ein Geschwindigkeitsvorteil und im Sinne der Datensparsamkeit werden die Daten nicht durch zusätzliche Dienstleister verarbeitet. Das Layout und Look & Feel ist flexibel an die Bedürfnisse der Anwender_in anpassbar.
-Die einzelnen Komponeten wie Bildbetrachter, Karte, Eingabe-Formular und E-Mail-Client sind eng verzahnt und reagieren direkt ohne lange Verzögerung.
+Die einzelnen Komponeten wie Bildbetrachter, Karte, Eingabe-Formular, Adressbuch und E-Mail-Client sind eng verzahnt und reagieren direkt ohne lange Verzögerung.
 
 ## Typischer Ablauf
 
  1. Falsch parkende Fahrzeuge fotografieren. Es können mehrere Fotos mit Kfz-Kennzeichen, Verkehrszeichen, HU- & Umwelt-Plakette, Anfang und Ende der Beoabachtung, etc... gemacht werden.
  1. Fotos (z.B. via USB-Kabel) vom Smartphone in einen Ordner auf den PC kopieren.
  1. Meldungen erfassen. Einige Daten wie Tat-Datum, -Uhrzeit, -Dauer und Adresse werden automatisch im Formular eingetragen. Kontrolle der Fotos durch integrierten Bildbetrachter und Adresse des Tatorts durch integrierte Kartenanzeige.
- 1. Meldungen über den integrierten E-Mail-Client über das eigene E-Mail-Postfach an das zuständige Ordnungsamt senden.
+ 1. Meldungen über den integrierten E-Mail-Client über den eigene E-Mail-Account an das zuständige Ordnungsamt senden.
  
 ## Downloads
 
