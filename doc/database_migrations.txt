@@ -1,0 +1,12 @@
+# Migration to version 1.0.3: (new feature: sending email messages in background)
+
+```
+alter table public.notices add column finalizedtime timestamp;
+update public.notices set finalizedtime = senttime where finalizedtime is null;
+
+-- could be always 20 bytes
+alter table public.notices add column messageid binary varying(255);
+
+alter table public.notices add column sendfailures integer;
+update public.notices set sendfailures = 0 where sendfailures is null;
+```

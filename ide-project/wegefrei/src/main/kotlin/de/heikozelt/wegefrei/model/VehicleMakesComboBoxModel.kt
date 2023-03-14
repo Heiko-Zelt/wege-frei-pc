@@ -52,7 +52,7 @@ class VehicleMakesComboBoxModel: DefaultComboBoxModel<String>() {
             "",
             "Abarth", "Adria", "Alfa Romeo", "Aston Martin", "Audi",
             "Bentley", "BMW", "Bugatti",
-            "Cadillac", "Chevrolet", "Chrysler", "Citroën", "Crysler",
+            "Cadillac", "Chevrolet", "Chrysler", "Citroën", "Crysler", "Cupra",
             "Dacia", "Daewoo", "DAF", "Deutz-Fahr", "Daihatsu", "Dodge", "DS", "Ducati",
             "Fendt", "Ferrari", "Fiat", "Ford",
             "Harley-Davidson", "Honda", "Hymer", "Hyundai",

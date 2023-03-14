@@ -1,7 +1,7 @@
-set WEGE_FREI_VERSION=1.0.2
-
-set JAVA_HOME=C:\Users\Hi\.jdks\temurin-17.0.5
+set WEGE_FREI_VERSION=1.0.3
+set JAVA_HOME=C:\Users\Hi\.jdks\corretto-17.0.6
 set WIX_HOME=C:\Program Files (x86)\WiX Toolset v3.11
+
 set PATH=%JAVA_HOME%\bin;%WIX_HOME%\bin;%PATH%
 
 rem Change code page to UTF-8

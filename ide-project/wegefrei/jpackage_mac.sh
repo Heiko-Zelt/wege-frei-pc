@@ -1,8 +1,8 @@
-WEGE_FREI_VERSION=1.0.2
+WEGE_FREI_VERSION=1.0.3
+export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk-17.0.6.jdk/Contents/Home
 
 unset CLASSPATH
-#export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
-export PATH=/Library/Java/JavaVirtualMachines/jdk-17.0.5.jdk/Contents/Home/bin:$PATH
+export PATH=$JAVA_HOME/bin:$PATH
 
 jpackage \
   --name WegeFrei \

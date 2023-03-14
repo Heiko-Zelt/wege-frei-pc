@@ -13,23 +13,23 @@ Alle Daten (Beweisfotos und Meldungen) werden auf dem eigenen PC gespeichert. De
  1. Falsch parkende Fahrzeuge fotografieren. Es können mehrere Fotos mit Kfz-Kennzeichen, Verkehrszeichen, HU- & Umwelt-Plakette, Anfang und Ende der Beoabachtung, etc... gemacht werden.
  1. Fotos (z.B. via USB-Kabel) vom Smartphone in einen Ordner auf den PC kopieren.
  1. Meldungen erfassen. Einige Daten wie Tat-Datum, -Uhrzeit, -Dauer und Adresse werden automatisch im Formular eingetragen. Kontrolle der Fotos durch integrierten Bildbetrachter und Adresse des Tatorts durch integrierte Kartenanzeige.
- 1. Meldungen über integrierten E-mail-Client über das eigene E-Mail-Postfach an das zuständige Ordnungsamt senden.
+ 1. Meldungen über den integrierten E-Mail-Client über das eigene E-Mail-Postfach an das zuständige Ordnungsamt senden.
  
 ## Downloads
 
  * Windows/x86-64: [WegeFrei-1.0.2.msi](https://www.heikozelt.de/wegefrei/download/WegeFrei-1.0.2.msi)
  * Apple macOS/x86-64, [WegeFrei-1.0.2.dmg](https://www.heikozelt.de/wegefrei/download/WegeFrei-1.0.2.dmg)
  * Ubuntu-Linux/x86-64: [wegefrei_1.0.2-1_amd64.deb](https://www.heikozelt.de/wegefrei/download/wegefrei_1.0.2-1_amd64.deb)
- * Betriebssystem- & Prozessor-unabhängig. Es wird zusätzlich Java 17 benötigt. Start mit `java -jar wegefrei-1.0.2.jar`<br />
-   [wegefrei-1.0.2.jar](https://www.heikozelt.de/wegefrei/download/wegefrei-1.0.2.jar)
+ * Betriebssystem- & Prozessor-unabhängig. (Es wird zusätzlich Java 17 benötigt.) [wegefrei-1.0.2.jar](https://www.heikozelt.de/wegefrei/download/wegefrei-1.0.2.jar)
    
 Smartphones und Tablets (Android, iOS & iPadOS) werden nicht unterstützt.
  
 ## Installation
 
-Am einfachsten ist die Verwendung eines Software-Paketes, abhängig vom Betriebssystem und Prozessor/CPU-Familie.
+Am einfachsten ist die Verwendung eines Software-Paketes, abhängig vom Betriebssystem und Prozessor/CPU-Familie (.msi, .dmg oder .deb-Datei). Dieses enthält eine Java 17 Runtime.
+
 Sollte es (noch) kein Paket für Deine Plattform (Betriebssystem & CPU) geben, schreibe mich bitte an oder verwende die plattformunabhängige .jar-Datei.
-Zur Ausführung der .jar-Datei, welche Java Byte Code enthält wird zusätzlich eine Java Virtual Machine ab Version 17 benötigt.
+Zur Ausführung der .jar-Datei, welche Java Byte Code enthält, wird zusätzlich eine Java Virtual Machine ab Version 17 benötigt. z.B. [Amazon Corretto](https://docs.aws.amazon.com/corretto/latest/corretto-17-ug/downloads-list.html). Start mit dem Kommando `java -jar wegefrei-1.0.2.jar`.
 
 ## Deinstallation
 

@@ -1,8 +1,8 @@
-WEGE_FREI_VERSION=1.0.2
+WEGE_FREI_VERSION=1.0.3
+export JAVA_HOME=/home/heiko/.jdks/corretto-17.0.6
 
-unset CLASSPATH
-export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
 export PATH=$JAVA_HOME/bin:$PATH
+unset CLASSPATH
 
 jpackage \
   --name WegeFrei \
