@@ -40,20 +40,20 @@ welche standardmäßig im Benutzer-Home-Verzeichnis liegen, müssen manuell gel�
 
 ## Konfiguration
 
-Nach der Installation kannst du direkt Meldungen erfassen. Wenn du die Beweiss-Fotos von deinen Urlaubsfotos, etc... trennen möchtest, kannst du unter Einstellungen einen anderen Ordner angeben. Bevor Du Meldungen an das Ordnungsamt übertragen kannst, musst du deine Zeugen-Daten angeben. Annonyme Anzeigen werden nicht akzeptiert. Außerdem werden die Konfigurations-Daten eines Postausgangs-Servers (SMTP) benötigt.
+Nach der Installation kannst du direkt Meldungen erfassen. Wenn du die Beweiss-Fotos von Deinen Urlaubsfotos, etc... trennen möchtest, kannst Du unter Einstellungen einen anderen Ordner angeben. Bevor Du Meldungen an das Ordnungsamt übertragen kannst, musst Du Deine Zeugen-Daten angeben. Annonyme Anzeigen werden nicht akzeptiert. Außerdem werden die Konfigurations-Daten eines Postausgangs-Servers (SMTP) benötigt.
 
 ![Screenshot Einstellungen](doc/screenshot_settings.png)
 
 
 ## Empfehlungen
 
- * Fotos verschlüsselt speichern (z.B. mit VeraCrypt)
+ * Fotos verschlüsselt speichern, z.B. mit [VeraCrypt](https://veracrypt.fr/)
  * Beim E-Mail-Versand TLS-Verschlüsselung verwenden
  
 ## Datenschutz
 
-Die Software verwendet Web-Services/APIs. Bei der Benutzung wird deine IP-Adresse daher an folgende Websites übermittelt:
+Die Software verwendet Web-Services/APIs. Bei der Benutzung wird Deine IP-Adresse daher an folgende Websites übermittelt:
  * https://tile.openstreetmap.org/ für die Kartendartstellung (Download von Kachel-Bildern)
  * https://nominatim.openstreetmap.org/ für die Suche nach Post-Anschrifts-Adressen von Tatort-Geo-Koordinaten
 
-Bei Nutzung des Internets wird deine IP-Adresse natürlich auch an den Internet-Zugangs-Provider übermittelt und beim Versand von E-Mails an den E-Mail-Provider.
+Bei Nutzung des Internets wird Deine IP-Adresse natürlich auch an den Internet-Zugangs-Provider übermittelt und beim Versand von E-Mails an den E-Mail-Provider.
