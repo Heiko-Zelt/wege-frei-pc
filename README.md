@@ -7,6 +7,7 @@ Wege-frei! PC ist ein Programm für den PC/Mac/Raspberry Pi/Desktop/Laptop, um F
 ## Besonderheit
 
 Alle Daten (Beweisfotos und Meldungen) werden auf dem eigenen PC gespeichert. Der Versand erfolgt über das persönliche E-Mail-Postfach direkt an das zuständige Ordnungsamt. Hierdurch ergibt sich ein Geschwindigkeitsvorteil und im Sinne der Datensparsamkeit werden die Daten nicht durch zusätzliche Dienstleister verarbeitet. Das Layout und Look & Feel ist flexibel an die Bedürfnisse der Anwender_in anpassbar.
+Die einzelnen Komponeten wie Bildbetrachter, Karte, Eingabe-Formular und E-Mail-Client sind eng verzahnt.
 
 ## Typischer Ablauf
 
