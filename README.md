@@ -26,10 +26,10 @@ Smartphones und Tablets (Android, iOS & iPadOS) werden nicht unterstützt.
  
 ## Installation
 
-Am einfachsten ist die Verwendung eines Software-Paketes, abhängig vom Betriebssystem und Prozessor/CPU-Familie (.msi, .dmg oder .deb-Datei). Dieses enthält eine Java 17 Runtime.
+Am einfachsten ist die Verwendung eines Software-Paketes, abhängig vom Betriebssystem und Prozessor/CPU-Familie (.msi, .pkg oder .deb-Datei). Dieses enthält eine Java 17 Runtime.
 
 Sollte es (noch) kein Paket für Deine Plattform (Betriebssystem & CPU) geben, dann schreibe mich bitte an oder verwende die plattformunabhängige .jar-Datei.
-Zur Ausführung der .jar-Datei, welche Java Byte Code enthält, wird zusätzlich eine Java Virtual Machine ab Version 17 benötigt. z.B. [Amazon Corretto](https://docs.aws.amazon.com/corretto/latest/corretto-17-ug/downloads-list.html). Start mit dem Kommando `java -jar wegefrei-1.0.2.jar`.
+Zur Ausführung der .jar-Datei, welche Java Byte Code enthält, wird zusätzlich eine Java Virtual Machine ab Version 17 benötigt. z.B. [Amazon Corretto](https://docs.aws.amazon.com/corretto/latest/corretto-17-ug/downloads-list.html). Start mit dem Kommando `java -jar wegefrei-1.0.3.jar`.
 
 ## Deinstallation
 
