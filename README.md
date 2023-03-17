@@ -35,7 +35,7 @@ Zur Ausführung der .jar-Datei, welche Java Byte Code enthält, wird zusätzlich
 ## Deinstallation
 
 Die Software kann über den Betriebssystem-spezifischen Paket-Manager wieder deinstalliert werden.
-Die Konfigurationsdatei `.wege_frei_v1.settings.json` und die Datenbankdateien `wege_frei_v1.mv.db` & `wege_frei_v1.trace.db`,
+Die Konfigurationsdatei `.wege_frei_v1_x_x.settings.json` und die Datenbankdateien `wege_frei_v1_x_x.mv.db` & `wege_frei_v1_x_x.trace.db`,
 welche standardmäßig im Benutzer-Home-Verzeichnis liegen, müssen manuell gelöscht werden.
 
 ## Konfiguration
