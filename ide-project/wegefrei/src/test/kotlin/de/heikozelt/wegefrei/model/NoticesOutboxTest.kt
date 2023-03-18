@@ -217,7 +217,7 @@ class NoticesOutboxTest {
             observationTime = obsTime
             createdTime = createTime
             licensePlate = "SE NT 0001"
-            vehicleMake = VehicleMakesComboBoxModel.VEHICLE_MAKES[1]
+            vehicleMake = VehicleMakesComboBoxModel.VEHICLE_MAKES[1].toString()
             color = VehicleColor.COLORS[1].colorName
             latitude = 50.1
             longitude = 8.1
@@ -273,7 +273,7 @@ class NoticesOutboxTest {
             observationTime = obsTime
             createdTime = createTime
             licensePlate = "SE NT 0001"
-            vehicleMake = VehicleMakesComboBoxModel.VEHICLE_MAKES[1]
+            vehicleMake = VehicleMakesComboBoxModel.VEHICLE_MAKES[1].toString()
             color = VehicleColor.COLORS[1].colorName
             latitude = 50.1
             longitude = 8.1
@@ -322,7 +322,7 @@ class NoticesOutboxTest {
             observationTime = obsTime
             createdTime = createTime
             licensePlate = "SE NT 0001"
-            vehicleMake = VehicleMakesComboBoxModel.VEHICLE_MAKES[1]
+            vehicleMake = VehicleMakesComboBoxModel.VEHICLE_MAKES[1].toString()
             color = VehicleColor.COLORS[1].colorName
             latitude = 50.1
             longitude = 8.1

@@ -37,14 +37,12 @@ internal class DatabaseRepoTest {
     @Test
     fun findAllNoticesIds() {
         val noticeIds = databaseRepo.findAllNoticesIdsDesc()
-        assertNotNull(noticeIds)
-        noticeIds?.let {
-            assertTrue(2 in it)
-            assertTrue(3 in it)
-            assertTrue(13 in it)
-            assertTrue(14 in it)
-            assertFalse(15 in it)
-        }
+        assertNotNull(noticeIds) // kann gar nicht null sein
+        assertTrue(2 in noticeIds)
+        assertTrue(3 in noticeIds)
+        assertTrue(13 in noticeIds)
+        assertTrue(14 in noticeIds)
+        assertFalse(15 in noticeIds)
     }
 
     @Test
@@ -58,7 +56,7 @@ internal class DatabaseRepoTest {
 
         val notice2 = databaseRepo.findNoticeById(3)
         assertNotNull(notice2)
-        notice2?.let{ n ->
+        notice2?.let { n ->
             n.photoEntities.forEach {
                 log.debug("path=${it.path}")
             }
@@ -80,7 +78,7 @@ internal class DatabaseRepoTest {
 
         val notice2 = databaseRepo.findNoticeById(4)
         assertNotNull(notice2)
-        notice2?.let{ n ->
+        notice2?.let { n ->
             n.photoEntities.forEach {
                 log.debug("path=${it.path}")
             }
@@ -115,7 +113,8 @@ internal class DatabaseRepoTest {
 
         val dir = Paths.get("src/test/resources").toAbsolutePath().toString()
 
-        @BeforeAll @JvmStatic
+        @BeforeAll
+        @JvmStatic
         fun inserts() {
             LOG.debug("BeforeAll()")
 
@@ -135,7 +134,7 @@ internal class DatabaseRepoTest {
             notice1.apply {
                 observationTime = photos[0].dateTime
                 licensePlate = "DEL ET 0000"
-                vehicleMake = VehicleMakesComboBoxModel.VEHICLE_MAKES[1]
+                vehicleMake = VehicleMakesComboBoxModel.VEHICLE_MAKES[1].toString()
                 color = VehicleColor.COLORS[1].colorName
                 latitude = 50.1
                 longitude = 8.1
@@ -148,7 +147,7 @@ internal class DatabaseRepoTest {
             notice2.apply {
                 observationTime = photos[0].dateTime
                 licensePlate = "KE EP 0001"
-                vehicleMake = VehicleMakesComboBoxModel.VEHICLE_MAKES[2]
+                vehicleMake = VehicleMakesComboBoxModel.VEHICLE_MAKES[2].toString()
                 color = VehicleColor.COLORS[2].colorName
                 latitude = 50.2
                 longitude = 8.2
@@ -161,7 +160,7 @@ internal class DatabaseRepoTest {
             notice3.apply {
                 observationTime = photos[0].dateTime
                 licensePlate = "UPD AT 0002"
-                vehicleMake = VehicleMakesComboBoxModel.VEHICLE_MAKES[3]
+                vehicleMake = VehicleMakesComboBoxModel.VEHICLE_MAKES[3].toString()
                 color = VehicleColor.COLORS[3].colorName
                 latitude = 50.3
                 longitude = 8.3
@@ -173,7 +172,7 @@ internal class DatabaseRepoTest {
             notice4.apply {
                 observationTime = photos[0].dateTime
                 licensePlate = "UPD AT 0002"
-                vehicleMake = VehicleMakesComboBoxModel.VEHICLE_MAKES[3]
+                vehicleMake = VehicleMakesComboBoxModel.VEHICLE_MAKES[3].toString()
                 color = VehicleColor.COLORS[3].colorName
                 latitude = 50.4
                 longitude = 8.4
@@ -187,7 +186,7 @@ internal class DatabaseRepoTest {
                     observationTime = ZonedDateTime.now()
                     licensePlate = "AA XX 00$i"
                     vehicleMake =
-                        VehicleMakesComboBoxModel.VEHICLE_MAKES[i % VehicleMakesComboBoxModel.VEHICLE_MAKES.size]
+                        VehicleMakesComboBoxModel.VEHICLE_MAKES[i % VehicleMakesComboBoxModel.VEHICLE_MAKES.size].toString()
                     color = VehicleColor.COLORS[i % VehicleColor.COLORS.size].colorName
                     latitude = 49 + i.toDouble() / 11
                     longitude = 8 + i.toDouble() / 13
@@ -198,7 +197,8 @@ internal class DatabaseRepoTest {
 
         }
 
-        @AfterAll @JvmStatic
+        @AfterAll
+        @JvmStatic
         fun close_db() {
             databaseRepo.close()
         }

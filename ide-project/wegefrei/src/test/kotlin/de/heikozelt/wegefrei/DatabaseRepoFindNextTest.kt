@@ -1,13 +1,12 @@
 package de.heikozelt.wegefrei
 
-import de.heikozelt.wegefrei.email.EmailAddressEntity
 import de.heikozelt.wegefrei.entities.NoticeEntity
 import de.heikozelt.wegefrei.entities.PhotoEntity
 import de.heikozelt.wegefrei.model.VehicleColor
 import de.heikozelt.wegefrei.model.VehicleMakesComboBoxModel
 import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
 import java.nio.file.Paths
@@ -44,7 +43,7 @@ internal class DatabaseRepoFindNextTest {
         notice1.apply {
             observationTime = photo1.dateTime
             licensePlate = "SE NT 0001"
-            vehicleMake = VehicleMakesComboBoxModel.VEHICLE_MAKES[1]
+            vehicleMake = VehicleMakesComboBoxModel.VEHICLE_MAKES[1].toString()
             color = VehicleColor.COLORS[1].colorName
             latitude = 50.1
             longitude = 8.1

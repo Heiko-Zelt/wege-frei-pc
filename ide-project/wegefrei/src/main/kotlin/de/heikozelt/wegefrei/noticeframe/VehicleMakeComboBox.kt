@@ -63,7 +63,7 @@ class VehicleMakeComboBox: JComboBox<String?>() {
         } else {
             val txt = text.trim()
             val lowerTxt = txt.lowercase()
-            val sItem = VehicleMakesComboBoxModel.VEHICLE_MAKES.find { lowerTxt == it.lowercase() }
+            val sItem = VehicleMakesComboBoxModel.VEHICLE_MAKES.find { lowerTxt == it.toString().lowercase() }
             if (sItem == null) {
                 setEditorText(txt)
             } else {

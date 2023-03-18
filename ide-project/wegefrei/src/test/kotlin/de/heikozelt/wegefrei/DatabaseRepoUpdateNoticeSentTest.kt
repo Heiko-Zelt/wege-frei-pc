@@ -1,6 +1,5 @@
 package de.heikozelt.wegefrei
 
-import com.beust.klaxon.Klaxon
 import de.heikozelt.wegefrei.entities.NoticeEntity
 import de.heikozelt.wegefrei.entities.PhotoEntity
 import de.heikozelt.wegefrei.model.NoticeState
@@ -66,7 +65,7 @@ internal class DatabaseRepoUpdateNoticeSentTest {
             notice1.apply {
                 observationTime = photo1.dateTime
                 licensePlate = "SE NT 0001"
-                vehicleMake = VehicleMakesComboBoxModel.VEHICLE_MAKES[1]
+                vehicleMake = VehicleMakesComboBoxModel.VEHICLE_MAKES[1].toString()
                 color = VehicleColor.COLORS[1].colorName
                 latitude = 50.1
                 longitude = 8.1

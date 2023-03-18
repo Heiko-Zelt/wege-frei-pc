@@ -1,6 +1,5 @@
 package de.heikozelt.wegefrei.model
 
-import de.heikozelt.wegefrei.latinLower
 import org.slf4j.LoggerFactory
 import java.lang.Math.min
 import javax.swing.DefaultComboBoxModel
@@ -13,7 +12,7 @@ import javax.swing.DefaultComboBoxModel
 class VehicleMakesComboBoxModel: DefaultComboBoxModel<String>() {
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
 
-    private val filteredList = mutableListOf<String>()
+    private val filteredList = mutableListOf<VehicleMake>()
 
     init {
         filteredList.addAll(VEHICLE_MAKES)
@@ -29,7 +28,7 @@ class VehicleMakesComboBoxModel: DefaultComboBoxModel<String>() {
         val oldSize = filteredList.size
         val normalized = syllable.lowercase()
         filteredList.clear()
-        filteredList.addAll(VEHICLE_MAKES.filter { normalized in latinLower(it) })
+        filteredList.addAll(VEHICLE_MAKES.filter { it.subStringMatches(normalized) })
         //VEHICLE_MAKES.forEach { if(normalized in it) filteredVehicleMakes.add(it) }
         val newSize = filteredList.size
         log.debug("newSize = $newSize")
@@ -45,27 +44,90 @@ class VehicleMakesComboBoxModel: DefaultComboBoxModel<String>() {
     }
 
     override fun getElementAt(index: Int): String {
-        return filteredList[index]
+        return filteredList[index].toString()
     }
 
     companion object {
         val VEHICLE_MAKES = arrayOf(
-            "",
-            "Abarth", "Adria", "Alfa Romeo", "Aston Martin", "Audi",
-            "Bentley", "BMW", "Bugatti",
-            "Cadillac", "Chevrolet", "Chrysler", "Citroën", "Crysler", "Cupra",
-            "Dacia", "Daewoo", "DAF", "Deutz-Fahr", "Daihatsu", "Dodge", "DS", "Ducati",
-            "Fendt", "Ferrari", "Fiat", "Ford",
-            "Harley-Davidson", "Honda", "Hymer", "Hyundai",
-            "Isuzu", "Iveco", "Jaguar", "Jeep", "John Deere",
-            "Kässbohrer", "Kawasaki", "Kia", "KTM",
-            "Lada", "Lamborghini", "Lancia", "Land Rover", "Lexus", "Lotus", "Lynk & Co",
-            "MAN", "Maserati", "Mazda", "Mercedes", "MG", "Mini", "Mitsubishi",
-            "Nissan", "Opel",
-            "Peugeot", "Piaggio", "Polestar", "Porsche", "Renault", "Rolls-Royce",
-            "Saab", "Scania", "Seat", "Setra", "Škoda", "Smart", "SsangYong", "Subaru", "Suzuki",
-            "Tesla", "Toyota", "Trabant",
-            "Vauxhall", "Volkswagen (VW)", "Volvo", "Yamaha", "Wartburg"
+            VehicleMake(""),
+            VehicleMake("Abarth"),
+            VehicleMake("Adria"),
+            VehicleMake("Alfa Romeo"),
+            VehicleMake("Aston Martin"),
+            VehicleMake("Audi"),
+            VehicleMake("Bentley"),
+            VehicleMake("BMW"),
+            VehicleMake("Bugatti"),
+            VehicleMake("Cadillac"),
+            VehicleMake("Chevrolet"),
+            VehicleMake("Chrysler"),
+            VehicleMake("Citroën", arrayOf("citroen")),
+            VehicleMake("Crysler"),
+            VehicleMake("Cupra"),
+            VehicleMake("Dacia"),
+            VehicleMake("Daewoo"),
+            VehicleMake("DAF"),
+            VehicleMake("Deutz-Fahr"),
+            VehicleMake("Daihatsu"),
+            VehicleMake("Dodge"),
+            VehicleMake("DS"),
+            VehicleMake("Ducati"),
+            VehicleMake("Fendt"),
+            VehicleMake("Ferrari"),
+            VehicleMake("Fiat"),
+            VehicleMake("Ford"),
+            VehicleMake("Harley-Davidson"),
+            VehicleMake("Honda"),
+            VehicleMake("Hymer"),
+            VehicleMake("Hyundai"),
+            VehicleMake("Isuzu"),
+            VehicleMake("Iveco"),
+            VehicleMake("Jaguar"),
+            VehicleMake("Jeep"),
+            VehicleMake("John Deere"),
+            VehicleMake("Kässbohrer", arrayOf("kassbohrer", "kaessbohrer")),
+            VehicleMake("Kawasaki"),
+            VehicleMake("Kia"),
+            VehicleMake("KTM"),
+            VehicleMake("Lada"),
+            VehicleMake("Lamborghini"),
+            VehicleMake("Lancia"),
+            VehicleMake("Land Rover"),
+            VehicleMake("Lexus"),
+            VehicleMake("Lotus"),
+            VehicleMake("Lynk & Co"),
+            VehicleMake("MAN"),
+            VehicleMake("Maserati"),
+            VehicleMake("Mazda"),
+            VehicleMake("Mercedes"),
+            VehicleMake("MG"),
+            VehicleMake("Mini"),
+            VehicleMake("Mitsubishi"),
+            VehicleMake("Nissan"),
+            VehicleMake("Opel"),
+            VehicleMake("Peugeot"),
+            VehicleMake("Piaggio"),
+            VehicleMake("Polestar"),
+            VehicleMake("Porsche"),
+            VehicleMake("Renault"),
+            VehicleMake("Rolls-Royce"),
+            VehicleMake("Saab"),
+            VehicleMake("Scania"),
+            VehicleMake("Seat"),
+            VehicleMake("Setra"),
+            VehicleMake("Škoda", arrayOf("skoda")),
+            VehicleMake("Smart"),
+            VehicleMake("SsangYong"),
+            VehicleMake("Subaru"),
+            VehicleMake("Suzuki"),
+            VehicleMake("Tesla"),
+            VehicleMake("Toyota"),
+            VehicleMake("Trabant", arrayOf("trabi", "trabbi")),
+            VehicleMake("Vauxhall"),
+            VehicleMake("Volkswagen", arrayOf("vw")),
+            VehicleMake("Volvo"),
+            VehicleMake("Yamaha"),
+            VehicleMake("Wartburg")
         )
     }
 }

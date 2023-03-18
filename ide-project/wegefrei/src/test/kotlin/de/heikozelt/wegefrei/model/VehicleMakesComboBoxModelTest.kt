@@ -8,7 +8,7 @@ class VehicleMakesComboBoxModelTest {
     @Test
     fun constr() {
         val m = VehicleMakesComboBoxModel()
-        assertEquals(78, m.size)
+        assertEquals(79, m.size)
     }
 
     @Test
@@ -18,12 +18,18 @@ class VehicleMakesComboBoxModelTest {
         assertEquals(2, m.size)
         m.setFilter("vo") // Volkswagen & Volvo
         assertEquals(2, m.size)
+        m.setFilter("skoda") // Skoda mit Dach
+        assertEquals(1, m.size)
+        m.setFilter("vw")
+        assertEquals(1, m.size)
+        m.setFilter("volksWagen")
+        assertEquals(1, m.size)
     }
 
     @Test
     fun setFilter_empty() {
         val m = VehicleMakesComboBoxModel()
-        m.setFilter("") // Lexus & Vauxhall
-        assertEquals(78, m.size)
+        m.setFilter("")
+        assertEquals(79, m.size)
     }
 }

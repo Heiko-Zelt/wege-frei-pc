@@ -181,7 +181,7 @@ class TestDataGenerator {
                 noticeEntity.apply {
                     observationTime = ZonedDateTime.now()
                     licensePlate = "AA XX 00$i"
-                    vehicleMake = VEHICLE_MAKES[i % VEHICLE_MAKES.size]
+                    vehicleMake = VEHICLE_MAKES[i % VEHICLE_MAKES.size].toString()
                     color = COLORS[i % COLORS.size].colorName
                     latitude = 49 + i.toDouble() / 11
                     longitude = 8 + i.toDouble() / 13
