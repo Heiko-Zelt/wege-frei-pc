@@ -1,5 +1,6 @@
 package de.heikozelt.wegefrei.model
 
+import de.heikozelt.wegefrei.latinLower
 import org.slf4j.LoggerFactory
 import java.lang.Math.min
 import javax.swing.DefaultComboBoxModel
@@ -20,7 +21,7 @@ class VehicleMakesComboBoxModel: DefaultComboBoxModel<String>() {
 
     /**
      * needed for autocomplete/filtered combo box
-     * @param: syllable part of a word
+     * @param syllable part of a word
      */
     fun setFilter(syllable: String) {
         selectedItem = syllable
@@ -28,7 +29,7 @@ class VehicleMakesComboBoxModel: DefaultComboBoxModel<String>() {
         val oldSize = filteredList.size
         val normalized = syllable.lowercase()
         filteredList.clear()
-        filteredList.addAll(VEHICLE_MAKES.filter { normalized in it.lowercase() })
+        filteredList.addAll(VEHICLE_MAKES.filter { normalized in latinLower(it) })
         //VEHICLE_MAKES.forEach { if(normalized in it) filteredVehicleMakes.add(it) }
         val newSize = filteredList.size
         log.debug("newSize = $newSize")
@@ -64,7 +65,7 @@ class VehicleMakesComboBoxModel: DefaultComboBoxModel<String>() {
             "Peugeot", "Piaggio", "Polestar", "Porsche", "Renault", "Rolls-Royce",
             "Saab", "Scania", "Seat", "Setra", "Škoda", "Smart", "SsangYong", "Subaru", "Suzuki",
             "Tesla", "Toyota", "Trabant",
-            "Vauxhall", "Volkswagen", "Volvo", "Yamaha", "Wartburg"
+            "Vauxhall", "Volkswagen (VW)", "Volvo", "Yamaha", "Wartburg"
         )
     }
 }
