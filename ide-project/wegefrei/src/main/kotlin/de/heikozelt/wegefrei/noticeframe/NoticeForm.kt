@@ -24,13 +24,14 @@ class NoticeForm(
 
     init {
         val okButton = JButton("Ok")
-        okButton.addActionListener { noticeFrame.saveButtonClicked() }
-        val cancelButton = JButton("Abbrechen")
-        cancelButton.addActionListener { noticeFrame.cancelButtonClicked() }
         deleteButton.isVisible = false
-        deleteButton.addActionListener { noticeFrame.deleteButtonClicked() }
         val sendButton = JButton("E-Mail absenden")
+        val cancelButton = JButton("Abbrechen")
+
+        cancelButton.addActionListener { noticeFrame.cancelButtonClicked() }
+        okButton.addActionListener { noticeFrame.saveButtonClicked() }
         sendButton.addActionListener { noticeFrame.sendButtonClicked() }
+        deleteButton.addActionListener { noticeFrame.deleteButtonClicked() }
 
         val lay = GroupLayout(this)
         lay.autoCreateGaps = false

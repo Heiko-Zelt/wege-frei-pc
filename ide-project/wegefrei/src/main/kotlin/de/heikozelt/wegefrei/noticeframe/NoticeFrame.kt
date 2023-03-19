@@ -65,7 +65,8 @@ class NoticeFrame(
 
     /**
      * Daten-Modell:
-     * todo Problem: Eine Nachricht besteht aus einfachen Benutzereingaben und generierten Status/Protokoll-Daten
+     * Problem: Eine Nachricht besteht aus Benutzereingaben
+     *   und generierten Status/Protokoll-Daten.
      * Lösung:
      * <ul>
      *   <li>NoticeFrame.noticeEntity enthält Status-Daten</li>
@@ -161,7 +162,7 @@ class NoticeFrame(
 
     /**
      * Initialisiert alle GUI-Komponenten mit dem Inhalt der Meldung.
-     * Mapping von Daten-Modell/Notice auf Swing-Komponenten.
+     * Mapping von Daten-Modell/NoticeEntity auf Swing-Komponenten.
      * <ol>
      *   <li>ohne Parameter bzw. mit Default-Parameter zum Bearbeiten einer neuen Meldung. notice.id ist null.</li>
      *   <li>Aufruf mit Notice als Parameter zum Bearbeiten einer bestehenden Meldung. notice.id enthält eine Zahl.</li>
@@ -489,6 +490,7 @@ class NoticeFrame(
      * todo Bei Validierung: Differenzierung zwischen Warnung und Fehler
      */
     fun sendButtonClicked() {
+        log.debug("sendButtonClicked()")
         var errors = validateAndMap()
         if (errors.isNotEmpty()) {
             showValidationErrors(errors)
@@ -541,6 +543,7 @@ class NoticeFrame(
      * speichert die Meldung in der Datenbank.
      */
     fun saveNotice() {
+        log.debug("saveNotice()")
         val dbRepo = app.getDatabaseRepo() ?: return
         noticeEntity?.let { ne ->
             log.debug("noticeEntity.id = ${ne.id}")
@@ -580,6 +583,7 @@ class NoticeFrame(
         noticeEntity?.let { ne ->
             val outbox = app.getNoticesOutbox()
             val message = outbox.buildEmailMessage(ne)
+            log.debug("message: $message")
             message?.let { me ->
                 log.debug("show email message dialog")
                 val dialog = EmailMessageDialog { sendEmailConfirmed() }

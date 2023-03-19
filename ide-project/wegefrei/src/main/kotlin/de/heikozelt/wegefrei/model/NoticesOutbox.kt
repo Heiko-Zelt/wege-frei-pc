@@ -108,21 +108,24 @@ class NoticesOutbox(/*private val app: WegeFrei*/) : Outbox<Int> {
         log.debug("sendFailedCallback(externalID=${externalID}, ...)")
         dbRepo?.updateNoticeSendFailed(externalID)
         EventQueue.invokeLater {
-          val options = arrayOf("Abbrechen", "Fortfahren/Erneut versuchen")
-          val result = JOptionPane.showOptionDialog(null, exception.message, "Fehler beim E-Mail senden",
-            JOptionPane.NO_OPTION, JOptionPane.PLAIN_MESSAGE,
-            null, options, options[1]);
-          when(result) {
-            // Problem: restart Thread. Has the Thread finished yet?
-            // usually the background thread should be faster than the GUI showing a window, user reading an error message and clicking a button.
-            1 -> {
-                log.debug("user pressed continue")
-                // todo Prio 1: replace with listener pattern
-                //app.startSendingEmails()
-                restartListener?.let { it() }
+            val options = arrayOf("Abbrechen", "Fortfahren/Erneut versuchen")
+            val result = JOptionPane.showOptionDialog(
+                null, exception.message, "Fehler beim E-Mail senden",
+                JOptionPane.NO_OPTION, JOptionPane.PLAIN_MESSAGE,
+                null, options, options[1]
+            );
+            when (result) {
+                // Problem: restart Thread. Has the Thread finished yet?
+                // usually the background thread should be faster than the GUI showing a window, user reading an error message and clicking a button.
+                1 -> {
+                    log.debug("user pressed continue")
+                    // todo Prio 1: replace with listener pattern
+                    //app.startSendingEmails()
+                    restartListener?.let { it() }
+                }
+
+                else -> log.debug("user pressed cancel")
             }
-            else -> log.debug("user pressed cancel")
-          }
         }
 
         /*
@@ -142,30 +145,29 @@ class NoticesOutbox(/*private val app: WegeFrei*/) : Outbox<Int> {
     fun buildEmailMessage(noticeEntity: NoticeEntity): EmailMessage<Int>? {
         log.debug("buildEmailMessage()")
         settings?.let { setti ->
-            noticeEntity.id?.let { noticeID ->
-                val from = EmailAddressEntity(setti.witness.emailAddress, setti.witness.getFullName())
-                // todo Prio 3: mehrere Empfänger erlauben
-                val to = noticeEntity.getRecipient()
-                val tos = TreeSet<EmailAddressEntity>()
-                tos.add(to)
-                val subject = buildSubject(noticeEntity)
-                val content = buildMailContent(noticeEntity, setti.witness)
-                val message = EmailMessage<Int>(noticeID, from, tos, subject, content)
-                if (from.address != to.address) {
-                    message.ccs.add(from)
-                }
-
-                /*
-                selectedPhotosListModel.getSelectedPhotos()
-                */
-                noticeEntity.photoEntities.forEach { pe ->
-                    pe.path?.let { pa ->
-                        val attachment = EmailAttachment(Paths.get(pa))
-                        message.attachments.add(attachment)
-                    }
-                }
-                return message
+            val nID = noticeEntity.id ?: 0 // neue oder bestehende Meldung
+            val from = EmailAddressEntity(setti.witness.emailAddress, setti.witness.getFullName())
+            // todo Prio 3: mehrere Empfänger erlauben
+            val to = noticeEntity.getRecipient()
+            val tos = TreeSet<EmailAddressEntity>()
+            tos.add(to)
+            val subject = buildSubject(noticeEntity)
+            val content = buildMailContent(noticeEntity, setti.witness)
+            val message = EmailMessage<Int>(nID, from, tos, subject, content)
+            if (from.address != to.address) {
+                message.ccs.add(from)
             }
+
+            /*
+            selectedPhotosListModel.getSelectedPhotos()
+            */
+            noticeEntity.photoEntities.forEach { pe ->
+                pe.path?.let { pa ->
+                    val attachment = EmailAttachment(Paths.get(pa))
+                    message.attachments.add(attachment)
+                }
+            }
+            return message
         }
         return null
     }
@@ -174,6 +176,7 @@ class NoticesOutbox(/*private val app: WegeFrei*/) : Outbox<Int> {
         private val LOG = LoggerFactory.getLogger(this::class.java.canonicalName)
 
         fun buildSubject(n: NoticeEntity): String {
+            LOG.debug("buildSubject()")
             var subject = "Anzeige"
             n.observationTime?.let {
                 val formatter = DateTimeFormatter.ofPattern("d. MMM, HH:mm").withLocale(Locale.GERMAN)
@@ -188,6 +191,8 @@ class NoticesOutbox(/*private val app: WegeFrei*/) : Outbox<Int> {
 
 
         fun buildMailContent(n: NoticeEntity, w: Witness): String {
+            LOG.debug("buildMailContent()")
+
             fun htmlEncode(str: String?): String {
                 str?.let {
                     return it
@@ -212,30 +217,30 @@ class NoticesOutbox(/*private val app: WegeFrei*/) : Outbox<Int> {
 
             val validationErrors = w.validate()
             validationErrors.addAll(n.isComplete())
-            if(validationErrors.isNotEmpty()) throw ValidationException(validationErrors)
+            if (validationErrors.isNotEmpty()) throw ValidationException(validationErrors)
 
             val caseRows = mutableListOf<String>()
             appendTableRow(caseRows, "Landeskennzeichen", n.getCountryFormatted())
-            appendTableRow(caseRows,"Kennzeichen", n.licensePlate)
-            appendTableRow(caseRows,"Marke", n.vehicleMake)
-            appendTableRow(caseRows,"Farbe", n.color)
-            appendTableRow(caseRows,"Tatortadresse", n.getAddress())
-            appendTableRow(caseRows,"Tatortbeschreibung", n.locationDescription)
-            appendTableRow(caseRows,"Geoposition", n.getGeoPositionFormatted())
-            appendTableRow(caseRows,"Verstoß", n.offense)
-            appendTableRowHtmlValue(caseRows,"Umstände", n.getCircumstancesHtml())
-            appendTableRow(caseRows,"HU-Fälligkeit", n.getInspectionMonthYear())
+            appendTableRow(caseRows, "Kennzeichen", n.licensePlate)
+            appendTableRow(caseRows, "Marke", n.vehicleMake)
+            appendTableRow(caseRows, "Farbe", n.color)
+            appendTableRow(caseRows, "Tatortadresse", n.getAddress())
+            appendTableRow(caseRows, "Tatortbeschreibung", n.locationDescription)
+            appendTableRow(caseRows, "Geoposition", n.getGeoPositionFormatted())
+            appendTableRow(caseRows, "Verstoß", n.offense)
+            appendTableRowHtmlValue(caseRows, "Umstände", n.getCircumstancesHtml())
+            appendTableRow(caseRows, "HU-Fälligkeit", n.getInspectionMonthYear())
             // todo Prio 3: Wochentag einfügen, wegen Werktags-Beschränkungen
-            appendTableRow(caseRows,"Beobachtungszeit", n.getObservationTimeFormatted())
-            appendTableRow(caseRows,"Beobachtungsdauer", n.getDurationFormatted())
-            appendTableRow(caseRows,"Hinweis", n.note)
+            appendTableRow(caseRows, "Beobachtungszeit", n.getObservationTimeFormatted())
+            appendTableRow(caseRows, "Beobachtungsdauer", n.getDurationFormatted())
+            appendTableRow(caseRows, "Hinweis", n.note)
             val caseTableRows = caseRows.joinToString("\n")
 
             val witnessRows = mutableListOf<String>()
-            appendTableRow(witnessRows,"Name", w.getFullName())
-            appendTableRow(witnessRows,"Adresse", w.getAddress())
-            appendTableRow(witnessRows,"E-Mail", w.emailAddress)
-            appendTableRow(witnessRows,"Telefon", w.telephoneNumber)
+            appendTableRow(witnessRows, "Name", w.getFullName())
+            appendTableRow(witnessRows, "Adresse", w.getAddress())
+            appendTableRow(witnessRows, "E-Mail", w.emailAddress)
+            appendTableRow(witnessRows, "Telefon", w.telephoneNumber)
             val witnessTableRows = witnessRows.joinToString("\n")
 
             val attachmentsSection = if (n.photoEntities.isEmpty()) {

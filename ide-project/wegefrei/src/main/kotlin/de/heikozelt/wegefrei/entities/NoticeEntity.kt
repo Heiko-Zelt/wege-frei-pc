@@ -242,11 +242,29 @@ class NoticeEntity(
         longitude = position?.longitude
     }
 
+    /**
+     * perfect example: "Bahnhofstraße 1, 12345 Musterstadt"
+     * but street/zipCode and/or town maybe null
+     * (null, null, null) -> null
+     * ("Street 1", null, null) -> "Street 1"
+     * (null, "12345", null) -> "12345"
+     * (null, null, "Town") -> "Town"
+     * ("Street 1", null, "Town") -> "Street 1, Town"
+     * ("Street 1", "12345", null) -> "Street 1, 12345"
+     */
     fun getAddress(): String? {
         return if(street == null && zipCode == null && town == null ) {
             null
         } else {
-            "$street, $zipCode $town"
+            val list1 = mutableListOf<String>()
+            zipCode?.let { list1.add(it) }
+            town?.let { list1.add(it) }
+            val zipCodeAndTown = list1.joinToString(" ")
+            val list2 = mutableListOf<String>()
+            street?.let { list2.add(it) }
+            if(zipCodeAndTown.isNotBlank()) list2.add(zipCodeAndTown)
+            val address = list2.joinToString(", ")
+            address
         }
     }
 
