@@ -284,7 +284,7 @@ class NoticesOutbox(/*private val app: WegeFrei*/) : Outbox<Int> {
                   an ${w.emailAddress}.
                   Falls Sie nicht zuständig sein sollten, leiten Sie bitte meine Anzeige weiter und informieren Sie mich darüber.
                   Sie dürfen meine persönlichen Daten auch weiterleiten und diese für die Dauer des Verfahrens speichern.</p>
-                <p>Diese E-Mail wurde mit <a href="https://github.com/Heiko-Zelt/wege-frei-pc">Wege frei!</a> erstellt.</p>
+                <p>Diese E-Mail wurde mit <a href="https://heikozelt.de/wegefrei/">Wege frei!</a> erstellt.</p>
                 <p>Mit freundlichen Grüßen</p>
                 <p>${w.getFullName()}</p>
               </html>""".trimIndent()

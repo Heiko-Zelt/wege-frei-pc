@@ -151,6 +151,6 @@ class EmailUserAgent {
     }
 
     companion object {
-        const val MAIL_USER_AGENT = "Wege frei! https://github.com/Heiko-Zelt/wege-frei-pc"
+        const val MAIL_USER_AGENT = "Wege frei! https://heikozelt.de/wegefrei/"
     }
 }

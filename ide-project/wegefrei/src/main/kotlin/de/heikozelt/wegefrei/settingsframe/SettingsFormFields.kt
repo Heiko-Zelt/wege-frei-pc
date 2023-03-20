@@ -321,6 +321,6 @@ class SettingsFormFields() : JPanel() {
         const val TEST_MAIL_SUBJECT = "Wege frei! Test-E-Mail"
         const val TEST_DEFAULT_MAIL_FROM_NAME = "Wege frei!"
         const val TEST_MAIL_CONTENT =
-            "<html><h1>Dies ist ein Test</h1>\n<p>Diese E-Mail-Nachricht wurde automatisch von der Wege frei!-Anwendung generiert.</p></html>"
+            "<html><h1>Dies ist ein Test</h1>\n<p>Diese E-Mail-Nachricht wurde von der <a href=\"https://heikozelt.de/wegefrei/\">Wege frei!</a>-Anwendung gesendet.</p></html>"
     }
 }
