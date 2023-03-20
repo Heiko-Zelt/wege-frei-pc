@@ -3,7 +3,9 @@ package de.heikozelt.wegefrei.noticesframe
 import de.heikozelt.wegefrei.WegeFrei
 import de.heikozelt.wegefrei.entities.NoticeEntity
 import org.slf4j.LoggerFactory
+import java.awt.Desktop
 import java.awt.Dimension
+import java.net.URI
 import java.time.ZonedDateTime
 import javax.swing.*
 
@@ -41,7 +43,10 @@ class NoticesFrame(private val app: WegeFrei) : JFrame("Meldungen - Wege frei!")
         val settingsButton = JButton("Einstellungen")
         settingsButton.addActionListener{ app.openSettingsFrame() }
         val helpButton = JButton("Hilfe")
-        helpButton.addActionListener { log.debug("unhandled event") }
+        helpButton.addActionListener {
+            val desktop: Desktop? = Desktop.getDesktop()
+            desktop?.browse(HELP_URI)
+        }
 
         // layout:
         val lay = GroupLayout(contentPane)
@@ -126,5 +131,9 @@ class NoticesFrame(private val app: WegeFrei) : JFrame("Meldungen - Wege frei!")
 
     fun noticeDeleted(noticeEntity: NoticeEntity) {
         noticesTableModel.removeNotice(noticeEntity)
+    }
+
+    companion object {
+        val HELP_URI = URI("https://heikozelt.de/wegefrei")
     }
 }
