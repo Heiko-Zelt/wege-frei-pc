@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Wege frei!</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+  
+    <h1>Wege frei!</h1>
+    <p>Wege-frei! ist ein Programm für den PC/Mac/Raspberry Pi/Desktop/Laptop,
+      um Falschparker_innen zu melden.
+      Die Idee zu diesem Projekt basiert auf der Wegeheld-App und der Weg.li-Website.</p>
+    <p><img src="img/screenshot.png" alt="Screenshot mit Meldungen, Erfassungs-Formular, Fotos von Autos und Stadtplan"></p>
+      
+    <h2>Besonderheiten</h2>
+    <p>Alle Daten (Beweisfotos und Meldungen) werden auf dem eigenen PC gespeichert.
+      Der Versand erfolgt über das persönliche E-Mail-Postfach direkt an das zuständige Ordnungsamt.
+      Hierdurch ergibt sich ein Geschwindigkeitsvorteil
+      und im Sinne der Datensparsamkeit werden die Daten nicht durch zusätzliche Dienstleister verarbeitet.
+      Das Layout und Look & Feel ist flexibel an die Bedürfnisse der Anwender_in anpassbar.
+      Die einzelnen Komponeten wie Bildbetrachter, Karte, Eingabe-Formular, Adressbuch und E-Mail-Client
+      sind eng verzahnt und reagieren direkt ohne lange Verzögerung.</p>
+      
+    <h2>Typischer Ablauf</h2>
+    <ol>
+      <li>Falsch parkende Fahrzeuge fotografieren.
+        Es können mehrere Fotos mit Kfz-Kennzeichen, Verkehrszeichen,
+        HU- & Umwelt-Plakette, Anfang und Ende der Beoabachtung, etc... gemacht werden.</li>
+      <li>Fotos (z.B. via USB-Kabel) vom Smartphone in einen Ordner auf den PC kopieren.</li>
+      <li>Meldungen erfassen. Einige Daten wie Tat-Datum, -Uhrzeit, -Dauer und Adresse
+        werden automatisch im Formular eingetragen.
+        Kontrolle der Fotos durch integrierten Bildbetrachter und
+        Adresse des Tatorts durch integrierte Kartenanzeige.</li>
+      <li>Meldungen über den integrierten E-Mail-Client über den eigene E-Mail-Account
+        an das zuständige Ordnungsamt senden.</li>
+    </ol>    
+     
+    <h2>Downloads</h2>
+    <ul>
+      <li>Windows/x86-64:
+        <a href="download/WegeFrei-1.0.3.msi">WegeFrei-1.0.3.msi</a></li>
+      <li>Apple macOS/x86-64:
+        <a href="download/WegeFrei-1.0.3.pkg">WegeFrei-1.0.3.pkg</a></li>
+      <li>Ubuntu-Linux/x86-64:
+        <a href="download/wegefrei_1.0.3-1_amd64.deb">wegefrei_1.0.3-1_amd64.deb</a></li>
+      <li>Betriebssystem- & Prozessor-unabhängig. (Es wird zusätzlich Java 17 benötigt.)
+        <a href="download/wegefrei-1.0.3.jar">wegefrei-1.0.3.jar</a></li>
+    </ul>
+    <p>Smartphones und Tablets (Android, iOS & iPadOS) werden nicht unterstützt.</p>
+    
+    <h2>Installation</h2>
+    <p>Am einfachsten ist die Verwendung eines Software-Paketes,
+      abhängig vom Betriebssystem und Prozessor/CPU-Familie (.msi, .pkg oder .deb-Datei).
+      Dieses enthält eine Java 17 Runtime.</p>
+    <p>Sollte es (noch) kein Paket für Deine Plattform (Betriebssystem & CPU) geben,
+      dann schreibe mich bitte an oder verwende die plattformunabhängige .jar-Datei.
+      Zur Ausführung der .jar-Datei, welche Java Byte Code enthält,
+      wird zusätzlich eine Java Virtual Machine ab Version 17 benötigt.
+      z.B. <a href="https://docs.aws.amazon.com/corretto/latest/corretto-17-ug/downloads-list.html" target="_blank">Amazon Corretto</a>.
+      Start mit dem Kommando <code>java -jar wegefrei-1.0.3.jar</code>.</p>
+    
+    <h2>Deinstallation</h2>
+    <p>Die Software kann über den Betriebssystem-spezifischen Paket-Manager wieder deinstalliert werden.
+      Die Konfigurationsdatei <code>.wege_frei_v1_x_x.settings.json</code>
+      und die Datenbankdateien
+      <code>wege_frei_v1_x_x.mv.db</code> & <code>wege_frei_v1_x_x.trace.db</code>,
+      welche standardmäßig im Benutzer-Home-Verzeichnis liegen,
+      müssen manuell gelöscht werden.</p>
+      
+    <h2>Konfiguration</h2>
+    <p>Nach der Installation kannst du direkt Meldungen erfassen.
+      Bevor Du Meldungen an das Ordnungsamt übertragen kannst,
+      musst Du Deine Zeugen-Daten angeben.
+      Annonyme Anzeigen werden nicht akzeptiert.
+      Außerdem werden die Konfigurations-Daten eines Postausgangs-Servers (SMTP) benötigt.</p>  
+      <p><img src="img/screenshot_settings.png" alt="Screenshot mit Einstellungen"></p>
+    
+    <h2>Empfehlungen</h2>
+    <ol>
+      <li>Fotos verschlüsselt speichern,
+        z.B. mit <a href="https://veracrypt.fr/" target="_blank">VeraCrypt</a></li>
+      <li>Beim E-Mail-Versand TLS-Verschlüsselung verwenden</li>
+    </ol>
+    
+    <h2>Datenschutz</h2>
+    <p>Die Software verwendet Web-Services/APIs.
+      Bei der Benutzung wird Deine IP-Adresse daher an folgende Websites übermittelt:</p>
+    <ul>
+      <li>  
+        <a href="https://tile.openstreetmap.org/" target="_blank">https://tile.openstreetmap.org/</a>
+        für die Kartendartstellung (Download von Kachel-Bildern)</li>
+      <li>
+        <a href="https://nominatim.openstreetmap.org/" target="_blank">https://nominatim.openstreetmap.org/</a>
+        für die Suche nach Post-Anschrifts-Adressen von Tatort-Geo-Koordinaten</li>
+    </ul>
+    <p>Bei Nutzung des Internets wird Deine IP-Adresse
+      natürlich auch an den Internet-Zugangs-Provider übermittelt
+      und beim Versand von E-Mails an den E-Mail-Provider.</p>
+      
+    <h2>Impressum & Quellcode</h2>
+    <p>Heiko Zelt, Uhlandstraße 16, 65189 Wiesbaden, 01 57/30 62 60 35, hz (ät) heikozelt (punkt) de</p>
+    <p>Quellcode: <a href="https://github.com/Heiko-Zelt/wege-frei-pc" target="_blank">GitHub-Repo</a></p>
+  </body>
+</html>
