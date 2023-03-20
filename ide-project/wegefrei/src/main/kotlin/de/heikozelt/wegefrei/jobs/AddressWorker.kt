@@ -7,6 +7,7 @@ import org.jxmapviewer.viewer.GeoPosition
 import org.slf4j.LoggerFactory
 import java.net.HttpURLConnection
 import java.net.URL
+import java.util.*
 import javax.swing.SwingWorker
 
 /**
@@ -30,17 +31,17 @@ class AddressWorker(
      */
     override fun doInBackground(): NominatimResponse? {
         log.info("doInBackground()")
-        val lat = "%.8f".format(position.latitude)
-        val lon = "%.8f".format(position.longitude)
+        val lat = "%.7f".format(Locale.ENGLISH, position.latitude)
+        val lon = "%.7f".format(Locale.ENGLISH, position.longitude)
         val url =
             URL("https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=$lat&lon=$lon&email=hz@heikozelt.de")
         log.debug("url: $url")
         val connection = url.openConnection() as HttpURLConnection
         connection.connect()
-        println(connection.responseCode)
-        println(connection.getHeaderField("Content-Type"))
+        log.debug("HTTP response code: ${connection.responseCode}")
+        log.debug("Content-Type: ${connection.getHeaderField("Content-Type")}")
         val text = connection.inputStream.use { it.reader().use { reader -> reader.readText() } }
-        log.debug("text: $text")
+        log.debug("Response-Body: $text")
 
         try {
             nominatimResponse = Klaxon().parse<NominatimResponse>(text)
