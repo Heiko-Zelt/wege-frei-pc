@@ -1,6 +1,7 @@
 package de.heikozelt.wegefrei.noticeframe
 
 import de.heikozelt.wegefrei.DatabaseRepo
+import de.heikozelt.wegefrei.durationInMinutesFormatted
 import de.heikozelt.wegefrei.email.combobox.RecipientComboBox
 import de.heikozelt.wegefrei.entities.NoticeEntity
 import de.heikozelt.wegefrei.gui.*
@@ -60,8 +61,10 @@ class NoticeFormFields(
 
     //private var offenseComboBox = JComboBox(Offense.selectableOffenses())
     private val observationDateTextField = JTextField(10)
-    private val observationTimeTextField = TrimmingTextField(5)
-    private val durationTextField = JTextField(3)
+    private val observationTimeTextField = TrimmingTextField(8)
+    private val endDateTextField = JTextField(10)
+    private val endTimeTextField = TrimmingTextField(8)
+    private val calculatedDurationLabel = JLabel("")
     private val abandonedCheckBox = JCheckBox("Fahrzeug war verlassen")
     private val obstructionCheckBox = JCheckBox("mit Behinderung")
     private val endangeringCheckBox = JCheckBox("mit Gefährdung")
@@ -113,10 +116,13 @@ class NoticeFormFields(
         //offenseComboBox.renderer = OffenseListCellRenderer()
 
         val observationDateTimeLabel = JLabel("<html>Beobachtungsdatum<sup>*</sup>, Uhrzeit:<sup>*</sup></html>")
+
         val observationDateDoc = observationDateTextField.document
         if (observationDateDoc is AbstractDocument) {
             observationDateDoc.documentFilter = CharPredicateDocFilter.dateDocFilter
         }
+
+        val endDateTimeLabel = JLabel("Endedatum, Uhrzeit:")
 
         observationDateTextField.toolTipText = "z.B. 31.12.2021"
         observationDateTextField.inputVerifier = PatternVerifier.dateVerifier
@@ -124,14 +130,11 @@ class NoticeFormFields(
         if (observationTimeDoc is AbstractDocument) {
             observationTimeDoc.documentFilter = CharPredicateDocFilter.timeDocFilter
         }
-        observationTimeTextField.toolTipText = "z.B. 23:59"
+        observationTimeTextField.toolTipText = "z.B. 23:59:59"
         observationTimeTextField.inputVerifier = PatternVerifier.timeVerifier
-        val durationLabel = JLabel("<html>Beobachtungs-Dauer (in Minuten):<sup>*</sup></html>")
-        val durationDoc = durationTextField.document
-        if (durationDoc is AbstractDocument) {
-            durationDoc.documentFilter = CharPredicateDocFilter.onlyDigitsDocFilter
-        }
-        durationTextField.toolTipText = "Ganzzahl"
+
+        val durationLabel = JLabel("Dauer:")
+        durationLabel.toolTipText = "abgerundet"
         vehicleInspectionStickerCheckBox.addChangeListener {
             val src = it.source as JCheckBox
             inspectionMonthYearLabel.isVisible = src.isSelected
@@ -161,7 +164,6 @@ class NoticeFormFields(
         val noteLabel = JLabel("Hinweis:")
         noteTextArea.toolTipText = "z.B. Behinderung / Gefährdung beschreiben"
 
-
         // layout
         val lay = GroupLayout(this)
         lay.autoCreateGaps = true
@@ -182,6 +184,7 @@ class NoticeFormFields(
                                 .addComponent(locationDescriptionLabel)
                                 .addComponent(offenseLabel)
                                 .addComponent(observationDateTimeLabel)
+                                .addComponent(endDateTimeLabel)
                                 .addComponent(durationLabel)
                                 .addComponent(recipientLabel)
                                 .addComponent(inspectionMonthYearLabel)
@@ -213,7 +216,12 @@ class NoticeFormFields(
                                         .addComponent(observationDateTextField)
                                         .addComponent(observationTimeTextField)
                                 )
-                                .addComponent(durationTextField)
+                                .addGroup(
+                                    lay.createSequentialGroup()
+                                        .addComponent(endDateTextField)
+                                        .addComponent(endTimeTextField)
+                                )
+                                .addComponent(calculatedDurationLabel)
                                 .addGroup(
                                     lay.createSequentialGroup()
                                         .addComponent(inspectionMonthTextField)
@@ -283,7 +291,12 @@ class NoticeFormFields(
                 )
                 .addGroup(
                     lay.createParallelGroup(GroupLayout.Alignment.CENTER)
-                        .addComponent(durationLabel).addComponent(durationTextField)
+                        .addComponent(endDateTimeLabel).addComponent(endDateTextField)
+                        .addComponent(endTimeTextField)
+                )
+                .addGroup(
+                    lay.createParallelGroup(GroupLayout.Alignment.CENTER)
+                        .addComponent(durationLabel).addComponent(calculatedDurationLabel)
                 )
                 .addGroup(
                     lay.createParallelGroup(GroupLayout.Alignment.CENTER)
@@ -317,7 +330,8 @@ class NoticeFormFields(
         Styles.restrictSize(zipCodeTextField)
         Styles.restrictSize(observationDateTextField)
         Styles.restrictSize(observationTimeTextField)
-        Styles.restrictSize(durationTextField)
+        Styles.restrictSize(endDateTextField)
+        Styles.restrictSize(endTimeTextField)
         Styles.restrictSize(inspectionYearTextField)
         Styles.restrictSize(inspectionMonthTextField)
 
@@ -345,7 +359,9 @@ class NoticeFormFields(
         offenseComboBox.setValue(noticeEntity.offense)
         observationDateTextField.text = blankOrDateString(noticeEntity.observationTime)
         observationTimeTextField.text = blankOrTimeString(noticeEntity.observationTime)
-        durationTextField.text = blankOrIntString(noticeEntity.duration)
+        endDateTextField.text = blankOrDateString(noticeEntity.endTime)
+        endTimeTextField.text = blankOrTimeString(noticeEntity.endTime)
+        calculatedDurationLabel.text = noticeEntity.getDurationFormatted()
         obstructionCheckBox.isSelected = noticeEntity.obstruction
         endangeringCheckBox.isSelected = noticeEntity.endangering
         environmentalStickerCheckBox.isSelected = noticeEntity.environmentalStickerMissing
@@ -371,6 +387,7 @@ class NoticeFormFields(
      * Es wird nicht geprüft, ob Pflichtfelder ausgefüllt sind,
      * sondern nur ob ausgefüllte Felder im Format korrekt sind/geparst werden können/auf Datenbankfelder abgebildet werden können.
      * @return Liste mit Validierungsfehlern oder leere Liste, wenn Felder leer oder korrekt ausgefüllt sind.
+     * todo Prio 1: endTime wird falsch gespeichert
      */
     fun validateAndMap(n: NoticeEntity): List<String> {
         // Normalerweise sollte vorher setNotice() aufgerufen worden sein.
@@ -410,32 +427,66 @@ class NoticeFormFields(
             errors.add("Beobachtungsdatum angegeben, aber keine Uhrzeit.")
         }
         if(obsTimeTxt.isNotBlank() && obsDateTxt.isBlank()) {
-            errors.add("Uhrzeit angegeben, aber kein Beobachtungsdatum.")
+            errors.add("Beobachtungsuhrzeit angegeben, aber kein Datum.")
         }
-        var dat: LocalDate? = null
+        var obsDat: LocalDate? = null
         if(obsDateTxt.isNotBlank()) {
             try {
-                dat = LocalDate.parse(obsDateTxt, format)
+                obsDat = LocalDate.parse(obsDateTxt, format)
             } catch (ex: DateTimeParseException) {
                 errors.add("Beobachtungsdatum muss im Format Tag.Monat.Jahr angegeben sein.")
             }
         }
-        var tim: LocalTime? = null
+        var obsTim: LocalTime? = null
         if(obsTimeTxt.isNotBlank()) {
             try {
-                val tFormat = DateTimeFormatter.ofPattern("H:m")
-                tim = LocalTime.parse(obsTimeTxt, tFormat)
+                val tFormat = DateTimeFormatter.ofPattern("H:m:s")
+                obsTim = LocalTime.parse(obsTimeTxt, tFormat)
             } catch (ex: DateTimeParseException) {
-                errors.add("Uhrzeit muss im Format Stunde:Minute angegeben sein.")
+                errors.add("Uhrzeit muss im Format Stunde:Minute:Sekunden angegeben sein.")
             }
         }
-        n.observationTime = if(dat == null || tim == null) {
+        n.observationTime = if(obsDat == null || obsTim == null) {
             null
         } else {
-            ZonedDateTime.of(dat, tim, ZoneId.systemDefault())
+            ZonedDateTime.of(obsDat, obsTim, ZoneId.systemDefault())
         }
 
-        n.duration = intOrNull(durationTextField.text)
+        var endDateTxt = endDateTextField.text
+        val endTimeTxt = endTimeTextField.text
+        if(endTimeTxt.isBlank() && endDateTxt.isNotBlank()) {
+            errors.add("Enddatum angegeben, aber keine Uhrzeit.")
+        }
+        log.debug("endTimeTxt: $endTimeTxt")
+        if(endTimeTxt.isNotBlank() && endDateTxt.isBlank()) {
+            endDateTxt = obsTimeTxt
+        }
+        var endDat: LocalDate? = null
+        if(endDateTxt.isNotBlank()) {
+            try {
+                endDat = LocalDate.parse(endDateTxt, format)
+            } catch (ex: DateTimeParseException) {
+                errors.add("Enddatum muss im Format Tag.Monat.Jahr angegeben sein.")
+            }
+        }
+        var endTim: LocalTime? = null
+        if(endTimeTxt.isNotBlank()) {
+            try {
+                val tFormat = DateTimeFormatter.ofPattern("H:m:s")
+                endTim = LocalTime.parse(endTimeTxt, tFormat)
+            } catch (ex: DateTimeParseException) {
+                errors.add("Enduhrzeit muss im Format Stunde:Minute:Sekunden angegeben sein.")
+            }
+        }
+        n.endTime = if(endDat == null || endTim == null) {
+            null
+        } else {
+            ZonedDateTime.of(endDat, endTim, ZoneId.systemDefault())
+        }
+        log.debug("observationTime: ${n.observationTime}")
+        log.debug("endTime: ${n.endTime}")
+
+        //n.duration = intOrNull(durationTextField.text)
         n.obstruction = obstructionCheckBox.isSelected
         n.endangering = endangeringCheckBox.isSelected
         n.environmentalStickerMissing = environmentalStickerCheckBox.isSelected
@@ -500,7 +551,7 @@ class NoticeFormFields(
         offenseComboBox.isEnabled = enab
         observationDateTextField.isEnabled = enab
         observationTimeTextField.isEnabled = enab
-        durationTextField.isEnabled = enab
+        //durationTextField.isEnabled = enab
         obstructionCheckBox.isEnabled = enab
         endangeringCheckBox.isEnabled = enab
         environmentalStickerCheckBox.isEnabled = enab
@@ -535,7 +586,11 @@ class NoticeFormFields(
         val newStartTime = selectedPhotosListModel.getStartTime()
         observationDateTextField.text = blankOrDateString(newStartTime)
         observationTimeTextField.text = blankOrTimeString(newStartTime)
-        durationTextField.text = blankOrIntString(selectedPhotosListModel.getDuration())
+        val newEndTime = selectedPhotosListModel.getEndTime()
+        endDateTextField.text = blankOrDateString(newEndTime)
+        endTimeTextField.text = blankOrTimeString(newEndTime)
+        // todo Prio 1: format in minutes
+        calculatedDurationLabel.text = durationInMinutesFormatted(selectedPhotosListModel.getStartTime(), selectedPhotosListModel.getEndTime())
     }
 
     companion object {
@@ -626,7 +681,7 @@ class NoticeFormFields(
             return if (zdt == null) {
                 ""
             } else {
-                val fmt = DateTimeFormatter.ofPattern("HH:mm")
+                val fmt = DateTimeFormatter.ofPattern("HH:mm:ss")
                 fmt.format(zdt)
             }
         }

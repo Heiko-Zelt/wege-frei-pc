@@ -1,8 +1,11 @@
 package de.heikozelt.wegefrei.entities
 
+import de.heikozelt.wegefrei.durationInMinutes
+import de.heikozelt.wegefrei.durationInMinutesFormatted
 import de.heikozelt.wegefrei.email.EmailAddressEntity
 import de.heikozelt.wegefrei.hex
 import de.heikozelt.wegefrei.model.CountrySymbol
+import de.heikozelt.wegefrei.model.GeoPositionFormatter
 import de.heikozelt.wegefrei.model.NoticeState
 import jakarta.persistence.*
 import org.jxmapviewer.viewer.GeoPosition
@@ -10,6 +13,7 @@ import org.slf4j.Logger
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
+
 
 @Entity
 @Table(name = "NOTICES")
@@ -24,13 +28,26 @@ class NoticeEntity(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Int? = null,
 
-    // todo: Prio 3: entscheiden ob UTC oder CET/CEST? Wie ist es in den Photo-Meta-Daten gespeichert?
-    // TIMESTAMP WITH TIME ZONE
+    /**
+     * Die Beobachtungszeit muss nicht mit der Tatzeit identisch sein.
+     * Das Fahrzeug kann vorher schon falsch gehalten/geparkt haben und/oder nachher immer noch.
+     * Amtlich/juristisch wird es trotzdem "Tatzeit" genannt.
+     * Angabe in Sekunden, damit bei der Berechnung der Dauer keine Rundungsfehler auftreten.
+     * TIMESTAMP WITH TIME ZONE
+     * todo: Prio 3: entscheiden ob UTC oder CET/CEST? Wie ist es in den Photo-Meta-Daten gespeichert?
+     */
     @Column
     var observationTime: ZonedDateTime? = null,
 
+    /**
+     * Tat/Beobachtungs-zeit-Ende
+     */
+    @Column
+    var endTime: ZonedDateTime? = null,
+
     var sentTime: ZonedDateTime? = null,
 
+    // todo Prio 1: Bug: Caused by: org.h2.jdbc.JdbcSQLDataException: Wert zu groß / lang für Feld "COUNTRYSYMBOL CHARACTER VARYING(3)": "'deutschland' (11)"
     @Column(length = 3)
     var countrySymbol: String? = null,
 
@@ -79,8 +96,11 @@ class NoticeEntity(
     @Column
     var locationDescription: String? = null,
 
+    /*
+    wird berechnet
     @Column
     var duration: Int? = null,
+     */
 
     /**
      * Ordnungswidrigkeit/Verstoß
@@ -179,6 +199,14 @@ class NoticeEntity(
     @Column
     var createdTime: ZonedDateTime? = null
 
+    /**
+     * Dauer in Minuten = Differenz Ende und Anfang des beobachteten Falschparkens.
+     * Es wird immer abgerundet. Beispiel: 59 Sekunden = 0 Minuten
+     */
+    fun getDuration(): Int {
+        return durationInMinutes(observationTime, endTime)
+    }
+
     fun getCreatedTimeFormatted(): String {
         val d = createdTime
         return if (d == null) {
@@ -202,8 +230,8 @@ class NoticeEntity(
     }
 
     /**
-     * Die Beobachtungszeit muss nicht mit der Tatzeit identisch sein.
-     * Das Fahrzeug kann vorher schon falsch gehalten/geparkt haben und/oder nachher immer noch.
+     * Beispiel: "31.12.2021, 12:58 MEZ" (Mitteleuropäische Zeit)
+     * nicht "CET" (Central European Time)
      */
     fun getObservationTimeFormatted(): String {
         val d = observationTime
@@ -227,14 +255,11 @@ class NoticeEntity(
         }
     }
 
+    /**
+     * GeoPosition(lat, lon).toString() -> [50.12341234, 8.12341234]
+     */
     fun getGeoPositionFormatted(): String? {
-        return if (latitude != null && longitude != null) {
-            val lat = "%.5f".format(latitude)
-            val lon = "%.5f".format(longitude)
-            "$lat, $lon"
-        } else {
-            null
-        }
+        return GeoPositionFormatter.format(latitude, longitude)
     }
 
     fun setGeoPosition(position: GeoPosition?) {
@@ -268,14 +293,8 @@ class NoticeEntity(
         }
     }
 
-    fun getDurationFormatted(): String? {
-        return duration?.let {
-            when(it) {
-                0 -> "weniger als 1 Minute"
-                1 -> "1 Minute"
-                else -> "${duration?.toString()} Minuten"
-            }
-        }
+    fun getDurationFormatted(): String {
+        return durationInMinutesFormatted(observationTime, endTime)
     }
 
     fun getCountryFormatted(): String? {
@@ -402,7 +421,10 @@ class NoticeEntity(
     }
 
     companion object {
-        val dateTimeFormat: DateTimeFormatter? = DateTimeFormatter.ofPattern("dd.MM.yyyy, HH:mm z")
+        /**
+         * Beispiel: "31.12.2021, 12:58 MEZ" (Mitteleuropäische Zeit), nicht "CET" (Central European Time)
+         */
+        val dateTimeFormat: DateTimeFormatter? = DateTimeFormatter.ofPattern("dd.MM.yyyy, HH:mm z", Locale.GERMAN)
 
         fun createdNow(): NoticeEntity {
             val n = NoticeEntity()

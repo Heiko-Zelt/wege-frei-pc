@@ -258,19 +258,15 @@ class NoticesOutbox(/*private val app: WegeFrei*/) : Outbox<Int> {
               <html>
                 <p>Sehr geehrte Damen und Herren,</p>
                 <p>hiermit zeige ich, mit der Bitte um Weiterverfolgung, folgende Verkehrsordnungswidrigkeit an:</p>
-                
                 <h1>Falldaten</h1>
                 <table>
                 $caseTableRows
                 </table>
-                
                 <h1>Zeuge</h1>
                 <table>
                 $witnessTableRows
                 </table>
-                
                 $attachmentsSection
-                  
                 <h1>Erklärung</h1>
                 <p>Hiermit bestätige ich, dass ich die Datenschutzerklärung zur Kenntnis genommen habe und ihr zustimme.
                   Meine oben gemachten Angaben einschließlich meiner Personalien sind zutreffend und vollständig.

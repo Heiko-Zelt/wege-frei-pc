@@ -20,6 +20,8 @@ import javax.swing.*
  *   <li>loadData()-Methode läd die GUI (nur die Tabelle) mit Daten.
  *       Das kann etwas länger dauern und läuft in einem Hintergrund-Thread.</li>
  * </ol>
+ * todo Prio 3: Bug: nach Löschen einer Meldung, wird im Foto Browser weiterhin die Meldungs-Nummer angezeigt
+ * todo Prio 2: Bug: Falls eine Meldung nicht gespeichert werden kann und eine SQL-Exception auftritt, dann sollte ein Fehlermeldungs-Popup angezeigt werden.
  */
 class NoticesFrame(private val app: WegeFrei) : JFrame("Meldungen - Wege frei!") {
 

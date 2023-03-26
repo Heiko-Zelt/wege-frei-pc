@@ -106,13 +106,7 @@ class PhotoFile(
     }
 
     fun getGeoPositionFormatted(): String? {
-        return if (latitude != null && longitude != null) {
-            val lat = "%.5f".format(latitude)
-            val lon = "%.5f".format(longitude)
-            "$lat, $lon"
-        } else {
-            null
-        }
+        return GeoPositionFormatter.format(latitude, longitude)
     }
 
     fun getHashHex(): String? {

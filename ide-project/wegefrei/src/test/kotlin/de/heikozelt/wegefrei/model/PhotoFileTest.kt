@@ -35,8 +35,7 @@ class PhotoFileTest {
         assertEquals(18, dateTime?.hour)
         assertEquals(24, dateTime?.minute)
         assertEquals(57, dateTime?.second)
-        assertEquals("50.07046", "%.5f".format(photoFile?.latitude))
-        assertEquals("8.24489", "%.5f".format(photoFile?.longitude))
+        assertEquals("50.07046° N 008.24489° E WGS 84", photoFile?.getGeoPositionFormatted())
         val img = photoFile?.image
         assertNotNull(img)
         // todo Bug: 90 Grad gedreht

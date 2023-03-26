@@ -80,7 +80,7 @@ class NoticesOutboxTest {
                 </tr>
                 <tr>
                   <td>Beobachtungszeit:</td>
-                  <td>01.01.2022, 12:01 CET</td>
+                  <td>01.01.2022, 12:01 MEZ</td>
                 </tr>
               </tbody>
             </table>
@@ -105,6 +105,7 @@ class NoticesOutboxTest {
             <p>Hiermit bestätige ich, dass ich die Datenschutzerklärung zur Kenntnis genommen habe und ihr zustimme. Meine oben gemachten Angaben einschließlich meiner Personalien sind zutreffend und vollständig. Als Zeuge bin ich zur wahrheitsgemäßen Aussage und auch zu einem möglichen Erscheinen vor Gericht verpflichtet. Vorsätzlich falsche Angaben zu angeblichen Ordnungswidrigkeiten können eine Straftat darstellen. Ich weiß, dass mir die Kosten des Verfahrens und die Auslagen des Betroffenen auferlegt werden, wenn ich vorsätzlich oder leichtfertig eine unwahre Anzeige erstatte.</p>
             <p>Beweisfotos, aus denen Kennzeichen und Tatvorwurf erkennbar hervorgehen, befinden sich im Anhang. Bitte prüfen Sie den Sachverhalt auch auf etwaige andere Verstöße, die aus den Beweisfotos zu ersehen sind.</p>
             <p>Bitte bestätigen Sie Ihre Zuständigkeit und den Erhalt dieser Anzeige mit der Zusendung des Aktenzeichens an hz@heikozelt.de. Falls Sie nicht zuständig sein sollten, leiten Sie bitte meine Anzeige weiter und informieren Sie mich darüber. Sie dürfen meine persönlichen Daten auch weiterleiten und diese für die Dauer des Verfahrens speichern.</p>
+            <p>Diese E-Mail wurde mit <a href="https://heikozelt.de/wegefrei/">Wege frei!</a> erstellt.</p>
             <p>Mit freundlichen Grüßen</p>
             <p>Heiko Zelt</p>
           </body>

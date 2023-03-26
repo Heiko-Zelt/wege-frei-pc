@@ -1,3 +1,16 @@
+# Move photos to other folder
+
+example: from home directory to USB stick
+
+select regexp_replace(path, '^/home/heiko/Bilder/falschparker', '/media/heiko/Paradies64/Falschparker') from photos;
+
+alter table notices_photos drop constraint fk_photo_path;
+
+update photos set path = regexp_replace(path, '^/home/heiko/Bilder/falschparker', '/media/heiko/Paradies64/Falschparker');
+
+update notices_photos set photo_path = regexp_replace(photo_path, '^/home/heiko/Bilder/falschparker', '/media/heiko/Paradies64/Falschparker');
+
+
 # Migration to version 1.0.3: (new feature: sending email messages in background)
 
 ```
@@ -10,3 +23,5 @@ alter table public.notices add column messageid binary varying(255);
 alter table public.notices add column sendfailures integer;
 update public.notices set sendfailures = 0 where sendfailures is null;
 ```
+
+# Migration to version 1.0.4: (new feature: observation time with seconds precision, add end time, calculate duration)

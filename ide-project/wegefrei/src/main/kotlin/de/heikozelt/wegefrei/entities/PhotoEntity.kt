@@ -5,6 +5,7 @@ import com.drew.lang.GeoLocation
 import com.drew.metadata.exif.ExifSubIFDDirectory
 import com.drew.metadata.exif.GpsDirectory
 import de.heikozelt.wegefrei.hex
+import de.heikozelt.wegefrei.model.GeoPositionFormatter
 import jakarta.persistence.*
 import org.jxmapviewer.viewer.GeoPosition
 import org.slf4j.LoggerFactory
@@ -117,13 +118,7 @@ class PhotoEntity(
     }
 
     fun getGeoPositionFormatted(): String? {
-        return if (latitude != null && longitude != null) {
-            val lat = "%.5f".format(latitude)
-            val lon = "%.5f".format(longitude)
-            "$lat, $lon"
-        } else {
-            null
-        }
+        return GeoPositionFormatter.format(latitude, longitude)
     }
 
     fun getHashHex(): String? {
