@@ -1,8 +1,6 @@
 package de.heikozelt.wegefrei.entities
 
-import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -25,11 +23,11 @@ class NoticeEntityTest {
             assertNull(observationTime)
             assertNull(endTime)
             assertEquals(0,getDuration())
-            Assertions.assertFalse(environmentalStickerMissing)
-            Assertions.assertFalse(vehicleInspectionExpired)
+            assertFalse(environmentalStickerMissing)
+            assertFalse(vehicleInspectionExpired)
             assertNull(vehicleInspectionYear)
             assertNull(vehicleInspectionMonth)
-            Assertions.assertFalse(vehicleAbandoned)
+            assertFalse(vehicleAbandoned)
             assertEquals(0, photoEntities.size)
             assertEquals("", getCreatedTimeFormatted())
         }
@@ -62,11 +60,13 @@ class NoticeEntityTest {
             "WI JA 233",
             "Honda",
             "rot",
+            "Pkw",
             50.123,
             8.123,
             "Wilhelmstraße 13",
             "65193",
             "Wiesbaden",
+            "Altstadt-Nord",
             "gegenüber Bäcker",
             "Öl läuft aus",
             true,
@@ -77,6 +77,7 @@ class NoticeEntityTest {
             2010,
             12,
             false,
+            'F',
             "verwarngeldstelle@notice-j-unit-test.de",
             "Verwarngeldstelle J-Unit-Test",
             photoEntities
@@ -87,19 +88,22 @@ class NoticeEntityTest {
             assertEquals("WI JA 233", licensePlate)
             assertEquals("Honda",vehicleMake)
             assertEquals("rot", color)
+            assertEquals("Pkw", vehicleType)
             assertEquals(50.123, latitude)
             assertEquals(8.123, longitude)
             assertEquals("Wilhelmstraße 13", street)
             assertEquals("65193", zipCode)
             assertEquals("Wiesbaden", town)
+            assertEquals("Altstadt-Nord", quarter)
             assertEquals(photoTime1, observationTime)
             assertEquals(photoTime2, endTime)
             assertEquals(3, getDuration())
-            Assertions.assertFalse(environmentalStickerMissing)
-            Assertions.assertTrue(vehicleInspectionExpired)
+            assertFalse(environmentalStickerMissing)
+            assertTrue(vehicleInspectionExpired)
             assertEquals(2010, vehicleInspectionYear)
             assertEquals(12, vehicleInspectionMonth)
-            Assertions.assertTrue(vehicleAbandoned)
+            assertTrue(vehicleAbandoned)
+            assertEquals('F', deliveryType)
             assertEquals("verwarngeldstelle@notice-j-unit-test.de", recipientEmailAddress)
             assertEquals(2, photoEntities.size)
         }

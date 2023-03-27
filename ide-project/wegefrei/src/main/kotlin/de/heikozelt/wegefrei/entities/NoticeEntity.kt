@@ -60,6 +60,9 @@ class NoticeEntity(
     @Column
     var color: String? = null,
 
+    @Column
+    var vehicleType: String? = null,
+
     /**
      * Breitengrad des Adress-Markers.
      * Y-Achse, Richtung Norden, , z.B. 50.08 für Wiesbaden.
@@ -84,6 +87,9 @@ class NoticeEntity(
 
     @Column
     var town: String? = null,
+
+    @Column
+    var quarter: String? = null,
 
     /**
      * Beispiele:
@@ -157,6 +163,12 @@ class NoticeEntity(
      */
     @Column
     var environmentalStickerMissing: Boolean = false,
+
+    /**
+     * Zustellart: E = E-Mail (Default), F = Web-Formular
+     */
+    @Column
+    var deliveryType: Char = 'E',
 
     @Column
     var recipientEmailAddress: String? = null,

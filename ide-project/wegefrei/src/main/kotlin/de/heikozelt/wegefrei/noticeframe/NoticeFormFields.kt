@@ -52,11 +52,15 @@ class NoticeFormFields(
     //private val vehicleMakeComboBox = JComboBox(ListVehicleMakes.VEHICLE_MAKES)
     private val vehicleMakeComboBox = VehicleMakeComboBox()
     private val colorComboBox = JComboBox(VehicleColor.COLORS)
+    private val vehicleTypes = arrayOf("", "Pkw", "Lkw", "Lkw mit Anhänger", "Motorrad", "Bus", "Anhänger ohne Zugfahrzeug", "Sonstiges" )
+    private val vehicleTypeComboBox = JComboBox(vehicleTypes)
     private val miniMap = MiniMap(noticeFrame, selectedPhotosListModel, tileFactory)
     private var streetTextField = TrimmingTextField(30)
     private var zipCodeTextField = TrimmingTextField(5)
     private var townTextField = TrimmingTextField(30)
     private var locationDescriptionTextField = TrimmingTextField(40)
+    private var quarterTextField = TrimmingTextField(30)
+
     private var offenseComboBox = OffenseComboBox()
 
     //private var offenseComboBox = JComboBox(Offense.selectableOffenses())
@@ -75,6 +79,10 @@ class NoticeFormFields(
     private val inspectionMonthTextField = JTextField(2)
     private val monthYearSeparatorLabel = JLabel("/")
     private val inspectionYearTextField = JTextField(4)
+
+    private val emailDeliveryRadioButton = JRadioButton("E-Mail")
+    private val webFormDeliveryRadioButton = JRadioButton("Web-Formular")
+    private val deliveryTypeGroup = ButtonGroup()
 
     // Idealfall: Addresse wird automatisch eingetragen, Ausnahmefall Benutzer wählt aus Adressbuch
     // todo Prio 3: Auswahl des Empfängers aus Addressbuch (Button öffnet "AddressChooser")
@@ -96,7 +104,7 @@ class NoticeFormFields(
         }
         val vehicleMakeLabel = JLabel("Fahrzeugmarke & Farbe:")
         //vehicleMakeComboBox.isEditable = true
-
+        val vehicleTypeLabel = JLabel("Fahrzeugart:")
 
         colorComboBox.renderer = ColorListCellRenderer()
         colorComboBox.maximumRowCount = VehicleColor.COLORS.size
@@ -106,6 +114,8 @@ class NoticeFormFields(
         streetTextField.toolTipText = "z.B. Taunusstraße 7"
         val zipCodeTownLabel = JLabel("<html>PLZ:<sup>(*)</sup>, Ort:<sup>(*)</sup></html>")
         zipCodeTextField.toolTipText = "z.B. 65183"
+        val quarterLabel = JLabel("<html>Stadtteil:<sup>(*)</sup></html>")
+        zipCodeTextField.toolTipText = "z.B. Altstadt-Nord"
         val locationDescriptionLabel = JLabel("<html>Tatort <sup>(*):</sup></html>")
         townTextField.toolTipText = "z.B. Wiesbaden"
         locationDescriptionTextField.toolTipText = "z.B. Bushaltestelle Kochbrunnen"
@@ -158,6 +168,10 @@ class NoticeFormFields(
         inspectionYearTextField.inputVerifier = PatternVerifier.inspectionYearVerifier
         inspectionYearTextField.isVisible = false
 
+        val deliveryTypeLabel = JLabel("<html>Zustellung:<sup>*</sup></html>")
+        deliveryTypeGroup.add(emailDeliveryRadioButton)
+        deliveryTypeGroup.add(webFormDeliveryRadioButton)
+
         val recipientLabel = JLabel("<html>Empfänger:<sup>*</sup></html>")
         recipientComboBox.toolTipText = "z.B. verwarngeldstelle@wiesbaden.de"
         recipientComboBox.inputVerifier = PatternVerifier.eMailVerifier
@@ -178,14 +192,17 @@ class NoticeFormFields(
                             lay.createParallelGroup(GroupLayout.Alignment.LEADING)
                                 .addComponent(licensePlateLabel)
                                 .addComponent(vehicleMakeLabel)
+                                .addComponent(vehicleTypeLabel)
                                 .addComponent(coordinatesLabel)
                                 .addComponent(streetLabel)
                                 .addComponent(zipCodeTownLabel)
+                                .addComponent(quarterLabel)
                                 .addComponent(locationDescriptionLabel)
                                 .addComponent(offenseLabel)
                                 .addComponent(observationDateTimeLabel)
                                 .addComponent(endDateTimeLabel)
                                 .addComponent(durationLabel)
+                                .addComponent(deliveryTypeLabel)
                                 .addComponent(recipientLabel)
                                 .addComponent(inspectionMonthYearLabel)
                                 .addComponent(noteLabel)
@@ -202,6 +219,7 @@ class NoticeFormFields(
                                         .addComponent(vehicleMakeComboBox)
                                         .addComponent(colorComboBox)
                                 )
+                                .addComponent(vehicleTypeComboBox)
                                 .addComponent(miniMap)
                                 .addComponent(streetTextField)
                                 .addGroup(
@@ -210,6 +228,7 @@ class NoticeFormFields(
                                         .addComponent(townTextField)
                                 )
                                 .addComponent(locationDescriptionTextField)
+                                .addComponent(quarterTextField)
                                 .addComponent(offenseComboBox)
                                 .addGroup(
                                     lay.createSequentialGroup()
@@ -227,6 +246,11 @@ class NoticeFormFields(
                                         .addComponent(inspectionMonthTextField)
                                         .addComponent(monthYearSeparatorLabel)
                                         .addComponent(inspectionYearTextField)
+                                )
+                                .addGroup(
+                                    lay.createSequentialGroup()
+                                        .addComponent(emailDeliveryRadioButton)
+                                        .addComponent(webFormDeliveryRadioButton)
                                 )
                                 .addComponent(recipientComboBox)
                                 .addComponent(noteTextArea)
@@ -266,6 +290,10 @@ class NoticeFormFields(
                 )
                 .addGroup(
                     lay.createParallelGroup(GroupLayout.Alignment.CENTER)
+                        .addComponent(vehicleTypeLabel).addComponent(vehicleTypeComboBox)
+                )
+                .addGroup(
+                    lay.createParallelGroup(GroupLayout.Alignment.CENTER)
                         .addComponent(coordinatesLabel).addComponent(miniMap)
                 )
                 .addGroup(
@@ -275,6 +303,10 @@ class NoticeFormFields(
                 .addGroup(
                     lay.createParallelGroup(GroupLayout.Alignment.CENTER)
                         .addComponent(zipCodeTownLabel).addComponent(zipCodeTextField).addComponent(townTextField)
+                )
+                .addGroup(
+                    lay.createParallelGroup(GroupLayout.Alignment.CENTER)
+                        .addComponent(quarterLabel).addComponent(quarterTextField)
                 )
                 .addGroup(
                     lay.createParallelGroup(GroupLayout.Alignment.CENTER)
@@ -312,6 +344,10 @@ class NoticeFormFields(
                     lay.createParallelGroup(GroupLayout.Alignment.CENTER)
                         .addComponent(inspectionMonthYearLabel).addComponent(inspectionMonthTextField)
                         .addComponent(monthYearSeparatorLabel).addComponent(inspectionYearTextField)
+                )
+                .addGroup(
+                    lay.createParallelGroup(GroupLayout.Alignment.CENTER)
+                        .addComponent(deliveryTypeLabel).addComponent(emailDeliveryRadioButton).addComponent(webFormDeliveryRadioButton)
                 )
                 .addGroup(
                     lay.createParallelGroup(GroupLayout.Alignment.CENTER)
