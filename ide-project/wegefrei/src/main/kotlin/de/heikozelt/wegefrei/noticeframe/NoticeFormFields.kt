@@ -391,6 +391,7 @@ class NoticeFormFields(
         streetTextField.text = noticeEntity.street
         zipCodeTextField.text = noticeEntity.zipCode
         townTextField.text = noticeEntity.town
+        quarterTextField.text = noticeEntity.quarter
         locationDescriptionTextField.text = noticeEntity.locationDescription
         offenseComboBox.setValue(noticeEntity.offense)
         observationDateTextField.text = blankOrDateString(noticeEntity.observationTime)
@@ -409,6 +410,8 @@ class NoticeFormFields(
         inspectionMonthTextField.text = blankOrByteString(noticeEntity.vehicleInspectionMonth)
         abandonedCheckBox.isSelected = noticeEntity.vehicleAbandoned
         warningLightsCheckBox.isSelected = noticeEntity.warningLights
+        emailDeliveryRadioButton.isSelected = noticeEntity.deliveryType == 'E'
+        webFormDeliveryRadioButton.isSelected = noticeEntity.deliveryType == 'F'
         recipientComboBox.loadData()
         recipientComboBox.setValue(noticeEntity.getRecipient())
         noteTextArea.text = noticeEntity.note
@@ -447,6 +450,7 @@ class NoticeFormFields(
         n.street = trimmedOrNull(streetTextField.text)
         n.zipCode = trimmedOrNull(zipCodeTextField.text)
         n.town = trimmedOrNull(townTextField.text)
+        n.quarter = trimmedOrNull(quarterTextField.text)
         n.locationDescription = trimmedOrNull(locationDescriptionTextField.text)
         n.offense = offenseComboBox.getValue()
 
@@ -537,6 +541,14 @@ class NoticeFormFields(
         }
         n.vehicleAbandoned = abandonedCheckBox.isSelected
         n.warningLights = warningLightsCheckBox.isSelected
+
+        n.deliveryType = if (emailDeliveryRadioButton.isSelected) {
+            'E'
+        } else if (webFormDeliveryRadioButton.isSelected) {
+            'F'
+        } else {
+            null // ein Radio-Button ist immer ausgewählt. Keine Angabe unmöglich.
+        }
 
         val recipient = recipientComboBox.getValue()
         n.recipientEmailAddress = recipient?.address

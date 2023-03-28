@@ -165,10 +165,10 @@ class NoticeEntity(
     var environmentalStickerMissing: Boolean = false,
 
     /**
-     * Zustellart: E = E-Mail (Default), F = Web-Formular
+     * Zustellart: E = E-Mail, F = Web-Formular
      */
     @Column
-    var deliveryType: Char = 'E',
+    var deliveryType: Char? = null,
 
     @Column
     var recipientEmailAddress: String? = null,
