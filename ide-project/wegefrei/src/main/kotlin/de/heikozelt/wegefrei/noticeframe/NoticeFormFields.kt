@@ -52,8 +52,7 @@ class NoticeFormFields(
     //private val vehicleMakeComboBox = JComboBox(ListVehicleMakes.VEHICLE_MAKES)
     private val vehicleMakeComboBox = VehicleMakeComboBox()
     private val colorComboBox = JComboBox(VehicleColor.COLORS)
-    private val vehicleTypes = arrayOf("", "Pkw", "Lkw", "Lkw mit Anhänger", "Motorrad", "Bus", "Anhänger ohne Zugfahrzeug", "Sonstiges" )
-    private val vehicleTypeComboBox = JComboBox(vehicleTypes)
+    private val vehicleTypeComboBox = VehicleTypeComboBox()
     private val miniMap = MiniMap(noticeFrame, selectedPhotosListModel, tileFactory)
     private var streetTextField = TrimmingTextField(30)
     private var zipCodeTextField = TrimmingTextField(5)
@@ -387,6 +386,7 @@ class NoticeFormFields(
         countryComboBox.setValue(noticeEntity.countrySymbol)
         licensePlateTextField.text = noticeEntity.licensePlate
         vehicleMakeComboBox.setValue(noticeEntity.vehicleMake)
+        vehicleTypeComboBox.setValue(noticeEntity.vehicleType)
         colorComboBox.selectedItem = VehicleColor.fromColorName(noticeEntity.color)
         streetTextField.text = noticeEntity.street
         zipCodeTextField.text = noticeEntity.zipCode
@@ -435,6 +435,7 @@ class NoticeFormFields(
         n.countrySymbol = countryComboBox.getValue()
         n.licensePlate = trimmedOrNull(licensePlateTextField.text)
         n.vehicleMake = vehicleMakeComboBox.getValue()
+        n.vehicleType = vehicleTypeComboBox.getValue()
 
         val selectedColor = colorComboBox.selectedObjects[0] as VehicleColor
         n.color = if (selectedColor.color == null) {
@@ -443,15 +444,12 @@ class NoticeFormFields(
             selectedColor.colorName
         }
 
-        // todo Prio 1: map addressLocation
-
         n.street = trimmedOrNull(streetTextField.text)
         n.zipCode = trimmedOrNull(zipCodeTextField.text)
         n.town = trimmedOrNull(townTextField.text)
         n.locationDescription = trimmedOrNull(locationDescriptionTextField.text)
         n.offense = offenseComboBox.getValue()
 
-        // todo: Prio 1: Validieren ob Datum und Uhrzeit zusammen angeben wurden.
         // Problem: 2 Eingabefelder für Datum und Uhrzeit, aber nur ein Datenbankfeld
         // Lösung: Beide müssen ausgefüllt sein oder keins. Nur zusammen speichern oder gar nicht.
         // Ähnlich wie Längengrad und Breitengrad. Diese müssen auch zusammen oder gar nicht gespeichert werden.
