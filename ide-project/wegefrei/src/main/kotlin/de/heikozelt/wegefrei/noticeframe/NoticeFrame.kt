@@ -6,6 +6,7 @@ import de.heikozelt.wegefrei.email.useragent.EmailMessageDialog
 import de.heikozelt.wegefrei.entities.NoticeEntity
 import de.heikozelt.wegefrei.gui.Styles
 import de.heikozelt.wegefrei.jobs.AddressWorker
+import de.heikozelt.wegefrei.json.Settings
 import de.heikozelt.wegefrei.maps.MaxiMapForm
 import de.heikozelt.wegefrei.model.*
 import org.jxmapviewer.viewer.GeoPosition
@@ -56,6 +57,7 @@ import kotlin.math.sqrt
  */
 class NoticeFrame(
     private val app: WegeFrei,
+    private val settings: Settings,
     private val dbRepo: DatabaseRepo,
     private val tileFactory: TileFactory,
     private val photoCache: LeastRecentlyUsedCache<Path, Photo>,
@@ -89,7 +91,7 @@ class NoticeFrame(
     private val selectedPhotosListCellRenderer = SelectedPhotosListCellRenderer()
     private var selectedPhotosList = JList(selectedPhotosListModel)
     private var selectedPhotosScrollPane = JScrollPane(selectedPhotosList)
-    private var noticeForm = NoticeForm(this, selectedPhotosListModel, dbRepo, tileFactory)
+    private var noticeForm = NoticeForm(this, settings, selectedPhotosListModel, dbRepo, tileFactory)
 
     // Split-Panes:
     private var topSplitPane = JSplitPane(JSplitPane.VERTICAL_SPLIT, browserPanel, selectedPhotosScrollPane)
@@ -204,8 +206,8 @@ class NoticeFrame(
             "Meldung #${noticeEntity.id} - Wege frei!"
         }
 
-        app.getSettings()?.let { s ->
-            browserPanel.setPhotosDirectory(s.getPhotosPath())
+        settings.let { setti ->
+            browserPanel.setPhotosDirectory(setti.getPhotosPath())
             noticeForm.setNotice(noticeEntity)
         }
         noticeEntity.id?.let {
@@ -394,10 +396,16 @@ class NoticeFrame(
      * und benachrichtigt die MiniMap und ggf. die MaxiMap.
      */
     fun updateOffensePositionFromSelectedPhotos() {
-        offensePosition = selectedPhotosListModel.getAveragePosition()
-        noticeForm.getNoticeFormFields().getMiniMap().setOffensePosition(offensePosition)
-        getMaxiMapForm()?.setOffenseMarker(offensePosition)
-        maybeFindAddress()
+        app.getSettings()?.let { setti ->
+            if (setti.autoGeoPosition) {
+                offensePosition = selectedPhotosListModel.getAveragePosition()
+                noticeForm.getNoticeFormFields().getMiniMap().setOffensePosition(offensePosition)
+                getMaxiMapForm()?.setOffenseMarker(offensePosition)
+                if (setti.autoAddress) {
+                    maybeFindAddress()
+                }
+            }
+        }
     }
 
     /**

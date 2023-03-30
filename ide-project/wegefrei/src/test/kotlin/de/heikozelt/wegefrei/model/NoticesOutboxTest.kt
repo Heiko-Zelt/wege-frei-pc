@@ -82,6 +82,10 @@ class NoticesOutboxTest {
                   <td>Beobachtungszeit:</td>
                   <td>01.01.2022, 12:01 MEZ</td>
                 </tr>
+                <tr>
+                  <td>Beobachtungsdauer:</td>
+                  <td>weniger als 1 Minute</td>
+                </tr>
               </tbody>
             </table>
             <h1>Zeuge</h1>

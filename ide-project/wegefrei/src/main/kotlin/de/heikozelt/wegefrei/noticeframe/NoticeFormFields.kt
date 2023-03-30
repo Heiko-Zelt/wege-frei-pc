@@ -5,6 +5,7 @@ import de.heikozelt.wegefrei.durationInMinutesFormatted
 import de.heikozelt.wegefrei.email.combobox.RecipientComboBox
 import de.heikozelt.wegefrei.entities.NoticeEntity
 import de.heikozelt.wegefrei.gui.*
+import de.heikozelt.wegefrei.json.Settings
 import de.heikozelt.wegefrei.maps.MiniMap
 import de.heikozelt.wegefrei.model.Photo
 import de.heikozelt.wegefrei.model.SelectedPhotosListDataEvent
@@ -38,6 +39,7 @@ import javax.swing.text.AbstractDocument
  */
 class NoticeFormFields(
     private val noticeFrame: NoticeFrame,
+    private val settings: Settings,
     private val selectedPhotosListModel: SelectedPhotosListModel,
     private val dbRepo: DatabaseRepo,
     private val tileFactory: TileFactory
@@ -611,19 +613,19 @@ class NoticeFormFields(
     }
 
     fun selectedPhoto(photo: Photo) {
-        if (photo.getDateTime() != null) {
+        if (photo.getDateTime() != null && settings.autoOffenseTime) {
             updateDateTimeAndDuration()
         }
     }
 
     fun unselectedPhoto(photo: Photo) {
-        if (photo.getDateTime() != null) {
+        if (photo.getDateTime() != null && settings.autoOffenseTime) {
             updateDateTimeAndDuration()
         }
     }
 
     fun replacedPhotoSelection(photos: TreeSet<Photo>) {
-        if (photos.size != 0) {
+        if (photos.size != 0 && settings.autoOffenseTime) {
             updateDateTimeAndDuration()
         }
     }

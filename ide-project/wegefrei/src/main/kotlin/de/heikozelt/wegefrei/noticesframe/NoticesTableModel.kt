@@ -46,9 +46,7 @@ class NoticesTableModel : AbstractTableModel() {
         this.databaseRepo = databaseRepo
         val ids = databaseRepo.findAllNoticesIdsDesc()
         noticeIds.clear()
-        ids?.let {
-            noticeIds.addAll(ids)
-        }
+        noticeIds.addAll(ids)
         fireTableDataChanged()
     }
 

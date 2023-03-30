@@ -46,6 +46,10 @@ class SettingsFormFields() : JPanel() {
     private val databaseDirField = JLabel()
     private val databaseDirButton = JButton("Ordner auswählen")
 
+    private val autoGeoPositionCheckBox = JCheckBox("Geo-Position automatisch ausfüllen")
+    private val autoAddressCheckBox = JCheckBox("Tatort-Adresse automatisch ausfüllen")
+    private val autoOffenseTimeCheckBox = JCheckBox("Tatzeit automatisch ausfüllen")
+
     init {
         /**
          * increase minimum height by constant factor
@@ -151,6 +155,9 @@ class SettingsFormFields() : JPanel() {
                 .addComponent(witnessHeading)
                 .addComponent(emailServerHeading)
                 .addComponent(technicalHeading)
+                .addComponent(autoGeoPositionCheckBox)
+                .addComponent(autoAddressCheckBox)
+                .addComponent(autoOffenseTimeCheckBox)
         )
         // top to bottom
         lay.setVerticalGroup(
@@ -222,6 +229,9 @@ class SettingsFormFields() : JPanel() {
                 .addComponent(databaseDirButton)
                 // Höhe von TextFields passt sich an. das sieht hässlich aus, Gap hilft leider nicht.
                 //.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.PREFERRED_SIZE, Int.MAX_VALUE)
+                .addComponent(autoGeoPositionCheckBox)
+                .addComponent(autoAddressCheckBox)
+                .addComponent(autoOffenseTimeCheckBox)
         )
         layout = lay
         components.filterIsInstance<JTextField>().forEach(Styles::restrictHeight)
@@ -251,6 +261,9 @@ class SettingsFormFields() : JPanel() {
         lookAndFeelComboBox.selectedItem = lookAndFeelNames.find { it == settings.lookAndFeel }
         //photosDirField.text = settings.photosDirectory
         databaseDirField.text = settings.databaseDirectory
+        autoGeoPositionCheckBox.isSelected = settings.autoGeoPosition
+        autoAddressCheckBox.isSelected = settings.autoAddress
+        autoOffenseTimeCheckBox.isSelected = settings.autoOffenseTime
     }
 
     /**
@@ -279,6 +292,10 @@ class SettingsFormFields() : JPanel() {
         }
         //settings.photosDirectory = photosDirField.text
         settings.databaseDirectory = databaseDirField.text
+
+        settings.autoGeoPosition = autoGeoPositionCheckBox.isSelected
+        settings.autoAddress = autoAddressCheckBox.isSelected
+        settings.autoOffenseTime = autoOffenseTimeCheckBox.isSelected
     }
 
     /**

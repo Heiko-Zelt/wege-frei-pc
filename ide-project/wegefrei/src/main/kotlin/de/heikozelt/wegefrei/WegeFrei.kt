@@ -85,7 +85,7 @@ class WegeFrei(private val settingsRepo: SettingsRepo = SettingsFileRepo()) {
         log.debug("initializing")
         val settings = settingsRepo.load()
         setSettings(settings)
-        emailUserAgent?.setEmailServerConfig(settings.emailServerConfig)
+        emailUserAgent.setEmailServerConfig(settings.emailServerConfig)
         //noticesOutbox.setRestartListener { startSendingEmails() }
         noticesOutbox.setRestartListener ( ::startSendingEmails )
         noticesOutbox.setSuccessfulSentListener ( ::updateNoticeSent )
@@ -230,13 +230,15 @@ class WegeFrei(private val settingsRepo: SettingsRepo = SettingsFileRepo()) {
      */
     fun openNoticeFrame(noticeEntity: NoticeEntity = NoticeEntity.createdNow()) {
         log.debug("Anzahl NoticeFrames: " + noticeFrames.size)
-        databaseRepo?.let { dbRepo ->
-            photoLoader?.let { pLoader ->
-                val noticeFrame = NoticeFrame(this, dbRepo, tileFactory, photoCache, pLoader)
-                noticeFrames.add(noticeFrame)
-                EventQueue.invokeLater {
-                    // Thread.sleep(5000) // simulate slowness
-                    noticeFrame.setNotice(noticeEntity)
+        settings?.let { setti ->
+            databaseRepo?.let { dbRepo ->
+                photoLoader?.let { pLoader ->
+                    val noticeFrame = NoticeFrame(this, setti, dbRepo, tileFactory, photoCache, pLoader)
+                    noticeFrames.add(noticeFrame)
+                    EventQueue.invokeLater {
+                        // Thread.sleep(5000) // simulate slowness
+                        noticeFrame.setNotice(noticeEntity)
+                    }
                 }
             }
         }

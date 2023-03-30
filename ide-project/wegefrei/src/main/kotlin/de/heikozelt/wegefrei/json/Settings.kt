@@ -30,7 +30,25 @@ data class Settings (
     var photosDirectory: String? = null,
 
     @Json(name = "database_directory")
-    var databaseDirectory: String? = null
+    var databaseDirectory: String? = null,
+
+    /**
+     * Geo-Koordinaten des Tatortes automatisch ermitteln, Mittelpunkt der Geo-Positionen der Fotos
+     */
+    @Json(name = "auto_geo_position")
+    var autoGeoPosition: Boolean = true,
+
+    /**
+     * automatisch reverse address lookup ausführen und Adresse eintragen
+     */
+    @Json(name = "auto_address")
+    var autoAddress: Boolean = true,
+
+    /**
+     * Anfang, Ende und Dauer der Tatbeobachtung automatisch ausfüllen/ändern
+     */
+    @Json(name = "auto_offense_time")
+    var autoOffenseTime: Boolean = true
 ): Cloneable {
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
 
@@ -58,7 +76,10 @@ data class Settings (
             emailServerConfig.clone(),
             lookAndFeel,
             photosDirectory,
-            databaseDirectory
+            databaseDirectory,
+            autoGeoPosition,
+            autoAddress,
+            autoOffenseTime
         )
     }
 
