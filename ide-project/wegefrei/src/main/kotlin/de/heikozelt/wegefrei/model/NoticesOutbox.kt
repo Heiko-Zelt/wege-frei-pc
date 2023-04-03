@@ -231,8 +231,9 @@ class NoticesOutbox(/*private val app: WegeFrei*/) : Outbox<Int> {
             appendTableRowHtmlValue(caseRows, "Umstände", n.getCircumstancesHtml())
             appendTableRow(caseRows, "HU-Fälligkeit", n.getInspectionMonthYear())
             // todo Prio 3: Wochentag einfügen, wegen Werktags-Beschränkungen
-            appendTableRow(caseRows, "Beobachtungszeit", n.getObservationTimeFormatted())
-            appendTableRow(caseRows, "Beobachtungsdauer", n.getDurationFormatted())
+            appendTableRow(caseRows, "Tatzeit", n.getObservationTimeFormatted())
+            appendTableRow(caseRows, "Tatende", n.getEndTimeFormatted())
+            appendTableRow(caseRows, "Dauer", n.getDurationFormatted())
             appendTableRow(caseRows, "Hinweis", n.note)
             val caseTableRows = caseRows.joinToString("\n")
 

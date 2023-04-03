@@ -27,7 +27,7 @@ class NoticeForm(
     init {
         val okButton = JButton("Ok")
         deleteButton.isVisible = false
-        val sendButton = JButton("E-Mail absenden")
+        val sendButton = JButton("Meldung absenden")
         val cancelButton = JButton("Abbrechen")
 
         cancelButton.addActionListener { noticeFrame.cancelButtonClicked() }
@@ -81,7 +81,7 @@ class NoticeForm(
             deleteButton.isVisible = true
         }
 
-        // todo Prio 2: Text des Senden-Buttons ändern in "E-Mail erneut senden", wenn bereits gesendet.
+        // todo Prio 2: Text des Senden-Buttons ändern in "erneut senden", wenn bereits gesendet.
     }
 
     /**

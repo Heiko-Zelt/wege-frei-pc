@@ -30,6 +30,18 @@ class TimeVerifierTest {
         assertTrue(verifier.shouldYieldFocus(source, target))
     }
 
+    @Test
+    fun verify_correct_time4() {
+        source.text = "1:2:3"
+        assertTrue(verifier.shouldYieldFocus(source, target))
+    }
+
+    @Test
+    fun verify_correct_time5() {
+        source.text = "23:59:59"
+        assertTrue(verifier.shouldYieldFocus(source, target))
+    }
+
     /**
      * "00:00" instead of "24:00"
      */
@@ -57,5 +69,16 @@ class TimeVerifierTest {
         assertFalse(verifier.shouldYieldFocus(source, target))
     }
 
+    @Test
+    fun verify_wrong_time5() {
+        source.text = "01:02:"
+        assertFalse(verifier.shouldYieldFocus(source, target))
+    }
+
+    @Test
+    fun verify_wrong_time6() {
+        source.text = "01:02:000"
+        assertFalse(verifier.shouldYieldFocus(source, target))
+    }
 
 }

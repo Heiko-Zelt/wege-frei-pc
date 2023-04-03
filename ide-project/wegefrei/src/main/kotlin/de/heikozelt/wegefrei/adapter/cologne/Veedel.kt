@@ -7,6 +7,23 @@ package de.heikozelt.wegefrei.adapter.cologne
  */
 class Veedel {
     companion object {
+
+        /**
+         * converts a String containing special characters in String containing only single spaces
+         */
+        fun normalizeString(original: String): String {
+            return original.replace(Regex("[ /,]+"), " ").lowercase()
+        }
+
+        /**
+         * wandelt "Altstadt-Nord", "altstadt nord" oder "Altstadt / Nord" in "Altstadt/Nord"
+         */
+        fun convertQuarter(original: String): String {
+            val searchFor = normalizeString(original)
+            val veedel = Veedel.veedels.find { normalizeString(it) == searchFor}
+            return veedel ?: original
+        }
+
         var veedels = arrayOf(
             "Altstadt/Nord", "Altstadt/Süd",
             "Bayenthal", "Bickendorf", "Bilderstöckchen", "Blumenberg", "Bocklemünd/Mengenich",

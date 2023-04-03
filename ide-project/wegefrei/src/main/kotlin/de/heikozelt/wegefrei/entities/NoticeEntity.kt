@@ -254,6 +254,15 @@ class NoticeEntity(
         }
     }
 
+    fun getEndTimeFormatted(): String {
+        val d = endTime
+        return if (d == null) {
+            ""
+        } else {
+            d.format(dateTimeFormat)
+        }
+    }
+
     /**
      * Achtung: liefert bei jedem Aufruf ein neues Objekt
      */
@@ -324,6 +333,7 @@ class NoticeEntity(
         if(endangering) lines.add("mit Gefährdung")
         if(environmentalStickerMissing) lines.add("Die Umweltplakette fehlte/war ungültig")
         if(vehicleInspectionExpired) lines.add("Die HU-Plakette war abgelaufen")
+        // todo Prio 1: Monat/Jahr hinzufügen & Test schreiben
         return if(lines.isEmpty()) {
             null
         } else {
@@ -370,9 +380,9 @@ class NoticeEntity(
             errors.add("Eine Tatortangabe fehlt. Es muss eine Adresse, Geo-Position und/oder Tatort-Beschreibung angegeben sein.")
         }
         if(observationTime == null) {
-            errors.add("Es muss ein Beobachtungsdatum und eine Uhrzeit angegeben sein.")
+            errors.add("Es muss ein Tatdatum und eine Uhrzeit angegeben sein.")
         }
-        if(recipientEmailAddress == null) {
+        if(deliveryType == 'E' && recipientEmailAddress == null) {
             errors.add("Es muss eine Empfänger-E-Mail-Adresse angegeben sein.")
         }
         return errors
@@ -436,7 +446,7 @@ class NoticeEntity(
         /**
          * Beispiel: "31.12.2021, 12:58 MEZ" (Mitteleuropäische Zeit), nicht "CET" (Central European Time)
          */
-        val dateTimeFormat: DateTimeFormatter? = DateTimeFormatter.ofPattern("dd.MM.yyyy, HH:mm z", Locale.GERMAN)
+        val dateTimeFormat: DateTimeFormatter? = DateTimeFormatter.ofPattern("dd.MM.yyyy, HH:mm:ss z", Locale.GERMAN)
 
         fun createdNow(): NoticeEntity {
             val n = NoticeEntity()

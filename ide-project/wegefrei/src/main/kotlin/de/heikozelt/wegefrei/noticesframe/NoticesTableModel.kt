@@ -163,8 +163,8 @@ class NoticesTableModel : AbstractTableModel() {
             2 -> notice.licensePlate
             3 -> notice.vehicleMake
             4 -> VehicleColor.fromColorName(notice.color)
-            5 -> notice.getCreatedTimeFormatted()
             6 -> notice.getObservationTimeFormatted()
+            5 -> notice.getCreatedTimeFormatted()
             7 -> notice.photoEntities.size
             8 -> notice.getState()
             9 -> notice.getSentTimeFormatted()
@@ -179,7 +179,7 @@ class NoticesTableModel : AbstractTableModel() {
 
     companion object {
         val COLUMN_NAMES = arrayOf(
-            "#", "Land", "Kennzeichen", "Marke", "Farbe", "Erstellt", "Beobachtet", "Fotos", "Status", "gesendet"
+            "#", "Land", "Kennzeichen", "Marke", "Farbe", "Tatdatum, Uhrzeit", "Erstellt", "Fotos", "Status", "gesendet"
         )
     }
 

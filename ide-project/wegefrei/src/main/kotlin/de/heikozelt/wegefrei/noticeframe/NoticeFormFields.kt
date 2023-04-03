@@ -126,7 +126,7 @@ class NoticeFormFields(
         val offenseLabel = JLabel("<html>Verstoß:<sup>*</sup></html>")
         //offenseComboBox.renderer = OffenseListCellRenderer()
 
-        val observationDateTimeLabel = JLabel("<html>Beobachtungsdatum<sup>*</sup>, Uhrzeit:<sup>*</sup></html>")
+        val observationDateTimeLabel = JLabel("<html>Tatdatum<sup>*</sup>, Uhrzeit:<sup>*</sup></html>")
 
         val observationDateDoc = observationDateTextField.document
         if (observationDateDoc is AbstractDocument) {
@@ -135,14 +135,23 @@ class NoticeFormFields(
 
         val endDateTimeLabel = JLabel("Endedatum, Uhrzeit:")
 
-        observationDateTextField.toolTipText = "z.B. 31.12.2021"
+        observationDateTextField.toolTipText = "Datum, an dem die Tat beobachtet wurde, z.B. 31.12.2021"
         observationDateTextField.inputVerifier = PatternVerifier.dateVerifier
         val observationTimeDoc = observationTimeTextField.document
         if (observationTimeDoc is AbstractDocument) {
             observationTimeDoc.documentFilter = CharPredicateDocFilter.timeDocFilter
         }
-        observationTimeTextField.toolTipText = "z.B. 23:59:59"
+        observationTimeTextField.toolTipText = "Uhrzeit, zu der die Tat beobachtet wurde, z.B. 23:59:59"
         observationTimeTextField.inputVerifier = PatternVerifier.timeVerifier
+
+        endDateTextField.toolTipText = "Datum, als die Tat/Beobachtung endete, falls an einem folgenden Tag, z.B. 31.12.2021"
+        endDateTextField.inputVerifier = PatternVerifier.dateVerifier
+        val endTimeDoc = endTimeTextField.document
+        if (endTimeDoc is AbstractDocument) {
+            endTimeDoc.documentFilter = CharPredicateDocFilter.timeDocFilter
+        }
+        endTimeTextField.toolTipText = "Uhrzeit, als die Tat/Beobachtung endete, z.B. 23:59:59"
+        endTimeTextField.inputVerifier = PatternVerifier.timeVerifier
 
         val durationLabel = JLabel("Dauer:")
         durationLabel.toolTipText = "abgerundet"
@@ -463,14 +472,14 @@ class NoticeFormFields(
         val format = DateTimeFormatter.ofPattern("d.M.yyyy")
         val obsDateTxt = observationDateTextField.text
         val obsTimeTxt = observationTimeTextField.text
-        if(obsTimeTxt.isBlank() && obsDateTxt.isNotBlank()) {
+        if (obsTimeTxt.isBlank() && obsDateTxt.isNotBlank()) {
             errors.add("Beobachtungsdatum angegeben, aber keine Uhrzeit.")
         }
-        if(obsTimeTxt.isNotBlank() && obsDateTxt.isBlank()) {
+        if (obsTimeTxt.isNotBlank() && obsDateTxt.isBlank()) {
             errors.add("Beobachtungsuhrzeit angegeben, aber kein Datum.")
         }
         var obsDat: LocalDate? = null
-        if(obsDateTxt.isNotBlank()) {
+        if (obsDateTxt.isNotBlank()) {
             try {
                 obsDat = LocalDate.parse(obsDateTxt, format)
             } catch (ex: DateTimeParseException) {
@@ -478,7 +487,7 @@ class NoticeFormFields(
             }
         }
         var obsTim: LocalTime? = null
-        if(obsTimeTxt.isNotBlank()) {
+        if (obsTimeTxt.isNotBlank()) {
             try {
                 val tFormat = DateTimeFormatter.ofPattern("H:m:s")
                 obsTim = LocalTime.parse(obsTimeTxt, tFormat)
@@ -486,7 +495,7 @@ class NoticeFormFields(
                 errors.add("Uhrzeit muss im Format Stunde:Minute:Sekunden angegeben sein.")
             }
         }
-        n.observationTime = if(obsDat == null || obsTim == null) {
+        n.observationTime = if (obsDat == null || obsTim == null) {
             null
         } else {
             ZonedDateTime.of(obsDat, obsTim, ZoneId.systemDefault())
@@ -494,15 +503,15 @@ class NoticeFormFields(
 
         var endDateTxt = endDateTextField.text
         val endTimeTxt = endTimeTextField.text
-        if(endTimeTxt.isBlank() && endDateTxt.isNotBlank()) {
+        if (endTimeTxt.isBlank() && endDateTxt.isNotBlank()) {
             errors.add("Enddatum angegeben, aber keine Uhrzeit.")
         }
         log.debug("endTimeTxt: $endTimeTxt")
-        if(endTimeTxt.isNotBlank() && endDateTxt.isBlank()) {
+        if (endTimeTxt.isNotBlank() && endDateTxt.isBlank()) {
             endDateTxt = obsTimeTxt
         }
         var endDat: LocalDate? = null
-        if(endDateTxt.isNotBlank()) {
+        if (endDateTxt.isNotBlank()) {
             try {
                 endDat = LocalDate.parse(endDateTxt, format)
             } catch (ex: DateTimeParseException) {
@@ -510,7 +519,7 @@ class NoticeFormFields(
             }
         }
         var endTim: LocalTime? = null
-        if(endTimeTxt.isNotBlank()) {
+        if (endTimeTxt.isNotBlank()) {
             try {
                 val tFormat = DateTimeFormatter.ofPattern("H:m:s")
                 endTim = LocalTime.parse(endTimeTxt, tFormat)
@@ -518,7 +527,7 @@ class NoticeFormFields(
                 errors.add("Enduhrzeit muss im Format Stunde:Minute:Sekunden angegeben sein.")
             }
         }
-        n.endTime = if(endDat == null || endTim == null) {
+        n.endTime = if (endDat == null || endTim == null) {
             null
         } else {
             ZonedDateTime.of(endDat, endTim, ZoneId.systemDefault())
@@ -552,10 +561,11 @@ class NoticeFormFields(
             null // ein Radio-Button ist immer ausgewählt. Keine Angabe unmöglich.
         }
 
-        val recipient = recipientComboBox.getValue()
-        n.recipientEmailAddress = recipient?.address
-        n.recipientName = recipient?.name
-
+        if (n.deliveryType == 'E') {
+            val recipient = recipientComboBox.getValue()
+            n.recipientEmailAddress = recipient?.address
+            n.recipientName = recipient?.name
+        }
         n.note = trimmedOrNull(noteTextArea.text)
         return errors
     }

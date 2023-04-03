@@ -18,15 +18,16 @@ repositories {
 }
 
 dependencies {
+    implementation 'org.seleniumhq.selenium:selenium-java:4.8.2' // needed by CologneAdapter for web form
     implementation 'org.jxmapviewer:jxmapviewer2:2.6'
     //implementation 'commons-logging:commons-logging:1.2'
     //implementation files('libs/jxmapviewer2-2.7-SNAPSHOT.jar')
 
     //implementation 'io.github.microutils:kotlin-logging:3.0.0' no module defined?
-    implementation 'org.slf4j:slf4j-api:2.0.4' // needed by kotlin-logging
-    implementation 'org.slf4j:slf4j-simple:2.0.4' // simple implementation of api
-    implementation 'org.hibernate:hibernate-core:6.1.5.Final'
-    implementation 'org.hibernate:hibernate-hikaricp:6.1.5.Final'
+    implementation 'org.slf4j:slf4j-api:2.0.5' // needed by kotlin-logging
+    implementation 'org.slf4j:slf4j-simple:2.0.5' // simple implementation of api
+    implementation 'org.hibernate:hibernate-core:6.1.7.Final'
+    implementation 'org.hibernate:hibernate-hikaricp:6.1.7.Final'
     implementation 'com.h2database:h2:2.1.214'
     implementation 'com.drewnoakes:metadata-extractor:2.18.0'
     implementation 'com.beust:klaxon:5.6' // JSON

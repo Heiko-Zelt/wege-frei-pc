@@ -29,9 +29,12 @@ open class PatternVerifier(patternStr: String) : InputVerifier() {
         val dateVerifier = PatternVerifier("^((0?[1-9]|[12]\\d|3[01])\\.(0?[1-9]|1[012])\\.(20\\d\\d))?$")
 
         /**
-         * "01:01" oder "1:1" oder Leerstring
+         * Uhrzeit mit oder ohne Sekunden oder Leerstring.
+         * Stunden, Minuten und Sekunden können 1 oder 2-stellig angegeben sein.
+         * Doppelpunkt als Trenner.
+         * "01:01", "1:1", "01:01:01", "1:1:1" oder Leerstring
          */
-        val timeVerifier = PatternVerifier("^(([01]?[0-9]|2[0-3]):([0-5]?\\d))?$")
+        val timeVerifier = PatternVerifier("^(([01]?[0-9]|2[0-3]):([0-5]?\\d)(:[0-5]?\\d)?)?$")
 
         /**
          * todo: Prio 3: ermöglichen mehrere E-Mail-Adressen durch Komma getrennt anzugeben

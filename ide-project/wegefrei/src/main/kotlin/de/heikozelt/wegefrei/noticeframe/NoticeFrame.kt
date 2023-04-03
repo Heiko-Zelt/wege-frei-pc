@@ -2,6 +2,7 @@ package de.heikozelt.wegefrei.noticeframe
 
 import de.heikozelt.wegefrei.DatabaseRepo
 import de.heikozelt.wegefrei.WegeFrei
+import de.heikozelt.wegefrei.adapter.cologne.CologneAdapter
 import de.heikozelt.wegefrei.email.useragent.EmailMessageDialog
 import de.heikozelt.wegefrei.entities.NoticeEntity
 import de.heikozelt.wegefrei.gui.Styles
@@ -510,10 +511,33 @@ class NoticeFrame(
                 showValidationErrors(errors)
                 return
             }
-            sendEmail()
+            sendNotice()
         }
     }
 
+    fun sendNotice() {
+        noticeEntity?.let { ne ->
+            // weitere Möglichkeit 'A' für API / Webservice
+            when(ne.deliveryType) {
+                'E' -> sendEmail()
+                'F' -> if(ne.town == "Köln") {
+                    val errors = CologneAdapter.validate(ne)
+                    if(errors.isEmpty()) {
+                        CologneAdapter.sendNotice(this, ne, settings.witness)
+                    } else {
+                        showValidationErrors(errors)
+                    }
+                } else {
+                    val errors = listOf("Kein Web-Formular/Adapter für diese Stadt implementiert.")
+                    showValidationErrors(errors)
+                }
+                else -> {
+                        val errors = listOf("Unbekannte Zustell-Art '{$ne.deliveryType}'.")
+                        showValidationErrors(errors)
+                    }
+            }
+        }
+    }
 
 
     /////////////////////////////////////////////
