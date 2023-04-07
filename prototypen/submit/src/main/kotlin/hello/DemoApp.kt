@@ -16,6 +16,7 @@ import org.openqa.selenium.support.ui.WebDriverWait
 import org.slf4j.LoggerFactory
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
+import java.io.File
 import java.time.Duration
 import java.util.*
 import java.util.logging.Level
@@ -68,6 +69,8 @@ fun getWebDriver(): WebDriver? {
 fun formidable() {
     val FORM_URL = "http://localhost:8080/form.html"
     val NAME = "Mustermann"
+    val FILE_NAME = System.getProperty("user.dir") + File.separator + "20220718_130222.jpg"
+    LOG.info("File name: $FILE_NAME")
 
     /*
     val fireProf = FirefoxProfile();
@@ -87,6 +90,14 @@ fun formidable() {
     driver.get(FORM_URL);
     val nameInputField: WebElement? = driver.findElement(By.id("name"))
     nameInputField?.sendKeys(NAME)
+    val fileInputField: WebElement? = driver.findElement(By.id("file"))
+    // todo catch exception if file not found
+    try {
+        fileInputField?.sendKeys(FILE_NAME)
+    } catch (ex: InvalidArgumentException) {
+        LOG.info("invalid argument")
+        LOG.info("Exception:", ex)
+    }
     LOG.info("Formular ausgefüllt.\n.\n.\n")
 
     val wait = WebDriverWait(driver, Duration.ofSeconds(10))

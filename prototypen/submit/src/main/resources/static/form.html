@@ -5,9 +5,10 @@
 </head>
 <body>
 <h1>Beispiel-Formular</h1>
-<form action="process" method="post">
+<form action="process" method="post" enctype="multipart/form-data">
     <label>Name:</label>
-    <input type="text" name="name" id="name">
+    <input type="text" name="name" id="name"><br>
+    <input type="file" name="file" id="file"><br>
     <input type="submit" value="Absenden">
 </form>
 </body>
