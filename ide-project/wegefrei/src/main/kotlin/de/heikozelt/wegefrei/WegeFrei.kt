@@ -6,7 +6,7 @@ import de.heikozelt.wegefrei.email.useragent.EmailUserAgent
 import de.heikozelt.wegefrei.entities.NoticeEntity
 import de.heikozelt.wegefrei.json.Settings
 import de.heikozelt.wegefrei.model.LeastRecentlyUsedCache
-import de.heikozelt.wegefrei.model.NoticesOutbox
+import de.heikozelt.wegefrei.delivery.email.NoticesOutbox
 import de.heikozelt.wegefrei.model.Photo
 import de.heikozelt.wegefrei.model.PhotoLoader
 import de.heikozelt.wegefrei.noticeframe.NoticeFrame

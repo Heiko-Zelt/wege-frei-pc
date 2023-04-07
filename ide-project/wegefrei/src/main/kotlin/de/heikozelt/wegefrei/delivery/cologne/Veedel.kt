@@ -1,4 +1,4 @@
-package de.heikozelt.wegefrei.adapter.cologne
+package de.heikozelt.wegefrei.delivery.cologne
 
 /**
  * Stadtteile von Köln in der Schreibweise der Werte der Combo-Box im Web-Formular.

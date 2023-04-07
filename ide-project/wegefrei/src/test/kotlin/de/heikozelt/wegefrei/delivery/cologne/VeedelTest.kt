@@ -1,4 +1,4 @@
-package de.heikozelt.wegefrei.adapter.cologne
+package de.heikozelt.wegefrei.delivery.cologne
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test

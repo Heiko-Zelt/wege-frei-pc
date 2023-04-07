@@ -305,6 +305,27 @@ class DatabaseRepo(jdbcUrl: String) {
         }
     }
 
+    /**
+     * im Falle von Meldungen, die über ein Web-Formular (oder eine API) synchron versendet werden
+     * und es keine E-Mail-Message-ID gibt. finalized & sent time sind identisch.
+     */
+    fun updateNoticeFinalizedAndSent(noticeID: Int, sentTime: ZonedDateTime) {
+        log.debug("updateNoticeSent(id=${noticeID})")
+        val session = sessionFactory.openSession()
+        log.debug("session: $session")
+        val tx = session.beginTransaction()
+        try {
+            val existing = session.find(NoticeEntity::class.java, noticeID)
+            existing.finalizedTime = sentTime
+            existing.sentTime = sentTime
+            session.merge(existing)
+            tx.commit()
+        } finally {
+            if (tx.isActive) tx.rollback()
+            if (session.isOpen) session.close()
+        }
+    }
+
     fun updateNoticeSendFailed(noticeID: Int) {
         log.debug("updateNoticeSendFailed(id=${noticeID})")
         val session = sessionFactory.openSession()

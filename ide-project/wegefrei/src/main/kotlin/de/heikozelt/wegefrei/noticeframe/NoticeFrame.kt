@@ -2,10 +2,12 @@ package de.heikozelt.wegefrei.noticeframe
 
 import de.heikozelt.wegefrei.DatabaseRepo
 import de.heikozelt.wegefrei.WegeFrei
-import de.heikozelt.wegefrei.adapter.cologne.CologneAdapter
+import de.heikozelt.wegefrei.delivery.WebFormWorkflow
+import de.heikozelt.wegefrei.delivery.cologne.CologneWebForm
 import de.heikozelt.wegefrei.email.useragent.EmailMessageDialog
 import de.heikozelt.wegefrei.entities.NoticeEntity
 import de.heikozelt.wegefrei.gui.Styles
+import de.heikozelt.wegefrei.gui.showValidationErrors
 import de.heikozelt.wegefrei.jobs.AddressWorker
 import de.heikozelt.wegefrei.json.Settings
 import de.heikozelt.wegefrei.maps.MaxiMapForm
@@ -517,16 +519,13 @@ class NoticeFrame(
 
     fun sendNotice() {
         noticeEntity?.let { ne ->
-            // weitere Möglichkeit 'A' für API / Webservice
+            // weitere Ausbau-Möglichkeit 'A' für API / Webservice
             when(ne.deliveryType) {
                 'E' -> sendEmail()
                 'F' -> if(ne.town == "Köln") {
-                    val errors = CologneAdapter.validate(ne)
-                    if(errors.isEmpty()) {
-                        CologneAdapter.sendNotice(this, ne, settings.witness)
-                    } else {
-                        showValidationErrors(errors)
-                    }
+                    val cologneWebForm = CologneWebForm(ne, settings.witness)
+                    val webFormWorkflow = WebFormWorkflow(cologneWebForm, dbRepo)
+                    webFormWorkflow.validateAndSend()
                 } else {
                     val errors = listOf("Kein Web-Formular/Adapter für diese Stadt implementiert.")
                     showValidationErrors(errors)
@@ -558,16 +557,6 @@ class NoticeFrame(
             }
         }
         return errors
-    }
-
-    fun showValidationErrors(errors: List<String>) {
-        val message = errors.joinToString("<br>", "<html>", "</html>")
-        JOptionPane.showMessageDialog(
-            null,
-            message,
-            "Validierungsfehler",
-            JOptionPane.INFORMATION_MESSAGE
-        )
     }
 
     /**
@@ -715,6 +704,7 @@ class NoticeFrame(
     companion object {
 
         private val LOG = LoggerFactory.getLogger(this::class.java.canonicalName)
+
 
         /**
          * Berechnet die Distanz zwischen 2 Punkten nach dem Satz vom Pythagoras
