@@ -35,7 +35,7 @@ fun main(args: Array<String>) {
 }
 
 /**
- * get a driver when available
+ * get a web driver when available
  */
 fun getWebDriver(): WebDriver? {
     if("Linux" == System.getProperty("os.name")) {
@@ -103,8 +103,6 @@ fun formidable() {
     val wait = WebDriverWait(driver, Duration.ofSeconds(10))
     try {
         val result = wait.until(UrlDiffersOrClosedExpectedCondition(FORM_URL))
-        //val result = wait.until(ExpectedConditions.not(ExpectedConditions.urlToBe(FORM_URL)))
-        //val result = wait.until(MyExpectedCondition())
         LOG.info("Fertig mit Warten :-)")
         LOG.info("Result: $result")
     } catch (ex: TimeoutException) {

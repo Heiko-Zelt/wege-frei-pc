@@ -84,6 +84,7 @@ class NoticeFormFields(
     private val emailDeliveryRadioButton = JRadioButton("E-Mail")
     private val webFormDeliveryRadioButton = JRadioButton("Web-Formular")
     private val deliveryTypeGroup = ButtonGroup()
+    private val recipientLabel = JLabel("<html>Empfänger:<sup>*</sup></html>")
 
     // Idealfall: Addresse wird automatisch eingetragen, Ausnahmefall Benutzer wählt aus Adressbuch
     // todo Prio 3: Auswahl des Empfängers aus Addressbuch (Button öffnet "AddressChooser")
@@ -181,10 +182,16 @@ class NoticeFormFields(
         val deliveryTypeLabel = JLabel("<html>Zustellung:<sup>*</sup></html>")
         deliveryTypeGroup.add(emailDeliveryRadioButton)
         deliveryTypeGroup.add(webFormDeliveryRadioButton)
+        emailDeliveryRadioButton.addChangeListener {
+            val src = it.source as JRadioButton
+            recipientLabel.isVisible = src.isSelected
+            recipientComboBox.isVisible = src.isSelected
+        }
+        recipientLabel.isVisible = false
 
-        val recipientLabel = JLabel("<html>Empfänger:<sup>*</sup></html>")
         recipientComboBox.toolTipText = "z.B. verwarngeldstelle@wiesbaden.de"
         recipientComboBox.inputVerifier = PatternVerifier.eMailVerifier
+        recipientComboBox.isVisible = false
         val noteLabel = JLabel("Hinweis:")
         noteTextArea.toolTipText = "z.B. Behinderung / Gefährdung beschreiben"
 
@@ -423,8 +430,10 @@ class NoticeFormFields(
         warningLightsCheckBox.isSelected = noticeEntity.warningLights
         emailDeliveryRadioButton.isSelected = noticeEntity.deliveryType == 'E'
         webFormDeliveryRadioButton.isSelected = noticeEntity.deliveryType == 'F'
+        recipientLabel.isVisible = noticeEntity.deliveryType == 'E'
         recipientComboBox.loadData()
         recipientComboBox.setValue(noticeEntity.getRecipient())
+        recipientComboBox.isVisible = noticeEntity.deliveryType == 'E'
         noteTextArea.text = noticeEntity.note
 
         val enab = !(noticeEntity.isFinalized())

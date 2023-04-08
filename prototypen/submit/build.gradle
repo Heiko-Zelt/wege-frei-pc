@@ -16,7 +16,7 @@ repositories {
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-    implementation 'org.seleniumhq.selenium:selenium-java:4.8.2'
+    implementation 'org.seleniumhq.selenium:selenium-java:4.8.3'
     testImplementation 'org.jetbrains.kotlin:kotlin-test'
 }
 

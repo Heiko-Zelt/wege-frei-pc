@@ -1,4 +1,4 @@
-package de.heikozelt.wegefrei.delivery.cologne
+package de.heikozelt.wegefrei.delivery.webform.cologne
 
 /**
  * Stadtteile von Köln in der Schreibweise der Werte der Combo-Box im Web-Formular.
@@ -20,7 +20,7 @@ class Veedel {
          */
         fun convertQuarter(original: String): String {
             val searchFor = normalizeString(original)
-            val veedel = Veedel.veedels.find { normalizeString(it) == searchFor}
+            val veedel = veedels.find { normalizeString(it) == searchFor}
             return veedel ?: original
         }
 

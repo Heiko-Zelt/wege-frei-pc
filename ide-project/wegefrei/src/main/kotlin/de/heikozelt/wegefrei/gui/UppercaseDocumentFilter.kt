@@ -32,10 +32,10 @@ class UppercaseDocumentFilter: DocumentFilter() {
         text: String,
         attrs: AttributeSet?
     ) {
-        log.debug("replace")
-        log.debug("text before replace: >>>$text<<<")
+        //log.debug("replace")
+        //log.debug("text before replace: >>>$text<<<")
         fb?.replace(offset, length, text.uppercase(Locale.getDefault()), attrs)
-        log.debug("text after replace: >>>$text<<<")
+        //log.debug("text after replace: >>>$text<<<")
     }
 
 }

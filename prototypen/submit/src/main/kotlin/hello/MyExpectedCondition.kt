@@ -17,7 +17,15 @@ class MyExpectedCondition : ExpectedCondition<Boolean> {
             true;
         }
     }
-
+    /*
+    override fun equals(other: Object?): Boolean {
+        return if (other == null) {
+            false
+        } else {
+            other.javaClass == javaClass
+        }
+    }
+     */
 
     companion object {
         val LOG = LoggerFactory.getLogger(DemoApp::class.java)

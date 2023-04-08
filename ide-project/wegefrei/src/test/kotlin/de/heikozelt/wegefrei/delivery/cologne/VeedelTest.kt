@@ -1,5 +1,6 @@
 package de.heikozelt.wegefrei.delivery.cologne
 
+import de.heikozelt.wegefrei.delivery.webform.cologne.Veedel
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
