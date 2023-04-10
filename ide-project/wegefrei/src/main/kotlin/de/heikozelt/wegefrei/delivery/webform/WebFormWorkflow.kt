@@ -42,6 +42,7 @@ class WebFormWorkflow(private var webForm: WebForm, private var dbRepo: Database
     }
 
     fun successfullySentCallback(noticeId: Int, sentTime: ZonedDateTime) {
+        LOG.debug("successfullySentCallback($noticeId, $sentTime)")
         dbRepo.updateNoticeFinalizedAndSent(noticeId, sentTime)
         // todo: Fenster schließen und Status in NoticesFrame updaten
     }

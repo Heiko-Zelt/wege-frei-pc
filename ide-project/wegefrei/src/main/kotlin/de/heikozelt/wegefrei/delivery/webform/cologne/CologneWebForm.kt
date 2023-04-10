@@ -1,7 +1,6 @@
 package de.heikozelt.wegefrei.delivery.webform.cologne
 
-import de.heikozelt.wegefrei.delivery.webform.UrlDiffersOrClosedExpectedCondition
-import de.heikozelt.wegefrei.delivery.webform.WaitResult
+import de.heikozelt.wegefrei.delivery.webform.UrlDiffersExpectedCondition
 import de.heikozelt.wegefrei.delivery.webform.WebForm
 import de.heikozelt.wegefrei.entities.NoticeEntity
 import de.heikozelt.wegefrei.json.Witness
@@ -9,6 +8,9 @@ import org.openqa.selenium.*
 import org.openqa.selenium.support.ui.Select
 import org.openqa.selenium.support.ui.WebDriverWait
 import org.slf4j.LoggerFactory
+import java.net.URL
+import java.nio.file.Files
+import java.nio.file.Paths
 import java.time.Duration
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
@@ -17,7 +19,7 @@ import java.util.*
 /**
  * Spezieller Adapter, um Meldungen über das Web-Formular der Stadt Köln zu versenden
  */
-class CologneWebForm(private val notice: NoticeEntity, private val witness: Witness): WebForm {
+class CologneWebForm(private val notice: NoticeEntity, private val witness: Witness, private val downloadDir: String) : WebForm {
 
     /**
      * parameters: notice id & sent time
@@ -62,7 +64,7 @@ class CologneWebForm(private val notice: NoticeEntity, private val witness: Witn
      * todo Prio 2: Eigener Thread, damit GUI nicht einfriert
      */
     override fun sendNotice() {
-        if(notice.id == null) {
+        if (notice.id == null) {
             LOG.error("Notice id ist null. Kann Datenbankeintrag nicht updaten. Erst speichern!")
         }
         webDriver?.let { driver ->
@@ -196,25 +198,51 @@ class CologneWebForm(private val notice: NoticeEntity, private val witness: Witn
 
             val wait = WebDriverWait(driver, Duration.ofMinutes(5))
             try {
-                val result = wait.until(UrlDiffersOrClosedExpectedCondition(FORM_URL))
+                val result = wait.until(UrlDiffersExpectedCondition(FORM_URL))
                 LOG.debug("Fertig mit Warten :-)")
                 LOG.debug("Result: $result")
-                when (result) {
-                    WaitResult.URL_DIFFERS -> {
-                        // todo Prio 1: check if correct URL
-                        notice.id?.let {
-                            // Meldung muss vorher in der DB abgespeichert worden sein, damit id nicht null ist.
-                            successfullySentCallback?.invoke(it, ZonedDateTime.now())
-                        }
-                    }
-                    WaitResult.WINDOW_CLOSED -> {
-                        notice.id?.let {
-                            failedCallback?.invoke(it)
-                        }
-                    }
-                    else -> {
-                        LOG.error("unexpected wait result")
-                    }
+
+
+                // todo Prio 1: check if correct URL
+                val newUrl = driver.currentUrl
+                LOG.debug("currentUrl: $newUrl}")
+                if(newUrl == PROCESS_URL) {
+                    LOG.debug("Form was validated")
+                    /*
+                    <a href="FormDisp?contract=707555&hash=SQ312F0&displayhash=1" target="FormDisp">
+				       Druckvorschau
+			        </a>
+                     */
+                    val printPreviewLink: WebElement? = driver.findElement(By.linkText("Druckvorschau"))
+                    LOG.debug("printPreviewLink Element: $printPreviewLink")
+                    val pdfUrl = printPreviewLink?.getAttribute("href")
+                    LOG.debug("printPreviewLink URL: $pdfUrl")
+                    // Beispiel: "https://formular-daten.stadt-koeln.de/NetGateway/FormDisp?contract=707579&hash=A8AAXF0&displayhash=1"
+
+                    //printPreviewLink?.click()
+
+                    // todo Prio 1: Pfad (Downloads oder Datenbank-Datei oder konfigurierbar?)
+                    val targetFileName = "notice${notice.id}.pdf"
+                    val targetPath = Paths.get(downloadDir, targetFileName)
+                    LOG.debug("targetPath: $targetPath")
+                    URL(pdfUrl).openStream().use { Files.copy(it, targetPath) }
+
+                    /*
+                    <a href="Confirm?type=final&contract=707555&hash=SQ312F0">
+				       Formular senden
+			        </a>
+                    */
+                    val confirmLink: WebElement? = driver.findElement(By.linkText("Formular senden"))
+                    LOG.debug("confirmLink: $confirmLink")
+                    confirmLink?.click()
+                }
+
+                // todo Prio 1: Nur wenn "Formulardaten sind versendet" erscheint
+                LOG.debug("Als gesendet markieren in DB...")
+                notice.id?.let {
+                    // Meldung muss vorher in der DB abgespeichert worden sein, damit id nicht null ist.
+                    LOG.debug("successfullySentCallback($it, ...)")
+                    successfullySentCallback?.invoke(it, ZonedDateTime.now())
                 }
             } catch (ex: TimeoutException) {
                 LOG.debug("Timeout");
@@ -232,10 +260,11 @@ class CologneWebForm(private val notice: NoticeEntity, private val witness: Witn
 
             try {
                 LOG.info("fertig.")
-                Thread.sleep(10 * 1000)
+                /*
                 LOG.info("Treiber beenden")
                 driver.close()
                 driver.quit()
+                */
             } catch (ex: NoSuchSessionException) {
                 LOG.info("Session ist (schon) geschlossen.")
             }
@@ -250,6 +279,9 @@ class CologneWebForm(private val notice: NoticeEntity, private val witness: Witn
 
         val FORM_URL =
             "https://formular-server.de/Koeln_FS/findform?shortname=32-F68_file_AnzVerkW&formtecid=3&areashortname=send_html"
+        val PROCESS_URL = "https://formular-daten.stadt-koeln.de/NetGateway/Process"
+        val PRINT_PREVIEW = "https://formular-daten.stadt-koeln.de/NetGateway/FormDisp?contract=707553&hash=SQ312F0&displayhash=1"
+
         val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy", Locale.GERMAN)
         val timeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm", Locale.GERMAN)
         val accurateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss z", Locale.GERMAN)

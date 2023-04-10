@@ -4,7 +4,7 @@ import de.heikozelt.wegefrei.delivery.webform.cologne.CologneWebForm
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
-class CologneAdapterTest {
+class CologneWebFormTest {
 
     @Test
     fun convertLicensePlate_normal() {

@@ -523,9 +523,13 @@ class NoticeFrame(
             when(ne.deliveryType) {
                 'E' -> sendEmail()
                 'F' -> if(ne.town == "Köln") {
-                    val cologneWebForm = CologneWebForm(ne, settings.witness)
-                    val webFormWorkflow = WebFormWorkflow(cologneWebForm, dbRepo)
-                    webFormWorkflow.validateAndSend()
+                    settings.databaseDirectory?.let { dbDir ->
+                        val cologneWebForm = CologneWebForm(ne, settings.witness, dbDir)
+                        val webFormWorkflow = WebFormWorkflow(cologneWebForm, dbRepo)
+                        // todo Prio 2: vorher oder zwischendrin speichern?
+                        saveNotice()
+                        webFormWorkflow.validateAndSend()
+                    }
                 } else {
                     val errors = listOf("Kein Web-Formular/Adapter für diese Stadt implementiert.")
                     showValidationErrors(errors)
