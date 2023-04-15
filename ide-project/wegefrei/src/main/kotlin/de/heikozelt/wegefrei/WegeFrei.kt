@@ -111,7 +111,7 @@ class WegeFrei(private val settingsRepo: SettingsRepo = SettingsFileRepo()) {
                 val result = JOptionPane.showOptionDialog(
                     null,
                     text,
-                    "Datenschutzvereinbarung",
+                    "Datenschutzvereinbarung - Wege frei!",
                     YES_NO_OPTION,
                     QUESTION_MESSAGE,
                     null,

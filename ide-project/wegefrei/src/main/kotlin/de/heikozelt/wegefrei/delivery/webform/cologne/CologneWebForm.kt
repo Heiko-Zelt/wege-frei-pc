@@ -1,10 +1,10 @@
 package de.heikozelt.wegefrei.delivery.webform.cologne
 
-import de.heikozelt.wegefrei.delivery.webform.UrlDiffersExpectedCondition
 import de.heikozelt.wegefrei.delivery.webform.WebForm
 import de.heikozelt.wegefrei.entities.NoticeEntity
 import de.heikozelt.wegefrei.json.Witness
 import org.openqa.selenium.*
+import org.openqa.selenium.support.ui.ExpectedConditions
 import org.openqa.selenium.support.ui.Select
 import org.openqa.selenium.support.ui.WebDriverWait
 import org.slf4j.LoggerFactory
@@ -19,7 +19,8 @@ import java.util.*
 /**
  * Spezieller Adapter, um Meldungen über das Web-Formular der Stadt Köln zu versenden
  */
-class CologneWebForm(private val notice: NoticeEntity, private val witness: Witness, private val downloadDir: String) : WebForm {
+class CologneWebForm(private val notice: NoticeEntity, private val witness: Witness, private val downloadDir: String) :
+    WebForm {
 
     /**
      * parameters: notice id & sent time
@@ -164,6 +165,7 @@ class CologneWebForm(private val notice: NoticeEntity, private val witness: Witn
             // fieldset: Tatvorwurf
             val statements = mutableListOf<String>()
             notice.offense?.let(statements::add)
+            notice.locationDescription?.let(statements::add)
             notice.note?.let(statements::add)
             if (notice.vehicleAbandoned) statements.add("Fahrzeug war verlassen")
             if (notice.warningLights) statements.add("Warnblinkanlage war eingeschaltet")
@@ -198,46 +200,55 @@ class CologneWebForm(private val notice: NoticeEntity, private val witness: Witn
 
             val wait = WebDriverWait(driver, Duration.ofMinutes(5))
             try {
-                val result = wait.until(UrlDiffersExpectedCondition(FORM_URL))
+                //val result = wait.until(UrlDiffersExpectedCondition(FORM_URL))
+                wait.until(ExpectedConditions.urlToBe(PROCESS_URL))
                 LOG.debug("Fertig mit Warten :-)")
-                LOG.debug("Result: $result")
+                //LOG.debug("Result: $result")
 
-
-                // todo Prio 1: check if correct URL
+                /*
                 val newUrl = driver.currentUrl
                 LOG.debug("currentUrl: $newUrl}")
                 if(newUrl == PROCESS_URL) {
-                    LOG.debug("Form was validated")
-                    /*
-                    <a href="FormDisp?contract=707555&hash=SQ312F0&displayhash=1" target="FormDisp">
-				       Druckvorschau
-			        </a>
-                     */
-                    val printPreviewLink: WebElement? = driver.findElement(By.linkText("Druckvorschau"))
-                    LOG.debug("printPreviewLink Element: $printPreviewLink")
-                    val pdfUrl = printPreviewLink?.getAttribute("href")
-                    LOG.debug("printPreviewLink URL: $pdfUrl")
-                    // Beispiel: "https://formular-daten.stadt-koeln.de/NetGateway/FormDisp?contract=707579&hash=A8AAXF0&displayhash=1"
-
-                    //printPreviewLink?.click()
-
-                    // todo Prio 1: Pfad (Downloads oder Datenbank-Datei oder konfigurierbar?)
-                    val targetFileName = "notice${notice.id}.pdf"
-                    val targetPath = Paths.get(downloadDir, targetFileName)
-                    LOG.debug("targetPath: $targetPath")
-                    URL(pdfUrl).openStream().use { Files.copy(it, targetPath) }
-
-                    /*
-                    <a href="Confirm?type=final&contract=707555&hash=SQ312F0">
-				       Formular senden
-			        </a>
                     */
-                    val confirmLink: WebElement? = driver.findElement(By.linkText("Formular senden"))
-                    LOG.debug("confirmLink: $confirmLink")
-                    confirmLink?.click()
-                }
+                LOG.debug("Form was validated")
+                /*
+                <a href="FormDisp?contract=707555&hash=SQ312F0&displayhash=1" target="FormDisp">
+                   Druckvorschau
+                </a>
+                 */
+                val printPreviewLink: WebElement? = driver.findElement(By.linkText("Druckvorschau"))
+                LOG.debug("printPreviewLink Element: $printPreviewLink")
+                val pdfUrl = printPreviewLink?.getAttribute("href")
+                LOG.debug("printPreviewLink URL: $pdfUrl")
+                // Beispiel: "https://formular-daten.stadt-koeln.de/NetGateway/FormDisp?contract=707579&hash=A8AAXF0&displayhash=1"
 
-                // todo Prio 1: Nur wenn "Formulardaten sind versendet" erscheint
+                //printPreviewLink?.click()
+
+                // todo Prio 1: Pfad (Downloads oder Datenbank-Datei oder konfigurierbar?)
+                val targetFileName = "notice${notice.id}.pdf"
+                val targetPath = Paths.get(downloadDir, targetFileName)
+                LOG.debug("targetPath: $targetPath")
+                URL(pdfUrl).openStream().use { Files.copy(it, targetPath) }
+
+                /*
+                <a href="Confirm?type=final&contract=707555&hash=SQ312F0">
+                   Formular senden
+                </a>
+                */
+                val confirmLink: WebElement? = driver.findElement(By.linkText("Formular senden"))
+                LOG.debug("confirmLink: $confirmLink")
+                confirmLink?.click()
+
+                LOG.debug("driver.currentUrl: ${driver.currentUrl}")
+                wait.until(ExpectedConditions.urlContains(FINISHED_URL))
+
+                // todo Prio 2: Nur wenn "Formulardaten sind versendet" erscheint (was soll sonst erscheinen?)
+                /*
+                <h1 id=ueberschriftBest">
+                   Formulardaten sind versendet
+                </h1>
+                */
+
                 LOG.debug("Als gesendet markieren in DB...")
                 notice.id?.let {
                     // Meldung muss vorher in der DB abgespeichert worden sein, damit id nicht null ist.
@@ -258,20 +269,25 @@ class CologneWebForm(private val notice: NoticeEntity, private val witness: Witn
                 }
             }
 
+            // finally?
+            LOG.info("Fertig.")
             try {
-                LOG.info("fertig.")
-                /*
-                LOG.info("Treiber beenden")
+                LOG.info("Fenster schließen.")
                 driver.close()
+            } catch (ex: NoSuchSessionException) {
+                LOG.info("Session ist (schon) geschlossen.")
+            }
+            try {
+                LOG.info("Treiber beenden.")
                 driver.quit()
-                */
             } catch (ex: NoSuchSessionException) {
                 LOG.info("Session ist (schon) geschlossen.")
             }
         }
 
-        // todo Prio 2: NoticeFrame disablen und warten bis Formular geschlossen wurde (gesendet oder abgebrochen)
-        // todo Prio 3: PDF speichern
+        // todo Prio 1: NoticesTable updaten
+        // todo Prio 2: bei Erfolg, NoticeFrame schließen
+        // todo Prio 3: NoticeFrame disablen und warten bis Formular geschlossen wurde (gesendet oder abgebrochen)
     }
 
     companion object {
@@ -280,7 +296,9 @@ class CologneWebForm(private val notice: NoticeEntity, private val witness: Witn
         val FORM_URL =
             "https://formular-server.de/Koeln_FS/findform?shortname=32-F68_file_AnzVerkW&formtecid=3&areashortname=send_html"
         val PROCESS_URL = "https://formular-daten.stadt-koeln.de/NetGateway/Process"
-        val PRINT_PREVIEW = "https://formular-daten.stadt-koeln.de/NetGateway/FormDisp?contract=707553&hash=SQ312F0&displayhash=1"
+        val FINISHED_URL = "https://formular-daten.stadt-koeln.de/NetGateway/Confirm"
+        val PRINT_PREVIEW =
+            "https://formular-daten.stadt-koeln.de/NetGateway/FormDisp?contract=707553&hash=SQ312F0&displayhash=1"
 
         val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy", Locale.GERMAN)
         val timeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm", Locale.GERMAN)
@@ -295,7 +313,7 @@ class CologneWebForm(private val notice: NoticeEntity, private val witness: Witn
          * todo: Landeskennzeichen berücksichtigen
          */
         fun convertLicensePlate(original: String): String {
-            val regex = Regex("^([A-ZÄÖÜ]+)[ -]([A-ZÄÖÜ]+) ?(\\d+)$")
+            val regex = Regex("^([A-ZÄÖÜ]+)[ -]([A-ZÄÖÜ]+) ?([A-ZÄÖÜ\\d]+)$")
             val matchResult = regex.matchEntire(original)
             //log.debug("entire match: ${matchResult?.groups?.get(0)}")
             //log.debug("group value 1: ${matchResult?.groupValues?.get(1)}")

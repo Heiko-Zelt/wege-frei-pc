@@ -1,0 +1,175 @@
+<!-- Metaangaben - v2.9 - ANFANG -->
+<html>
+    <head>
+        <meta http-equiv="content-type" content="text/xhtml; charset=UTF-8"/>
+        <meta http-equiv="content-language" content="de"/>
+        <meta name="author" content="Stadt K&ouml;ln"/>
+        <meta name="copyright" content="Stadt K&ouml;ln"/>
+        <meta http-equiv="Expires" content="0"/>
+        <meta http-equiv="Pragma" content="no-cache"/>
+        <meta http-equiv="Cache-Control" content="no-cache"/>
+        <title>Stadt K&ouml;ln - Formular einreichen</title>
+		<style type="text/css">
+		<!--
+		/* CSS v1.7 */
+		body {
+			color: #000;
+			background-color: #FFF;
+			font-family: Arial;
+			margin: 0.5em 1em 1em 2%;
+		}
+		a {
+			text-decoration: none;
+			color: #000;
+		}
+		p {
+			margin: 0em 0em 0.5em 0em;
+			padding: 0px;
+		}
+		h1 {
+			font-size: 1.5em;
+			margin: 0em 0em 0.4em 0em;
+		}
+		h2, h3 {
+			font-wight: bold;
+			font-size: 1.0em;
+			margin: 0em 0em 0.2em 0em;
+		}
+		.text {
+			margin: 0em 0em 2.0em 0em;
+		}
+		ol, li {
+			margin: 0em 0em 0em 1.2em;
+			padding: 0em 0em 0em 0em;
+		}
+		img.logo {
+			float: right;
+			border: 0em;
+			padding: 0 0 1em 1em;
+		}
+		.footer {
+			text-align: right;
+			font-size: 0.8em;
+			float: right;
+			border-top: 2px solid #004;
+			width: 100%;
+			margin: 1em 0em 0.5em 0em;
+		}
+		.fButton a,
+		.fButton input,
+		.fButton a:visited {
+			padding: 0.2em 0em 0.1em 0em;
+			margin: 0.3em 0em 2em -0.3px;
+			border: 2px solid #8E8E8E;
+			cursor: pointer;
+			text-decoration: none;
+			background-color: #EBEBEB;
+			width: 220px;
+			height: 1.2em;
+			display: block;
+			text-align: center;
+			font-size: 1em;
+		}
+		#formulardatenWiederOeffnenKnopf {
+			height: 1.9em;
+			width: 224px;
+		}
+		.fButton a:hover,
+		.fButton input:hover {
+			border: 2px solid #E82028;
+			background-color: #F7F7F7;
+			color: #C00;
+		}
+		#zwischenspeichern {
+			margin: 0px;
+			padding: 1em 0em 0em 0em;
+		}
+		#zurueckZumFormularZwSp a,
+		#zurueckZumFormularBest a,
+		#hilfeZuFormulare		{
+			margin: 2.5em 0em 0.5em 0em;
+		}
+		#zwischenspeichern_text {
+			margin: 0px 0px 0px 0px;
+			padding: 1em 0em 0em 0em;
+		}
+		form {
+			margin: 0px;
+			padding: 0px;
+		}
+		.demo {
+			background-color: #BFE8FF;
+			text-align: center;
+			font-size: 2em;
+			float: right;
+			color: #004;
+			border: 2px solid #004;
+			width: 100%;
+			margin: 0em 0em 1em 0em;
+		}
+		.test {
+			background-color: #FFF361;
+			text-align: center;
+			font-size: 2em;
+			float: right;
+			color: #004;
+			border: 2px solid #004;
+			width: 100%;
+			margin: 0em 0em 1em 0em;
+		}
+		-->
+		</style>
+	</head>
+	<body>
+	<!-- Metaangaben - ENDE -->		
+		<!-- Logo - v1.3 - ANFANG -->
+
+
+
+
+
+        <a href="http://www.stadt-koeln.de" target="_blank">
+			<img src="https://formular-server.de/Koeln_FS/getform/logo_koeln_koeln_intern_HTML/000-01/logo_koeln.gif" alt="Logo K&ouml;ln, Link zur Webseite der Stadt K&ouml;ln" class="logo"/>
+
+		</a>
+		<!-- Logo - ENDE -->
+		<!-- Ueberschrift - v1.2 - ANFANG -->
+        <h1 id=ueberschriftBest">
+			Formular Senden ohne Unterschrift
+		</h1>
+		<!-- Ueberschrift - ENDE -->
+
+		<!-- Senden ohne Signatur - v1.2 - ANFANG -->
+        <p>
+		Drücken Sie die Schaltfläche <b>Formular senden</b> um das ausgefüllte Formular ohne Unterschrift an die Stadt Köln zu senden.
+		</p>
+		<p class="fButton" id="formularOhneSignaturSenden">
+			<a href="Confirm?type=final&contract=707555&hash=SQ312F0">
+				Formular senden
+			</a>
+		</p>
+		<!-- Senden ohne Signatur - ENDE -->
+		
+		<!-- Druck Vorschau - v1.3 - ANFANG -->
+		<p class="textDruckvorschau">
+		Drücken Sie die Schaltfläche <b>Druckvorschau</b> um das Formular als <b>PDF</b> auszudrucken oder lokal auf den eigenen Rechner zu speichern (zum Beispiel zur Archivierung).
+		 </p>
+		<p class="fButton" id="formularAnsicht">				
+			<a href="FormDisp?contract=707555&hash=SQ312F0&displayhash=1" target="FormDisp">
+				Druckvorschau
+			</a>
+		</p>
+		<!-- Druck Vorschau - ENDE -->
+
+		<!-- zurueck zum Formular - Bestaetigugsseite - v1.2 - ANFANG -->
+		<p class="fButton" id="zurueckZumFormularBest">
+			<a href="Back2FormHtml?contract=707555&hash=SQ312F0" target="_self">
+				Zur&uuml;ck zum Formular
+			</a>
+		</p>
+		<!-- zurueck zum Formular - Bestaetigugsseite - ENDE -->
+		<!-- Footer - v1.4 - ANFANG -->
+		<div class="footer">&copy; Stadt K&ouml;ln 2019</div>
+	</body>
+</html>
+<!-- Footer - ENDE -->

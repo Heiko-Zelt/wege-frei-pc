@@ -36,6 +36,7 @@ import javax.swing.text.AbstractDocument
  * </pre>
  * todo Prio 4: Feature: Rechtschreibprüfung insbesondere für Hinweis-Textarea
  * todo Prio 1: Bug: HU-Fälligkeit wird nicht mehr angezeigt, wenn Nachricht gesendet und wieder geöffnet wird.
+ * todo Prio 2: Dauer neu berechnen, wenn Datum oder Uhrzeit (manuell (oder automatisch)) geändert wurde.
  */
 class NoticeFormFields(
     private val noticeFrame: NoticeFrame,

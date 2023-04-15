@@ -9,6 +9,8 @@ import javax.swing.JLabel
  * Choose directory dialog.
  * @param label The text of the Label holds the directory path.
  * @param title dialog window title.
+ * todo: Prio 2: Die Datenbank-Datei wird nicht angezeigt.
+ *   Beim Öffnen einer existierenden DB sieht man nicht, ob man den richtigen Ordner auswählt.
  */
 class DirectoryChooser(private val label: JLabel, title: String): JFileChooser() {
 

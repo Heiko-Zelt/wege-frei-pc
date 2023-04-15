@@ -502,6 +502,7 @@ class NoticeFrame(
      */
     fun sendButtonClicked() {
         log.debug("sendButtonClicked()")
+        // todo Prio 2: validieren, ob Zeugendaten vollständig sind
         var errors = validateAndMap()
         if (errors.isNotEmpty()) {
             showValidationErrors(errors)

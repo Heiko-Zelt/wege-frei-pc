@@ -26,5 +26,10 @@ class CologneWebFormTest {
         assertEquals("AB-123-BC", CologneWebForm.convertLicensePlate("AB-123-BC"))
     }
 
+    @Test
+    fun convertLicensePlate_electric() {
+        assertEquals("K-X123E", CologneWebForm.convertLicensePlate("K X 123E"))
+    }
+
 
 }
