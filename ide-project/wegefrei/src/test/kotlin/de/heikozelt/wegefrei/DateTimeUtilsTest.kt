@@ -19,10 +19,11 @@ class DateTimeUtilsTest {
     }
 
     @Test
-    fun validateStartDateTime_perfect_with_minutes_precision() {
+    fun validateStartDateTime_with_minutes_precision() {
         val errors = validateStartDateTime("31.12.2023", "23:59")
         traceErrors(errors)
-        assertTrue(errors.isEmpty())
+        assertEquals(1, errors.size)
+        assertEquals("Tatzeit hat nicht das Format 23:59:59.", errors[0])
     }
 
     @Test
@@ -143,5 +144,48 @@ class DateTimeUtilsTest {
         val startTime = ZonedDateTime.of(2021, 12, 31, 13, 0, 0, 0, ZoneId.of("Europe/Berlin"))
         val endTime = ZonedDateTime.of(2021, 12, 31, 13, 1, 0, 0, ZoneId.of("Europe/Berlin"))
         assertEquals("1 Minute", durationInMinutesFormatted(startTime, endTime))
+    }
+
+    @Test
+    fun duration_2days() {
+        val start = ZonedDateTime.of(2021, 12, 31, 13, 1, 1, 0, ZoneId.of("Europe/Berlin"))
+        val end = ZonedDateTime.of(2022, 1, 2, 14, 59, 59, 0, ZoneId.of("Europe/Berlin"))
+        assertEquals("2 d 1 h 58 min 58 sec", durationFormatted(start, end))
+    }
+
+    /**
+     * macht keinen Sinn. Eine Validierung sollte verhindern, dass diese Dauer gemeldet wird.
+     */
+    @Test
+    fun duration_negative() {
+        val start = ZonedDateTime.of(2022, 1, 2, 14, 59, 59, 0, ZoneId.of("Europe/Berlin"))
+        val end = ZonedDateTime.of(2021, 12, 31, 13, 1, 1, 0, ZoneId.of("Europe/Berlin"))
+        assertEquals("-2 d -1 h -58 min -58 sec", durationFormatted(start, end))
+    }
+
+    @Test
+    fun duration_zero() {
+        val start = ZonedDateTime.of(2022, 1, 2, 14, 59, 59, 0, ZoneId.of("Europe/Berlin"))
+        assertEquals("0 sec", durationFormatted(start, start))
+    }
+
+    @Test
+    fun duration_1_second() {
+        val start = ZonedDateTime.of(2022, 1, 2, 14, 59, 59, 0, ZoneId.of("Europe/Berlin"))
+        assertEquals("1 sec", durationFormatted(start, start))
+    }
+
+    @Test
+    fun duration_exactly_1_hour() {
+        val start = ZonedDateTime.of(2022, 1, 2, 14, 59, 59, 0, ZoneId.of("Europe/Berlin"))
+        val end = ZonedDateTime.of(2022, 1, 2, 15, 59, 59, 0, ZoneId.of("Europe/Berlin"))
+        assertEquals("1 h 0 min 0 sec", durationFormatted(start, end))
+    }
+
+    @Test
+    fun duration_1_year_and_1_minute() {
+        val start = ZonedDateTime.of(2022, 1, 2, 14, 58, 59, 0, ZoneId.of("Europe/Berlin"))
+        val end = ZonedDateTime.of(2023, 1, 2, 14, 59, 59, 0, ZoneId.of("Europe/Berlin"))
+        assertEquals("365 d 0 h 1 min 0 sec", durationFormatted(start, end))
     }
 }

@@ -1,12 +1,10 @@
 package de.heikozelt.wegefrei
 
-import java.time.LocalDate
-import java.time.LocalTime
-import java.time.ZoneId
-import java.time.ZonedDateTime
+import java.time.*
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
 import java.time.temporal.ChronoUnit
+
 
 val dateFormat = DateTimeFormatter.ofPattern("d.M.yyyy")
 val timeFormat = DateTimeFormatter.ofPattern("H:m:s")
@@ -76,18 +74,7 @@ fun validateEndDateTime(startDateStr: String?, endDateStr: String?, endTimeStr: 
     return errors
 }
 
-/**
- * @return duration in minutes
- */
-fun durationInMinutes(startDateStr: String?, startTimeStr: String?, endDateStr: String?, endTimeStr: String?): String? {
-    val startDate = parseDate(startDateStr)
-    val startTime = parseTime(startTimeStr)
-    val endDate = parseDate(endDateStr)
-    val endTime = parseTime(endTimeStr)
-    val startZonedDateTime = zonedDateTime(startDate, startTime)
-    val endZonedDateTime = endZonedDateTime(startDate, endDate, endTime)
-    return durationInMinutesFormatted(startZonedDateTime, endZonedDateTime)
-}
+
 
 fun parseDate(dateStr: String?): LocalDate? {
     val dateFormat = DateTimeFormatter.ofPattern("d.M.yyyy")
@@ -119,7 +106,7 @@ fun zonedDateTime(date: LocalDate?, time: LocalTime?): ZonedDateTime? {
 }
 
 /**
- * use startDate if not endDate is provided
+ * use startDate if endDate is not provided
  */
 fun endZonedDateTime(startDate: LocalDate?, endDate: LocalDate?, endTime: LocalTime?): ZonedDateTime? {
     return if(endDate == null) {
@@ -127,6 +114,19 @@ fun endZonedDateTime(startDate: LocalDate?, endDate: LocalDate?, endTime: LocalT
     } else {
         zonedDateTime(endDate, endTime)
     }
+}
+
+/**
+ * @return duration in minutes
+ */
+fun durationInMinutes(startDateStr: String?, startTimeStr: String?, endDateStr: String?, endTimeStr: String?): String? {
+    val startDate = parseDate(startDateStr)
+    val startTime = parseTime(startTimeStr)
+    val endDate = parseDate(endDateStr)
+    val endTime = parseTime(endTimeStr)
+    val startZonedDateTime = zonedDateTime(startDate, startTime)
+    val endZonedDateTime = endZonedDateTime(startDate, endDate, endTime)
+    return durationInMinutesFormatted(startZonedDateTime, endZonedDateTime)
 }
 
 /**
@@ -156,5 +156,26 @@ fun durationInMinutesFormatted(start: ZonedDateTime?, end: ZonedDateTime?): Stri
             1 -> "1 Minute"
             else -> "$d Minuten"
         }
+    }
+}
+
+/**
+ * liefert die Dauer im Format 25 h 59 min 59 sec
+ */
+fun durationFormatted(start: ZonedDateTime?, end: ZonedDateTime?): String? {
+    return if(start == null || end == null) {
+        null
+    } else {
+        val duration = Duration.between(start, end) // null?
+        val days = duration.toDays()
+        val hours = duration.toHoursPart()
+        val minutes = duration.toMinutesPart()
+        val seconds = duration.toSecondsPart()
+        val parts = mutableListOf<String>()
+        if(days != 0L) parts.add("$days d")
+        if(hours != 0 || days != 0L) parts.add("$hours h")
+        if(minutes != 0 || hours != 0 || days != 0L) parts.add("$minutes min")
+        parts.add("$seconds sec")
+        parts.joinToString(" ")
     }
 }
