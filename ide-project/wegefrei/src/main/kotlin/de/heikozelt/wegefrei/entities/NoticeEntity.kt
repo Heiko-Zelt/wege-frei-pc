@@ -314,7 +314,7 @@ class NoticeEntity(
         }
     }
 
-    fun getDurationFormatted(): String {
+    fun getDurationFormatted(): String? {
         return durationInMinutesFormatted(observationTime, endTime)
     }
 

@@ -1,12 +1,12 @@
 package de.heikozelt.wegefrei
 
+import de.heikozelt.wegefrei.delivery.email.NoticesOutbox
 import de.heikozelt.wegefrei.email.addressbook.AddressBookFrame
 import de.heikozelt.wegefrei.email.useragent.EmailSender
 import de.heikozelt.wegefrei.email.useragent.EmailUserAgent
 import de.heikozelt.wegefrei.entities.NoticeEntity
 import de.heikozelt.wegefrei.json.Settings
 import de.heikozelt.wegefrei.model.LeastRecentlyUsedCache
-import de.heikozelt.wegefrei.delivery.email.NoticesOutbox
 import de.heikozelt.wegefrei.model.Photo
 import de.heikozelt.wegefrei.model.PhotoLoader
 import de.heikozelt.wegefrei.noticeframe.NoticeFrame
@@ -36,6 +36,8 @@ import javax.swing.UIManager
  * todo Prio 1: update notice in NoticesFrame after it was sent
  * todo Prio 3: Logo/Icon für die Anwendung
  * todo Prio 3: Export data from database as CSV tables and JSON document collections
+ * todo Prio 2: Fehlermeldung ausgeben, wenn Datenbank-Datei nicht geöffnet werden kann
+ *   z.b. von anderem Prozess geöffnet.
  */
 class WegeFrei(private val settingsRepo: SettingsRepo = SettingsFileRepo()) {
 

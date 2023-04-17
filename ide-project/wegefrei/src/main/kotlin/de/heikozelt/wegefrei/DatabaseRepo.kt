@@ -96,7 +96,7 @@ class DatabaseRepo(jdbcUrl: String) {
         try {
             val jpql = """
                 SELECT n FROM NoticeEntity n LEFT JOIN FETCH n.photoEntities
-                  WHERE n.deliverytype = 'E'
+                  WHERE n.deliveryType = 'E'
                   AND n.finalizedTime <> null
                   AND n.sentTime = null
                   ORDER BY n.sendFailures, n.finalizedTime""".trimIndent()

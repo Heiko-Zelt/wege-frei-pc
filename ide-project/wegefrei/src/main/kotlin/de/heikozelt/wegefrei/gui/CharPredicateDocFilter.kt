@@ -50,7 +50,7 @@ open class CharPredicateDocFilter(private val predicate: (Char) -> Boolean): Doc
         /**
          * Erlaubt die Eingabe einer Uhrzeit.
          * Alle anderen Zeichen werden verworfen.
-         * z.B. "23:59"
+         * z.B. "23:59" oder "23:59:59"
          */
         val timeDocFilter = CharPredicateDocFilter { it.isDigit() || it == ':' }
     }

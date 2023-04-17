@@ -1,7 +1,6 @@
 package de.heikozelt.wegefrei.noticeframe
 
-import de.heikozelt.wegefrei.DatabaseRepo
-import de.heikozelt.wegefrei.durationInMinutesFormatted
+import de.heikozelt.wegefrei.*
 import de.heikozelt.wegefrei.email.combobox.RecipientComboBox
 import de.heikozelt.wegefrei.entities.NoticeEntity
 import de.heikozelt.wegefrei.gui.*
@@ -13,12 +12,10 @@ import de.heikozelt.wegefrei.model.SelectedPhotosListModel
 import de.heikozelt.wegefrei.model.VehicleColor
 import org.jxmapviewer.viewer.TileFactory
 import org.slf4j.LoggerFactory
-import java.time.LocalDate
-import java.time.LocalTime
-import java.time.ZoneId
+import java.awt.event.FocusAdapter
+import java.awt.event.FocusEvent
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeParseException
 import java.util.*
 import javax.swing.*
 import javax.swing.event.ListDataEvent
@@ -70,6 +67,7 @@ class NoticeFormFields(
     private val observationTimeTextField = TrimmingTextField(8)
     private val endDateTextField = JTextField(10)
     private val endTimeTextField = TrimmingTextField(8)
+    private val durationLabel = JLabel("Dauer:")
     private val calculatedDurationLabel = JLabel("")
     private val abandonedCheckBox = JCheckBox("Fahrzeug war verlassen")
     private val obstructionCheckBox = JCheckBox("mit Behinderung")
@@ -94,6 +92,12 @@ class NoticeFormFields(
     private val noteTextArea = JTextArea(2, 40)
 
     //private var noticeEntity: NoticeEntity? = null
+
+    private val dateTimeLostFocusListener = object : FocusAdapter() {
+        override fun focusLost(e: FocusEvent?) {
+            updateDurationAfterEdit()
+        }
+    }
 
     init {
         log.debug("init")
@@ -134,28 +138,37 @@ class NoticeFormFields(
         if (observationDateDoc is AbstractDocument) {
             observationDateDoc.documentFilter = CharPredicateDocFilter.dateDocFilter
         }
-
-        val endDateTimeLabel = JLabel("Endedatum, Uhrzeit:")
-
         observationDateTextField.toolTipText = "Datum, an dem die Tat beobachtet wurde, z.B. 31.12.2021"
         observationDateTextField.inputVerifier = PatternVerifier.dateVerifier
+        observationDateTextField.addFocusListener(dateTimeLostFocusListener)
+
         val observationTimeDoc = observationTimeTextField.document
         if (observationTimeDoc is AbstractDocument) {
             observationTimeDoc.documentFilter = CharPredicateDocFilter.timeDocFilter
         }
         observationTimeTextField.toolTipText = "Uhrzeit, zu der die Tat beobachtet wurde, z.B. 23:59:59"
         observationTimeTextField.inputVerifier = PatternVerifier.timeVerifier
+        observationTimeTextField.addFocusListener(dateTimeLostFocusListener)
 
-        endDateTextField.toolTipText = "Datum, als die Tat/Beobachtung endete, falls an einem folgenden Tag, z.B. 31.12.2021"
+        val endDateTimeLabel = JLabel("Endedatum, Uhrzeit:")
+
+        val endDateDoc = endDateTextField.document
+        if (endDateDoc is AbstractDocument) {
+            endDateDoc.documentFilter = CharPredicateDocFilter.dateDocFilter
+        }
+        endDateTextField.toolTipText =
+            "Datum, als die Tat/Beobachtung endete, falls an einem folgenden Tag, z.B. 31.12.2021"
         endDateTextField.inputVerifier = PatternVerifier.dateVerifier
+        endDateTextField.addFocusListener(dateTimeLostFocusListener)
+
         val endTimeDoc = endTimeTextField.document
         if (endTimeDoc is AbstractDocument) {
             endTimeDoc.documentFilter = CharPredicateDocFilter.timeDocFilter
         }
         endTimeTextField.toolTipText = "Uhrzeit, als die Tat/Beobachtung endete, z.B. 23:59:59"
         endTimeTextField.inputVerifier = PatternVerifier.timeVerifier
+        endTimeTextField.addFocusListener(dateTimeLostFocusListener)
 
-        val durationLabel = JLabel("Dauer:")
         durationLabel.toolTipText = "abgerundet"
         vehicleInspectionStickerCheckBox.addChangeListener {
             val src = it.source as JCheckBox
@@ -365,7 +378,8 @@ class NoticeFormFields(
                 )
                 .addGroup(
                     lay.createParallelGroup(GroupLayout.Alignment.CENTER)
-                        .addComponent(deliveryTypeLabel).addComponent(emailDeliveryRadioButton).addComponent(webFormDeliveryRadioButton)
+                        .addComponent(deliveryTypeLabel).addComponent(emailDeliveryRadioButton)
+                        .addComponent(webFormDeliveryRadioButton)
                 )
                 .addGroup(
                     lay.createParallelGroup(GroupLayout.Alignment.CENTER)
@@ -390,6 +404,49 @@ class NoticeFormFields(
         Styles.restrictSize(inspectionMonthTextField)
 
         enableOrDisableEditing(false)
+    }
+
+    fun updateDurationAfterEdit() {
+        val obsDateTxt = observationDateTextField.text
+        val obsTimeTxt = observationTimeTextField.text
+        val endDateTxt = endDateTextField.text
+        val endTimeTxt = endTimeTextField.text
+        val obsDate = parseDate(obsDateTxt)
+        val obsTime = parseTime(obsTimeTxt)
+        val endDate = if (endDateTxt.isNullOrBlank()) {
+            obsDate
+        } else {
+            parseDate(endDateTxt)
+        }
+        val endTime = parseTime(endTimeTxt)
+        val startDateTime = zonedDateTime(obsDate, obsTime)
+        val endDateTime = zonedDateTime(endDate, endTime)
+        updateDuration(startDateTime, endDateTime)
+    }
+
+    /**
+     * show duration (or hide row if it can't be calculated)
+     */
+    fun updateDuration(startDateTime: ZonedDateTime?, endDateTime: ZonedDateTime?) {
+        val durationTxt = durationInMinutesFormatted(startDateTime, endDateTime)
+        val visi = durationTxt != null
+        durationLabel.isVisible = visi
+        calculatedDurationLabel.isVisible = visi
+        calculatedDurationLabel.text = if (visi) {
+            durationTxt
+        } else {
+            ""
+        }
+    }
+
+    private fun updateDateTimeAndDuration() {
+        val newStartTime = selectedPhotosListModel.getStartTime()
+        observationDateTextField.text = blankOrDateString(newStartTime)
+        observationTimeTextField.text = blankOrTimeString(newStartTime)
+        val newEndTime = selectedPhotosListModel.getEndTime()
+        endDateTextField.text = blankOrDateString(newEndTime)
+        endTimeTextField.text = blankOrTimeString(newEndTime)
+        updateDuration(newStartTime, newEndTime)
     }
 
     /**
@@ -417,6 +474,7 @@ class NoticeFormFields(
         observationTimeTextField.text = blankOrTimeString(noticeEntity.observationTime)
         endDateTextField.text = blankOrDateString(noticeEntity.endTime)
         endTimeTextField.text = blankOrTimeString(noticeEntity.endTime)
+        updateDuration(noticeEntity.observationTime, noticeEntity.endTime)
         calculatedDurationLabel.text = noticeEntity.getDurationFormatted()
         obstructionCheckBox.isSelected = noticeEntity.obstruction
         endangeringCheckBox.isSelected = noticeEntity.endangering
@@ -475,10 +533,28 @@ class NoticeFormFields(
         n.locationDescription = trimmedOrNull(locationDescriptionTextField.text)
         n.offense = offenseComboBox.getValue()
 
+        val obsDateTxt = observationDateTextField.text
+        val obsTimeTxt = observationTimeTextField.text
+        val endDateTxt = endDateTextField.text
+        val endTimeTxt = endTimeTextField.text
+        errors.addAll(validateStartDateTime(obsDateTxt, obsTimeTxt))
+        errors.addAll(validateEndDateTime(obsDateTxt, endDateTxt, endTimeTxt))
+        val obsDate = parseDate(obsDateTxt)
+        val obsTime = parseTime(obsTimeTxt)
+        val endDate = if (endDateTxt.isNullOrBlank()) {
+            obsDate
+        } else {
+            parseDate(endDateTxt)
+        }
+        val endTime = parseTime(endTimeTxt)
+        n.observationTime = zonedDateTime(obsDate, obsTime)
+        n.endTime = zonedDateTime(endDate, endTime)
+
         // Problem: 2 Eingabefelder für Datum und Uhrzeit, aber nur ein Datenbankfeld
         // Lösung: Beide müssen ausgefüllt sein oder keins. Nur zusammen speichern oder gar nicht.
         // Ähnlich wie Längengrad und Breitengrad. Diese müssen auch zusammen oder gar nicht gespeichert werden.
 
+        /*
         val format = DateTimeFormatter.ofPattern("d.M.yyyy")
         val obsDateTxt = observationDateTextField.text
         val obsTimeTxt = observationTimeTextField.text
@@ -546,6 +622,8 @@ class NoticeFormFields(
         log.debug("endTime: ${n.endTime}")
 
         //n.duration = intOrNull(durationTextField.text)
+
+         */
         n.obstruction = obstructionCheckBox.isSelected
         n.endangering = endangeringCheckBox.isSelected
         n.environmentalStickerMissing = environmentalStickerCheckBox.isSelected
@@ -648,17 +726,6 @@ class NoticeFormFields(
         if (photos.size != 0 && settings.autoOffenseTime) {
             updateDateTimeAndDuration()
         }
-    }
-
-    private fun updateDateTimeAndDuration() {
-        val newStartTime = selectedPhotosListModel.getStartTime()
-        observationDateTextField.text = blankOrDateString(newStartTime)
-        observationTimeTextField.text = blankOrTimeString(newStartTime)
-        val newEndTime = selectedPhotosListModel.getEndTime()
-        endDateTextField.text = blankOrDateString(newEndTime)
-        endTimeTextField.text = blankOrTimeString(newEndTime)
-        // todo Prio 1: format in minutes
-        calculatedDurationLabel.text = durationInMinutesFormatted(selectedPhotosListModel.getStartTime(), selectedPhotosListModel.getEndTime())
     }
 
     companion object {
