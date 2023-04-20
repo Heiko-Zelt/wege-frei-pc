@@ -428,7 +428,7 @@ class NoticeFormFields(
      * show duration (or hide row if it can't be calculated)
      */
     fun updateDuration(startDateTime: ZonedDateTime?, endDateTime: ZonedDateTime?) {
-        val durationTxt = durationInMinutesFormatted(startDateTime, endDateTime)
+        val durationTxt = durationFormatted(startDateTime, endDateTime)
         val visi = durationTxt != null
         durationLabel.isVisible = visi
         calculatedDurationLabel.isVisible = visi

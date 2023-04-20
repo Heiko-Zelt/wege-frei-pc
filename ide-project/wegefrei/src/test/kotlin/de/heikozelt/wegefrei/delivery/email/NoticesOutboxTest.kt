@@ -1,11 +1,13 @@
-package de.heikozelt.wegefrei.model
+package de.heikozelt.wegefrei.delivery.email
 
 import de.heikozelt.wegefrei.DatabaseRepo
-import de.heikozelt.wegefrei.delivery.email.NoticesOutbox
 import de.heikozelt.wegefrei.email.EmailAddressEntity
 import de.heikozelt.wegefrei.entities.NoticeEntity
 import de.heikozelt.wegefrei.json.Settings
 import de.heikozelt.wegefrei.json.Witness
+import de.heikozelt.wegefrei.model.ValidationException
+import de.heikozelt.wegefrei.model.VehicleColor
+import de.heikozelt.wegefrei.model.VehicleMakesComboBoxModel
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
@@ -80,12 +82,8 @@ class NoticesOutboxTest {
                     mit Gefährdung</td>
                 </tr>
                 <tr>
-                  <td>Beobachtungszeit:</td>
-                  <td>01.01.2022, 12:01 MEZ</td>
-                </tr>
-                <tr>
-                  <td>Beobachtungsdauer:</td>
-                  <td>weniger als 1 Minute</td>
+                  <td>Tatzeit:</td>
+                  <td>01.01.2022, 12:01:00 MEZ</td>
                 </tr>
               </tbody>
             </table>
@@ -228,6 +226,7 @@ class NoticesOutboxTest {
             latitude = 50.1
             longitude = 8.1
             offense = "Parken im Rhein"
+            deliveryType = 'E'
             recipientEmailAddress = "ordnungsamt@junit-test-gemeinde.de"
             finalizedTime = finalTime
         }

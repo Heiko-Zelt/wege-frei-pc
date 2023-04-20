@@ -1,7 +1,7 @@
 package de.heikozelt.wegefrei.entities
 
+import de.heikozelt.wegefrei.durationFormatted
 import de.heikozelt.wegefrei.durationInMinutes
-import de.heikozelt.wegefrei.durationInMinutesFormatted
 import de.heikozelt.wegefrei.email.EmailAddressEntity
 import de.heikozelt.wegefrei.hex
 import de.heikozelt.wegefrei.model.CountrySymbol
@@ -315,7 +315,7 @@ class NoticeEntity(
     }
 
     fun getDurationFormatted(): String? {
-        return durationInMinutesFormatted(observationTime, endTime)
+        return durationFormatted(observationTime, endTime)
     }
 
     fun getCountryFormatted(): String? {
