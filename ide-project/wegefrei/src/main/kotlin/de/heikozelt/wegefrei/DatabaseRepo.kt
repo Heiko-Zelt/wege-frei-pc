@@ -274,6 +274,20 @@ class DatabaseRepo(jdbcUrl: String) {
     }
 
     /**
+     * Inserts a new notice or updates and existing one.
+     * If the id is null, it is assumed that it is a new notice, which hasn't been saved yet.
+     */
+    fun upsertNotice(noticeEntity: NoticeEntity) {
+        log.debug("upsertNotice(id=${noticeEntity.id})")
+        if(noticeEntity.id == null) {
+            insertNotice(noticeEntity)
+        } else {
+            updateNotice(noticeEntity)
+        }
+        log.debug("noticeEntity.id=${noticeEntity.id}")
+    }
+
+    /**
      * markiert eine Meldung/Nachricht als erfolgreich gesendet. /
      * changes fields, which represent state change after an email message was sent.
      * These are sentTime and messageId.

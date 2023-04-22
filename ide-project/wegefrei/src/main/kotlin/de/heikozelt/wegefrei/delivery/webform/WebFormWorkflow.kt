@@ -1,6 +1,7 @@
 package de.heikozelt.wegefrei.delivery.webform
 
 import de.heikozelt.wegefrei.DatabaseRepo
+import de.heikozelt.wegefrei.entities.NoticeEntity
 import de.heikozelt.wegefrei.gui.showValidationErrors
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.WebDriverException
@@ -11,7 +12,7 @@ import org.openqa.selenium.safari.SafariDriver
 import org.slf4j.LoggerFactory
 import java.time.ZonedDateTime
 
-class WebFormWorkflow(private var webForm: WebForm, private var dbRepo: DatabaseRepo): Thread() {
+class WebFormWorkflow(private val notice: NoticeEntity, private var webForm: WebForm, private var dbRepo: DatabaseRepo): Thread() {
 
     init {
         webForm.setSuccessfullySentCallback(::successfullySentCallback)
@@ -41,14 +42,19 @@ class WebFormWorkflow(private var webForm: WebForm, private var dbRepo: Database
         start()
     }
 
-    fun successfullySentCallback(noticeId: Int, sentTime: ZonedDateTime) {
-        LOG.debug("successfullySentCallback($noticeId, $sentTime)")
-        dbRepo.updateNoticeFinalizedAndSent(noticeId, sentTime)
+    fun successfullySentCallback() {
+        //dbRepo.updateNoticeFinalizedAndSent(noticeId, sentTime)
+        notice.finalizedTime = ZonedDateTime.now()
+        notice.sentTime = notice.finalizedTime
+        LOG.debug("successfullySentCallback() id: ${notice.id}, sentTime: ${notice.sentTime}")
+        dbRepo.updateNotice(notice)
         // todo: Fenster schließen und Status in NoticesFrame updaten
     }
 
-    fun failedCallback(noticeId: Int) {
-        dbRepo.updateNoticeSendFailed(noticeId)
+    fun failedCallback() {
+        notice.sendFailures++
+        LOG.debug("failedCallback() id: ${notice.id}, sendFailures: ${notice.sendFailures}")
+        dbRepo.updateNotice(notice)
     }
 
     companion object {

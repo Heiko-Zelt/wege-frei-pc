@@ -12,7 +12,6 @@ import java.net.URL
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.time.Duration
-import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
 
@@ -25,20 +24,20 @@ class CologneWebForm(private val notice: NoticeEntity, private val witness: Witn
     /**
      * parameters: notice id & sent time
      */
-    private var successfullySentCallback: ((Int, ZonedDateTime) -> Unit)? = null
+    private var successfullySentCallback: (() -> Unit)? = null
 
     /**
      * parameter: notice id
      */
-    private var failedCallback: ((Int) -> Unit)? = null
+    private var failedCallback: (() -> Unit)? = null
 
     private var webDriver: WebDriver? = null
 
-    override fun setSuccessfullySentCallback(callback: ((Int, ZonedDateTime) -> Unit)) {
+    override fun setSuccessfullySentCallback(callback: () -> Unit) {
         successfullySentCallback = callback
     }
 
-    override fun setFailedCallback(callback: (Int) -> Unit) {
+    override fun setFailedCallback(callback: () -> Unit) {
         failedCallback = callback
     }
 
@@ -253,19 +252,19 @@ class CologneWebForm(private val notice: NoticeEntity, private val witness: Witn
                 notice.id?.let {
                     // Meldung muss vorher in der DB abgespeichert worden sein, damit id nicht null ist.
                     LOG.debug("successfullySentCallback($it, ...)")
-                    successfullySentCallback?.invoke(it, ZonedDateTime.now())
+                    successfullySentCallback?.invoke()
                 }
             } catch (ex: TimeoutException) {
                 LOG.debug("Timeout");
                 notice.id?.let {
-                    failedCallback?.invoke(it)
+                    failedCallback?.invoke()
                 }
             } catch (ex: Exception) {
                 LOG.debug("Fertig mit Exception :-(")
                 // Exception: org.openqa.selenium.WebDriverException: Failed to decode response from marionette
                 LOG.debug("Exception:", ex)
                 notice.id?.let {
-                    failedCallback?.invoke(it)
+                    failedCallback?.invoke()
                 }
             }
 

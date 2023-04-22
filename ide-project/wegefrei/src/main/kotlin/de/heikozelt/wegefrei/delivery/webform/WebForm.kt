@@ -1,13 +1,12 @@
 package de.heikozelt.wegefrei.delivery.webform
 
 import org.openqa.selenium.WebDriver
-import java.time.ZonedDateTime
 
 interface WebForm {
 
-    fun setSuccessfullySentCallback(callback: ((Int, ZonedDateTime) -> Unit))
+    fun setSuccessfullySentCallback(callback: () -> Unit)
 
-    fun setFailedCallback(callback: (Int) -> Unit)
+    fun setFailedCallback(callback: () -> Unit)
 
     fun setDriver(webDriver: WebDriver)
 

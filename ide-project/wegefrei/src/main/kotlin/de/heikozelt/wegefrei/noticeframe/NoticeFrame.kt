@@ -222,9 +222,8 @@ class NoticeFrame(
     }
 
 
-
     fun getNotice(): NoticeEntity? {
-       return noticeEntity
+        return noticeEntity
     }
 
     /**
@@ -521,36 +520,43 @@ class NoticeFrame(
     fun sendNotice() {
         noticeEntity?.let { ne ->
             // weitere Ausbau-Möglichkeit 'A' für API / Webservice
-            when(ne.deliveryType) {
+            when (ne.deliveryType) {
                 'E' -> sendEmail()
-                'F' -> if(ne.town == "Köln") {
-                    settings.databaseDirectory?.let { dbDir ->
-                        val cologneWebForm = CologneWebForm(ne, settings.witness, dbDir)
-                        val webFormWorkflow = WebFormWorkflow(cologneWebForm, dbRepo)
-                        // todo Prio 2: vorher oder zwischendrin speichern?
-                        saveNotice()
-                        webFormWorkflow.validateAndSend()
-                    }
-                } else {
-                    val errors = listOf("Kein Web-Formular/Adapter für diese Stadt implementiert.")
-                    showValidationErrors(errors)
-                }
-                else -> {
-                        val errors = listOf("Unbekannte Zustell-Art '{$ne.deliveryType}'.")
+                'F' -> {
+                    // vorher speichern, damit auf jeden Fall eine ID vergeben wird.
+                    // Die ID wird z.B. beim Speichern des PDFs als Dateiname (oder sonst einer Sendebestätigung) benötigt.
+                    dbRepo.upsertNotice(ne)
+                    if (ne.town == "Köln") {
+                        settings.databaseDirectory?.let { dbDir ->
+                            val cologneWebForm = CologneWebForm(ne, settings.witness, dbDir)
+                            val webFormWorkflow = WebFormWorkflow(ne, cologneWebForm, dbRepo)
+                            webFormWorkflow.validateAndSend()
+                        }
+                    } else {
+                        val errors = listOf("Kein Web-Formular/Adapter für diese Stadt implementiert.")
                         showValidationErrors(errors)
                     }
+                }
+                else -> {
+                    val errors = listOf("Unbekannte Zustell-Art '{$ne.deliveryType}'.")
+                    showValidationErrors(errors)
+                }
             }
         }
     }
 
 
     /////////////////////////////////////////////
-
+    /**
+     * Es wird nur validiert, ob die Meldung gespeichert werden kann,
+     * also ob. z.B. Datum und Uhrzeiten vom Format her umgewandelt werden können.
+     */
     fun validateAndMap(): List<String> {
         log.debug("validateAndMap()")
         var errors = listOf<String>()
         if (noticeEntity == null) {
             noticeEntity = NoticeEntity.createdNow()
+            log.info("created new NoticeEntity")
         }
         noticeEntity?.let { ne ->
             errors = noticeForm.getNoticeFormFields().validateAndMap(ne)
@@ -569,7 +575,7 @@ class NoticeFrame(
      * speichert die Meldung in der Datenbank.
      */
     fun saveNotice() {
-        log.debug("saveNotice()")
+        log.debug("saveNotice(id=${noticeEntity?.id})")
         val dbRepo = app.getDatabaseRepo() ?: return
         noticeEntity?.let { ne ->
             log.debug("noticeEntity.id = ${ne.id}")
