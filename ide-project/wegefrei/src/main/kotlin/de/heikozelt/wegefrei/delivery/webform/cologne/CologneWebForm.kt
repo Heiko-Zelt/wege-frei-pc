@@ -53,8 +53,14 @@ class CologneWebForm(private val notice: NoticeEntity, private val witness: Witn
      */
     override fun validate(): List<String> {
         val errors = mutableListOf<String>()
+        if(notice.vehicleType == null) {
+            errors.add("Im Web-Formular der Stadt Köln muss die Fahrzeugart angegeben werden.")
+        }
         if (notice.photoEntities.size > 3) {
             errors.add("Mittels Web-Formular der Stadt Köln können maximal 3 Fotos hochgeladen werden.")
+        }
+        if(notice.quarter == null) {
+            errors.add("Im Web-Formular der Stadt Köln muss der Stadtteil angegeben werden.")
         }
         return errors
     }
