@@ -537,8 +537,12 @@ class NoticeFrame(
                         showValidationErrors(errors)
                     }
                 }
+                null -> {
+                    val errors = listOf("Keine Zustellungsart ausgewählt.")
+                    showValidationErrors(errors)
+                }
                 else -> {
-                    val errors = listOf("Unbekannte Zustell-Art '{$ne.deliveryType}'.")
+                    val errors = listOf("Unbekannte Zustellungsart '${ne.deliveryType}'.")
                     showValidationErrors(errors)
                 }
             }
