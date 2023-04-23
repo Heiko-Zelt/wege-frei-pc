@@ -1,4 +1,4 @@
-WEGE_FREI_VERSION=1.0.3
+WEGE_FREI_VERSION=1.0.4
 export JAVA_HOME=/Library/Java/JavaVirtualMachines/amazon-corretto-17.jdk/Contents/Home
 
 unset CLASSPATH

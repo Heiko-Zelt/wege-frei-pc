@@ -491,12 +491,12 @@ class DatabaseRepo(jdbcUrl: String) {
 
         fun fromDirectory(directory: String): DatabaseRepo {
             LOG.info("use database in directory: $directory")
-            return DatabaseRepo("jdbc:h2:file:$directory/wege_frei_v1_0_3")
+            return DatabaseRepo("jdbc:h2:file:$directory/wege_frei_v1_0_4")
         }
 
         fun fromMemory(): DatabaseRepo {
             LOG.info("use in memory database")
-            return DatabaseRepo("jdbc:h2:mem:wege_frei_v1_0_3")
+            return DatabaseRepo("jdbc:h2:mem:wege_frei_v1_0_4")
         }
 
     }

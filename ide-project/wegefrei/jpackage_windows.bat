@@ -1,4 +1,4 @@
-set WEGE_FREI_VERSION=1.0.3
+set WEGE_FREI_VERSION=1.0.4
 set JAVA_HOME=C:\Users\Hi\.jdks\corretto-17.0.6
 set WIX_HOME=C:\Program Files (x86)\WiX Toolset v3.11
 

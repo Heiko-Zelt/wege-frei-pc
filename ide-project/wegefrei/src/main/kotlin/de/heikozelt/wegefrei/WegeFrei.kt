@@ -100,13 +100,17 @@ class WegeFrei(private val settingsRepo: SettingsRepo = SettingsFileRepo()) {
             } else {
                 val text = """
                     |<html>
-                    |  <p>Diese Software verwendet Web-Services/APIs.</p>
+                    |  <p>Diese Software verwendet HTTP-Aufrufe/Web-Services/APIs.</p>
                     |  <p>Bei der Benutzung wird Deine IP-Adresse daher an folgende Websites übermittelt:</p>
                     |  <ul>
                     |    <li>https://tile.openstreetmap.org/<br>
                     |      für die Kartendarstellung (Download von Kachel-Bildern)</li>
                     |    <li>https://nominatim.openstreetmap.org/<br>
                     |      für die Suche nach Postanschriften/Adressen von Tatorten</li> 
+                    |    <li>https://formular-server.de/ und https://formular-daten.stadt-koeln.de/<br>
+                    |      bei Verwendung des Online-Formulars der Stadt Köln</li>
+                    |    <li>https://www.heikozelt.de/wegefrei/<br>
+                    |      bei Klicke auf den Hilfe-Button/öffnen der Hilfeseite</li>
                     |  </ul>
                     |</html>""".trimMargin().replace("\n", "")
                 log.debug(text)
@@ -385,7 +389,7 @@ class WegeFrei(private val settingsRepo: SettingsRepo = SettingsFileRepo()) {
     companion object {
         private val LOG = LoggerFactory.getLogger(this::class.java.canonicalName)
 
-        private const val PRIVACY_CONSENT_VERSION = 1
+        private const val PRIVACY_CONSENT_VERSION = 2
 
         @JvmStatic
         fun main(args: Array<String>) {
