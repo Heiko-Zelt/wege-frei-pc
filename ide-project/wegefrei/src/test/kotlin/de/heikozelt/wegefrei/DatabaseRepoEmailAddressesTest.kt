@@ -16,7 +16,7 @@ internal class DatabaseRepoEmailAddressesTest {
      */
     @Test
     fun findAllEmailAddresses() {
-        val addresses = databaseRepo.findAllEmailAddresses()
+        val addresses = databaseRepo?.findAllEmailAddresses()
         assertNotNull(addresses)
         addresses?.let {
             assertEquals(20, addresses.size)
@@ -26,31 +26,32 @@ internal class DatabaseRepoEmailAddressesTest {
     companion object {
         private val LOG = LoggerFactory.getLogger(this::class.java.canonicalName)
 
-        private val databaseRepo = DatabaseRepo.fromMemory()
+        private var databaseRepo: DatabaseRepo? = null
 
         @BeforeAll @JvmStatic
         fun inserts() {
             LOG.debug("BeforeAll()")
+            databaseRepo = DatabaseRepo.fromMemory()
 
             for (i in 0 until 10) {
                 val adr = EmailAddressEntity(
                     "verkehrsueberwachung$i@junit-test-stadt.de",
                     "Verkehrsüberwachung$i JUnit-Test-Stadt"
                 )
-                databaseRepo.insertEmailAddress(adr)
+                databaseRepo?.insertEmailAddress(adr)
             }
             for (i in 0 until 10) {
                 val adr = EmailAddressEntity(
                     "ueberwachung$i@test-stadt.de",
                 )
-                databaseRepo.insertEmailAddress(adr)
+                databaseRepo?.insertEmailAddress(adr)
             }
-            databaseRepo.logStatistics()
+            databaseRepo?.logStatistics()
         }
 
         @AfterAll @JvmStatic
         fun close_db() {
-            databaseRepo.close()
+            databaseRepo?.close()
         }
     }
 }

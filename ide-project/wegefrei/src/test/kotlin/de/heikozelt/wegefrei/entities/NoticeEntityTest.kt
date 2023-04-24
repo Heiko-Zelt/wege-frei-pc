@@ -173,7 +173,7 @@ class NoticeEntityTest {
     fun getObservationTimeFormatted() {
         val n = NoticeEntity()
         n.observationTime = ZonedDateTime.of(2021, 12, 31, 12, 58, 59, 0, ZoneId.of("Europe/Berlin"))
-        assertEquals("31.12.2021, 12:58 MEZ", n.getObservationTimeFormatted())
+        assertEquals("31.12.2021, 12:58:59 MEZ", n.getObservationTimeFormatted())
     }
 
     /**
@@ -219,7 +219,7 @@ class NoticeEntityTest {
         val n = NoticeEntity()
         n.observationTime = ZonedDateTime.of(2021, 12, 31, 13, 0, 0, 0, ZoneId.of("Europe/Berlin"))
         n.endTime = ZonedDateTime.of(2021, 12, 31, 13, 0, 59, 0, ZoneId.of("Europe/Berlin"))
-        assertEquals("weniger als 1 Minute", n.getDurationFormatted())
+        assertEquals("59 sec", n.getDurationFormatted())
     }
 
     @Test
@@ -227,7 +227,7 @@ class NoticeEntityTest {
         val n = NoticeEntity()
         n.observationTime = ZonedDateTime.of(2021, 12, 31, 13, 0, 0, 0, ZoneId.of("Europe/Berlin"))
         n.endTime = ZonedDateTime.of(2021, 12, 31, 13, 1, 0, 0, ZoneId.of("Europe/Berlin"))
-        assertEquals("1 Minute", n.getDurationFormatted())
+        assertEquals("1 min 0 sec", n.getDurationFormatted())
     }
 
     @Test
@@ -235,7 +235,7 @@ class NoticeEntityTest {
         val n = NoticeEntity()
         n.observationTime = ZonedDateTime.of(2021, 12, 31, 13, 0, 59, 0, ZoneId.of("Europe/Berlin"))
         n.endTime = ZonedDateTime.of(2021, 12, 31, 13, 2, 59, 0, ZoneId.of("Europe/Berlin"))
-        assertEquals("2 Minuten", n.getDurationFormatted())
+        assertEquals("2 min 0 sec", n.getDurationFormatted())
     }
 
 }

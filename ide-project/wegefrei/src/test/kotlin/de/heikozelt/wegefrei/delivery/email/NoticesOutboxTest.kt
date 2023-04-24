@@ -32,6 +32,7 @@ class NoticesOutboxTest {
             locationDescription = "Köln Hauptbahnhof"
             endangering = true
             offense = "Parken am Taxenstand"
+            deliveryType = 'E'
             recipientEmailAddress = "hz@heikozelt.de"
             observationTime = ZonedDateTime.of(2022, 1, 1, 12, 1, 0, 0, ZoneId.of("Europe/Berlin"))
             finalizedTime = ZonedDateTime.of(2022, 1, 1, 23, 58, 0, 0, ZoneId.of("Europe/Berlin"))
@@ -130,6 +131,7 @@ class NoticesOutboxTest {
             offense = "Parken am Taxenstand"
             observationTime = ZonedDateTime.of(2022, 1, 1, 12, 1, 0, 0, ZoneId.of("Europe/Berlin"))
             finalizedTime = ZonedDateTime.of(2022, 1, 1, 23, 58, 0, 0, ZoneId.of("Europe/Berlin"))
+            deliveryType = 'E'
             recipientEmailAddress = "hz@heikozelt.de"
         }
         val witness = Witness()
@@ -163,6 +165,7 @@ class NoticesOutboxTest {
             endangering = true
             observationTime = ZonedDateTime.of(2022, 1, 1, 12, 1, 0, 0, ZoneId.of("Europe/Berlin"))
             finalizedTime = ZonedDateTime.of(2022, 1, 1, 23, 58, 0, 0, ZoneId.of("Europe/Berlin"))
+            deliveryType = 'E'
             recipientEmailAddress = "hz@heikozelt.de"
         }
         val witness = Witness()
@@ -283,6 +286,7 @@ class NoticesOutboxTest {
             latitude = 50.1
             longitude = 8.1
             offense = "Parken auf Motorradparkplatz. Ich konnte mein Krad dort nicht abstellen."
+            deliveryType = 'E'
             recipientEmailAddress = "ordnungsamt@junit-test-gemeinde.de"
             finalizedTime = finalTime
         }
@@ -332,6 +336,7 @@ class NoticesOutboxTest {
             latitude = 50.1
             longitude = 8.1
             offense = "Parken auf Grünfläche"
+            deliveryType = 'E'
             recipientEmailAddress = "ordnungsamt@junit-test-gemeinde.de"
             finalizedTime = finalTime
         }

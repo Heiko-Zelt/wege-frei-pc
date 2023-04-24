@@ -5,8 +5,10 @@ import de.heikozelt.wegefrei.entities.PhotoEntity
 import de.heikozelt.wegefrei.model.VehicleColor
 import de.heikozelt.wegefrei.model.VehicleMakesComboBoxModel
 import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
 import java.nio.file.Paths
@@ -19,6 +21,10 @@ import java.time.ZonedDateTime
 internal class DatabaseRepoFindNextTest {
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
 
+    private var databaseRepo: DatabaseRepo? = null
+    val filename = "dhl1.jpg"
+    val dir = Paths.get("src/test/resources").toAbsolutePath().toString()
+
     /**
      *
      */
@@ -26,13 +32,13 @@ internal class DatabaseRepoFindNextTest {
     fun findNextNoticeToSend() {
 
         // At first the queue is empty
-        val nothing = databaseRepo.findNextNoticeToSend()
+        val nothing = databaseRepo?.findNextNoticeToSend()
         assertNull(nothing)
 
         // Insert a notice (containing a photo)
         val dateTime = ZonedDateTime.of(2021, 12, 31, 12, 58, 59, 0, ZoneId.of("Europe/Berlin"))
         val photo1 = PhotoEntity(
-            Paths.get(DatabaseRepoUpdateNoticeSentTest.dir, DatabaseRepoUpdateNoticeSentTest.filename).toString(),
+            Paths.get(dir, filename).toString(),
             null,
             50.1,
             8.1,
@@ -49,21 +55,24 @@ internal class DatabaseRepoFindNextTest {
             longitude = 8.1
             photoEntities.add(photo1)
             finalizedTime = finalTime
+            deliveryType = 'E'
         }
-        databaseRepo.insertNotice(notice1)
+        databaseRepo?.insertNotice(notice1)
 
         // now there is a notice waiting to be sent
-        val something = databaseRepo.findNextNoticeToSend()
+        val something = databaseRepo?.findNextNoticeToSend()
         assertNotNull(something)
 
     }
 
-    companion object {
-        private val databaseRepo = DatabaseRepo.fromMemory()
-
-        @AfterAll @JvmStatic
-        fun close_db() {
-            databaseRepo.close()
-        }
+    @BeforeEach
+    fun init_db() {
+        databaseRepo = DatabaseRepo.fromMemory()
     }
+
+    @AfterEach
+    fun close_db() {
+        databaseRepo?.close()
+    }
+
 }

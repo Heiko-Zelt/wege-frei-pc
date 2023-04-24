@@ -172,7 +172,8 @@ class DateTimeUtilsTest {
     @Test
     fun duration_1_second() {
         val start = ZonedDateTime.of(2022, 1, 2, 14, 59, 59, 0, ZoneId.of("Europe/Berlin"))
-        assertEquals("1 sec", durationFormatted(start, start))
+        val end = ZonedDateTime.of(2022, 1, 2, 15, 0, 0, 0, ZoneId.of("Europe/Berlin"))
+        assertEquals("1 sec", durationFormatted(start, end))
     }
 
     @Test

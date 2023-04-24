@@ -4,6 +4,7 @@ import de.heikozelt.wegefrei.email.EmailAddressEntity
 import de.heikozelt.wegefrei.entities.NoticeEntity
 import de.heikozelt.wegefrei.entities.PhotoEntity
 import jakarta.persistence.EntityManager
+import jakarta.persistence.EntityManagerFactory
 import jakarta.persistence.Persistence
 import org.hibernate.Session
 import org.hibernate.SessionFactory
@@ -12,7 +13,8 @@ import java.nio.file.Path
 import java.time.ZonedDateTime
 
 
-class DatabaseRepo(jdbcUrl: String) {
+class DatabaseRepo(jdbcUrl: String, persistenceUnitName: String = PERSISTENCE_UNIT_NAME) {
+    private val factory: EntityManagerFactory
     private val em: EntityManager
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
     private val sessionFactory: SessionFactory
@@ -20,7 +22,7 @@ class DatabaseRepo(jdbcUrl: String) {
     init {
         val persistenceMap = hashMapOf<String, String>()
         persistenceMap["jakarta.persistence.jdbc.url"] = jdbcUrl
-        val factory = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME, persistenceMap)
+        factory = Persistence.createEntityManagerFactory(persistenceUnitName, persistenceMap)
         em = factory.createEntityManager()
         val session = em.unwrap(Session::class.java)
         sessionFactory = session.sessionFactory
@@ -455,11 +457,25 @@ class DatabaseRepo(jdbcUrl: String) {
         }
     }
 
+    /**
+     * Schließt die Entity Manager Factory inklusive dem Entity Manager & Persistence Unit.
+     * Wird nur für JUnit-Tests und Wegwerf-In-Memory-Datenbanken benötigt.
+     */
     fun close() {
+        /*
+        Wenn nur der Entity Manager geschlossen wird, gibt es weiterhin Seiteneffekte,
+        wenn die gleiche Persistence Unit/der gleichen Persistence Unit Name verwendet wird.
+        Daher die ganze Factory schließen und nicht nur den Entity Manager!
         if (em.isOpen) {
             log.debug("closing entity manager")
             em.close()
             log.debug("entity manager closed")
+        }
+        */
+        if (factory.isOpen) {
+            log.debug("closing entity manager factory")
+            factory.close()
+            log.debug("entity manager factory closed")
         }
     }
 
@@ -494,9 +510,9 @@ class DatabaseRepo(jdbcUrl: String) {
             return DatabaseRepo("jdbc:h2:file:$directory/wege_frei_v1_0_4")
         }
 
-        fun fromMemory(): DatabaseRepo {
+        fun fromMemory(persistenceUnitName: String = PERSISTENCE_UNIT_NAME): DatabaseRepo {
             LOG.info("use in memory database")
-            return DatabaseRepo("jdbc:h2:mem:wege_frei_v1_0_4")
+            return DatabaseRepo("jdbc:h2:mem:wege_frei_v1_0_4_$persistenceUnitName", persistenceUnitName)
         }
 
     }
