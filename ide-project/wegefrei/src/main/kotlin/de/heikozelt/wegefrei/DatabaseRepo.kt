@@ -13,7 +13,7 @@ import java.nio.file.Path
 import java.time.ZonedDateTime
 
 
-class DatabaseRepo(jdbcUrl: String, persistenceUnitName: String = PERSISTENCE_UNIT_NAME) {
+class DatabaseRepo(jdbcUrl: String) {
     private val factory: EntityManagerFactory
     private val em: EntityManager
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
@@ -22,7 +22,7 @@ class DatabaseRepo(jdbcUrl: String, persistenceUnitName: String = PERSISTENCE_UN
     init {
         val persistenceMap = hashMapOf<String, String>()
         persistenceMap["jakarta.persistence.jdbc.url"] = jdbcUrl
-        factory = Persistence.createEntityManagerFactory(persistenceUnitName, persistenceMap)
+        factory = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME, persistenceMap)
         em = factory.createEntityManager()
         val session = em.unwrap(Session::class.java)
         sessionFactory = session.sessionFactory
@@ -505,14 +505,20 @@ class DatabaseRepo(jdbcUrl: String, persistenceUnitName: String = PERSISTENCE_UN
          */
         private const val PERSISTENCE_UNIT_NAME = "wegefrei"
 
+        /**
+         * Factory method
+         */
         fun fromDirectory(directory: String): DatabaseRepo {
             LOG.info("use database in directory: $directory")
             return DatabaseRepo("jdbc:h2:file:$directory/wege_frei_v1_0_4")
         }
 
-        fun fromMemory(persistenceUnitName: String = PERSISTENCE_UNIT_NAME): DatabaseRepo {
+        /**
+         * Factory method
+         */
+        fun fromMemory(): DatabaseRepo {
             LOG.info("use in memory database")
-            return DatabaseRepo("jdbc:h2:mem:wege_frei_v1_0_4_$persistenceUnitName", persistenceUnitName)
+            return DatabaseRepo("jdbc:h2:mem:wege_frei_v1_0_4")
         }
 
     }
