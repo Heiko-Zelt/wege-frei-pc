@@ -1,5 +1,7 @@
 package de.heikozelt.wegefrei.entities
 
+import de.heikozelt.wegefrei.db.entities.NoticeEntity
+import de.heikozelt.wegefrei.db.entities.PhotoEntity
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import java.time.ZoneId

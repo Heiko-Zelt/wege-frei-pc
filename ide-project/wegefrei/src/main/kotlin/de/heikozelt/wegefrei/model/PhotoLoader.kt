@@ -1,6 +1,6 @@
 package de.heikozelt.wegefrei.model
 
-import de.heikozelt.wegefrei.DatabaseRepo
+import de.heikozelt.wegefrei.db.DatabaseRepo
 import org.slf4j.LoggerFactory
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit

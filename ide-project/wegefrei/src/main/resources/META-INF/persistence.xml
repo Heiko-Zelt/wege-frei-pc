@@ -6,8 +6,8 @@
         <!-- Persistence provider -->
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
         <!-- Entity classes -->
-        <class>de.heikozelt.wegefrei.entities.PhotoEntity</class>
-        <class>de.heikozelt.wegefrei.entities.NoticeEntity</class>
+        <class>de.heikozelt.wegefrei.db.entities.PhotoEntity</class>
+        <class>de.heikozelt.wegefrei.db.entities.NoticeEntity</class>
         <class>de.heikozelt.wegefrei.email.EmailAddressEntity</class>
         <properties>
             <property name="jakarta.persistence.jdbc.driver" value="org.h2.Driver" />

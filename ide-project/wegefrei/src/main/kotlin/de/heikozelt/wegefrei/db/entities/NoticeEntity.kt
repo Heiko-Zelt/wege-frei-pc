@@ -1,4 +1,4 @@
-package de.heikozelt.wegefrei.entities
+package de.heikozelt.wegefrei.db.entities
 
 import de.heikozelt.wegefrei.durationFormatted
 import de.heikozelt.wegefrei.durationInMinutes

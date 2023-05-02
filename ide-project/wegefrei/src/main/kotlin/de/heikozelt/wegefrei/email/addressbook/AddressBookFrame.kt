@@ -1,6 +1,6 @@
 package de.heikozelt.wegefrei.email.addressbook
 
-import de.heikozelt.wegefrei.DatabaseRepo
+import de.heikozelt.wegefrei.db.DatabaseRepo
 import de.heikozelt.wegefrei.WegeFrei
 import de.heikozelt.wegefrei.email.EmailAddressEntity
 import org.slf4j.LoggerFactory

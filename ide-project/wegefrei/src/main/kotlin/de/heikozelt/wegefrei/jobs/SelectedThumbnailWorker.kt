@@ -1,6 +1,6 @@
 package de.heikozelt.wegefrei.jobs
 
-import de.heikozelt.wegefrei.entities.PhotoEntity
+import de.heikozelt.wegefrei.db.entities.PhotoEntity
 import de.heikozelt.wegefrei.gui.Styles
 import org.slf4j.LoggerFactory
 import java.awt.Image

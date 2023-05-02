@@ -1,11 +1,11 @@
 package de.heikozelt.wegefrei.noticeframe
 
-import de.heikozelt.wegefrei.DatabaseRepo
+import de.heikozelt.wegefrei.db.DatabaseRepo
 import de.heikozelt.wegefrei.WegeFrei
 import de.heikozelt.wegefrei.delivery.webform.WebFormWorkflow
 import de.heikozelt.wegefrei.delivery.webform.cologne.CologneWebForm
 import de.heikozelt.wegefrei.email.useragent.EmailMessageDialog
-import de.heikozelt.wegefrei.entities.NoticeEntity
+import de.heikozelt.wegefrei.db.entities.NoticeEntity
 import de.heikozelt.wegefrei.gui.Styles
 import de.heikozelt.wegefrei.gui.showValidationErrors
 import de.heikozelt.wegefrei.jobs.AddressWorker

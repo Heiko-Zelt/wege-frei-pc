@@ -1,7 +1,7 @@
 package de.heikozelt.wegefrei.noticesframe
 
 import de.heikozelt.wegefrei.WegeFrei
-import de.heikozelt.wegefrei.entities.NoticeEntity
+import de.heikozelt.wegefrei.db.entities.NoticeEntity
 import org.slf4j.LoggerFactory
 import java.awt.Desktop
 import java.awt.Dimension

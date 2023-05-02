@@ -1,5 +1,6 @@
 package de.heikozelt.wegefrei
 
+import de.heikozelt.wegefrei.db.DatabaseRepo
 import de.heikozelt.wegefrei.email.EmailAddressEntity
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertEquals

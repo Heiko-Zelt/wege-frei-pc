@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory
  * werden alte Elemente nach der Least Recently Used-Strategie rausgeschmissen.
  *
  * Komplikation: Wenn ein Element mehrmals hinzugefügt wird,
- * dann ist es neu und muss es an das Ende der Queue verschoben werden.
+ * dann ist es neu und muss an das Ende der Queue verschoben werden.
  * (oder entfernt und ein neues Element angehängt werden.)
  * todo Prio 4 Optimierung: Verschieben statt entfernen und hinzufügen
  */

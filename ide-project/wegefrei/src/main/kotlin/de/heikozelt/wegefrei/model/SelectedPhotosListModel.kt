@@ -1,6 +1,6 @@
 package de.heikozelt.wegefrei.model
 
-import de.heikozelt.wegefrei.entities.PhotoEntity
+import de.heikozelt.wegefrei.db.entities.PhotoEntity
 import org.jxmapviewer.viewer.GeoPosition
 import org.slf4j.LoggerFactory
 import java.lang.Math.min

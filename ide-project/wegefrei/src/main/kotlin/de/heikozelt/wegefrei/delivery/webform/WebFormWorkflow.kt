@@ -1,7 +1,7 @@
 package de.heikozelt.wegefrei.delivery.webform
 
-import de.heikozelt.wegefrei.DatabaseRepo
-import de.heikozelt.wegefrei.entities.NoticeEntity
+import de.heikozelt.wegefrei.db.DatabaseRepo
+import de.heikozelt.wegefrei.db.entities.NoticeEntity
 import de.heikozelt.wegefrei.gui.showValidationErrors
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.WebDriverException

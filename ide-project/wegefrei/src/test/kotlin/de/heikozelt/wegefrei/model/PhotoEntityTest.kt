@@ -1,7 +1,7 @@
 package de.heikozelt.wegefrei.model
 
-import de.heikozelt.wegefrei.DatabaseRepo
-import de.heikozelt.wegefrei.entities.PhotoEntity
+import de.heikozelt.wegefrei.db.DatabaseRepo
+import de.heikozelt.wegefrei.db.entities.PhotoEntity
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull

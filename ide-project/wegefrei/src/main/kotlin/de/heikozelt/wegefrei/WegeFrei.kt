@@ -1,10 +1,11 @@
 package de.heikozelt.wegefrei
 
+import de.heikozelt.wegefrei.db.DatabaseRepo
 import de.heikozelt.wegefrei.delivery.email.NoticesOutbox
 import de.heikozelt.wegefrei.email.addressbook.AddressBookFrame
 import de.heikozelt.wegefrei.email.useragent.EmailSender
 import de.heikozelt.wegefrei.email.useragent.EmailUserAgent
-import de.heikozelt.wegefrei.entities.NoticeEntity
+import de.heikozelt.wegefrei.db.entities.NoticeEntity
 import de.heikozelt.wegefrei.json.Settings
 import de.heikozelt.wegefrei.model.LeastRecentlyUsedCache
 import de.heikozelt.wegefrei.model.Photo

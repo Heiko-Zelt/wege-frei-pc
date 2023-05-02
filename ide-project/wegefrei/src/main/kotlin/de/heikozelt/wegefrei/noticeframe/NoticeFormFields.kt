@@ -1,8 +1,9 @@
 package de.heikozelt.wegefrei.noticeframe
 
 import de.heikozelt.wegefrei.*
+import de.heikozelt.wegefrei.db.DatabaseRepo
 import de.heikozelt.wegefrei.email.combobox.RecipientComboBox
-import de.heikozelt.wegefrei.entities.NoticeEntity
+import de.heikozelt.wegefrei.db.entities.NoticeEntity
 import de.heikozelt.wegefrei.gui.*
 import de.heikozelt.wegefrei.json.Settings
 import de.heikozelt.wegefrei.maps.MiniMap

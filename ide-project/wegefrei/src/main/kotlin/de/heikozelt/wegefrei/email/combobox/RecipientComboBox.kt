@@ -1,6 +1,6 @@
 package de.heikozelt.wegefrei.email.combobox
 
-import de.heikozelt.wegefrei.DatabaseRepo
+import de.heikozelt.wegefrei.db.DatabaseRepo
 import de.heikozelt.wegefrei.email.EmailAddressEntity
 import org.slf4j.LoggerFactory
 import java.awt.event.KeyAdapter

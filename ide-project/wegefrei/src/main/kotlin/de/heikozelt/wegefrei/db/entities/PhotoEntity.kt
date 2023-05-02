@@ -1,4 +1,4 @@
-package de.heikozelt.wegefrei.entities
+package de.heikozelt.wegefrei.db.entities
 
 import com.drew.imaging.ImageMetadataReader
 import com.drew.lang.GeoLocation

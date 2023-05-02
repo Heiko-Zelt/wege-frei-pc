@@ -1,6 +1,6 @@
 package de.heikozelt.wegefrei.noticeframe
 
-import de.heikozelt.wegefrei.DatabaseRepo
+import de.heikozelt.wegefrei.db.DatabaseRepo
 import de.heikozelt.wegefrei.dirnavi.AbsolutePath
 import de.heikozelt.wegefrei.dirnavi.DirectoryNavigation
 import de.heikozelt.wegefrei.fileutils.getFileUtilsInstance

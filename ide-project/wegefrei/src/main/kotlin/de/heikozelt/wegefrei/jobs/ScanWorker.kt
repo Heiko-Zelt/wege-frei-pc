@@ -4,9 +4,9 @@ import com.drew.imaging.ImageMetadataReader
 import com.drew.lang.GeoLocation
 import com.drew.metadata.exif.ExifSubIFDDirectory
 import com.drew.metadata.exif.GpsDirectory
-import de.heikozelt.wegefrei.DatabaseRepo
+import de.heikozelt.wegefrei.db.DatabaseRepo
 import de.heikozelt.wegefrei.ImageFilenameFilter
-import de.heikozelt.wegefrei.entities.PhotoEntity
+import de.heikozelt.wegefrei.db.entities.PhotoEntity
 import de.heikozelt.wegefrei.scanframe.ScanFrame
 import org.slf4j.LoggerFactory
 import java.io.File

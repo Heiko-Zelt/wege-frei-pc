@@ -1,7 +1,8 @@
 package de.heikozelt.wegefrei
 
-import de.heikozelt.wegefrei.entities.NoticeEntity
-import de.heikozelt.wegefrei.entities.PhotoEntity
+import de.heikozelt.wegefrei.db.DatabaseRepo
+import de.heikozelt.wegefrei.db.entities.NoticeEntity
+import de.heikozelt.wegefrei.db.entities.PhotoEntity
 import de.heikozelt.wegefrei.model.NoticeState
 import de.heikozelt.wegefrei.model.VehicleColor
 import de.heikozelt.wegefrei.model.VehicleMakesComboBoxModel

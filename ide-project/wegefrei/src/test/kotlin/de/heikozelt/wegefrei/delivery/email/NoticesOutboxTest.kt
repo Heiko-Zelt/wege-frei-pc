@@ -1,8 +1,8 @@
 package de.heikozelt.wegefrei.delivery.email
 
-import de.heikozelt.wegefrei.DatabaseRepo
+import de.heikozelt.wegefrei.db.DatabaseRepo
 import de.heikozelt.wegefrei.email.EmailAddressEntity
-import de.heikozelt.wegefrei.entities.NoticeEntity
+import de.heikozelt.wegefrei.db.entities.NoticeEntity
 import de.heikozelt.wegefrei.json.Settings
 import de.heikozelt.wegefrei.json.Witness
 import de.heikozelt.wegefrei.model.ValidationException

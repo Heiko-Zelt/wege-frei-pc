@@ -1,6 +1,6 @@
 package de.heikozelt.wegefrei.model
 
-import de.heikozelt.wegefrei.entities.NoticeEntity
+import de.heikozelt.wegefrei.db.entities.NoticeEntity
 import org.jxmapviewer.viewer.GeoPosition
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols

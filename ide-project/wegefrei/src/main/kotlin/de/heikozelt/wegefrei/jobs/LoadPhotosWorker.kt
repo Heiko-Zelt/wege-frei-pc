@@ -1,7 +1,7 @@
 package de.heikozelt.wegefrei.jobs
 
 import de.heikozelt.wegefrei.ImageFilenameFilter
-import de.heikozelt.wegefrei.entities.PhotoEntity
+import de.heikozelt.wegefrei.db.entities.PhotoEntity
 import de.heikozelt.wegefrei.model.BrowserListModel
 import org.slf4j.LoggerFactory
 import java.io.File

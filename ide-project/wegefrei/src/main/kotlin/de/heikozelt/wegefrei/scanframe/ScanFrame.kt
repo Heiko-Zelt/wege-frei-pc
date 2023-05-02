@@ -1,6 +1,6 @@
 package de.heikozelt.wegefrei.scanframe
 
-import de.heikozelt.wegefrei.DatabaseRepo
+import de.heikozelt.wegefrei.db.DatabaseRepo
 import de.heikozelt.wegefrei.jobs.ScanWorker
 import java.awt.Dimension
 import javax.swing.*

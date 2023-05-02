@@ -1,8 +1,9 @@
-package de.heikozelt.wegefrei
+package de.heikozelt.wegefrei.db
 
 import de.heikozelt.wegefrei.email.EmailAddressEntity
-import de.heikozelt.wegefrei.entities.NoticeEntity
-import de.heikozelt.wegefrei.entities.PhotoEntity
+import de.heikozelt.wegefrei.db.entities.NoticeEntity
+import de.heikozelt.wegefrei.db.entities.PhotoEntity
+import de.heikozelt.wegefrei.sha1
 import jakarta.persistence.EntityManager
 import jakarta.persistence.EntityManagerFactory
 import jakarta.persistence.Persistence
@@ -18,6 +19,19 @@ class DatabaseRepo(jdbcUrl: String) {
     private val em: EntityManager
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
     private val sessionFactory: SessionFactory
+
+    private val noticesObservers = HashSet<NoticesObserver>()
+
+    fun subscribe(observer: NoticesObserver) {
+        noticesObservers.add(observer)
+    }
+
+    /**
+     * Wichtig, um Memory-Leaks zu vermeiden
+     */
+    fun unsubscribe(observer: NoticesObserver) {
+        noticesObservers.remove(observer)
+    }
 
     init {
         val persistenceMap = hashMapOf<String, String>()
@@ -227,6 +241,7 @@ class DatabaseRepo(jdbcUrl: String) {
         try {
             insertMissingPhotos(session, noticeEntity)
             session.persist(noticeEntity)
+            noticesObservers.forEach { it.noticeInserted(noticeEntity) }
             tx.commit()
         } finally {
             if (tx.isActive) tx.rollback()
@@ -268,6 +283,7 @@ class DatabaseRepo(jdbcUrl: String) {
             insertMissingPhotos(session, noticeEntity)
             session.merge(noticeEntity)
             deleteOrphanedPhotos(session)
+            noticesObservers.forEach { it.noticeUpdated(noticeEntity) }
             tx.commit()
         } finally {
             if (tx.isActive) tx.rollback()
@@ -314,6 +330,7 @@ class DatabaseRepo(jdbcUrl: String) {
             existing.sentTime = sentTime
             existing.messageId = messageID
             session.merge(existing)
+            noticesObservers.forEach { it.noticeUpdated(existing) }
             tx.commit()
         } finally {
           if (tx.isActive) tx.rollback()
@@ -335,6 +352,7 @@ class DatabaseRepo(jdbcUrl: String) {
             existing.finalizedTime = sentTime
             existing.sentTime = sentTime
             session.merge(existing)
+            noticesObservers.forEach { it.noticeUpdated(existing) }
             tx.commit()
         } finally {
             if (tx.isActive) tx.rollback()
@@ -351,6 +369,7 @@ class DatabaseRepo(jdbcUrl: String) {
             val existing = session.find(NoticeEntity::class.java, noticeID);
             existing.sendFailures++
             session.merge(existing)
+            noticesObservers.forEach { it.noticeUpdated(existing) }
             tx.commit()
         } finally {
             if (tx.isActive) tx.rollback()
@@ -425,6 +444,7 @@ class DatabaseRepo(jdbcUrl: String) {
                 notice.photoEntities.forEach { it.noticeEntities.remove(notice) }
                 session.remove(notice)
                 deleteOrphanedPhotos(session)
+                noticesObservers.forEach { it.noticeDeleted(notice) }
             }
             tx.commit()
         } finally {

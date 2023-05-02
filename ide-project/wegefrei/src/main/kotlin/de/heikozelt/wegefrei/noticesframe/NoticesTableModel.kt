@@ -1,22 +1,22 @@
 package de.heikozelt.wegefrei.noticesframe
 
-import de.heikozelt.wegefrei.DatabaseRepo
-import de.heikozelt.wegefrei.entities.NoticeEntity
+import de.heikozelt.wegefrei.db.DatabaseRepo
+import de.heikozelt.wegefrei.db.NoticesObserver
+import de.heikozelt.wegefrei.db.entities.NoticeEntity
 import de.heikozelt.wegefrei.model.LeastRecentlyUsedCache
+import de.heikozelt.wegefrei.model.RowNumIdMapDesc
 import de.heikozelt.wegefrei.model.VehicleColor
 import org.slf4j.LoggerFactory
 import java.awt.EventQueue
 import java.time.ZonedDateTime
-import java.util.concurrent.Callable
-import java.util.concurrent.Executors
-import java.util.concurrent.Future
-import java.util.concurrent.FutureTask
+import java.util.concurrent.*
 import javax.swing.table.AbstractTableModel
 
 /**
  * Im Gegensatz zum DefaultTableModel werden die Daten nicht in einem 2-dimensionalen Vector
  * (Vector dessen Elemente wiederum Vector-Objekte sind) gespeichert,
- * sondern in einer MutableList mit Notice-Objekten.
+ * sondern in einem Cache.
+ * Cache-Einträge werden bei Bedarf asynchron via LoaderThread aus der Datenbank geladen.
  *
  * Einige Methoden sind ähnlich, wie im DefaultTableModel implementiert.
  * Es werden aber nicht alle Funktionen benötigt. Es sind also weniger Methoden implementiert.
@@ -26,18 +26,34 @@ import javax.swing.table.AbstractTableModel
  * todo Prio 3: Sortierung konfigurierbar
  */
 
-class NoticesTableModel : AbstractTableModel() {
+class NoticesTableModel : AbstractTableModel(), NoticesObserver {
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
 
-    //private var noticeEntities: MutableList<NoticeEntity> = mutableListOf<NoticeEntity>()
-    private val noticeIds = mutableListOf<Int>() // = arrayListOf()
+    // Abbildung von Notice-IDs auf Zeilennummern und umgekehrt
+    private val noticeIds = RowNumIdMapDesc<Int>() // = arrayListOf()
 
     /**
-     * Schlüssel sind Zeilennummern der Tabelle beginnend bei 0
+     * Schlüssel sind Notice-IDs.
+     * Ein Cache wird benötig, sonst müsste für jede Zelle (nicht nur jeden Datensatz) die Datenbank abgefragt werden.
      */
-    private val cache = LeastRecentlyUsedCache<Int, Future<NoticeEntity?>>(300)
-    private val executor = Executors.newFixedThreadPool(4)
+    private val cache = LeastRecentlyUsedCache<Int, NoticeEntity>(300)
+
+    private val queue = LinkedBlockingDeque<Int>()
+    private var loader: LoaderThread<Int, NoticeEntity>? = null
     private var databaseRepo: DatabaseRepo? = null
+
+    /**
+     * called by Background/LoaderThread
+     */
+    private fun noticeLoaded(noticeEntity: NoticeEntity) {
+        noticeEntity.id?.let {
+            // Wechsel zu Main/GUI-Thread, da Swing sonst nicht thread save ist
+            EventQueue.invokeLater {
+                val rowIndex = noticeIds.rowNumById(it)
+                fireTableRowsUpdated(rowIndex, rowIndex)
+            }
+        }
+    }
 
     /**
      * sets the database repository and loads IDs of all notices
@@ -45,13 +61,16 @@ class NoticesTableModel : AbstractTableModel() {
     fun setDatabaseRepo(databaseRepo: DatabaseRepo) {
         this.databaseRepo = databaseRepo
         val ids = databaseRepo.findAllNoticesIdsDesc()
-        noticeIds.clear()
-        noticeIds.addAll(ids)
+        noticeIds.replaceAll(ids)
+        loader?.interrupt()
+        loader = LoaderThread(queue, databaseRepo::findNoticeById, cache, ::noticeLoaded)
+        loader?.start()
+        databaseRepo.subscribe(this)
         fireTableDataChanged()
     }
 
     override fun getRowCount(): Int {
-        return noticeIds.size
+        return noticeIds.getSize()
     }
 
     override fun getColumnCount(): Int {
@@ -63,43 +82,21 @@ class NoticesTableModel : AbstractTableModel() {
      * ähnliches Problem beim Löschen. Oder einfach Cache leeren?
      */
     fun getNoticeAt(rowIndex: Int): NoticeEntity {
-        databaseRepo?.let { dbRepo ->
-            log.debug("getNoticeAt(rowIndex=$rowIndex)")
-            val entry = cache[rowIndex]
-            return if (entry == null) { // Initial-Fall: Eintrag nicht im Cache und Laden noch nicht gestartet.
-                val callable = Callable<NoticeEntity?> { dbRepo.findNoticeById(noticeIds[rowIndex]) }
-                val futureTask = object: FutureTask<NoticeEntity?>(callable) {
-                    override fun done() {
-                        EventQueue.invokeLater {
-                            fireTableRowsUpdated(rowIndex, rowIndex)
-                        }
-                    }
-                }
-                executor.execute(futureTask)
-                cache[rowIndex] = futureTask
-                val n = NoticeEntity()
-                n.id = noticeIds[rowIndex]
-                n
-            } else {
-                if (entry.isDone) {
-                    var n = entry.get()
-                    if (n == null) { // Fehler-Fall: Irgendetwas muss beim Laden schiefgelaufen sein.
-                        n = NoticeEntity()
-                        n.id = noticeIds[rowIndex]
-                        n
-                    } else { // Ideal-Fall, Eintrag im Cache und geladen.
-                        n
-                    }
-                } else { // Geduld: Das Laden ist noch im Gange.
-                    val n = NoticeEntity()
-                    n.id = noticeIds[rowIndex]
-                    n
-                }
+        log.debug("getNoticeAt(rowIndex=$rowIndex)")
+        val noticeId = noticeIds.idByRowNum(rowIndex)
+        val noticeEntity = cache[noticeId]
+        return if (noticeEntity == null) {
+            if (noticeId !in queue) {
+                queue.add(noticeId) // enqueue for loading
             }
+            NoticeEntity() // empty notice
+        } else {
+            noticeEntity // cache hit, success :-)
         }
-        val n = NoticeEntity() // empty notice
-        n.id = noticeIds[rowIndex]
-        return n
+    }
+
+    fun addNotice(noticeEntity: NoticeEntity) {
+        log.warn("addNotice(${noticeEntity.id})")
     }
 
     /**
@@ -107,19 +104,15 @@ class NoticesTableModel : AbstractTableModel() {
      * und aktualisiert die View(s).
      * Man könnte statt add/update/delete auch jedes Mal die ganze Tabelle neu aufbauen.
      */
-    fun addNotice(noticeEntity: NoticeEntity) {
-        log.debug("addNotice(${noticeEntity.id})")
+    override fun noticeInserted(noticeEntity: NoticeEntity) {
+        log.debug("noticeInserted(id=${noticeEntity.id})")
         noticeEntity.id?.let { id ->
-            log.debug("add notice #${noticeEntity.id}")
-            //noticeEntities.add(0, noticeEntity)
-            val callable = Callable { noticeEntity } // tut nichts
-            val futureTask = FutureTask(callable)
-            executor.execute(futureTask)
-            cache.transformKeys { it + 1 }
-            cache[0] = futureTask
-            noticeIds.add(0, id)
-            log.debug("fireTableRowsInserted(0, 0)")
-            fireTableRowsInserted(0, 0)
+            EventQueue.invokeLater {
+                cache[id] = noticeEntity
+                noticeIds.push(id)
+                log.debug("fireTableRowsInserted(0, 0)")
+                fireTableRowsInserted(0, 0)
+            }
         }
     }
 
@@ -128,16 +121,28 @@ class NoticesTableModel : AbstractTableModel() {
      * todo: eigentlich wird nur die id benötigt, nicht das ganze Objekt
      */
     fun updateNotice(noticeEntity: NoticeEntity) {
-        log.debug("update notice #${noticeEntity.id}")
-        val rowIndex = noticeIds.indexOf(noticeEntity.id)
-        fireTableRowsUpdated(rowIndex, rowIndex)
+        log.warn("update notice #${noticeEntity.id}")
     }
 
+    // todo Prio 1: replace by noticeUpdated()
     fun updateNoticeSent(noticeID: Int, sentTime: ZonedDateTime) {
-        log.debug("updateNotice(${noticeID})")
-        val rowIndex = noticeIds.indexOf(noticeID)
+        log.warn("updateNotice(${noticeID})")
+        /*
+        val rowIndex = noticeIds.rowNumById(noticeID)
         cache[rowIndex]?.get()?.sentTime = sentTime
         fireTableRowsUpdated(rowIndex, rowIndex)
+        */
+    }
+
+    override fun noticeUpdated(noticeEntity: NoticeEntity) {
+        log.debug("update notice #${noticeEntity.id}")
+        noticeEntity.id?.let { id ->
+            EventQueue.invokeLater {
+                val rowIndex = noticeIds.rowNumById(id)
+                cache[id] = noticeEntity
+                fireTableRowsUpdated(rowIndex, rowIndex)
+            }
+        }
     }
 
     /**
@@ -145,12 +150,18 @@ class NoticesTableModel : AbstractTableModel() {
      * und aktualisiert die View(s)
      */
     fun removeNotice(noticeEntity: NoticeEntity) {
-        log.debug("remove notice #${noticeEntity.id}")
-        val rowIndex = noticeIds.indexOf(noticeEntity.id)
-        noticeIds.removeAt(rowIndex)
-        cache.removeKey(rowIndex)
-        cache.transformKeys (transformation = { it - 1 }, predicate = { it > rowIndex })
-        fireTableRowsDeleted(rowIndex, rowIndex)
+        log.warn("remove notice #${noticeEntity.id}")
+    }
+
+    override fun noticeDeleted(noticeEntity: NoticeEntity) {
+        noticeEntity.id?.let { id ->
+            EventQueue.invokeLater {
+                val rowIndex = noticeIds.rowNumById(id)
+                noticeIds.delete(rowIndex)
+                cache.removeKey(id)
+                fireTableRowsDeleted(rowIndex, rowIndex)
+            }
+        }
     }
 
     override fun getValueAt(rowIndex: Int, columnIndex: Int): Any? {
@@ -158,7 +169,10 @@ class NoticesTableModel : AbstractTableModel() {
         val notice = getNoticeAt(rowIndex)
 
         return when (columnIndex) {
-            0 -> { log.debug("notice.id=${notice.id}"); notice.id }
+            0 -> {
+                log.debug("notice.id=${notice.id}"); notice.id
+            }
+
             1 -> notice.countrySymbol
             2 -> notice.licensePlate
             3 -> notice.vehicleMake
@@ -182,5 +196,4 @@ class NoticesTableModel : AbstractTableModel() {
             "#", "Land", "Kennzeichen", "Marke", "Farbe", "Tatdatum, Uhrzeit", "Erstellt", "Fotos", "Status", "gesendet"
         )
     }
-
 }
