@@ -27,16 +27,13 @@ class NoticesFrame(private val app: WegeFrei) : JFrame("Meldungen - Wege frei!")
 
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
     private val noticesTableModel = NoticesTableModel()
-    private val noticesTable = JTable(noticesTableModel)
+    private val noticesTable = NoticesTable(noticesTableModel) // JTable(noticesTableModel)
 
     init {
         log.debug("init")
+        noticesTable.addMouseListener(NoticesTableMouseListener(app))
 
         // more GUI components
-        noticesTable.selectionModel.selectionMode = ListSelectionModel.SINGLE_SELECTION
-        noticesTable.addMouseListener(NoticesTableMouseListener(app))
-        noticesTable.getColumn("Farbe").cellRenderer = NoticesTableColorCellRenderer()
-        noticesTable.getColumn("Status").cellRenderer = NoticesTableStateCellRenderer()
         val scrollPane = JScrollPane(noticesTable)
         val newButton = JButton("neue Meldung erfassen")
         newButton.addActionListener { app.openNoticeFrame() }
@@ -85,17 +82,6 @@ class NoticesFrame(private val app: WegeFrei) : JFrame("Meldungen - Wege frei!")
         )
         layout = lay
 
-        /*
-        layout = BorderLayout(5,5)
-        background = Styles.FRAME_BACKGROUND
-        noticesTable.background = Styles.NOTICES_TABLE_BACKGROUND
-        noticesTable.foreground = Styles.TEXT_COLOR
-        scrollPanel.add(noticesTable.tableHeader, BorderLayout.NORTH)
-        scrollPanel.add(noticesTable, BorderLayout.CENTER)
-        add(scrollPanel)
-        add(noticesToolBar, BorderLayout.SOUTH)
-        */
-
         minimumSize = Dimension(250, 250)
         setSize(1000, 700)
         defaultCloseOperation = EXIT_ON_CLOSE
@@ -111,28 +97,6 @@ class NoticesFrame(private val app: WegeFrei) : JFrame("Meldungen - Wege frei!")
         //val worker = LoadNoticesWorker(dbRepo, noticesTableModel)
         //worker.execute()
         noticesTableModel.setDatabaseRepo(dbRepo)
-    }
-
-    /**
-     * called, when new notice is saved, added to database
-     */
-    fun noticeAdded(noticeEntity: NoticeEntity) {
-        log.debug("noticeAdded(id=${noticeEntity.id})")
-        noticesTableModel.addNotice(noticeEntity)
-        noticesTable.changeSelection(0, 0, false, false)
-    }
-
-    fun noticeUpdated(noticeEntity: NoticeEntity) {
-        noticesTableModel.updateNotice(noticeEntity)
-    }
-
-    fun noticeUpdatedSent(noticeID: Int, sentTime: ZonedDateTime) {
-        log.debug("noticeSent(id=${noticeID})")
-        noticesTableModel.updateNoticeSent(noticeID, sentTime)
-    }
-
-    fun noticeDeleted(noticeEntity: NoticeEntity) {
-        noticesTableModel.removeNotice(noticeEntity)
     }
 
     companion object {

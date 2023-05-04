@@ -319,32 +319,36 @@ class WegeFrei(private val settingsRepo: SettingsRepo = SettingsFileRepo()) {
     /**
      * called, when new notice is saved, added to database
      */
+    @Deprecated("replaced by observer pattern")
     fun noticeAdded(noticeEntity: NoticeEntity) {
         log.debug("noticeAdded(id=${noticeEntity.id})")
-        noticesFrame?.noticeAdded(noticeEntity)
+        //noticesFrame?.noticeAdded(noticeEntity)
     }
 
     /**
      * called, when existing notice is saved, updated in database
      */
+    @Deprecated("replaced by observer pattern")
     fun noticeUpdated(noticeEntity: NoticeEntity) {
         log.debug("noticeUpdated(id=${noticeEntity.id})")
-        noticesFrame?.noticeUpdated(noticeEntity)
+        //noticesFrame?.noticeUpdated(noticeEntity)
     }
 
     /**
      * called after a notice was sent
      */
+    @Deprecated("replaced by observer pattern")
     fun updateNoticeSent(noticeID: Int, sentTime: ZonedDateTime) {
         log.debug("noticeSent(id=${noticeID})")
-        noticesFrame?.noticeUpdatedSent(noticeID, sentTime)
+        //noticesFrame?.noticeUpdatedSent(noticeID, sentTime)
     }
 
     /**
      * called, when existing notice is deleted
      */
+    @Deprecated("replaced by observer pattern")
     fun noticeDeleted(noticeEntity: NoticeEntity) {
-        noticesFrame?.noticeDeleted(noticeEntity)
+        //noticesFrame?.noticeDeleted(noticeEntity)
     }
 
     private fun changeLookAndFeel() {

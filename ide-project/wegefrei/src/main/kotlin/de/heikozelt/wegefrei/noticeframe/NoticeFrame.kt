@@ -586,11 +586,11 @@ class NoticeFrame(
             if (ne.id == null) {
                 dbRepo.insertNotice(ne)
                 log.debug("added")
-                app.noticeAdded(ne)
+                app.noticeAdded(ne) // change selection
             } else {
                 dbRepo.updateNotice(ne)
                 log.debug("updated")
-                app.noticeUpdated(ne)
+                //app.noticeUpdated(ne)
             }
         }
     }
@@ -605,7 +605,7 @@ class NoticeFrame(
             entity.id?.let { id ->
                 dbRepo.deleteNotice(id)
             }
-            app.noticeDeleted(entity)
+            //app.noticeDeleted(entity) replaced by observer pattern
         }
     }
 

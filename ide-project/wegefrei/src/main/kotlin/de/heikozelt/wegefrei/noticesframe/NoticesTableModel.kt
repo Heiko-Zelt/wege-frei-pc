@@ -42,6 +42,11 @@ class NoticesTableModel : AbstractTableModel(), NoticesObserver {
     private var loader: LoaderThread<Int, NoticeEntity>? = null
     private var databaseRepo: DatabaseRepo? = null
 
+    init {
+        log.debug("init")
+        //log.debug("columnCount: ${getColumnCount()}")
+    }
+
     /**
      * called by Background/LoaderThread
      */
@@ -95,6 +100,7 @@ class NoticesTableModel : AbstractTableModel(), NoticesObserver {
         }
     }
 
+    @Deprecated("replaced by noticeInserted")
     fun addNotice(noticeEntity: NoticeEntity) {
         log.warn("addNotice(${noticeEntity.id})")
     }
@@ -149,6 +155,7 @@ class NoticesTableModel : AbstractTableModel(), NoticesObserver {
      * entfernt eine Meldung
      * und aktualisiert die View(s)
      */
+    @Deprecated("replaced by noticeDeleted")
     fun removeNotice(noticeEntity: NoticeEntity) {
         log.warn("remove notice #${noticeEntity.id}")
     }

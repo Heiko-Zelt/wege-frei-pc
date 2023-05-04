@@ -155,13 +155,16 @@ class CologneWebForm(private val notice: NoticeEntity, private val witness: Witn
             }
 
             // fieldset: Kennzeichen des betroffenen Fahrzeuges
-            // todo Prio 2: Bricht ab, wenn das Kennzeichen nicht dem Format entspricht
+            // Das Kfz-Kennzeichen wird auf Basis des Landeskennzeichens bei lost focus validiert.
+            // Das Landeskennzeichen muss also zuerst ausgewählt werden,
+            // danach kann erst das Kfz-Kennzeichen eingeben werden.
+            // Leider ist im Formular die Reihenfolge umgekehrt.
+            vehicleCountryCodeInputField?.clear()
+            vehicleCountryCodeInputField?.sendKeys(notice.countrySymbol)
             notice.licensePlate?.let {
                 LOG.debug("license plate: ${notice.licensePlate}")
                 vehicleLicensePlateInputField?.sendKeys(convertLicensePlate(it))
             }
-            vehicleCountryCodeInputField?.clear()
-            vehicleCountryCodeInputField?.sendKeys(notice.countrySymbol)
             vehicleTypeSelect?.sendKeys(notice.vehicleType)
             vehicleMakeInputField?.sendKeys(notice.vehicleMake)
             vehicleColorInputField?.sendKeys(notice.color)
