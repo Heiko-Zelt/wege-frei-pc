@@ -18,8 +18,10 @@ class NoticesTableMouseListener(private val app: WegeFrei): MouseAdapter() {
                 val rowIndex = table.selectedRow
                 val model = table.model
                 if(model is NoticesTableModel) {
-                    val notice = model.getNoticeAt(rowIndex)
-                    app.openNoticeFrame(notice)
+                    val notice = model.getNoticeAt(rowIndex) // im Cache?
+                    notice?.let {
+                        app.openNoticeFrame(it)
+                    }
                 } else {
                     log.error("Model ist keine NoticesTableModel")
                 }

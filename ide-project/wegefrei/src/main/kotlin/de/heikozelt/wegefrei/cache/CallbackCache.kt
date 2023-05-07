@@ -64,4 +64,9 @@ class CallbackCache<K, V>(sizeLimit: Int, findFunction: (K) -> (V?), callbackFun
         cache.removeKey(key)
         queue.remove(key)
     }
+
+    // todo is a tread automatically interrupted, if it has no more references pointing on it?
+    fun close() {
+        loader.interrupt()
+    }
 }

@@ -7,7 +7,8 @@ import org.junit.jupiter.api.Test
 class CallbackCacheTest {
 
     /**
-     * very simple mock of a TableModel or ListModel
+     * very simple mock of a TableModel or ListModel.
+     * just logs the calls to the consume method.
      */
     class Consumer {
         val list = mutableListOf<String>()
@@ -47,5 +48,4 @@ class CallbackCacheTest {
         Thread.sleep(1000)
         assertEquals(0, consumer.list.size)
     }
-
 }

@@ -1,5 +1,6 @@
 package de.heikozelt.wegefrei.noticesframe
 
+import de.heikozelt.wegefrei.cache.CallbackCache
 import de.heikozelt.wegefrei.db.DatabaseRepo
 import de.heikozelt.wegefrei.db.NoticesObserver
 import de.heikozelt.wegefrei.db.entities.NoticeEntity
@@ -30,17 +31,16 @@ import javax.swing.table.AbstractTableModel
 class NoticesTableModel : AbstractTableModel(), NoticesObserver {
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
 
-    // Abbildung von Notice-IDs auf Zeilennummern und umgekehrt
+    /**
+     * Abbildung von Notice-IDs auf Zeilennummern und umgekehrt
+     */
     private val noticeIds = RowNumIdMapDesc<Int>() // = arrayListOf()
 
     /**
      * Schlüssel sind Notice-IDs.
      * Ein Cache wird benötig, sonst müsste für jede Zelle (nicht nur jeden Datensatz) die Datenbank abgefragt werden.
      */
-    private val cache = LeastRecentlyUsedCache<Int, NoticeEntity>(300)
-
-    private val queue = LinkedBlockingDeque<Int>()
-    private var loader: LoaderThread<Int, NoticeEntity>? = null
+    private var cache: CallbackCache<Int, NoticeEntity>? = null
     private var databaseRepo: DatabaseRepo? = null
 
     init {
@@ -68,9 +68,8 @@ class NoticesTableModel : AbstractTableModel(), NoticesObserver {
         this.databaseRepo = databaseRepo
         val ids = databaseRepo.findAllNoticesIdsDesc()
         noticeIds.replaceAll(ids)
-        loader?.interrupt()
-        loader = LoaderThread(queue, databaseRepo::findNoticeById, cache, ::noticeLoaded)
-        loader?.start()
+        cache?.close()
+        cache = CallbackCache(300, databaseRepo::findNoticeById, ::noticeLoaded)
         databaseRepo.subscribe(this)
         fireTableDataChanged()
     }
@@ -87,18 +86,10 @@ class NoticesTableModel : AbstractTableModel(), NoticesObserver {
      * todo: im Cache nach Notice.ID speichern statt nach rowIndex oder alle Cache-Einträge anpassen
      * ähnliches Problem beim Löschen. Oder einfach Cache leeren?
      */
-    fun getNoticeAt(rowIndex: Int): NoticeEntity {
+    fun getNoticeAt(rowIndex: Int): NoticeEntity? {
         log.debug("getNoticeAt(rowIndex=$rowIndex)")
         val noticeId = noticeIds.idByRowNum(rowIndex)
-        val noticeEntity = cache[noticeId]
-        return if (noticeEntity == null) {
-            if (noticeId !in queue) {
-                queue.add(noticeId) // enqueue for loading
-            }
-            NoticeEntity() // empty notice
-        } else {
-            noticeEntity // cache hit, success :-)
-        }
+        return cache?.get(noticeId)
     }
 
     @Deprecated("replaced by noticeInserted")
@@ -115,7 +106,7 @@ class NoticesTableModel : AbstractTableModel(), NoticesObserver {
         log.debug("noticeInserted(id=${noticeEntity.id})")
         noticeEntity.id?.let { id ->
             EventQueue.invokeLater {
-                cache[id] = noticeEntity
+                cache?.set(id, noticeEntity)
                 noticeIds.push(id)
                 log.debug("fireTableRowsInserted(0, 0)")
                 fireTableRowsInserted(0, 0)
@@ -128,7 +119,7 @@ class NoticesTableModel : AbstractTableModel(), NoticesObserver {
         noticeEntity.id?.let { id ->
             EventQueue.invokeLater {
                 val rowIndex = noticeIds.rowNumById(id)
-                cache[id] = noticeEntity
+                cache?.set(id, noticeEntity)
                 fireTableRowsUpdated(rowIndex, rowIndex)
             }
         }
@@ -148,7 +139,7 @@ class NoticesTableModel : AbstractTableModel(), NoticesObserver {
             EventQueue.invokeLater {
                 val rowIndex = noticeIds.rowNumById(id)
                 noticeIds.delete(rowIndex)
-                cache.removeKey(id)
+                cache?.removeKey(id)
                 fireTableRowsDeleted(rowIndex, rowIndex)
             }
         }
@@ -157,22 +148,25 @@ class NoticesTableModel : AbstractTableModel(), NoticesObserver {
     override fun getValueAt(rowIndex: Int, columnIndex: Int): Any? {
         log.debug("getValueAt(rowIndex=$rowIndex, columnIndex=$columnIndex)")
         val notice = getNoticeAt(rowIndex)
-
-        return when (columnIndex) {
-            0 -> {
-                log.debug("notice.id=${notice.id}"); notice.id
+        return if(notice == null) {
+            null
+        } else {
+            when (columnIndex) {
+                0 -> {
+                    log.debug("notice.id=${notice.id}")
+                    notice.id
+                }
+                1 -> notice.countrySymbol
+                2 -> notice.licensePlate
+                3 -> notice.vehicleMake
+                4 -> VehicleColor.fromColorName(notice.color)
+                6 -> notice.getObservationTimeFormatted()
+                5 -> notice.getCreatedTimeFormatted()
+                7 -> notice.photoEntities.size
+                8 -> notice.getState()
+                9 -> notice.getSentTimeFormatted()
+                else -> throw IndexOutOfBoundsException()
             }
-
-            1 -> notice.countrySymbol
-            2 -> notice.licensePlate
-            3 -> notice.vehicleMake
-            4 -> VehicleColor.fromColorName(notice.color)
-            6 -> notice.getObservationTimeFormatted()
-            5 -> notice.getCreatedTimeFormatted()
-            7 -> notice.photoEntities.size
-            8 -> notice.getState()
-            9 -> notice.getSentTimeFormatted()
-            else -> throw IndexOutOfBoundsException()
         }
     }
 
