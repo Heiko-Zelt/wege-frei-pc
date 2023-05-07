@@ -11,10 +11,13 @@ import de.heikozelt.wegefrei.model.Photo
 import de.heikozelt.wegefrei.model.SelectedPhotosListDataEvent
 import de.heikozelt.wegefrei.model.SelectedPhotosListModel
 import de.heikozelt.wegefrei.model.VehicleColor
+import de.heikozelt.wegefrei.noticesframe.NoticesFrame
 import org.jxmapviewer.viewer.TileFactory
 import org.slf4j.LoggerFactory
+import java.awt.Desktop
 import java.awt.event.FocusAdapter
 import java.awt.event.FocusEvent
+import java.net.URI
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -55,6 +58,7 @@ class NoticeFormFields(
     private val colorComboBox = JComboBox(VehicleColor.COLORS)
     private val vehicleTypeComboBox = VehicleTypeComboBox()
     private val miniMap = MiniMap(noticeFrame, selectedPhotosListModel, tileFactory)
+    private val externalMapButton = JButton("in Falschparker-Karte öffnen")
     private var streetTextField = TrimmingTextField(30)
     private var zipCodeTextField = TrimmingTextField(5)
     private var townTextField = TrimmingTextField(30)
@@ -118,6 +122,14 @@ class NoticeFormFields(
         colorComboBox.maximumRowCount = VehicleColor.COLORS.size
         miniMap.toolTipText = "Bitte positionieren Sie den roten Pin."
         val coordinatesLabel = JLabel("Koordinaten:")
+        externalMapButton.addActionListener {
+            val desktop: Desktop? = Desktop.getDesktop()
+            val position = noticeFrame.getOffensePosition()
+            position?.let {
+                val uri = URI("https://wege-frei.heikozelt.de/?x=${position.longitude}&y=${position.latitude}&z=19")
+                desktop?.browse(uri)
+            }
+        }
         val streetLabel = JLabel("<html>Straße & Hausnummer:<sup>(*)</sup></html>")
         streetTextField.toolTipText = "z.B. Taunusstraße 7"
         val zipCodeTownLabel = JLabel("<html>PLZ:<sup>(*)</sup>, Ort:<sup>(*)</sup></html>")
@@ -252,7 +264,11 @@ class NoticeFormFields(
                                         .addComponent(colorComboBox)
                                 )
                                 .addComponent(vehicleTypeComboBox)
-                                .addComponent(miniMap)
+                                .addGroup(
+                                    lay.createSequentialGroup()
+                                        .addComponent(miniMap)
+                                        .addComponent(externalMapButton)
+                                )
                                 .addComponent(streetTextField)
                                 .addGroup(
                                     lay.createSequentialGroup()
@@ -326,7 +342,7 @@ class NoticeFormFields(
                 )
                 .addGroup(
                     lay.createParallelGroup(GroupLayout.Alignment.CENTER)
-                        .addComponent(coordinatesLabel).addComponent(miniMap)
+                        .addComponent(coordinatesLabel).addComponent(miniMap).addComponent(externalMapButton)
                 )
                 .addGroup(
                     lay.createParallelGroup(GroupLayout.Alignment.CENTER)

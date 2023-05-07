@@ -430,6 +430,10 @@ class NoticeFrame(
         maybeFindAddress()
     }
 
+    fun getOffensePosition(): GeoPosition? {
+        return offensePosition
+    }
+
 
 /////////////////////////////////////////////
 
