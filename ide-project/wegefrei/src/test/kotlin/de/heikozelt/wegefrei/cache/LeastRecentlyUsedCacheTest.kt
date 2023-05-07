@@ -1,5 +1,6 @@
-package de.heikozelt.wegefrei.model
+package de.heikozelt.wegefrei.cache
 
+import de.heikozelt.wegefrei.cache.LeastRecentlyUsedCache
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test

@@ -1,6 +1,5 @@
-package de.heikozelt.wegefrei.noticesframe
+package de.heikozelt.wegefrei.cache
 
-import de.heikozelt.wegefrei.model.LeastRecentlyUsedCache
 import java.util.concurrent.LinkedBlockingDeque
 
 /**

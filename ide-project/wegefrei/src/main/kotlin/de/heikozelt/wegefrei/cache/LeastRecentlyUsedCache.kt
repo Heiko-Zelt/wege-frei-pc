@@ -1,4 +1,4 @@
-package de.heikozelt.wegefrei.model
+package de.heikozelt.wegefrei.cache
 
 import org.slf4j.LoggerFactory
 

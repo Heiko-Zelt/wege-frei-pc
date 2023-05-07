@@ -2,6 +2,7 @@ package de.heikozelt.wegefrei.noticeframe
 
 import de.heikozelt.wegefrei.db.DatabaseRepo
 import de.heikozelt.wegefrei.WegeFrei
+import de.heikozelt.wegefrei.cache.LeastRecentlyUsedCache
 import de.heikozelt.wegefrei.delivery.webform.WebFormWorkflow
 import de.heikozelt.wegefrei.delivery.webform.cologne.CologneWebForm
 import de.heikozelt.wegefrei.email.useragent.EmailMessageDialog

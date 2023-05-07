@@ -3,7 +3,8 @@ package de.heikozelt.wegefrei.noticesframe
 import de.heikozelt.wegefrei.db.DatabaseRepo
 import de.heikozelt.wegefrei.db.NoticesObserver
 import de.heikozelt.wegefrei.db.entities.NoticeEntity
-import de.heikozelt.wegefrei.model.LeastRecentlyUsedCache
+import de.heikozelt.wegefrei.cache.LeastRecentlyUsedCache
+import de.heikozelt.wegefrei.cache.LoaderThread
 import de.heikozelt.wegefrei.model.RowNumIdMapDesc
 import de.heikozelt.wegefrei.model.VehicleColor
 import org.slf4j.LoggerFactory
@@ -120,24 +121,6 @@ class NoticesTableModel : AbstractTableModel(), NoticesObserver {
                 fireTableRowsInserted(0, 0)
             }
         }
-    }
-
-    /**
-     * aktualisiert die View(s) nach Änderungen
-     * todo: eigentlich wird nur die id benötigt, nicht das ganze Objekt
-     */
-    fun updateNotice(noticeEntity: NoticeEntity) {
-        log.warn("update notice #${noticeEntity.id}")
-    }
-
-    // todo Prio 1: replace by noticeUpdated()
-    fun updateNoticeSent(noticeID: Int, sentTime: ZonedDateTime) {
-        log.warn("updateNotice(${noticeID})")
-        /*
-        val rowIndex = noticeIds.rowNumById(noticeID)
-        cache[rowIndex]?.get()?.sentTime = sentTime
-        fireTableRowsUpdated(rowIndex, rowIndex)
-        */
     }
 
     override fun noticeUpdated(noticeEntity: NoticeEntity) {

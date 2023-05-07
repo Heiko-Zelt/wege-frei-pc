@@ -1,5 +1,6 @@
 package de.heikozelt.wegefrei.noticeframe
 
+import de.heikozelt.wegefrei.cache.LeastRecentlyUsedCache
 import de.heikozelt.wegefrei.db.DatabaseRepo
 import de.heikozelt.wegefrei.dirnavi.AbsolutePath
 import de.heikozelt.wegefrei.dirnavi.DirectoryNavigation

@@ -1,6 +1,7 @@
 package de.heikozelt.wegefrei.model
 
 import de.heikozelt.wegefrei.ImageFilenameFilter
+import de.heikozelt.wegefrei.cache.LeastRecentlyUsedCache
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.lang.Math.min
