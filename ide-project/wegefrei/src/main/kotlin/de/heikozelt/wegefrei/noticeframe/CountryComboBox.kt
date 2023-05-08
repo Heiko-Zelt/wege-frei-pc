@@ -16,6 +16,27 @@ class CountryComboBox: JComboBox<CountrySymbol?>() {
     private val log = LoggerFactory.getLogger(this::class.java.canonicalName)
     private val mod = CountryComboBoxModel()
 
+    init {
+        val keyListener = object: KeyAdapter() {
+            override fun keyReleased(e: KeyEvent?) {
+                log.debug("keyReleased()")
+                mod.setFilter(getEditorText())
+                hidePopup()
+                showPopup()
+            }
+        }
+
+        model = mod
+        setRenderer(CountryListCellRenderer())
+        setEditable(true)
+        maximumRowCount = 15
+        val editComp = editor.editorComponent
+        if(editComp is JTextComponent) {
+            log.debug("editorComponent is JTextComponent")
+            editComp.addKeyListener(keyListener)
+        }
+    }
+
     fun getEditorText(): String {
         editor.editorComponent?.let { comp ->
             if (comp is JTextComponent) {
@@ -76,27 +97,6 @@ class CountryComboBox: JComboBox<CountrySymbol?>() {
             } else {
                 selectedItem = countrySymbol
             }
-        }
-    }
-
-    init {
-        val keyListener = object: KeyAdapter() {
-            override fun keyReleased(e: KeyEvent?) {
-                log.debug("keyReleased()")
-                mod.setFilter(getEditorText())
-                hidePopup()
-                showPopup()
-            }
-        }
-
-        model = mod
-        setRenderer(CountryListCellRenderer())
-        setEditable(true)
-        maximumRowCount = 15
-        val editComp = editor.editorComponent
-        if(editComp is JTextComponent) {
-            log.debug("editorComponent is JTextComponent")
-            editComp.addKeyListener(keyListener)
         }
     }
 }

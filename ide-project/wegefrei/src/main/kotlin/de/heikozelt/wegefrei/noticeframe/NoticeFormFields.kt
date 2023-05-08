@@ -11,13 +11,10 @@ import de.heikozelt.wegefrei.model.Photo
 import de.heikozelt.wegefrei.model.SelectedPhotosListDataEvent
 import de.heikozelt.wegefrei.model.SelectedPhotosListModel
 import de.heikozelt.wegefrei.model.VehicleColor
-import de.heikozelt.wegefrei.noticesframe.NoticesFrame
 import org.jxmapviewer.viewer.TileFactory
 import org.slf4j.LoggerFactory
-import java.awt.Desktop
 import java.awt.event.FocusAdapter
 import java.awt.event.FocusEvent
-import java.net.URI
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -58,7 +55,7 @@ class NoticeFormFields(
     private val colorComboBox = JComboBox(VehicleColor.COLORS)
     private val vehicleTypeComboBox = VehicleTypeComboBox()
     private val miniMap = MiniMap(noticeFrame, selectedPhotosListModel, tileFactory)
-    private val externalMapButton = JButton("in Falschparker-Karte öffnen")
+    private val externalMapComboBox = ExternalMapComboBox(noticeFrame)
     private var streetTextField = TrimmingTextField(30)
     private var zipCodeTextField = TrimmingTextField(5)
     private var townTextField = TrimmingTextField(30)
@@ -122,14 +119,7 @@ class NoticeFormFields(
         colorComboBox.maximumRowCount = VehicleColor.COLORS.size
         miniMap.toolTipText = "Bitte positionieren Sie den roten Pin."
         val coordinatesLabel = JLabel("Koordinaten:")
-        externalMapButton.addActionListener {
-            val desktop: Desktop? = Desktop.getDesktop()
-            val position = noticeFrame.getOffensePosition()
-            position?.let {
-                val uri = URI("https://wege-frei.heikozelt.de/?x=${position.longitude}&y=${position.latitude}&z=19")
-                desktop?.browse(uri)
-            }
-        }
+
         val streetLabel = JLabel("<html>Straße & Hausnummer:<sup>(*)</sup></html>")
         streetTextField.toolTipText = "z.B. Taunusstraße 7"
         val zipCodeTownLabel = JLabel("<html>PLZ:<sup>(*)</sup>, Ort:<sup>(*)</sup></html>")
@@ -267,7 +257,7 @@ class NoticeFormFields(
                                 .addGroup(
                                     lay.createSequentialGroup()
                                         .addComponent(miniMap)
-                                        .addComponent(externalMapButton)
+                                        .addComponent(externalMapComboBox)
                                 )
                                 .addComponent(streetTextField)
                                 .addGroup(
@@ -342,7 +332,7 @@ class NoticeFormFields(
                 )
                 .addGroup(
                     lay.createParallelGroup(GroupLayout.Alignment.CENTER)
-                        .addComponent(coordinatesLabel).addComponent(miniMap).addComponent(externalMapButton)
+                        .addComponent(coordinatesLabel).addComponent(miniMap).addComponent(externalMapComboBox)
                 )
                 .addGroup(
                     lay.createParallelGroup(GroupLayout.Alignment.CENTER)
@@ -571,76 +561,6 @@ class NoticeFormFields(
         // Lösung: Beide müssen ausgefüllt sein oder keins. Nur zusammen speichern oder gar nicht.
         // Ähnlich wie Längengrad und Breitengrad. Diese müssen auch zusammen oder gar nicht gespeichert werden.
 
-        /*
-        val format = DateTimeFormatter.ofPattern("d.M.yyyy")
-        val obsDateTxt = observationDateTextField.text
-        val obsTimeTxt = observationTimeTextField.text
-        if (obsTimeTxt.isBlank() && obsDateTxt.isNotBlank()) {
-            errors.add("Beobachtungsdatum angegeben, aber keine Uhrzeit.")
-        }
-        if (obsTimeTxt.isNotBlank() && obsDateTxt.isBlank()) {
-            errors.add("Beobachtungsuhrzeit angegeben, aber kein Datum.")
-        }
-        var obsDat: LocalDate? = null
-        if (obsDateTxt.isNotBlank()) {
-            try {
-                obsDat = LocalDate.parse(obsDateTxt, format)
-            } catch (ex: DateTimeParseException) {
-                errors.add("Beobachtungsdatum muss im Format Tag.Monat.Jahr angegeben sein.")
-            }
-        }
-        var obsTim: LocalTime? = null
-        if (obsTimeTxt.isNotBlank()) {
-            try {
-                val tFormat = DateTimeFormatter.ofPattern("H:m:s")
-                obsTim = LocalTime.parse(obsTimeTxt, tFormat)
-            } catch (ex: DateTimeParseException) {
-                errors.add("Uhrzeit muss im Format Stunde:Minute:Sekunden angegeben sein.")
-            }
-        }
-        n.observationTime = if (obsDat == null || obsTim == null) {
-            null
-        } else {
-            ZonedDateTime.of(obsDat, obsTim, ZoneId.systemDefault())
-        }
-
-        var endDateTxt = endDateTextField.text
-        val endTimeTxt = endTimeTextField.text
-        if (endTimeTxt.isBlank() && endDateTxt.isNotBlank()) {
-            errors.add("Enddatum angegeben, aber keine Uhrzeit.")
-        }
-        log.debug("endTimeTxt: $endTimeTxt")
-        if (endTimeTxt.isNotBlank() && endDateTxt.isBlank()) {
-            endDateTxt = obsTimeTxt
-        }
-        var endDat: LocalDate? = null
-        if (endDateTxt.isNotBlank()) {
-            try {
-                endDat = LocalDate.parse(endDateTxt, format)
-            } catch (ex: DateTimeParseException) {
-                errors.add("Enddatum muss im Format Tag.Monat.Jahr angegeben sein.")
-            }
-        }
-        var endTim: LocalTime? = null
-        if (endTimeTxt.isNotBlank()) {
-            try {
-                val tFormat = DateTimeFormatter.ofPattern("H:m:s")
-                endTim = LocalTime.parse(endTimeTxt, tFormat)
-            } catch (ex: DateTimeParseException) {
-                errors.add("Enduhrzeit muss im Format Stunde:Minute:Sekunden angegeben sein.")
-            }
-        }
-        n.endTime = if (endDat == null || endTim == null) {
-            null
-        } else {
-            ZonedDateTime.of(endDat, endTim, ZoneId.systemDefault())
-        }
-        log.debug("observationTime: ${n.observationTime}")
-        log.debug("endTime: ${n.endTime}")
-
-        //n.duration = intOrNull(durationTextField.text)
-
-         */
         n.obstruction = obstructionCheckBox.isSelected
         n.endangering = endangeringCheckBox.isSelected
         n.environmentalStickerMissing = environmentalStickerCheckBox.isSelected
