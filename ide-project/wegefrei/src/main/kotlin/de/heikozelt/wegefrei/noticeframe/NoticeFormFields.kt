@@ -197,6 +197,8 @@ class NoticeFormFields(
         inspectionYearTextField.isVisible = false
 
         val deliveryTypeLabel = JLabel("<html>Zustellung:<sup>*</sup></html>")
+        emailDeliveryRadioButton.toolTipText = "Standard"
+        webFormDeliveryRadioButton.toolTipText = "in Köln"
         deliveryTypeGroup.add(emailDeliveryRadioButton)
         deliveryTypeGroup.add(webFormDeliveryRadioButton)
         emailDeliveryRadioButton.addChangeListener {
