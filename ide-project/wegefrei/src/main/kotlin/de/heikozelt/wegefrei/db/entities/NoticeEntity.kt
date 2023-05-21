@@ -17,6 +17,15 @@ import java.util.*
 
 @Entity
 @Table(name = "NOTICES")
+@NamedQuery(name = "NoticeEntity.findNoticeById", query="SELECT n FROM NoticeEntity n LEFT JOIN FETCH n.photoEntities WHERE n.id = ?1")
+@NamedQuery(name = "NoticeEntity.findNextNoticeToSend", query="""
+    SELECT n FROM NoticeEntity n LEFT JOIN FETCH n.photoEntities
+    WHERE n.deliveryType = 'E'
+    AND n.finalizedTime <> null
+    AND n.sentTime = null
+    ORDER BY n.sendFailures, n.finalizedTime""")
+@NamedQuery(name = "NoticeEntity.findAllNoticesDesc", query = "SELECT n FROM NoticeEntity n ORDER BY n.id DESC")
+@NamedQuery(name = "Int.findAllNoticesIdsDesc", query = "SELECT n.id FROM NoticeEntity n ORDER BY n.id DESC")
 // todo Prio 3: two constructors instead of default values
 // todo Prio 3: weitere Umstände: Kfz-Kennzeichen fehlt, HU-Plakette fehlt
 /**

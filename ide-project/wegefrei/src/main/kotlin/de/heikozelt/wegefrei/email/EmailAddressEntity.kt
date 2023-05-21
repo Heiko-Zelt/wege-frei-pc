@@ -1,9 +1,6 @@
 package de.heikozelt.wegefrei.email
 
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.Id
-import jakarta.persistence.Table
+import jakarta.persistence.*
 import javax.mail.internet.InternetAddress
 
 /**
@@ -11,6 +8,7 @@ import javax.mail.internet.InternetAddress
  */
 @Entity
 @Table(name = "EMAIL_ADDRESSES")
+@NamedQuery(name = "EmailAddressEntity.findAllEmailAddresses", query="SELECT e FROM EmailAddressEntity e ORDER BY e.address")
 class EmailAddressEntity(
     @Id
     val address: String = "",

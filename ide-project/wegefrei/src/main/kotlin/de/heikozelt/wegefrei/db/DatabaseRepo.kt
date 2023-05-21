@@ -54,8 +54,9 @@ class DatabaseRepo(jdbcUrl: String) {
         log.debug("session: $session")
         val tx = session.beginTransaction()
         try {
-            val jpql = "SELECT p FROM PhotoEntity p LEFT JOIN FETCH p.noticeEntities WHERE p.path = ?1"
-            val qry = session.createQuery(jpql, PhotoEntity::class.java)
+            //val jpql = "SELECT p FROM PhotoEntity p LEFT JOIN FETCH p.noticeEntities WHERE p.path = ?1"
+            //val qry = session.createQuery(jpql, PhotoEntity::class.java)
+            val qry = session.createNamedQuery("PhotoEntity.findPhotoByPath", PhotoEntity::class.java)
             qry.setParameter(1, path)
             photoEntity = qry.singleResultOrNull
             //photoEntity = session.find(PhotoEntity::class.java, path)
@@ -81,8 +82,9 @@ class DatabaseRepo(jdbcUrl: String) {
             noticeEntity = session.find(NoticeEntity::class.java, id)
             log.debug("not so lazy: ${noticeEntity?.photoEntities?.size}")
              */
-            val jpql = "SELECT n FROM NoticeEntity n LEFT JOIN FETCH n.photoEntities WHERE n.id = ?1"
-            val qry = session.createQuery(jpql, NoticeEntity::class.java)
+            //val jpql = "SELECT n FROM NoticeEntity n LEFT JOIN FETCH n.photoEntities WHERE n.id = ?1"
+            //val qry = session.createQuery(jpql, NoticeEntity::class.java)
+            val qry = session.createNamedQuery("NoticeEntity.findNoticeById", NoticeEntity::class.java)
             qry.setParameter(1, id)
             noticeEntity = qry.singleResultOrNull
             tx.commit()
@@ -110,6 +112,8 @@ class DatabaseRepo(jdbcUrl: String) {
         val session = sessionFactory.openSession()
         val tx = session.beginTransaction()
         try {
+
+            /*
             val jpql = """
                 SELECT n FROM NoticeEntity n LEFT JOIN FETCH n.photoEntities
                   WHERE n.deliveryType = 'E'
@@ -117,6 +121,8 @@ class DatabaseRepo(jdbcUrl: String) {
                   AND n.sentTime = null
                   ORDER BY n.sendFailures, n.finalizedTime""".trimIndent()
             val qry = session.createQuery(jpql, NoticeEntity::class.java)
+            */
+            val qry = session.createNamedQuery("NoticeEntity.findNextNoticeToSend", NoticeEntity::class.java)
 
             /*
             throws exception
@@ -156,8 +162,10 @@ class DatabaseRepo(jdbcUrl: String) {
         log.debug("session: $session")
         val tx = session.beginTransaction()
         try {
-            val jpql = "SELECT n FROM NoticeEntity n ORDER BY n.id DESC"
-            resultList = session.createQuery(jpql, NoticeEntity::class.java).resultList
+            //val jpql = "SELECT n FROM NoticeEntity n ORDER BY n.id DESC"
+            //resultList = session.createQuery(jpql, NoticeEntity::class.java).resultList
+            val qry = session.createNamedQuery("NoticeEntity.findAllNoticesDesc", NoticeEntity::class.java)
+            resultList = qry.resultList
             tx.commit()
         } finally {
             if (tx.isActive) tx.rollback()
@@ -175,8 +183,10 @@ class DatabaseRepo(jdbcUrl: String) {
         log.debug("session: $session")
         val tx = session.beginTransaction()
         try {
-            val jpql = "SELECT n.id FROM NoticeEntity n ORDER BY n.id DESC"
-            resultList = session.createQuery(jpql, Int::class.java).resultList
+            //val jpql = "SELECT n.id FROM NoticeEntity n ORDER BY n.id DESC"
+            //resultList = session.createQuery(jpql, Int::class.java).resultList
+            val qry = session.createNamedQuery("Int.findAllNoticesIdsDesc", Int::class.java)
+            resultList = qry.resultList
             tx.commit()
         } finally {
             if (tx.isActive) tx.rollback()
@@ -194,8 +204,10 @@ class DatabaseRepo(jdbcUrl: String) {
         log.debug("session: $session")
         val tx = session.beginTransaction()
         try {
-            val jpql = "SELECT e FROM EmailAddressEntity e ORDER BY e.address"
-            resultList = session.createQuery(jpql, EmailAddressEntity::class.java).resultList
+            //val jpql = "SELECT e FROM EmailAddressEntity e ORDER BY e.address"
+            //resultList = session.createQuery(jpql, EmailAddressEntity::class.java).resultList
+            val qry = session.createNamedQuery("EmailAddressEntity.findAllEmailAddresses", EmailAddressEntity::class.java)
+            resultList = qry.resultList
             tx.commit()
         } finally {
             if (tx.isActive) tx.rollback()

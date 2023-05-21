@@ -22,6 +22,7 @@ import kotlin.jvm.Transient
 
 @Entity
 @Table(name = "PHOTOS")
+@NamedQuery(name = "PhotoEntity.findPhotoByPath", query="SELECT p FROM PhotoEntity p LEFT JOIN FETCH p.noticeEntities WHERE p.path = ?1")
 // todo Prio 3: two constructors instead of default values
 /**
  * Strategie: nur von den Fotos, die Metadaten in der Datenbank speichern,
