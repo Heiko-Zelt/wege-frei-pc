@@ -1,0 +1,46 @@
+plugins {
+    id 'org.jetbrains.kotlin.jvm' version '1.8.22'
+    id 'application'
+    id 'org.liquibase.gradle' version '2.2.0'
+}
+
+group = 'de.heikozelt.liquibase'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.liquibase:liquibase-core:4.22.0'
+    implementation 'com.h2database:h2:2.1.214'
+    implementation 'org.slf4j:slf4j-simple:2.0.7'
+    implementation 'org.slf4j:jul-to-slf4j:2.0.7'
+    testImplementation 'org.jetbrains.kotlin:kotlin-test'
+    liquibaseRuntime 'org.liquibase:liquibase-core:4.2.2'
+    liquibaseRuntime 'com.h2database:h2:2.1.214'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+kotlin {
+    jvmToolchain(8)
+}
+
+application {
+    mainClassName = 'de.heikozelt.liquibase.MainKt'
+}
+
+liquibase {
+    activities {
+        main {
+            changelogFile 'src/main/resources/database_changelog.xml'
+            url "jdbc:h2:file:~/liquibase_test"
+            username "wegefrei"
+            password ""
+            logLevel "debug"
+        }
+    }
+}

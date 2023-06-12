@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- xmlns:pro="http://www.liquibase.org/xml/ns/pro" -->
+<!-- http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd -->
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+    <changeSet id="1" author="Heiko Zelt">
+        <!-- Wählt H2 die Namen von Constraints selber? -->
+        <!-- names of primary keys are randomly chosen: PRIMARY_KEY_ + random suffix -->
+        <!-- names of unique indexes are randomly chosen: uniqueConstraintName + random suffix -->
+        <!-- names of foreign key indexes are randomly chosen: foreignKeyName + random suffix -->
+        <!-- Das Suffix wird aber bei anschließendem DROP nicht berücksichtigt. :-) -->
+
+        <createTable tableName="EMAIL_ADDRESSES">
+            <column name="ADDRESS" type="CHARACTER VARYING(255)" >
+                <constraints primaryKey="true" primaryKeyName="PK_EMAIL_ADDRESSES_ADDRESS"/>
+            </column>
+            <column name="NAME" type="CHARACTER VARYING(255)">
+                <constraints unique="true" uniqueConstraintName="UNIQUE_EMAIL_ADDRESSES_NAME"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="PHOTOS">
+            <column name="PATH" type="CHARACTER VARYING(512)">
+                <constraints primaryKey="true" primaryKeyName="PK_PHOTOS_PATH"/>
+            </column>
+            <column name="DATETIME" type="TIMESTAMP(6)"/>
+            <column name="HASH" type="BINARY(20)"/>
+            <column name="LATITUDE" type="FLOAT(53)"/>
+            <column name="LONGITUDE" type="FLOAT(53)"/>
+        </createTable>
+
+        <createTable tableName="NOTICES">
+            <column name="ID" type="INTEGER">
+                <constraints primaryKey="true" primaryKeyName="PK_NOTICES_ID"/>
+            </column>
+            <column name="COLOR" type="CHARACTER VARYING(255)" />
+            <column name="COUNTRYSYMBOL" type="CHARACTER VARYING(3)" />
+            <column name="LICENSEPLATE" type="CHARACTER VARYING(255)" />
+            <column name="LOCATIONDESCRIPTION" type="CHARACTER VARYING(255)" />
+            <column name="NOTE" type="CHARACTER VARYING(255)" />
+            <column name="OFFENSE" type="CHARACTER VARYING(255)" />
+            <column name="QUARTER" type="CHARACTER VARYING(255)" />
+            <column name="RECIPIENTEMAILADDRESS" type="CHARACTER VARYING(255)" />
+            <column name="RECIPIENTNAME" type="CHARACTER VARYING(255)" />
+            <column name="STREET" type="CHARACTER VARYING(255)" />
+            <column name="TOWN" type="CHARACTER VARYING(255)" />
+            <column name="VEHICLEMAKE" type="CHARACTER VARYING(255)" />
+            <column name="VEHICLETYPE" type="CHARACTER VARYING(255)" />
+            <column name="ZIPCODE" type="CHARACTER VARYING(255)" />
+
+            <column name="OBSERVATIONTIME" type="TIMESTAMP(6)" />
+            <column name="ENDTIME" type="TIMESTAMP(6)" />
+            <column name="CREATEDTIME" type="TIMESTAMP(6)" />
+            <column name="FINALIZEDTIME" type="TIMESTAMP(6)" />
+            <column name="SENTTIME" type="TIMESTAMP(6)" />
+
+            <column name="LATITUDE" type="FLOAT(53)" />
+            <column name="LONGITUDE" type="FLOAT(53)" />
+
+            <column name="ENDANGERING" type="BOOLEAN" />
+            <column name="ENVIRONMENTALSTICKERMISS" type="BOOLEAN" />
+            <column name="OBSTRUCTION" type="BOOLEAN" />
+            <column name="VEHICLEABANDONED" type="BOOLEAN" />
+            <column name="VEHICLEINSPECTIONEXPIRED" type="BOOLEAN" />
+            <column name="WARNINGLIGHTS" type="BOOLEAN" />
+
+            <column name="VEHICLEINSPECTIONMONTH" type="TINYINT" />
+            <column name="VEHICLEINSPECTIONYEAR" type="SMALLINT" />
+            <column name="MESSAGEID" type="BINARY(20)" />
+            <column name="SENDFAILURES" type="INTEGER" />
+            <column name="DELIVERYTYPE" type="CHARACTER(1)" />
+        </createTable>
+
+        <createTable tableName="NOTICES_PHOTOS">
+            <column name="NOTICE_ID" type="INTEGER">
+               <constraints nullable="false" foreignKeyName="FK_NOTICES_ID" references="NOTICES(ID)"/>
+            </column>
+            <column name="PHOTO_PATH" type="CHARACTER VARYING(512)">
+                <constraints nullable="false" foreignKeyName="FK_PHOTOS_PATH" references="PHOTOS(PATH)"/>
+            </column>
+        </createTable>
+        <addPrimaryKey tableName="NOTICES_PHOTOS" columnNames="NOTICE_ID,PHOTO_PATH" constraintName="PK_NOTICES_PHOTOS"/>
+
+        <!--insert tableName="PHOTOS">
+            <column name="PATH"  value="/hallo/welt"/>
+        </insert-->
+    </changeSet>
+
+    <!-- changeSet id="2" author="Heiko Zelt">
+        <dropPrimaryKey tableName="EMAIL_ADDRESSES" />
+        <dropForeignKeyConstraint baseTableName="NOTICES_PHOTOS" constraintName="FK_PHOTOS_PATH" />
+        <dropUniqueConstraint tableName="EMAIL_ADDRESSES" uniqueColumns="NAME" constraintName="UNIQUE_EMAIL_ADDRESSES_NAME" />
+    </changeSet -->
+</databaseChangeLog>
