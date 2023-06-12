@@ -5,8 +5,10 @@ import liquibase.LabelExpression
 import liquibase.Liquibase
 import liquibase.Scope
 import liquibase.changelog.ChangeLogParameters
+import liquibase.changelog.visitor.DefaultChangeExecListener
 import liquibase.command.CommandScope
 import liquibase.command.core.UpdateCommandStep
+import liquibase.command.core.UpdateSqlCommandStep
 import liquibase.command.core.helpers.DbUrlConnectionCommandStep
 import liquibase.database.DatabaseFactory
 import liquibase.database.jvm.JdbcConnection
@@ -36,7 +38,7 @@ fun main(args: Array<String>) {
 fun openConnection(): Connection {
     val jdbcUrl = "jdbc:h2:file:~/liquibase_test;TRACE_LEVEL_FILE=4"
     val username = "wegefrei"
-    val password = "wegefrei"
+    val password = ""
     return DriverManager.getConnection(jdbcUrl, username, password)
 }
 
@@ -51,6 +53,24 @@ fun updateDatabaseSchema(conn: Connection) {
             log.info("safe? ${liquibase.isSafeToRunUpdate}")
             log.info("auto commit? ${conn.autoCommit}")
             liquibase.validate()
+
+            liquibase.listUnrunChangeSets(null, null);
+
+            val updateSqlCommand = CommandScope(*UpdateSqlCommandStep.COMMAND_NAME).apply {
+                addArgumentValue(DbUrlConnectionCommandStep.DATABASE_ARG, database)
+                addArgumentValue(UpdateCommandStep.CHANGELOG_FILE_ARG, "database_changelog.xml")
+                addArgumentValue(UpdateCommandStep.CONTEXTS_ARG, Contexts().toString())
+                addArgumentValue(UpdateCommandStep.LABEL_FILTER_ARG, LabelExpression().originalString)
+                addArgumentValue(DatabaseChangelogCommandStep.CHANGELOG_PARAMETERS, ChangeLogParameters(database))
+            }
+            val results = updateSqlCommand.execute()
+            log.info("RESULTS: $results")
+            results.results.values.forEach { result ->
+                log.info("result: $result")
+                if(result is DefaultChangeExecListener) {
+                    log.info("deployedChangeSets: ${result.deployedChangeSets}")
+                }
+            }
 
             val updateCommand = CommandScope(*UpdateCommandStep.COMMAND_NAME).apply {
                 addArgumentValue(DbUrlConnectionCommandStep.DATABASE_ARG, database)
